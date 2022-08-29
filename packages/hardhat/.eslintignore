@@ -1,6 +1,12 @@
-.husky
+!.*.js
+!.*.ts
+!.*.json
+!.vscode
+
 artifacts
+bin
 cache
+contracts
 docs
 node_modules
 soldata
@@ -9,8 +15,5 @@ typechain-types
 gasReporterOutput.json
 
 coverage*
-.*rc
-.env*
-.*ignore
 tags*
 yarn*

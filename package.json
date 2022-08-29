@@ -12,10 +12,10 @@
     "compile": "yarn workspace lets-fucking-game-hardhat compile",
     "test:contracts": "yarn workspace lets-fucking-game-hardhat test",
     "test:dapp": "yarn workspace lets-fucking-game-dapp test",
-    "coverage:contracts": "yarn workspace lets-fucking-game-hardhat coverage",
+    "coverage:contracts": "yarn workspace lets-fucking-game-hardhat test:coverage",
     "lint:dapp": "yarn workspace lets-fucking-game-dapp lint",
     "format:dapp": "yarn workspace lets-fucking-game-dapp format",
-    "format:hardhat": "yarn workspace lets-fucking-game-hardhat format"
+    "format:contracts": "yarn workspace lets-fucking-game-hardhat format"
   },
   "workspaces": {
     "packages": [

@@ -1,16 +1,10 @@
-.husky
 artifacts
 cache
+coverage
 docs
 node_modules
 soldata
 typechain-types
 
-gasReporterOutput.json
-
 coverage*
-.*rc
-.env*
-.*ignore
 tags*
-yarn*

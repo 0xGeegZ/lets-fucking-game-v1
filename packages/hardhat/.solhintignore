@@ -1,14 +1,20 @@
+.github
 .husky
+.vscode
 artifacts
+bin
 cache
 docs
 node_modules
+scripts
 soldata
 typechain-types
 
-gasReporterOutput.json
-
 coverage*
+*.js
+*.ts
+*.json
+*.md
 .*rc
 .env*
 .*ignore
