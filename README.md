@@ -1,6 +1,6 @@
 # Chainlink Fullstack Demo App
 
-[![codecov](https://codecov.io/gh/hackbg/chainlink-fullstack/branch/main/graph/badge.svg?token=60ZDWLHB53)](https://codecov.io/gh/hackbg/chainlink-fullstack)
+[![codecov](https://codecov.io/gh/hackbg/lets-fucking-game/branch/main/graph/badge.svg?token=60ZDWLHB53)](https://codecov.io/gh/hackbg/lets-fucking-game)
 
 [LIVE DEMO](https://chainlink-demo.app)
 
@@ -39,8 +39,8 @@ In order to use the frontend portion of the demo application you will need
 Clone the repo and install all dependencies:
 
 ```bash
-git clone https://github.com/hackbg/chainlink-fullstack
-cd chainlink-fullstack
+git clone https://github.com/hackbg/lets-fucking-game
+cd lets-fucking-game
 
 git submodule init
 git submodule update
@@ -101,7 +101,7 @@ yarn deploy --network kovan
 
 The Hardhat project will attempt to auto-fund any newly deployed contract that uses Any-API or VRF, which otherwise has to be done manually.
 
-The amount in LINK to send as part of this process can be modified in this [Hardhat Config](https://github.com/hackbg/chainlink-fullstack/blob/main/packages/hardhat/helper-hardhat-config.ts), and are configurable per network.
+The amount in LINK to send as part of this process can be modified in this [Hardhat Config](https://github.com/hackbg/lets-fucking-game/blob/main/packages/hardhat/helper-hardhat-config.ts), and are configurable per network.
 
 | Parameter  | Description                                       | Default Value |
 | ---------- | :------------------------------------------------ | :------------ |
