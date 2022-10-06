@@ -1,4 +1,5 @@
 {
+  "eslint.workingDirectories": ["./packages/*"],
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
@@ -60,5 +61,6 @@
       }
     ]
   },
-  "hardhat.telemetry": false
+  "hardhat.telemetry": false,
+  "cSpell.words": ["shellcheck", "solhint"]
 }

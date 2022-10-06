@@ -13,8 +13,8 @@ PATH+=":./bin"    # use your sh files (which are located in bin/) directly from 
 ```
 
 ```shell
-./build.sh      # install solc and other tools in the docker image
-yarn install    # install deps
+yarn install      # install deps
+yarn run build    # install solc and other tools in the docker image
 ```
 
 Don't forget to copy the .env.example file to a file named .env, and then edit it to fill in the details.
@@ -85,13 +85,17 @@ yarn run verify ropsten <DEPLOYED_CONTRACT_ADDRESS> "<CONSTRUCTOR_ARGUMENT(S)>" 
 # Miscellaneous
 
 ```shell
-yarn run generate:docs    # generate docs. it checks to /contracts folder
+yarn run generate:docs    # generate docs according to the contracts/ folder
 ```
 
 ```shell
-yarn run generate:flatten path/to/contract    # generate the flatten file
-yarn run generate:abi path/to/contract        # generate the ABI file
-yarn run generate:bin path/to/contract        # generate the binary in a hex
+yarn run generate:flatten ./path/to/contract     # generate the flatten file (path must be "./" prefixed)
+yarn run generate:abi ./path/to/contract         # generate the ABI file (path must be "./" prefixed)
+yarn run generate:bin ./path/to/contract         # generate the binary in a hex (path must be "./" prefixed)
+yarn run generate:metadata ./path/to/contract    # generate the metadata (path must be "./" prefixed)
+yarn run generate:all-abi
+yarn run generate:all-bin
+yarn run generate:all-metadata
 ```
 
 ```shell

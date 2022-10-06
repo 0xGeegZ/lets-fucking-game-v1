@@ -1,44 +1,46 @@
-import * as dotenv from 'dotenv';
-import { HardhatUserConfig, task } from 'hardhat/config';
-import '@nomiclabs/hardhat-etherscan';
-import '@typechain/hardhat';
-import 'hardhat-gas-reporter';
-import 'hardhat-contract-sizer';
-import 'solidity-coverage';
-import 'hardhat-docgen';
-import 'hardhat-tracer';
-import 'hardhat-spdx-license-identifier';
-import '@tenderly/hardhat-tenderly';
-import '@nomicfoundation/hardhat-chai-matchers';
-import '@nomiclabs/hardhat-ethers';
-import 'hardhat-storage-layout';
+import * as dotenv from 'dotenv'
+import { HardhatUserConfig, task } from 'hardhat/config'
 
-dotenv.config();
+import '@nomicfoundation/hardhat-toolbox'
+
+// import '@nomiclabs/hardhat-etherscan'
+// import '@nomiclabs/hardhat-ethers'
+// import 'hardhat-gas-reporter'
+// import 'solidity-coverage'
+// import '@typechain/hardhat'
+
+import 'hardhat-contract-sizer'
+import 'hardhat-deploy'
+import 'hardhat-docgen'
+import 'hardhat-tracer'
+import 'hardhat-spdx-license-identifier'
+import '@tenderly/hardhat-tenderly'
+import '@nomicfoundation/hardhat-chai-matchers'
+import 'hardhat-storage-layout'
+
+import './tasks/accounts'
+import './tasks/storage-layout'
+
+dotenv.config()
 
 function getWallet(): Array<string> {
   return process.env.DEPLOYER_WALLET_PRIVATE_KEY !== undefined
     ? [process.env.DEPLOYER_WALLET_PRIVATE_KEY]
-    : [];
+    : []
 }
-
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
-
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
-
-task('storage-layout', 'Prints the storage layout', async (_, hre) => {
-  await hre.storageLayout.export();
-});
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 const config: HardhatUserConfig = {
   solidity: {
+    // compilers: [
+    //   {
+    //     version: process.env.SOLC_VERSION || '0.8.9',
+    //   },
+    //   {
+    //     version: '0.8.7',
+    //   },
+    // ],
     version: process.env.SOLC_VERSION || '0.8.7',
     settings: {
       optimizer: {
@@ -63,6 +65,15 @@ const config: HardhatUserConfig = {
     path: './docs',
     clear: true,
     runOnCompile: false,
+  },
+  namedAccounts: {
+    deployer: {
+      default: 0, // here this will by default take the first account as deployer
+      1: 0, // similarly on mainnet it will take the first account as deployer. Note though that depending on how hardhat network are configured, the account 0 on one network can be different than on another
+    },
+    feeCollector: {
+      default: 1,
+    },
   },
   typechain: {
     outDir: '../types/typechain',
@@ -104,62 +115,77 @@ const config: HardhatUserConfig = {
         mnemonic: process.env.CUSTOM_NETWORK_ACCOUNTS_MNEMONIC || '',
         path: process.env.CUSTOM_NETWORK_ACCOUNTS_PATH || '',
       },
+      saveDeployments: true,
     },
     arbitrumTestnet: {
       url: process.env.ARBITRUM_TESTNET_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     auroraTestnet: {
       url: process.env.AURORA_TESTNET_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     avalancheFujiTestnet: {
       url: process.env.AVALANCHE_FUJI_TESTNET_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     bscTestnet: {
       url: process.env.BSC_TESTNET_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     ftmTestnet: {
       url: process.env.FTM_TESTNET_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     goerli: {
       url: process.env.GOERLI_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     harmonyTest: {
       url: process.env.HARMONY_TEST_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     hecoTestnet: {
       url: process.env.HECO_TESTNET_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     kovan: {
       url: process.env.KOVAN_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     moonbaseAlpha: {
       url: process.env.MOONBASE_ALPHA_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     polygonMumbai: {
       url: process.env.POLYGON_MUMBAI_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     rinkeby: {
       url: process.env.RINKEBY_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     ropsten: {
       url: process.env.ROPSTEN_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
     sokol: {
       url: process.env.SOKOL_RPC_URL || '',
       accounts: getWallet(),
+      saveDeployments: true,
     },
   },
   etherscan: {
@@ -195,6 +221,6 @@ const config: HardhatUserConfig = {
       },
     ],
   },
-};
+}
 
-export default config;
+export default config

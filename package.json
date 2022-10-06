@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "prepare": "husky install",
     "dev": "yarn workspace lets-fucking-game-dapp dev",
     "build": "yarn workspace lets-fucking-game-dapp build",
     "export": "yarn workspace lets-fucking-game-dapp export",
@@ -15,7 +16,16 @@
     "coverage:contracts": "yarn workspace lets-fucking-game-hardhat test:coverage",
     "lint:dapp": "yarn workspace lets-fucking-game-dapp lint",
     "format:dapp": "yarn workspace lets-fucking-game-dapp format",
-    "format:contracts": "yarn workspace lets-fucking-game-hardhat format"
+    "format:contracts": "yarn workspace lets-fucking-game-hardhat format",
+    "hook:pre-push": "tsc --noEmit && shellcheck bin/* && cspell lint --dot --gitignore '**/{*,''}{.,''}*' && prettier '**/{*,''}.{json,js,ts,sol}' --check && solhint 'contracts/*.sol' && eslint '**/{*,''}.{json,js,ts}'"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn run hook:pre-push"
+    }
+  },
+  "devDependencies": {
+    "husky": "^8.0.1"
   },
   "workspaces": {
     "packages": [
