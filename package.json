@@ -17,7 +17,7 @@
     "lint:dapp": "yarn workspace lets-fucking-game-dapp lint",
     "format:dapp": "yarn workspace lets-fucking-game-dapp format",
     "format:contracts": "yarn workspace lets-fucking-game-hardhat format",
-    "hook:pre-push": "tsc --noEmit && shellcheck bin/* && cspell lint --dot --gitignore '**/{*,''}{.,''}*' && prettier '**/{*,''}.{json,js,ts,sol}' --check && solhint 'contracts/*.sol' && eslint '**/{*,''}.{json,js,ts}'"
+    "hook:pre-push": "cd packages/hardhat && tsc --noEmit && shellcheck bin/* && cspell lint --dot --gitignore '**/{*,''}{.,''}*' && prettier '**/{*,''}.{json,js,ts,sol}' --check && solhint 'contracts/*.sol' && eslint '**/{*,''}.{json,js,ts}'"
   },
   "husky": {
     "hooks": {
