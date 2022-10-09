@@ -1,0 +1,67 @@
+name: Hardhat CD
+
+on: [pull_request]
+
+env:
+  SOLC_VERSION: ${{ secrets.SOLC_VERSION }}
+  SOLIDITY_OPTIMIZER: ${{ secrets.SOLIDITY_OPTIMIZER }}
+
+jobs:
+  cd:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [16.x]
+        python: [3.8.x]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Verify Changed sol files in the contracts directory
+        uses: tj-actions/verify-changed-files@v9
+        id: verify-changed-sol-files
+        with:
+          files: contracts/*.sol
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install Analyzer tools
+        if: steps.verify-changed-sol-files.outputs.files_changed == 'true'
+        run: |
+          pip3 install slither-analyzer
+          pip3 install mythril
+
+      - name: Setup Solc
+        run: |
+          sudo apt-get -y install libssl-dev python3-dev python3-pip
+          pip3 install solc-select
+
+          solc-select install ${{ env.SOLC_VERSION }}
+          solc-select use ${{ env.SOLC_VERSION }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies with dev deps
+        run: yarn install --production=false
+
+      - name: Hardhat compile
+        run: yarn run hardhat compile --force
+
+      - name: Tests
+        run: yarn run hardhat test --no-compile
+
+      - name: Linters & Formatters
+        run: yarn run hook:pre-push
+
+      - name: Analyze to contracts
+        if: steps.verify-changed-sol-files.outputs.files_changed == 'true'
+        run: slither contracts/ && myth analyze --solc-json mythril.config.json contracts/*.sol

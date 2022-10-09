@@ -21,8 +21,9 @@ const config: Config = {
   networks: [Rinkeby, Kovan, Hardhat],
   multicallAddresses: {
     [ChainId.Hardhat]:
-      deployedContracts[ChainId.Hardhat].localhost.contracts.Multicall.address,
-    [ChainId.Mainnet]: Mainnet.multicallAddress,
+      deployedContracts[ChainId.Hardhat]?.localhost?.contracts?.Multicall
+        ?.address,
+    [ChainId.Mainnet]: Mainnet?.multicallAddress,
   },
 }
 

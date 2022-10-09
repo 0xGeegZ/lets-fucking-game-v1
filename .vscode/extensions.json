@@ -1,0 +1,20 @@
+{
+  "recommendations": [
+    "mikestead.dotenv",
+    "timonwong.shellcheck",
+    "foxundermoon.shell-format",
+    "ms-azuretools.vscode-docker",
+    "emeraldwalk.runonsave",
+    "redhat.vscode-yaml",
+    "streetsidesoftware.code-spell-checker",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "abumalick.vscode-nvm",
+    "ryanluker.vscode-coverage-gutters",
+    "hbenl.vscode-mocha-test-adapter",
+    "juanblanco.solidity",
+    "emretepedev.solc-select-vscode",
+    "nomicfoundation.hardhat-solidity",
+    "remixproject.ethereum-remix"
+  ]
+}
