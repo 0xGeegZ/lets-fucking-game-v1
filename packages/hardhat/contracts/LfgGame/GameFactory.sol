@@ -63,9 +63,7 @@ contract GameFactory is Pausable, Ownable {
   }
 
   modifier onlyAllowedNumberOfPlayers(uint256 _maxPlayers) {
-    require(_maxPlayers > 0, "maxPlayers should be bigger than or equal to 1");
-    // TODO REACTIVATE AFTER TESTS
-    // require(_maxPlayers > 1, "maxPlayers should be bigger than or equal to 2");
+    require(_maxPlayers > 1, "maxPlayers should be bigger than or equal to 2");
     require(_maxPlayers < 21, "maxPlayers should not be bigger than 20");
     _;
   }

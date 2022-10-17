@@ -50,7 +50,7 @@ describe('GameFactoryContract', function () {
     })
 
     describe('when the creator tries to initialize a game already initialized', function () {
-      it.only('should revert with the correct message', async function () {
+      it('should revert with the correct message', async function () {
         await createAndDeployContracts()
         await gameFactoryContract
           .connect(secondAccount)
@@ -92,8 +92,6 @@ describe('GameFactoryContract', function () {
           )
 
         const responseOwner = await gameFactoryContract.owner()
-        const responseRegistrationAmount =
-          await gameFactoryContract.registrationAmount()
         const responseHouseEdge = await gameFactoryContract.houseEdge()
         const responseCreatorEdge = await gameFactoryContract.creatorEdge()
 
@@ -102,7 +100,6 @@ describe('GameFactoryContract', function () {
         expect(responseGameImplementation.deployedAddress).to.be.equal(
           gameImplementationContract.address
         )
-        expect(responseRegistrationAmount).to.be.equal(registrationAmount)
         expect(responseHouseEdge).to.be.equal(houseEdge)
         expect(responseCreatorEdge).to.be.equal(creatorEdge)
       })
@@ -118,7 +115,7 @@ describe('GameFactoryContract', function () {
         await expectRevert(
           gameFactoryContract
             .connect(secondAccount)
-            .createNewGameLine(maxPlayers, roundLength),
+            .createNewGameLine(maxPlayers, roundLength, registrationAmount),
           'Pausable: paused'
         )
       })
@@ -133,14 +130,22 @@ describe('GameFactoryContract', function () {
         await expectRevert(
           gameFactoryContract
             .connect(secondAccount)
-            .createNewGameLine(outOfRangeMaxPlayers1, roundLength),
+            .createNewGameLine(
+              outOfRangeMaxPlayers1,
+              roundLength,
+              registrationAmount
+            ),
           'maxPlayers should not be bigger than 20'
         )
 
         await expectRevert(
           gameFactoryContract
             .connect(secondAccount)
-            .createNewGameLine(outOfRangeMaxPlayers2, roundLength),
+            .createNewGameLine(
+              outOfRangeMaxPlayers2,
+              roundLength,
+              registrationAmount
+            ),
           'maxPlayers should be bigger than or equal to 2'
         )
       })
@@ -155,14 +160,22 @@ describe('GameFactoryContract', function () {
         await expectRevert(
           gameFactoryContract
             .connect(secondAccount)
-            .createNewGameLine(maxPlayers, outOfRangeRoundLength1),
+            .createNewGameLine(
+              maxPlayers,
+              outOfRangeRoundLength1,
+              registrationAmount
+            ),
           'roundLength should not be bigger than 8'
         )
 
         await expectRevert(
           gameFactoryContract
             .connect(secondAccount)
-            .createNewGameLine(maxPlayers, outOfRangeRoundLength2),
+            .createNewGameLine(
+              maxPlayers,
+              outOfRangeRoundLength2,
+              registrationAmount
+            ),
           'roundLength should be bigger than 0'
         )
       })
@@ -173,7 +186,7 @@ describe('GameFactoryContract', function () {
         await createAndDeployContracts()
         await gameFactoryContract
           .connect(secondAccount)
-          .createNewGameLine(maxPlayers, roundLength)
+          .createNewGameLine(maxPlayers, roundLength, registrationAmount)
 
         const newGame = await gameFactoryContract.deployedGameLines(0)
 
@@ -211,10 +224,10 @@ describe('GameFactoryContract', function () {
         await createAndDeployContracts()
         await gameFactoryContract
           .connect(secondAccount)
-          .createNewGameLine(maxPlayers, roundLength)
+          .createNewGameLine(maxPlayers, roundLength, registrationAmount)
         await gameFactoryContract
           .connect(thirdAccount)
-          .createNewGameLine(maxPlayers, roundLength)
+          .createNewGameLine(maxPlayers, roundLength, registrationAmount)
 
         const firstGame = await gameFactoryContract.deployedGameLines(0)
         const secondGame = await gameFactoryContract.deployedGameLines(1)
@@ -232,7 +245,7 @@ describe('GameFactoryContract', function () {
         await expect(
           gameFactoryContract
             .connect(secondAccount)
-            .createNewGameLine(maxPlayers, roundLength)
+            .createNewGameLine(maxPlayers, roundLength, registrationAmount)
         )
           .to.emit(gameFactoryContract, 'GameLineCreated')
           .withArgs('0', anyValue, '0', secondAccount.address)
@@ -245,10 +258,10 @@ describe('GameFactoryContract', function () {
       await createAndDeployContracts()
       await gameFactoryContract
         .connect(secondAccount)
-        .createNewGameLine(maxPlayers, roundLength)
+        .createNewGameLine(maxPlayers, roundLength, registrationAmount)
       await gameFactoryContract
         .connect(thirdAccount)
-        .createNewGameLine(maxPlayers, roundLength)
+        .createNewGameLine(maxPlayers, roundLength, registrationAmount)
 
       const deployedGameLines = await gameFactoryContract
         .connect(secondAccount)

@@ -1,7 +1,10 @@
 const { anyValue } = require('@nomicfoundation/hardhat-chai-matchers/withArgs')
-const { time, expectRevert } = require('@openzeppelin/test-helpers')
+const { expectRevert } = require('@openzeppelin/test-helpers')
 const { expect } = require('chai')
 const { ethers } = require('hardhat')
+
+const OneHourInSeconds = 3600
+const OneDayInSeconds = OneHourInSeconds * 24
 
 let creator,
   players,
@@ -20,8 +23,8 @@ describe('GameImplementationContract', function () {
     this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
     this.zeroRegistrationAmount = ethers.utils.parseEther('0')
     this.launchDuration = 60 * 60 * 25
-    this.nextAllowedPlay = time.duration.days(1)
-    this.RoundMaximumDuration = time.duration.days(2)
+    this.nextAllowedPlay = OneDayInSeconds
+    this.RoundMaximumDuration = OneDayInSeconds * 2
     this.upperMaxDuration = 60 * 60 * 24
     this.underMaxDuration = 60 * 60 * 20
     this.mockKeeper = players[18]
@@ -37,12 +40,13 @@ describe('GameImplementationContract', function () {
       this.generalAdmin
     ).deploy(
       gameImplementationContract.address,
-      this.correctRegistrationAmount,
       this.houseEdge,
       this.creatorEdge
     )
     await gameFactoryContract.deployed()
-    await gameFactoryContract.connect(creator).createNewGameLine(10, 2)
+    await gameFactoryContract
+      .connect(creator)
+      .createNewGameLine(10, 2, this.correctRegistrationAmount)
     const clonedContract = await gameFactoryContract.deployedGameLines('0')
     this.contract = await GameImplementationContract.attach(
       clonedContract.deployedAddress
@@ -73,11 +77,10 @@ HELPERS FUNCTIONS
     }
 
     // Some time passes before the daily checkpoint gets triggered
-    await time.increase(time.duration.hours(2))
+    await ethers.provider.send('evm_increaseTime', [7200])
 
     // Daily checkpoint gets triggered, the game starts
-    const receipt = await contract.connect(mockKeeper).triggerDailyCheckpoint()
-    return receipt
+    return contract.connect(mockKeeper).triggerDailyCheckpoint()
   }
 
   const makePlayerLooseForNotPlaying = async function (
@@ -93,6 +96,7 @@ HELPERS FUNCTIONS
     const otherPlayer2InitialData = await contract.players(
       players[otherPlayer2Index].address
     )
+
     const otherPlayer1RangeLowerLimit =
       otherPlayer1InitialData.roundRangeLowerLimit
     const otherPlayer2RangeLowerLimit =
@@ -101,28 +105,38 @@ HELPERS FUNCTIONS
     // Time passes until first other player's range, he plays, then until second other player's range, who plays too
     // Whoever has the soonest range plays first
     if (otherPlayer1RangeLowerLimit.eq(otherPlayer2RangeLowerLimit)) {
-      await time.increaseTo(otherPlayer1RangeLowerLimit.toString())
+      await ethers.provider.send('evm_setNextBlockTimestamp', [
+        otherPlayer1RangeLowerLimit.toNumber(),
+      ])
+
       await contract.connect(players[otherPlayer1Index]).playRound()
       await contract.connect(players[otherPlayer2Index]).playRound()
     } else if (otherPlayer1RangeLowerLimit.lt(otherPlayer2RangeLowerLimit)) {
-      await time.increaseTo(otherPlayer1RangeLowerLimit.toString())
+      await ethers.provider.send('evm_setNextBlockTimestamp', [
+        otherPlayer1RangeLowerLimit.toNumber(),
+      ])
       await contract.connect(players[otherPlayer1Index]).playRound()
-      await time.increaseTo(otherPlayer2RangeLowerLimit.toString())
+      await ethers.provider.send('evm_setNextBlockTimestamp', [
+        otherPlayer2RangeLowerLimit.toNumber(),
+      ])
       await contract.connect(players[otherPlayer2Index]).playRound()
     } else {
-      await time.increaseTo(otherPlayer2RangeLowerLimit.toString())
+      await ethers.provider.send('evm_setNextBlockTimestamp', [
+        otherPlayer2RangeLowerLimit.toNumber(),
+      ])
       await contract.connect(players[otherPlayer2Index]).playRound()
-      await time.increaseTo(otherPlayer1RangeLowerLimit.toString())
+      await ethers.provider.send('evm_setNextBlockTimestamp', [
+        otherPlayer1RangeLowerLimit.toNumber(),
+      ])
       await contract.connect(players[otherPlayer1Index]).playRound()
     }
 
     // Time passes until next checkpoint
-    await time.increaseTo(
-      startedGameTimestamp.add(time.duration.hours(24)).toString()
-    )
+    await ethers.provider.send('evm_increaseTime', [
+      startedGameTimestamp + OneDayInSeconds,
+    ])
 
-    const receipt = await contract.connect(mockKeeper).triggerDailyCheckpoint()
-    return receipt
+    return contract.connect(mockKeeper).triggerDailyCheckpoint()
   }
 
   const setUpGameWithAWinner = async function (
@@ -133,7 +147,10 @@ HELPERS FUNCTIONS
   ) {
     const secondPlayerIndex = 2
     await setUpGameReadyToPlay(contract, amount, mockKeeper)
-    const startedGameTimestamp = await time.latest()
+
+    const startedGameBlock = await ethers.provider.getBlock()
+    const startedGameTimestamp = startedGameBlock.timestamp
+
     // 8 players lost for not playing, 2 players remain in second round
     await makePlayerLooseForNotPlaying(
       contract,
@@ -142,7 +159,11 @@ HELPERS FUNCTIONS
       startedGameTimestamp,
       mockKeeper
     )
-    const secondRoundStartedTimestamp = await time.latest()
+
+    const secondRoundStartedBlock = await ethers.provider.getBlock()
+
+    const secondRoundStartedTimestamp = secondRoundStartedBlock.timestamp
+
     const firstPlayerInitialData = await contract.players(
       players[winnerIndex].address
     )
@@ -157,28 +178,37 @@ HELPERS FUNCTIONS
     // Time passes beyond second player's round range and until winner's round range
     // Both play and second player looses
     if (firstPlayerRangeLowerLimit.eq(secondPlayerRangeUpperLimit)) {
-      await time.increaseTo(firstPlayerRangeLowerLimit.toString())
+      await ethers.provider.send('evm_setNextBlockTimestamp', [
+        firstPlayerRangeLowerLimit.toNumber(),
+      ])
       await contract.connect(players[winnerIndex]).playRound()
       await contract.connect(players[secondPlayerIndex]).playRound()
     } else if (firstPlayerRangeLowerLimit.lt(secondPlayerRangeUpperLimit)) {
-      await time.increaseTo(firstPlayerRangeLowerLimit.toString())
+      await ethers.provider.send('evm_setNextBlockTimestamp', [
+        firstPlayerRangeLowerLimit.toNumber(),
+      ])
       await contract.connect(players[winnerIndex]).playRound()
-      await time.increaseTo(secondPlayerRangeUpperLimit.toString())
+      await ethers.provider.send('evm_setNextBlockTimestamp', [
+        secondPlayerRangeUpperLimit.toNumber(),
+      ])
       await contract.connect(players[secondPlayerIndex]).playRound()
     } else {
-      await time.increaseTo(secondPlayerRangeUpperLimit.toString())
+      await ethers.provider.send('evm_setNextBlockTimestamp', [
+        secondPlayerRangeUpperLimit.toNumber(),
+      ])
       await contract.connect(players[secondPlayerIndex]).playRound()
-      await time.increaseTo(firstPlayerRangeLowerLimit.toString())
+      await ethers.provider.send('evm_setNextBlockTimestamp', [
+        firstPlayerRangeLowerLimit.toNumber(),
+      ])
       await contract.connect(players[winnerIndex]).playRound()
     }
 
     // Time passes until next checkpoint
-    await time.increaseTo(
-      secondRoundStartedTimestamp.add(time.duration.hours(25)).toString()
-    )
+    await ethers.provider.send('evm_setNextBlockTimestamp', [
+      secondRoundStartedTimestamp + OneDayInSeconds + OneHourInSeconds,
+    ])
 
-    const receipt = await contract.connect(mockKeeper).triggerDailyCheckpoint()
-    return receipt
+    return contract.connect(mockKeeper).triggerDailyCheckpoint()
   }
 
   /*
@@ -427,7 +457,7 @@ TESTS
         )
 
         // A day passes until the next checkpoint
-        await time.increase(time.duration.hours(24))
+        await ethers.provider.send('evm_increaseTime', [OneDayInSeconds])
 
         await expect(
           this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
@@ -442,7 +472,7 @@ TESTS
         )
 
         // A day passes until the next checkpoint
-        await time.increase(time.duration.hours(24))
+        await ethers.provider.send('evm_increaseTime', [OneDayInSeconds])
 
         await expect(
           this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
@@ -457,7 +487,7 @@ TESTS
         )
 
         // A day passes until the next checkpoint
-        await time.increase(time.duration.hours(24))
+        await ethers.provider.send('evm_increaseTime', [OneDayInSeconds])
 
         await expect(
           this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
@@ -484,10 +514,13 @@ TESTS
         this.correctRegistrationAmount,
         this.mockKeeper
       )
-      const currentBlockTimestamp = await time.latest()
-      const nextCheckpointTimestamp = currentBlockTimestamp.add(
-        time.duration.hours(24)
-      )
+
+      const currentBlock = await ethers.provider.send('eth_getBlockByNumber', [
+        'latest',
+        false,
+      ])
+      const currentBlockTimestamp = currentBlock.timestamp
+      const nextCheckpointTimestamp = currentBlockTimestamp + OneDayInSeconds
       for (let i = 0; i < 10; i++) {
         const player = await this.contract.players(players[i].address)
         expect(
@@ -591,8 +624,11 @@ TESTS
           await this.contract.connect(players[playerIndex]).playRound()
 
           // Time passes until we reach player's range
-          const insidePlayerRange = initialPlayerRangeLowerLimit.add(3600)
-          await time.increaseTo(insidePlayerRange.toString())
+          const insidePlayerRange =
+            initialPlayerRangeLowerLimit.add(OneHourInSeconds)
+          await ethers.provider.send('evm_setNextBlockTimestamp', [
+            insidePlayerRange.toNumber(),
+          ])
 
           await expectRevert(
             this.contract.connect(players[playerIndex]).playRound(),
@@ -616,8 +652,11 @@ TESTS
             initialPlayer.roundRangeLowerLimit
 
           // Time passes until we reach player's range
-          const insidePlayerRange = initialPlayerRangeLowerLimit.add(3600)
-          await time.increaseTo(insidePlayerRange.toString())
+          const insidePlayerRange =
+            initialPlayerRangeLowerLimit.add(OneHourInSeconds)
+          await ethers.provider.send('evm_setNextBlockTimestamp', [
+            insidePlayerRange.toNumber(),
+          ])
 
           await this.contract.connect(players[playerIndex]).playRound()
 
@@ -644,8 +683,11 @@ TESTS
         const initialPlayerRangeLowerLimit = initialPlayer.roundRangeLowerLimit
 
         // Time passes until we reach player's range
-        const insidePlayerRange = initialPlayerRangeLowerLimit.add(3600)
-        await time.increaseTo(insidePlayerRange.toString())
+        const insidePlayerRange =
+          initialPlayerRangeLowerLimit.add(OneHourInSeconds)
+        await ethers.provider.send('evm_setNextBlockTimestamp', [
+          insidePlayerRange.toNumber(),
+        ])
 
         await this.contract.connect(players[playerIndex]).playRound()
         const updatedPlayer = await this.contract.players(
@@ -671,8 +713,11 @@ TESTS
         const initialPlayerRangeLowerLimit = initialPlayer.roundRangeLowerLimit
 
         // Time passes until we reach player's range
-        const insidePlayerRange = initialPlayerRangeLowerLimit.add(3600)
-        await time.increaseTo(insidePlayerRange.toString())
+        const insidePlayerRange =
+          initialPlayerRangeLowerLimit.add(OneHourInSeconds)
+        await ethers.provider.send('evm_setNextBlockTimestamp', [
+          insidePlayerRange.toNumber(),
+        ])
 
         await this.contract.connect(players[playerIndex]).playRound()
 
@@ -696,8 +741,11 @@ TESTS
         const initialPlayerRangeLowerLimit = initialPlayer.roundRangeLowerLimit
 
         // Time passes until we reach player's range
-        const insidePlayerRange = initialPlayerRangeLowerLimit.add(3600)
-        await time.increaseTo(insidePlayerRange.toString())
+        const insidePlayerRange =
+          initialPlayerRangeLowerLimit.add(OneHourInSeconds)
+        await ethers.provider.send('evm_setNextBlockTimestamp', [
+          insidePlayerRange.toNumber(),
+        ])
 
         await expect(this.contract.connect(players[playerIndex]).playRound())
           .to.emit(this.contract, 'PlayedRound')
@@ -717,8 +765,11 @@ TESTS
         const initialPlayerRangeLowerLimit = initialPlayer.roundRangeLowerLimit
 
         // Time passes until we reach player's range
-        const insidePlayerRange = initialPlayerRangeLowerLimit.add(3600)
-        await time.increaseTo(insidePlayerRange.toString())
+        const insidePlayerRange =
+          initialPlayerRangeLowerLimit.add(OneHourInSeconds)
+        await ethers.provider.send('evm_setNextBlockTimestamp', [
+          insidePlayerRange.toNumber(),
+        ])
 
         await this.contract.connect(players[playerIndex]).playRound()
 
@@ -746,8 +797,11 @@ TESTS
         const initialPlayerRangeUpperLimit = initialPlayer.roundRangeUpperLimit
 
         // Time passes beyond player's range
-        const beyondPlayerRange = initialPlayerRangeUpperLimit.add(3600)
-        await time.increaseTo(beyondPlayerRange.toString())
+        const beyondPlayerRange =
+          initialPlayerRangeUpperLimit.add(OneHourInSeconds)
+        await ethers.provider.send('evm_setNextBlockTimestamp', [
+          beyondPlayerRange.toNumber(),
+        ])
 
         await this.contract.connect(players[playerIndex]).playRound()
 
@@ -771,8 +825,11 @@ TESTS
         const initialPlayerRangeUpperLimit = initialPlayer.roundRangeUpperLimit
 
         // Time passes beyond player's range
-        const beyondPlayerRange = initialPlayerRangeUpperLimit.add(3600)
-        await time.increaseTo(beyondPlayerRange.toString())
+        const beyondPlayerRange =
+          initialPlayerRangeUpperLimit.add(OneHourInSeconds)
+        await ethers.provider.send('evm_setNextBlockTimestamp', [
+          beyondPlayerRange.toNumber(),
+        ])
 
         await this.contract.connect(players[playerIndex]).playRound()
 
@@ -796,8 +853,11 @@ TESTS
         const initialPlayerRangeUpperLimit = initialPlayer.roundRangeUpperLimit
 
         // Time passes beyond player's range
-        const beyondPlayerRange = initialPlayerRangeUpperLimit.add(3600)
-        await time.increaseTo(beyondPlayerRange.toString())
+        const beyondPlayerRange =
+          initialPlayerRangeUpperLimit.add(OneHourInSeconds)
+        await ethers.provider.send('evm_setNextBlockTimestamp', [
+          beyondPlayerRange.toNumber(),
+        ])
 
         await expect(this.contract.connect(players[playerIndex]).playRound())
           .to.emit(this.contract, 'GameLost')
@@ -815,7 +875,7 @@ TESTS
           this.correctRegistrationAmount,
           this.mockKeeper
         )
-        const StartedGameTimestamp = await time.latest()
+
         const looserInitialData = await this.contract.players(
           players[looserIndex].address
         )
@@ -823,7 +883,6 @@ TESTS
           this.contract,
           otherPlayerIndex,
           otherPlayerIndex2,
-          StartedGameTimestamp,
           this.mockKeeper
         )
         const looserUpdatedData = await this.contract.players(
@@ -842,7 +901,6 @@ TESTS
           this.correctRegistrationAmount,
           this.mockKeeper
         )
-        const StartedGameTimestamp = await time.latest()
         const looserInitialData = await this.contract.players(
           players[looserIndex].address
         )
@@ -850,7 +908,6 @@ TESTS
           this.contract,
           otherPlayerIndex,
           otherPlayerIndex2,
-          StartedGameTimestamp,
           this.mockKeeper
         )
         const looserUpdatedData = await this.contract.players(
@@ -869,13 +926,11 @@ TESTS
           this.correctRegistrationAmount,
           this.mockKeeper
         )
-        const StartedGameTimestamp = await time.latest()
         await expect(
           makePlayerLooseForNotPlaying(
             this.contract,
             otherPlayerIndex,
             otherPlayerIndex2,
-            StartedGameTimestamp,
             this.mockKeeper
           )
         )

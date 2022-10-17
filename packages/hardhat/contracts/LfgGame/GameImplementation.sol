@@ -514,13 +514,11 @@ contract GameImplementation {
 
   // Called for empty calldata (and any value)
   receive() external payable {
-    // TODO is current contract is Model, send to _factroy
     emit Received(msg.sender, msg.value);
   }
 
   // Called when no other function matches (not even the receive function). Optionally payable
   fallback() external payable {
-    // TODO is current contract is Model, send to _factroy
     emit Received(msg.sender, msg.value);
   }
 }
