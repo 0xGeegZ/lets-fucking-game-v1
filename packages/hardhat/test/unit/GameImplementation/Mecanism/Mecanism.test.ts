@@ -46,8 +46,7 @@ describe('GameImplementationContract - Mecanism', function () {
           const maxAmountOfUser = 10
           for (let i = 0; i < maxAmountOfUser; i++) {
             await registerPlayer({
-              players: this.players,
-              index: i,
+              player: this.players[i],
               contract: this.contract,
               value: this.correctRegistrationAmount,
             })
@@ -65,8 +64,7 @@ describe('GameImplementationContract - Mecanism', function () {
         it('should not allow user to register to the game', async function () {
           const player = this.players[0]
           await registerPlayer({
-            players: this.players,
-            index: 0,
+            player: this.players[0],
             contract: this.contract,
             value: this.correctRegistrationAmount,
           })
@@ -115,8 +113,7 @@ describe('GameImplementationContract - Mecanism', function () {
         it('should increase the number of registered players', async function () {
           const initialNumberOfPlayers = await this.contract.numPlayers()
           await registerPlayer({
-            players: this.players,
-            index: 0,
+            player: this.players[0],
             contract: this.contract,
             value: this.correctRegistrationAmount,
           })
@@ -130,8 +127,7 @@ describe('GameImplementationContract - Mecanism', function () {
           const intialPlayerAddressesList =
             await this.contract.getPlayerAddresses()
           await registerPlayer({
-            players: this.players,
-            index: newPlayerIndex,
+            player: this.players[newPlayerIndex],
             contract: this.contract,
             value: this.correctRegistrationAmount,
           })
@@ -149,8 +145,7 @@ describe('GameImplementationContract - Mecanism', function () {
           const newPlayerIndex = 0
           const newPlayerAddress = this.players[newPlayerIndex].address
           await registerPlayer({
-            players: this.players,
-            index: newPlayerIndex,
+            player: this.players[newPlayerIndex],
             contract: this.contract,
             value: this.correctRegistrationAmount,
           })
@@ -173,8 +168,7 @@ describe('GameImplementationContract - Mecanism', function () {
           it('should let the user register', async function () {
             for (let i = 0; i < 10; i++) {
               await registerPlayer({
-                players: this.players,
-                index: i,
+                player: this.players[i],
                 contract: this.contract,
                 value: this.correctRegistrationAmount,
               })
@@ -215,8 +209,7 @@ describe('GameImplementationContract - Mecanism', function () {
         it('should not start the game', async function () {
           for (let i = 0; i < 8; i++) {
             await registerPlayer({
-              players: this.players,
-              index: i,
+              player: this.players[i],
               contract: this.contract,
               value: this.correctRegistrationAmount,
             })
@@ -232,8 +225,7 @@ describe('GameImplementationContract - Mecanism', function () {
         it('should start the game', async function () {
           for (let i = 0; i < 10; i++) {
             await registerPlayer({
-              players: this.players,
-              index: i,
+              player: this.players[i],
               contract: this.contract,
               value: this.correctRegistrationAmount,
             })
@@ -382,8 +374,7 @@ describe('GameImplementationContract - Mecanism', function () {
           const maxAmountOfUser = 10
           for (let i = 0; i < maxAmountOfUser - 1; i++) {
             await registerPlayer({
-              players: this.players,
-              index: i,
+              player: this.players[i],
               contract: this.contract,
               value: this.correctRegistrationAmount,
             })
@@ -401,8 +392,7 @@ describe('GameImplementationContract - Mecanism', function () {
           const notRegisteredUserIndex = 11
           for (let i = 0; i < maxAmountOfUser; i++) {
             await registerPlayer({
-              players: this.players,
-              index: i,
+              player: this.players[i],
               contract: this.contract,
               value: this.correctRegistrationAmount,
             })
@@ -843,6 +833,8 @@ describe('GameImplementationContract - Mecanism', function () {
         const updatedPlayersAmount = await this.contract.numPlayers()
         const updatedPlayerAddressesList =
           await this.contract.getPlayerAddresses()
+
+        const updatedGameId = await this.contract.gameId()
 
         expect(updatedPlayersAmount).to.equal(0)
         for (let i = 0; i < updatedPlayerAddressesList.length; i++) {

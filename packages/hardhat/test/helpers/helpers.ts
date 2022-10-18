@@ -88,9 +88,7 @@ const beforeEachGameImplementation = async function () {
   await this.contract.connect(this.generalAdmin).setKeeper(players[18].address)
 }
 
-const registerPlayer = async function ({ players, index, contract, value }) {
-  const player = players[index]
-
+const registerPlayer = async function ({ player, contract, value }) {
   await expect(contract.connect(player).registerForGame({ value }))
     .to.emit(contract, 'RegisteredForGame')
     .withArgs(player.address, anyValue)
@@ -104,7 +102,7 @@ const setUpGameReadyToPlay = async function ({
 }) {
   // 10 players register for the game.
   for (let i = 0; i < 10; i++) {
-    await registerPlayer({ players, index: i, contract, value: amount })
+    await registerPlayer({ player: players[i], contract, value: amount })
   }
 
   // Some time passes before the daily checkpoint gets triggered
