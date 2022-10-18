@@ -39,7 +39,7 @@ describe('GameFactoryContract', function () {
               this.roundLength,
               this.registrationAmount
             ),
-          'this.maxPlayers should not be bigger than 20'
+          'maxPlayers should not be bigger than 20'
         )
 
         await expectRevert(
@@ -50,7 +50,7 @@ describe('GameFactoryContract', function () {
               this.roundLength,
               this.registrationAmount
             ),
-          'this.maxPlayers should be bigger than or equal to 2'
+          'maxPlayers should be bigger than or equal to 2'
         )
       })
     })
@@ -68,7 +68,7 @@ describe('GameFactoryContract', function () {
               outOfRangeRoundLength1,
               this.registrationAmount
             ),
-          'this.roundLength should not be bigger than 8'
+          'roundLength should not be bigger than 8'
         )
 
         await expectRevert(
@@ -79,7 +79,7 @@ describe('GameFactoryContract', function () {
               outOfRangeRoundLength2,
               this.registrationAmount
             ),
-          'this.roundLength should be bigger than 0'
+          'roundLength should be bigger than 0'
         )
       })
     })

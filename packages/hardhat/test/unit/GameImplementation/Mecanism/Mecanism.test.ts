@@ -757,6 +757,7 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should emit the event notifying the user lost the game', async function () {
+        // TODO this case test fail
         const looserIndex = 0
         const otherPlayerIndex = 2
         const otherPlayerIndex2 = 3
@@ -787,6 +788,7 @@ describe('GameImplementationContract - Mecanism', function () {
   context('Winning a game', function () {
     describe('when there is only one user left', async function () {
       it('should create a new Winner and add it to the gameWinners mapping', async function () {
+        // TODO this case test fail
         const gameId = 0
         const winnerIndex = 4
         await setUpGameWithAWinner({
@@ -807,6 +809,7 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should emit the GameWon event with the correct data', async function () {
+        // TODO this case test fail
         const winnerIndex = 4
 
         await expect(
@@ -827,6 +830,7 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should reset the game', async function () {
+        // TODO this case test fail
         const previousGameId = 0
         const winnerIndex = 4
         await setUpGameWithAWinner({
@@ -839,13 +843,14 @@ describe('GameImplementationContract - Mecanism', function () {
         const updatedPlayersAmount = await this.contract.numPlayers()
         const updatedPlayerAddressesList =
           await this.contract.getPlayerAddresses()
-        const updatedGameId = await this.contract.gameId()
+
         expect(updatedPlayersAmount).to.equal(0)
         for (let i = 0; i < updatedPlayerAddressesList.length; i++) {
           expect(updatedPlayerAddressesList[i]).to.equal(
             '0x0000000000000000000000000000000000000000'
           )
         }
+
         expect(updatedGameId).to.equal(previousGameId + 1)
       })
 
@@ -910,6 +915,8 @@ describe('GameImplementationContract - Mecanism', function () {
 
     describe('when the prize for the game as been claimed already', function () {
       it('should revert', async function () {
+        // TODO this case test fail
+        // TODO GUIGUI
         const winnerIndex = 0
         const existantGameId = 0
         await setUpGameWithAWinner({
@@ -934,6 +941,8 @@ describe('GameImplementationContract - Mecanism', function () {
 
     describe('when the user did win an existing game not already claimed', function () {
       it('should transfer the prize to the winner', async function () {
+        // TODO this case test fail
+        // TODO GUIGUI
         const winnerIndex = 3
         const existantGameId = 0
 
@@ -963,7 +972,7 @@ describe('GameImplementationContract - Mecanism', function () {
           this.contract.address
         )
         const updatedWinnerBalance = await ethers.provider.getBalance(
-          players[winnerIndex].address
+          this.players[winnerIndex].address
         )
 
         expect(updatedContractBalance).to.be.equal(
@@ -975,6 +984,7 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should emit the GamePrizeClaimed event with the correct data', async function () {
+        // TODO this case test fail
         const winnerIndex = 0
         const existantGameId = 0
         await setUpGameWithAWinner({
