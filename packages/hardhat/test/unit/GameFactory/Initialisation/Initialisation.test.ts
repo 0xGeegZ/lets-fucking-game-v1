@@ -16,7 +16,7 @@ describe('GameFactoryContract', function () {
             _initializer: this.secondAccount.address,
             _factoryOwner: this.owner.address,
             _gameImplementationVersion: '0',
-            _gameLineId: '0',
+            _gameId: '0',
             _roundLength: this.roundLength,
             _maxPlayers: this.maxPlayers,
             _registrationAmount: this.registrationAmount,
@@ -32,15 +32,13 @@ describe('GameFactoryContract', function () {
       it('should revert with the correct message', async function () {
         await this.gameFactoryContract
           .connect(this.secondAccount)
-          .createNewGameLine(
+          .createNewGame(
             this.maxPlayers,
             this.roundLength,
             this.registrationAmount
           )
 
-        const clonedContract = await this.gameFactoryContract.deployedGameLines(
-          0
-        )
+        const clonedContract = await this.gameFactoryContract.deployedGames(0)
         const clonedGameContract = await this.GameImplementationContract.attach(
           clonedContract.deployedAddress
         )
@@ -50,7 +48,7 @@ describe('GameFactoryContract', function () {
             _initializer: this.secondAccount.address,
             _factoryOwner: this.owner.address,
             _gameImplementationVersion: '0',
-            _gameLineId: '0',
+            _gameId: '0',
             _roundLength: this.roundLength,
             _maxPlayers: this.maxPlayers,
             _registrationAmount: this.registrationAmount,

@@ -53,7 +53,7 @@
                 {
                   "indexed": false,
                   "internalType": "uint256",
-                  "name": "gameLineId",
+                  "name": "gameId",
                   "type": "uint256"
                 },
                 {
@@ -75,7 +75,7 @@
                   "type": "address"
                 }
               ],
-              "name": "GameLineCreated",
+              "name": "GameCreated",
               "type": "event"
             },
             {
@@ -141,7 +141,7 @@
                   "type": "uint256"
                 }
               ],
-              "name": "createNewGameLine",
+              "name": "createNewGame",
               "outputs": [
                 {
                   "internalType": "address",
@@ -173,7 +173,7 @@
                   "type": "uint256"
                 }
               ],
-              "name": "deployedGameLines",
+              "name": "deployedGames",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -225,7 +225,7 @@
             },
             {
               "inputs": [],
-              "name": "gameLineId",
+              "name": "gameId",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -238,7 +238,7 @@
             },
             {
               "inputs": [],
-              "name": "getDeployedGameLines",
+              "name": "getDeployedGames",
               "outputs": [
                 {
                   "components": [
@@ -263,7 +263,7 @@
                       "type": "address"
                     }
                   ],
-                  "internalType": "struct GameFactory.GameLine[]",
+                  "internalType": "struct GameFactory.Game[]",
                   "name": "",
                   "type": "tuple[]"
                 }
@@ -431,7 +431,7 @@
                 {
                   "indexed": false,
                   "internalType": "uint256",
-                  "name": "gameId",
+                  "name": "roundId",
                   "type": "uint256"
                 },
                 {
@@ -456,7 +456,7 @@
                 {
                   "indexed": false,
                   "internalType": "uint256",
-                  "name": "gameId",
+                  "name": "roundId",
                   "type": "uint256"
                 },
                 {
@@ -475,7 +475,7 @@
                 {
                   "indexed": false,
                   "internalType": "uint256",
-                  "name": "gameId",
+                  "name": "roundId",
                   "type": "uint256"
                 },
                 {
@@ -591,7 +591,7 @@
               "inputs": [
                 {
                   "internalType": "uint256",
-                  "name": "_gameId",
+                  "name": "_roundId",
                   "type": "uint256"
                 }
               ],
@@ -654,7 +654,7 @@
             },
             {
               "inputs": [],
-              "name": "gameId",
+              "name": "roundId",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -706,7 +706,7 @@
             },
             {
               "inputs": [],
-              "name": "gameLineId",
+              "name": "gameId",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -742,7 +742,7 @@
               "outputs": [
                 {
                   "internalType": "uint256",
-                  "name": "gameId",
+                  "name": "roundId",
                   "type": "uint256"
                 },
                 {
@@ -961,7 +961,7 @@
                     },
                     {
                       "internalType": "uint256",
-                      "name": "_gameLineId",
+                      "name": "_gameId",
                       "type": "uint256"
                     },
                     {
@@ -1600,7 +1600,7 @@
                 {
                   "indexed": false,
                   "internalType": "uint256",
-                  "name": "gameId",
+                  "name": "roundId",
                   "type": "uint256"
                 },
                 {
@@ -1625,7 +1625,7 @@
                 {
                   "indexed": false,
                   "internalType": "uint256",
-                  "name": "gameId",
+                  "name": "roundId",
                   "type": "uint256"
                 },
                 {
@@ -1644,7 +1644,7 @@
                 {
                   "indexed": false,
                   "internalType": "uint256",
-                  "name": "gameId",
+                  "name": "roundId",
                   "type": "uint256"
                 },
                 {
@@ -1760,7 +1760,7 @@
               "inputs": [
                 {
                   "internalType": "uint256",
-                  "name": "_gameId",
+                  "name": "_roundId",
                   "type": "uint256"
                 }
               ],
@@ -1823,7 +1823,7 @@
             },
             {
               "inputs": [],
-              "name": "gameId",
+              "name": "roundId",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -1875,7 +1875,7 @@
             },
             {
               "inputs": [],
-              "name": "gameLineId",
+              "name": "gameId",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -1911,7 +1911,7 @@
               "outputs": [
                 {
                   "internalType": "uint256",
-                  "name": "gameId",
+                  "name": "roundId",
                   "type": "uint256"
                 },
                 {
@@ -2130,7 +2130,7 @@
                     },
                     {
                       "internalType": "uint256",
-                      "name": "_gameLineId",
+                      "name": "_gameId",
                       "type": "uint256"
                     },
                     {
@@ -2491,7 +2491,7 @@
                 {
                   "indexed": false,
                   "internalType": "uint256",
-                  "name": "gameLineId",
+                  "name": "gameId",
                   "type": "uint256"
                 },
                 {
@@ -2513,7 +2513,7 @@
                   "type": "address"
                 }
               ],
-              "name": "GameLineCreated",
+              "name": "GameCreated",
               "type": "event"
             },
             {
@@ -2579,7 +2579,7 @@
                   "type": "uint256"
                 }
               ],
-              "name": "createNewGameLine",
+              "name": "createNewGame",
               "outputs": [
                 {
                   "internalType": "address",
@@ -2611,7 +2611,7 @@
                   "type": "uint256"
                 }
               ],
-              "name": "deployedGameLines",
+              "name": "deployedGames",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -2663,7 +2663,7 @@
             },
             {
               "inputs": [],
-              "name": "gameLineId",
+              "name": "gameId",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -2676,7 +2676,7 @@
             },
             {
               "inputs": [],
-              "name": "getDeployedGameLines",
+              "name": "getDeployedGames",
               "outputs": [
                 {
                   "components": [
@@ -2701,7 +2701,7 @@
                       "type": "address"
                     }
                   ],
-                  "internalType": "struct GameFactory.GameLine[]",
+                  "internalType": "struct GameFactory.Game[]",
                   "name": "",
                   "type": "tuple[]"
                 }

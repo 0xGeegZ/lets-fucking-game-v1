@@ -779,7 +779,7 @@ describe('GameImplementationContract - Mecanism', function () {
     describe('when there is only one user left', async function () {
       it('should create a new Winner and add it to the gameWinners mapping', async function () {
         // TODO this case test fail
-        const gameId = 0
+        const roundId = 0
         const winnerIndex = 4
         await setUpGameWithAWinner({
           players: this.players,
@@ -789,13 +789,13 @@ describe('GameImplementationContract - Mecanism', function () {
           mockKeeper: this.mockKeeper,
         })
 
-        const newWinner = await this.contract.gameWinners(gameId)
+        const newWinner = await this.contract.gameWinners(roundId)
         expect(newWinner.playerAddress).to.equal(
           this.players[winnerIndex].address
         )
         expect(newWinner.amountWon.eq(this.prizeAmount)).to.be.true
         expect(newWinner.prizeClaimed).to.be.false
-        expect(newWinner.gameId).to.equal(gameId)
+        expect(newWinner.roundId).to.equal(roundId)
       })
 
       it('should emit the GameWon event with the correct data', async function () {
@@ -834,7 +834,7 @@ describe('GameImplementationContract - Mecanism', function () {
         const updatedPlayerAddressesList =
           await this.contract.getPlayerAddresses()
 
-        const updatedGameId = await this.contract.gameId()
+        const updatedGameId = await this.contract.roundId()
 
         expect(updatedPlayersAmount).to.equal(0)
         for (let i = 0; i < updatedPlayerAddressesList.length; i++) {

@@ -16,7 +16,7 @@ describe('GameFactoryContract', function () {
         await expectRevert(
           this.gameFactoryContract
             .connect(this.secondAccount)
-            .createNewGameLine(
+            .createNewGame(
               this.maxPlayers,
               this.roundLength,
               this.registrationAmount
@@ -34,7 +34,7 @@ describe('GameFactoryContract', function () {
         await expectRevert(
           this.gameFactoryContract
             .connect(this.secondAccount)
-            .createNewGameLine(
+            .createNewGame(
               outOfRangeMaxPlayers1,
               this.roundLength,
               this.registrationAmount
@@ -45,7 +45,7 @@ describe('GameFactoryContract', function () {
         await expectRevert(
           this.gameFactoryContract
             .connect(this.secondAccount)
-            .createNewGameLine(
+            .createNewGame(
               outOfRangeMaxPlayers2,
               this.roundLength,
               this.registrationAmount
@@ -63,7 +63,7 @@ describe('GameFactoryContract', function () {
         await expectRevert(
           this.gameFactoryContract
             .connect(this.secondAccount)
-            .createNewGameLine(
+            .createNewGame(
               this.maxPlayers,
               outOfRangeRoundLength1,
               this.registrationAmount
@@ -74,7 +74,7 @@ describe('GameFactoryContract', function () {
         await expectRevert(
           this.gameFactoryContract
             .connect(this.secondAccount)
-            .createNewGameLine(
+            .createNewGame(
               this.maxPlayers,
               outOfRangeRoundLength2,
               this.registrationAmount
@@ -88,13 +88,13 @@ describe('GameFactoryContract', function () {
       it('should create a new game with the correct data', async function () {
         await this.gameFactoryContract
           .connect(this.secondAccount)
-          .createNewGameLine(
+          .createNewGame(
             this.maxPlayers,
             this.roundLength,
             this.registrationAmount
           )
 
-        const newGame = await this.gameFactoryContract.deployedGameLines(0)
+        const newGame = await this.gameFactoryContract.deployedGames(0)
 
         const clonedGameContract = await this.GameImplementationContract.attach(
           newGame.deployedAddress
@@ -103,7 +103,7 @@ describe('GameFactoryContract', function () {
         const responseGeneralAdmin = await clonedGameContract.generalAdmin()
         const responseCreator = await clonedGameContract.creator()
         const responseFactory = await clonedGameContract.factory()
-        const responseGameId = await clonedGameContract.gameId()
+        const responseGameId = await clonedGameContract.roundId()
         const responseGameImplementationVersion =
           await clonedGameContract.gameImplementationVersion()
         const responseRoundLength = await clonedGameContract.roundLength()
@@ -129,21 +129,21 @@ describe('GameFactoryContract', function () {
       it('should add the new game in deployedGames', async function () {
         await this.gameFactoryContract
           .connect(this.secondAccount)
-          .createNewGameLine(
+          .createNewGame(
             this.maxPlayers,
             this.roundLength,
             this.registrationAmount
           )
         await this.gameFactoryContract
           .connect(this.thirdAccount)
-          .createNewGameLine(
+          .createNewGame(
             this.maxPlayers,
             this.roundLength,
             this.registrationAmount
           )
 
-        const firstGame = await this.gameFactoryContract.deployedGameLines(0)
-        const secondGame = await this.gameFactoryContract.deployedGameLines(1)
+        const firstGame = await this.gameFactoryContract.deployedGames(0)
+        const secondGame = await this.gameFactoryContract.deployedGames(1)
 
         expect(firstGame.id).to.be.equal('0')
         expect(firstGame.versionId).to.be.equal('0')
@@ -153,44 +153,44 @@ describe('GameFactoryContract', function () {
         expect(secondGame.creator).to.be.equal(this.thirdAccount.address)
       })
 
-      it('should emit the GameLineCreated event with the correct data', async function () {
+      it('should emit the GameCreated event with the correct data', async function () {
         await expect(
           this.gameFactoryContract
             .connect(this.secondAccount)
-            .createNewGameLine(
+            .createNewGame(
               this.maxPlayers,
               this.roundLength,
               this.registrationAmount
             )
         )
-          .to.emit(this.gameFactoryContract, 'GameLineCreated')
+          .to.emit(this.gameFactoryContract, 'GameCreated')
           .withArgs('0', anyValue, '0', this.secondAccount.address)
       })
     })
   })
 
-  context('GameFactory getDeployedGameLines', function () {
+  context('GameFactory getDeployedGames', function () {
     it('should return all the deployed game lines', async function () {
       await this.gameFactoryContract
         .connect(this.secondAccount)
-        .createNewGameLine(
+        .createNewGame(
           this.maxPlayers,
           this.roundLength,
           this.registrationAmount
         )
       await this.gameFactoryContract
         .connect(this.thirdAccount)
-        .createNewGameLine(
+        .createNewGame(
           this.maxPlayers,
           this.roundLength,
           this.registrationAmount
         )
 
-      const deployedGameLines = await this.gameFactoryContract
+      const deployedGames = await this.gameFactoryContract
         .connect(this.secondAccount)
-        .getDeployedGameLines()
+        .getDeployedGames()
 
-      expect(deployedGameLines.length).to.be.equal(2)
+      expect(deployedGames.length).to.be.equal(2)
     })
   })
 })

@@ -46,8 +46,8 @@ describe('GameImplementationContract', function () {
     await gameFactoryContract.deployed()
     await gameFactoryContract
       .connect(creator)
-      .createNewGameLine(10, 2, this.correctRegistrationAmount)
-    const clonedContract = await gameFactoryContract.deployedGameLines('0')
+      .createNewGame(10, 2, this.correctRegistrationAmount)
+    const clonedContract = await gameFactoryContract.deployedGames('0')
     this.contract = await GameImplementationContract.attach(
       clonedContract.deployedAddress
     )
@@ -943,7 +943,7 @@ TESTS
   context('Winning a game', function () {
     describe('when there is only one user left', async function () {
       it('should create a new Winner and add it to the gameWinners mapping', async function () {
-        const gameId = 0
+        const roundId = 0
         const winnerIndex = 4
         await setUpGameWithAWinner(
           winnerIndex,
@@ -951,11 +951,11 @@ TESTS
           this.correctRegistrationAmount,
           this.mockKeeper
         )
-        const newWinner = await this.contract.gameWinners(gameId)
+        const newWinner = await this.contract.gameWinners(roundId)
         expect(newWinner.playerAddress).to.equal(players[winnerIndex].address)
         expect(newWinner.amountWon.eq(this.prizeAmount)).to.be.true
         expect(newWinner.prizeClaimed).to.be.false
-        expect(newWinner.gameId).to.equal(gameId)
+        expect(newWinner.roundId).to.equal(roundId)
       })
 
       it('should emit the GameWon event with the correct data', async function () {
@@ -989,7 +989,7 @@ TESTS
         const updatedPlayersAmount = await this.contract.numPlayers()
         const updatedPlayerAddressesList =
           await this.contract.getPlayerAddresses()
-        const updatedGameId = await this.contract.gameId()
+        const updatedGameId = await this.contract.roundId()
         expect(updatedPlayersAmount).to.equal(0)
         for (let i = 0; i < updatedPlayerAddressesList.length; i++) {
           expect(updatedPlayerAddressesList[i]).to.equal(
