@@ -79,8 +79,8 @@ const beforeEachGameImplementation = async function () {
   await gameFactoryContract.deployed()
   await gameFactoryContract
     .connect(creator)
-    .createNewGameLine(10, 2, this.correctRegistrationAmount)
-  const clonedContract = await gameFactoryContract.deployedGameLines('0')
+    .createNewGame(10, 2, this.correctRegistrationAmount)
+  const clonedContract = await gameFactoryContract.deployedGames('0')
   this.contract = await GameImplementationContract.attach(
     clonedContract.deployedAddress
   )

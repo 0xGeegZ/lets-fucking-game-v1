@@ -19,8 +19,8 @@ contract GameImplementation {
     uint256 public houseEdge;
     uint256 public creatorEdge;
 
-    uint256 public gameLineId;
-    uint256 public gameId; // This gets incremented every time the game restarts
+    uint256 public gameId;
+    uint256 public roundId; // This gets incremented every time the game restarts
     string public gameName;
     string public gameImage;
 
@@ -49,7 +49,7 @@ contract GameImplementation {
     }
 
     struct Winner {
-        uint256 gameId;
+        uint256 roundId;
         address playerAddress;
         uint256 amountWon;
         bool prizeClaimed;
@@ -59,7 +59,7 @@ contract GameImplementation {
         address _initializer;
         address _factoryOwner;
         uint256 _gameImplementationVersion;
-        uint256 _gameLineId;
+        uint256 _gameId;
         uint256 _roundLength;
         uint256 _maxPlayers;
         uint256 _registrationAmount;
@@ -71,12 +71,12 @@ contract GameImplementation {
     event RegisteredForGame(address playerAddress, uint256 playersCount);
     event StartedGame(uint256 timelock, uint256 playersCount);
     event ResetGame(uint256 timelock, uint256 resetGameId);
-    event GameLost(uint256 gameId, address playerAddress);
+    event GameLost(uint256 roundId, address playerAddress);
     event PlayedRound(address playerAddress);
-    event GameWon(uint256 gameId, address playerAddress, uint256 amountWon);
+    event GameWon(uint256 roundId, address playerAddress, uint256 amountWon);
     event FailedTransfer(address receiver, uint256 amount);
     event Received(address sender, uint256 amount);
-    event GamePrizeClaimed(address claimer, uint256 gameId, uint256 amountClaimed);
+    event GamePrizeClaimed(address claimer, uint256 roundId, uint256 amountClaimed);
 
     ///
     /// CONSTRUCTOR AND DEFAULT
@@ -95,10 +95,10 @@ contract GameImplementation {
         houseEdge = initialization._houseEdge;
         creatorEdge = initialization._creatorEdge;
 
-        gameLineId = initialization._gameLineId;
+        gameId = initialization._gameId;
         gameImplementationVersion = initialization._gameImplementationVersion;
 
-        gameId = 0;
+        roundId = 0;
         roundLength = initialization._roundLength;
         maxPlayers = initialization._maxPlayers;
 
@@ -276,15 +276,15 @@ contract GameImplementation {
         }
     }
 
-    function claimPrize(uint256 _gameId) external {
-        require(_gameId <= gameId, "This game does not exist");
-        require(msg.sender == gameWinners[_gameId].playerAddress, "Player did not win this game");
-        require(gameWinners[_gameId].prizeClaimed == false, "Prize for this game already claimed");
-        require(address(this).balance >= gameWinners[_gameId].amountWon, "Not enough funds in contract");
+    function claimPrize(uint256 _roundId) external {
+        require(_roundId <= roundId, "This game does not exist");
+        require(msg.sender == gameWinners[_roundId].playerAddress, "Player did not win this game");
+        require(gameWinners[_roundId].prizeClaimed == false, "Prize for this game already claimed");
+        require(address(this).balance >= gameWinners[_roundId].amountWon, "Not enough funds in contract");
 
-        gameWinners[_gameId].prizeClaimed = true;
-        _safeTransfert(msg.sender, gameWinners[_gameId].amountWon);
-        emit GamePrizeClaimed(msg.sender, gameWinners[_gameId].gameId, gameWinners[_gameId].amountWon);
+        gameWinners[_roundId].prizeClaimed = true;
+        _safeTransfert(msg.sender, gameWinners[_roundId].amountWon);
+        emit GamePrizeClaimed(msg.sender, gameWinners[_roundId].roundId, gameWinners[_roundId].amountWon);
     }
 
     ///
@@ -308,8 +308,8 @@ contract GameImplementation {
         }
         numPlayers = 0;
 
-        emit ResetGame(block.timestamp, gameId);
-        gameId += 1;
+        emit ResetGame(block.timestamp, roundId);
+        roundId += 1;
     }
 
     function _safeTransfert(address receiver, uint256 amount) internal {
@@ -339,14 +339,14 @@ contract GameImplementation {
         if (remainingPlayersCounter == 1) {
             // TODO houseEdge + creatorEdge are cumultate.
             uint256 prize = registrationAmount * numPlayers - houseEdge - creatorEdge;
-            gameWinners[gameId] = Winner({
+            gameWinners[roundId] = Winner({
                 playerAddress: lastNonLoosingPlayerAddress,
                 amountWon: prize,
                 prizeClaimed: false,
-                gameId: gameId
+                roundId: roundId
             });
 
-            emit GameWon(gameId, lastNonLoosingPlayerAddress, prize);
+            emit GameWon(roundId, lastNonLoosingPlayerAddress, prize);
 
             _resetGame();
         }
@@ -391,7 +391,7 @@ contract GameImplementation {
         player.hasLost = true;
         player.isSplitOk = false;
 
-        emit GameLost(gameId, player.playerAddress);
+        emit GameLost(roundId, player.playerAddress);
     }
 
     /// CREATOR FUNCTIONS
@@ -472,7 +472,7 @@ contract GameImplementation {
 
         return (
             creator,
-            gameId,
+            roundId,
             gameName,
             gameImage,
             numPlayers,
