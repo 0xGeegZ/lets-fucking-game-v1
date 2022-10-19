@@ -4,7 +4,7 @@ import { ethers } from 'hardhat'
 
 import {
   beforeEachGameImplementation,
-  makePlayerLooseForNotPlaying,
+  getTwoPlayersInFinal,
   ONE_DAY_IN_SECONDS,
   ONE_HOUR_IN_SECOND,
   registerPlayer,

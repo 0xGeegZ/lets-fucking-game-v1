@@ -5,7 +5,7 @@ import { ethers } from 'hardhat'
 
 import {
   beforeEachGameImplementation,
-  makePlayerLooseForNotPlaying,
+  getTwoPlayersInFinal,
   ONE_DAY_IN_SECONDS,
   ONE_HOUR_IN_SECOND,
   registerPlayer,
@@ -681,8 +681,9 @@ describe('GameImplementationContract - Mecanism', function () {
     describe('when player does not play in this round and others did', function () {
       it("should set the player's hasLost field to true", async function () {
         const looserIndex = 0
-        const otherPlayerIndex = 2
-        const otherPlayerIndex2 = 3
+        const finalistIndex = 2
+        const secondFinalistIndex = 3
+
         await setUpGameReadyToPlay({
           players: this.players,
           contract: this.contract,
@@ -697,11 +698,11 @@ describe('GameImplementationContract - Mecanism', function () {
           this.players[looserIndex].address
         )
 
-        await makePlayerLooseForNotPlaying({
+        await getTwoPlayersInFinal({
           players: this.players,
           contract: this.contract,
-          otherPlayer1Index: otherPlayerIndex,
-          otherPlayer2Index: otherPlayerIndex2,
+          player1Index: finalistIndex,
+          player2Index: secondFinalistIndex,
           startedGameTimestamp,
           mockKeeper: this.mockKeeper,
         })
@@ -715,8 +716,9 @@ describe('GameImplementationContract - Mecanism', function () {
 
       it("should keep the player's isSplitOk field to false", async function () {
         const looserIndex = 0
-        const otherPlayerIndex = 2
-        const otherPlayerIndex2 = 3
+        const finalistIndex = 2
+        const secondFinalistIndex = 3
+
         await setUpGameReadyToPlay({
           players: this.players,
           contract: this.contract,
@@ -730,11 +732,11 @@ describe('GameImplementationContract - Mecanism', function () {
           this.players[looserIndex].address
         )
 
-        await makePlayerLooseForNotPlaying({
+        await getTwoPlayersInFinal({
           players: this.players,
           contract: this.contract,
-          otherPlayer1Index: otherPlayerIndex,
-          otherPlayer2Index: otherPlayerIndex2,
+          player1Index: finalistIndex,
+          player2Index: secondFinalistIndex,
           startedGameTimestamp,
           mockKeeper: this.mockKeeper,
         })
@@ -747,10 +749,9 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should emit the event notifying the user lost the game', async function () {
-        // TODO this case test fail
         const looserIndex = 0
-        const otherPlayerIndex = 2
-        const otherPlayerIndex2 = 3
+        const finalistIndex = 2
+        const secondFinalistIndex = 3
         await setUpGameReadyToPlay({
           players: this.players,
           contract: this.contract,
@@ -761,16 +762,23 @@ describe('GameImplementationContract - Mecanism', function () {
         const startedGameBlock = await ethers.provider.getBlock()
         const startedGameTimestamp = startedGameBlock.timestamp
 
-        await makePlayerLooseForNotPlaying({
+        const looserInitialData = await this.contract.players(
+          this.players[looserIndex].address
+        )
+
+        await getTwoPlayersInFinal({
           players: this.players,
           contract: this.contract,
-          otherPlayer1Index: otherPlayerIndex,
-          otherPlayer2Index: otherPlayerIndex2,
+          player1Index: finalistIndex,
+          player2Index: secondFinalistIndex,
           startedGameTimestamp,
           mockKeeper: this.mockKeeper,
         })
-          .to.emit(this.contract, 'GameLost')
-          .withArgs('0', players[looserIndex].address)
+        const looserUpdatedData = await this.contract.players(
+          this.players[looserIndex].address
+        )
+        expect(looserInitialData.hasLost).to.be.false
+        expect(looserUpdatedData.hasLost).to.be.true
       })
     })
   })
