@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
-
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-
 import { GameImplementation } from "./GameImplementation.sol";
 
 contract GameFactory is Pausable, Ownable {
@@ -12,80 +10,94 @@ contract GameFactory is Pausable, Ownable {
     uint256 public houseEdge;
     // TODO should be entered as percent
     uint256 public creatorEdge;
-
     uint256 public latestGameImplementationVersionId;
     GameImplementationVersion[] public gameImplementations;
-    uint256 public gameId = 0;
-    Game[] public deployedGames;
-
+    uint256 public gameLineId = 0;
+    GameLine[] public deployedGameLines;
+    AuthorizedAmount[] public authorizedAmounts;
+    mapping(AuthorizedAmount => bool) public usedAuthorizedAmounts;
     ///
     ///STRUCTS
     ///
-
+    struct AuthorizedAmount {
+        uint256 amount;
+        bool isUsed;
+    }
     struct GameImplementationVersion {
         uint256 id;
         address deployedAddress;
     }
-
-    struct Game {
+    struct GameLine {
         uint256 id;
         uint256 versionId;
         address creator;
         address deployedAddress;
     }
-
     ///
     ///EVENTS
     ///
-
-    event GameCreated(uint256 gameId, address gameAddress, uint256 implementationVersion, address creatorAddress);
+    event GameLineCreated(
+        uint256 gameLineId,
+        address gameAddress,
+        uint256 implementationVersion,
+        address creatorAddress
+    );
     event FailedTransfer(address receiver, uint256 amount);
 
     constructor(
         address _gameImplementation,
         uint256 _houseEdge,
-        uint256 _creatorEdge
-    ) {
+        uint256 _creatorEdge,
+        uint256[] _authorizedAmounts
+    ) onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts) {
         houseEdge = _houseEdge;
         creatorEdge = _creatorEdge;
         gameImplementations.push(
             GameImplementationVersion({ id: latestGameImplementationVersionId, deployedAddress: _gameImplementation })
         );
+        // For each amount, create an AuthorizedAmount with amount & isUsed = false
+        authorizedAmounts = _authorizedAmounts;
     }
 
     ///
     /// MODIFIERS
     ///
-
     modifier onlyAdmin() {
         require(msg.sender == owner(), "Caller is not the admin");
         _;
     }
-
     modifier onlyAllowedNumberOfPlayers(uint256 _maxPlayers) {
         require(_maxPlayers > 1, "maxPlayers should be bigger than or equal to 2");
         require(_maxPlayers < 21, "maxPlayers should not be bigger than 20");
         _;
     }
-
     modifier onlyAllowedRoundLength(uint256 _roundLength) {
         require(_roundLength > 0, "roundLength should be bigger than 0");
         require(_roundLength < 9, "roundLength should not be bigger than 8");
         _;
     }
-
     modifier onlyAllowedRegistrationAmount(uint256 _registrationAmount) {
         require(_registrationAmount > 0, "registrationAmount should be bigger than 0");
         require(_registrationAmount <= 1 ether, "registrationAmount should not be bigger or equal to 1");
+        _;
+    }
+    modifier onlyIfAuthorizedAmounts(uint256 _registrationAmount) {
+        require(
+            authorizedAmounts[_registrationAmount].isUsed = false,
+            "_registrationAmout that match with AuthorizedAmout should not be used"
+        );
+        _;
+    }
+    modifier onlyIfAuthorizedAmountsIsNotEmpty(uint256[] _authorizedAmounts) {
+        require(_authorizedAmounts.length >= 1, "authorizedAmounts should be greather or equal to 1");
         _;
     }
 
     ///
     ///BUSINESS LOGIC FUNCTIONS
     ///
-
-    // TODO add Name and image url as argument to createNewGame & initialize functions
-    function createNewGame(
+    // TODO add Name and image url as argument to createNewGameLine & initialize functions
+    function createNewGameLine(
         uint256 _maxPlayers,
         uint256 _roundLength,
         uint256 _registrationAmount
@@ -95,18 +107,18 @@ contract GameFactory is Pausable, Ownable {
         onlyAllowedNumberOfPlayers(_maxPlayers)
         onlyAllowedRoundLength(_roundLength)
         onlyAllowedRegistrationAmount(_registrationAmount)
+        onlyIfAuthorizedAmounts(_registrationAmount)
         returns (address game)
     {
         address latestGameImplementationAddress = gameImplementations[latestGameImplementationVersionId]
             .deployedAddress;
         address payable newGameAddress = payable(Clones.clone(latestGameImplementationAddress));
-
         GameImplementation(newGameAddress).initialize(
             GameImplementation.Initialization({
                 _initializer: msg.sender,
                 _factoryOwner: owner(),
                 _gameImplementationVersion: latestGameImplementationVersionId,
-                _gameId: gameId,
+                _gameLineId: gameLineId,
                 _roundLength: _roundLength,
                 _maxPlayers: _maxPlayers,
                 _registrationAmount: _registrationAmount,
@@ -114,31 +126,27 @@ contract GameFactory is Pausable, Ownable {
                 _creatorEdge: creatorEdge
             })
         );
-
-        deployedGames.push(
-            Game({
-                id: gameId,
+        deployedGameLines.push(
+            GameLine({
+                id: gameLineId,
                 versionId: latestGameImplementationVersionId,
                 creator: msg.sender,
                 deployedAddress: newGameAddress
             })
         );
-        emit GameCreated(gameId, newGameAddress, latestGameImplementationVersionId, msg.sender);
-
-        gameId += 1;
+        emit GameLineCreated(gameLineId, newGameAddress, latestGameImplementationVersionId, msg.sender);
+        gameLineId += 1;
+        // TODO : Pass AuthorizedAmount.isUsed to true.
         return newGameAddress;
     }
 
     ///
     ///INTERNAL FUNCTIONS
     ///
-
     function _safeTransfert(address receiver, uint256 amount) internal {
         uint256 balance = address(this).balance;
         if (balance < amount) require(false, "Not enough in contract balance");
-
         (bool success, ) = receiver.call{ value: amount }("");
-
         if (!success) {
             emit FailedTransfer(receiver, amount);
             require(false, "Transfer failed.");
@@ -148,9 +156,7 @@ contract GameFactory is Pausable, Ownable {
     ///
     ///ADMIN FUNCTIONS
     ///
-
     function setAdmin(address _adminAddress) public onlyAdmin {
-        require(_adminAddress != msg.sender, "Cannot transfer to self");
         transferOwnership(_adminAddress);
     }
 
@@ -173,11 +179,19 @@ contract GameFactory is Pausable, Ownable {
         _unpause();
     }
 
+    function updateAuthorizedAmounts(uint256[] _authorizedAmounts) public onlyAdmin {
+        authorizedAmounts = _authorizedAmounts;
+    }
+
     ///
     ///GETTER FUNCTIONS
     ///
-
-    function getDeployedGames() external view returns (Game[] memory) {
-        return deployedGames;
+    function getDeployedGameLines() external view returns (GameLine[] memory) {
+        return deployedGameLines;
     }
+
+    ///
+    ///SETTER FUNCTION
+    ///
+    function updateAuthorizedAmounts(string memory authorizedAmount) external onlyAdmin {}
 }
