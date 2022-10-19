@@ -83,18 +83,18 @@ HELPERS FUNCTIONS
     return contract.connect(mockKeeper).triggerDailyCheckpoint()
   }
 
-  const makePlayerLooseForNotPlaying = async function (
+  const getTwoPlayersInFinal = async function (
     contract,
-    otherPlayer1Index,
-    otherPlayer2Index,
+    player1Index,
+    player2Index,
     startedGameTimestamp,
     mockKeeper
   ) {
     const otherPlayer1InitialData = await contract.players(
-      players[otherPlayer1Index].address
+      players[player1Index].address
     )
     const otherPlayer2InitialData = await contract.players(
-      players[otherPlayer2Index].address
+      players[player2Index].address
     )
 
     const otherPlayer1RangeLowerLimit =
@@ -109,26 +109,26 @@ HELPERS FUNCTIONS
         otherPlayer1RangeLowerLimit.toNumber(),
       ])
 
-      await contract.connect(players[otherPlayer1Index]).playRound()
-      await contract.connect(players[otherPlayer2Index]).playRound()
+      await contract.connect(players[player1Index]).playRound()
+      await contract.connect(players[player2Index]).playRound()
     } else if (otherPlayer1RangeLowerLimit.lt(otherPlayer2RangeLowerLimit)) {
       await ethers.provider.send('evm_setNextBlockTimestamp', [
         otherPlayer1RangeLowerLimit.toNumber(),
       ])
-      await contract.connect(players[otherPlayer1Index]).playRound()
+      await contract.connect(players[player1Index]).playRound()
       await ethers.provider.send('evm_setNextBlockTimestamp', [
         otherPlayer2RangeLowerLimit.toNumber(),
       ])
-      await contract.connect(players[otherPlayer2Index]).playRound()
+      await contract.connect(players[player2Index]).playRound()
     } else {
       await ethers.provider.send('evm_setNextBlockTimestamp', [
         otherPlayer2RangeLowerLimit.toNumber(),
       ])
-      await contract.connect(players[otherPlayer2Index]).playRound()
+      await contract.connect(players[player2Index]).playRound()
       await ethers.provider.send('evm_setNextBlockTimestamp', [
         otherPlayer1RangeLowerLimit.toNumber(),
       ])
-      await contract.connect(players[otherPlayer1Index]).playRound()
+      await contract.connect(players[player1Index]).playRound()
     }
 
     // Time passes until next checkpoint
@@ -152,7 +152,7 @@ HELPERS FUNCTIONS
     const startedGameTimestamp = startedGameBlock.timestamp
 
     // 8 players lost for not playing, 2 players remain in second round
-    await makePlayerLooseForNotPlaying(
+    await getTwoPlayersInFinal(
       contract,
       winnerIndex,
       secondPlayerIndex,
@@ -879,7 +879,7 @@ TESTS
         const looserInitialData = await this.contract.players(
           players[looserIndex].address
         )
-        await makePlayerLooseForNotPlaying(
+        await getTwoPlayersInFinal(
           this.contract,
           otherPlayerIndex,
           otherPlayerIndex2,
@@ -904,7 +904,7 @@ TESTS
         const looserInitialData = await this.contract.players(
           players[looserIndex].address
         )
-        await makePlayerLooseForNotPlaying(
+        await getTwoPlayersInFinal(
           this.contract,
           otherPlayerIndex,
           otherPlayerIndex2,
@@ -927,7 +927,7 @@ TESTS
           this.mockKeeper
         )
         await expect(
-          makePlayerLooseForNotPlaying(
+          getTwoPlayersInFinal(
             this.contract,
             otherPlayerIndex,
             otherPlayerIndex2,

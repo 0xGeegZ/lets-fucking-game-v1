@@ -2,7 +2,7 @@ import { expect } from 'chai'
 
 import {
   beforeEachGameImplementation,
-  makePlayerLooseForNotPlaying,
+  getTwoPlayersInFinal,
   ONE_DAY_IN_SECONDS,
   ONE_HOUR_IN_SECOND,
   registerPlayer,
