@@ -1,6 +1,6 @@
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-import { expect } from 'chai'
 import { ethers } from 'hardhat'
+import { expect } from 'chai'
 
 const ONE_HOUR_IN_SECOND = 3600
 const ONE_DAY_IN_SECONDS = ONE_HOUR_IN_SECOND * 24
@@ -56,6 +56,17 @@ const beforeEachGameImplementation = async function () {
   this.correctRegistrationAmount = ethers.utils.parseEther('0.0001')
   this.houseEdge = ethers.utils.parseEther('0.00005')
   this.creatorEdge = ethers.utils.parseEther('0.00005')
+  this.authorizedAmounts = [
+    ethers.utils.parseEther('0.0001'),
+    ethers.utils.parseEther('0.00025'),
+    ethers.utils.parseEther('0.0005'),
+    ethers.utils.parseEther('0.00075'),
+    ethers.utils.parseEther('0.001'),
+    ethers.utils.parseEther('0.0015'),
+    ethers.utils.parseEther('0.002'),
+    ethers.utils.parseEther('0.005'),
+    ethers.utils.parseEther('0.01')
+  ]
   this.prizeAmount = ethers.utils.parseEther('0.0009') // prizeAmount equals total prize amount minus house edge
   this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
   this.zeroRegistrationAmount = ethers.utils.parseEther('0')

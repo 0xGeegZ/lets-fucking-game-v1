@@ -19,6 +19,7 @@ describe('GameFactoryContract', function () {
             _registrationAmount: this.registrationAmount,
             _houseEdge: this.houseEdge,
             _creatorEdge: this.creatorEdge,
+            _authorizedAmounts: this.authorizedAmounts,
           }),
           "The implementation contract can't be initialized"
         )
@@ -50,6 +51,7 @@ describe('GameFactoryContract', function () {
             _registrationAmount: this.registrationAmount,
             _houseEdge: this.houseEdge,
             _creatorEdge: this.creatorEdge,
+            _authorizedAmounts: this.authorizedAmounts,
           }),
           'Contract already initialized'
         )
@@ -87,7 +89,7 @@ describe('GameFactoryContract', function () {
   context('GameFactory setter', function () {
     describe("when amounts authorized are initialized", function () {
       it('should initialize amounts whit available values', function () {
-        // does Setter test should be writhed here ?
+
       })
     })
   })

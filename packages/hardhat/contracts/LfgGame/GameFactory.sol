@@ -189,9 +189,4 @@ contract GameFactory is Pausable, Ownable {
     function getDeployedGameLines() external view returns (GameLine[] memory) {
         return deployedGameLines;
     }
-
-    ///
-    ///SETTER FUNCTION
-    ///
-    function updateAuthorizedAmounts(string memory authorizedAmount) external onlyAdmin {}
 }
