@@ -21,17 +21,18 @@ const beforeEachGameFactory = async function () {
   this.houseEdge = ethers.utils.parseEther('0.000005')
   this.creatorEdge = ethers.utils.parseEther('0.000005')
 
-  // TODO Create list of AuthorisedAmounts
   this.authorizedAmounts = [
     ethers.utils.parseEther('0.0001'),
-    ethers.utils.parseEther('0.00025'),
-    ethers.utils.parseEther('0.0005'),
-    ethers.utils.parseEther('0.00075'),
-    ethers.utils.parseEther('0.001'),
-    ethers.utils.parseEther('0.0015'),
-    ethers.utils.parseEther('0.002'),
-    ethers.utils.parseEther('0.005'),
-    ethers.utils.parseEther('0.01'),
+    ethers.utils.parseEther('0.05'),
+    ethers.utils.parseEther('0.1'),
+    ethers.utils.parseEther('0.25'),
+    ethers.utils.parseEther('0.50'),
+    ethers.utils.parseEther('0.75'),
+    ethers.utils.parseEther('1'),
+    ethers.utils.parseEther('1.5'),
+    ethers.utils.parseEther('2'),
+    ethers.utils.parseEther('5'),
+    ethers.utils.parseEther('10'),
   ]
 
   const GameFactoryContract = await ethers.getContractFactory('GameFactory')
@@ -73,14 +74,16 @@ const beforeEachGameImplementation = async function () {
   this.creatorEdge = ethers.utils.parseEther('0.00005')
   this.authorizedAmounts = [
     ethers.utils.parseEther('0.0001'),
-    ethers.utils.parseEther('0.00025'),
-    ethers.utils.parseEther('0.0005'),
-    ethers.utils.parseEther('0.00075'),
-    ethers.utils.parseEther('0.001'),
-    ethers.utils.parseEther('0.0015'),
-    ethers.utils.parseEther('0.002'),
-    ethers.utils.parseEther('0.005'),
-    ethers.utils.parseEther('0.01'),
+    ethers.utils.parseEther('0.05'),
+    ethers.utils.parseEther('0.1'),
+    ethers.utils.parseEther('0.25'),
+    ethers.utils.parseEther('0.50'),
+    ethers.utils.parseEther('0.75'),
+    ethers.utils.parseEther('1'),
+    ethers.utils.parseEther('1.5'),
+    ethers.utils.parseEther('2'),
+    ethers.utils.parseEther('5'),
+    ethers.utils.parseEther('10'),
   ]
 
   this.prizeAmount = ethers.utils.parseEther('0.0009') // prizeAmount equals total prize amount minus house edge
