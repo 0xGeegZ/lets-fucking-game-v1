@@ -110,6 +110,27 @@ describe('GameFactoryContract', function () {
           'authorizedAmounts should be greather or equal to 1'
         )
       })
+      it('should revert create game with already used amount', async function () {
+        const sameRegistrationAmount = this.authorizedAmounts[1]
+        await this.gameFactoryContract
+          .connect(this.secondAccount)
+          .createNewGame(
+            this.maxPlayers,
+            this.roundLength,
+            sameRegistrationAmount
+          )
+
+        await expectRevert(
+          this.gameFactoryContract
+            .connect(this.thirdAccount)
+            .createNewGame(
+              this.maxPlayers,
+              this.roundLength,
+              sameRegistrationAmount
+            ),
+          'registrationAmout is already used'
+        )
+      })
     })
   })
 })

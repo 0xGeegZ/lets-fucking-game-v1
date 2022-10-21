@@ -53,12 +53,14 @@ contract GameFactory is Pausable, Ownable {
             GameImplementationVersion({ id: latestGameImplementationVersionId, deployedAddress: _gameImplementation })
         );
 
-        authorizedAmounts = _authorizedAmounts;
-        for (uint256 i = 0; i < authorizedAmounts.length; i++) {
-            usedAuthorisedAmounts[authorizedAmounts[i]] = AuthorizedAmount({
-                isUsed: false,
-                amount: authorizedAmounts[i]
-            });
+        for (uint256 i = 0; i < _authorizedAmounts.length; i++) {
+            if (!_isExistAuthorizedAmounts(_authorizedAmounts[i])) {
+                authorizedAmounts.push(_authorizedAmounts[i]);
+                usedAuthorisedAmounts[_authorizedAmounts[i]] = AuthorizedAmount({
+                    isUsed: false,
+                    amount: _authorizedAmounts[i]
+                });
+            }
         }
     }
 
