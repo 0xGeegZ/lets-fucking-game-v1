@@ -1,6 +1,6 @@
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-import { expect } from 'chai'
 import { ethers } from 'hardhat'
+import { expect } from 'chai'
 
 const ONE_HOUR_IN_SECOND = 3600
 const ONE_DAY_IN_SECONDS = ONE_HOUR_IN_SECOND * 24
@@ -21,16 +21,32 @@ const beforeEachGameFactory = async function () {
   this.houseEdge = ethers.utils.parseEther('0.000005')
   this.creatorEdge = ethers.utils.parseEther('0.000005')
 
+  this.authorizedAmounts = [
+    ethers.utils.parseEther('0.0001'),
+    ethers.utils.parseEther('0.05'),
+    ethers.utils.parseEther('0.1'),
+    ethers.utils.parseEther('0.25'),
+    ethers.utils.parseEther('0.50'),
+    ethers.utils.parseEther('0.75'),
+    ethers.utils.parseEther('1'),
+    ethers.utils.parseEther('1.5'),
+    ethers.utils.parseEther('2'),
+    ethers.utils.parseEther('5'),
+    ethers.utils.parseEther('10'),
+  ]
+
   const GameFactoryContract = await ethers.getContractFactory('GameFactory')
   const GameImplementationContract = await ethers.getContractFactory(
     'GameImplementation'
   )
   const gameImplementationContract = await GameImplementationContract.deploy()
   await gameImplementationContract.deployed()
+
   const gameFactoryContract = await GameFactoryContract.connect(owner).deploy(
     gameImplementationContract.address,
     this.houseEdge,
-    this.creatorEdge
+    this.creatorEdge,
+    this.authorizedAmounts
   )
   await gameFactoryContract.deployed()
 
@@ -56,6 +72,20 @@ const beforeEachGameImplementation = async function () {
   this.correctRegistrationAmount = ethers.utils.parseEther('0.0001')
   this.houseEdge = ethers.utils.parseEther('0.00005')
   this.creatorEdge = ethers.utils.parseEther('0.00005')
+  this.authorizedAmounts = [
+    ethers.utils.parseEther('0.0001'),
+    ethers.utils.parseEther('0.05'),
+    ethers.utils.parseEther('0.1'),
+    ethers.utils.parseEther('0.25'),
+    ethers.utils.parseEther('0.50'),
+    ethers.utils.parseEther('0.75'),
+    ethers.utils.parseEther('1'),
+    ethers.utils.parseEther('1.5'),
+    ethers.utils.parseEther('2'),
+    ethers.utils.parseEther('5'),
+    ethers.utils.parseEther('10'),
+  ]
+
   this.prizeAmount = ethers.utils.parseEther('0.0009') // prizeAmount equals total prize amount minus house edge
   this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
   this.zeroRegistrationAmount = ethers.utils.parseEther('0')
@@ -75,12 +105,18 @@ const beforeEachGameImplementation = async function () {
   await gameImplementationContract.deployed()
   const gameFactoryContract = await GameFactoryContract.connect(
     this.generalAdmin
-  ).deploy(gameImplementationContract.address, this.houseEdge, this.creatorEdge)
+  ).deploy(
+    gameImplementationContract.address,
+    this.houseEdge,
+    this.creatorEdge,
+    this.authorizedAmounts
+  )
   await gameFactoryContract.deployed()
   await gameFactoryContract
     .connect(creator)
     .createNewGame(10, 2, this.correctRegistrationAmount)
   const clonedContract = await gameFactoryContract.deployedGames('0')
+
   this.contract = await GameImplementationContract.attach(
     clonedContract.deployedAddress
   )

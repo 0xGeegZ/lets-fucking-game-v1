@@ -1,9 +1,8 @@
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-import { expectRevert } from '@openzeppelin/test-helpers'
-import { expect } from 'chai'
-import { ethers } from 'hardhat'
-
 import { beforeEachGameFactory } from '../../../helpers/helpers'
+import { ethers } from 'hardhat'
+import { expect } from 'chai'
+import { expectRevert } from '@openzeppelin/test-helpers'
 
 describe('GameFactoryContract', function () {
   beforeEach(beforeEachGameFactory)
@@ -75,6 +74,65 @@ describe('GameFactoryContract', function () {
         expect(responseGameImplementations2.id).to.be.equal('1')
         expect(responseGameImplementations2.deployedAddress).to.be.equal(
           this.secondGameImplementationContract.address
+        )
+      })
+    })
+  })
+  context('GameFactory addAuthorizedAmounts', function () {
+    describe('when admin update authorisedAmounts', function () {
+      it('should be updated with correct amounts', async function () {
+        const toUpdateAuthorisedAmounts = [ethers.utils.parseEther('999')]
+
+        const responseAuthorizedAmountsBefore = await this.gameFactoryContract
+          .connect(this.owner)
+          .getAuthorisedAmounts()
+
+        await this.gameFactoryContract
+          .connect(this.owner)
+          .addAuthorizedAmounts(toUpdateAuthorisedAmounts)
+
+        const responseAuthorizedAmountsAfter = await this.gameFactoryContract
+          .connect(this.owner)
+          .getAuthorisedAmounts()
+
+        expect(responseAuthorizedAmountsBefore.length + 1).to.be.equal(
+          responseAuthorizedAmountsAfter.length
+        )
+      })
+
+      it('should be updated with no duplicates amounts', async function () {
+        const toUpdateAuthorisedAmounts = [
+          ...this.authorizedAmounts,
+          ethers.utils.parseEther('999'),
+          ethers.utils.parseEther('999'),
+        ]
+
+        const responseAuthorizedAmountsBefore = await this.gameFactoryContract
+          .connect(this.owner)
+          .getAuthorisedAmounts()
+
+        await this.gameFactoryContract
+          .connect(this.owner)
+          .addAuthorizedAmounts(toUpdateAuthorisedAmounts)
+
+        const responseAuthorizedAmountsAfter = await this.gameFactoryContract
+          .connect(this.owner)
+          .getAuthorisedAmounts()
+
+        expect(responseAuthorizedAmountsBefore.length + 1).to.be.equal(
+          responseAuthorizedAmountsAfter.length
+        )
+      })
+    })
+    describe('when called by non admin', function () {
+      it('should revert with correct message', async function () {
+        const toUpdateAuthorisedAmounts = [ethers.utils.parseEther('999')]
+
+        await expectRevert(
+          this.gameFactoryContract
+            .connect(this.thirdAccount)
+            .addAuthorizedAmounts(toUpdateAuthorisedAmounts),
+          'Caller is not the admin'
         )
       })
     })
