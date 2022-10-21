@@ -1,9 +1,8 @@
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-import { expectRevert } from '@openzeppelin/test-helpers'
-import { expect } from 'chai'
-import { ethers } from 'hardhat'
-
 import { beforeEachGameFactory } from '../../../helpers/helpers'
+import { ethers } from 'hardhat'
+import { expect } from 'chai'
+import { expectRevert } from '@openzeppelin/test-helpers'
 
 describe('GameFactoryContract', function () {
   beforeEach(beforeEachGameFactory)
@@ -76,6 +75,25 @@ describe('GameFactoryContract', function () {
         expect(responseGameImplementations2.deployedAddress).to.be.equal(
           this.secondGameImplementationContract.address
         )
+      })
+    })
+    
+    context('GameFactory updateAuthorizedAmounts', function () {
+      describe('when authorized amounts is going to be update', function () {
+        it('should be updated with correct amounts', async function () {
+          const responseAuthorizedAmounts = await this.authorisedAmounts
+          const responseNewAuthorizedAmounts = await this.newAuthorizedAmounts
+          // Setter tasks
+          expect(responseNewAuthorizedAmounts).to.be.an('array').and.to.be.empty.should.throw('New list of authorized amounts can not be empty')
+          expect(responseNewAuthorizedAmounts).to.be.an('array').and.to.have.lengthOf(1).that.includes.same.members(responseAuthorizedAmounts).should.throw('New list of authorized amounts can not be already exists in authorized amounts')
+          expect(responseNewAuthorizedAmounts).to.be.an('array').and.to.have.lengthOf(2).that.includes.same.members(responseAuthorizedAmounts).should.throw('New list of authorized amounts can not be already exists in authorized amounts')
+          expect(responseNewAuthorizedAmounts).to.be.an('array').to.not.include.same.members(responseAuthorizedAmounts).and.to.have.lengthOf(1)
+          expect(responseNewAuthorizedAmounts).to.be.an('array').to.not.include.same.members(responseAuthorizedAmounts).and.to.have.lengthOf(10)
+          // i didn't find better solution to check if all values are unique
+          // https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
+          const arrayWithUniqueValues = responseNewAuthorizedAmounts.filter((v, i, a) => a.indexOf(v) === i)
+          expect(arrayWithUniqueValues).to.be.an('array').and.to.not.have.lengthOf(lengthOf(responseNewAuthorizedAmounts)).should.throw('New list of authorized amounts must contains unique values')
+        })
       })
     })
   })

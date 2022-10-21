@@ -79,6 +79,7 @@ describe('GameFactoryContract', function () {
         expect(responseHouseEdge).to.be.equal(this.houseEdge)
         expect(responseCreatorEdge).to.be.equal(this.creatorEdge)
         expect(responseAuthorizedAmounts).to.be.equal(this.authorizedAmounts)
+        // Constructor tasks
         expect(responseAuthorizedAmounts).to.be.empty.should.throw("Authorized amounts list should not be empty")
         expect(responseAuthorizedAmounts).to.have.lengthOf(1)
         expect(responseAuthorizedAmounts).to.have.lengthOf(10)
@@ -86,11 +87,34 @@ describe('GameFactoryContract', function () {
       })
     })
   })
-  context('GameFactory setter', function () {
-    describe("when amounts authorized are initialized", function () {
-      it('should initialize amounts whit available values', function () {
-
-      })
+  context('GameFactory create game', function () {
+    describe("when amount authorized is available", function () {
+      it('should create game', function () {
+        // I tried to write test of creation game with all arguments needed but not sur of this implementation
+        const responseGameImplementationContract = await this.gameImplementationContract()
+        const responseHouseEdge = await this.gameFactoryContract.houseEdge()
+        const responseCreatorEdge = await this.gameFactoryContract.creatorEdge()
+        const responseAuthorizedAmounts = await this.gameFactoryContract.authorizedAmounts()
+        const responseRegistrationAmount = await this.correctRegistrationAmount()
+        const responseIncorrectRegistrationAmount = await this.incorrectRegistrationAmount()
+        const responseZeroRegistrationAmount = await this.zeroRegistrationAmount()
+        const responseAdmin = await this.generalAdmin()
+        const responseDeployedGame = await this.gameFactoryContract.deployed()
+        const ResponseCreatedGame = await GameFactoryContract()
+          .connect(responseAdmin)
+          .deploy(responseGameImplementationContract.address, responseHouseEdge, responseCreatorEdge, responseRegistrationAmount)
+        // GameCreation task 3: check correct registration amount
+        expect(responseAuthorizedAmounts).to.not.include(responseIncorrectRegistrationAmount).should.throw("Registration amount must be authorized")
+        expect(responseAuthorizedAmounts).to.not.include(responseZeroRegistrationAmount).should.throw("Registration amount must be authorized")
+        // GameCreation task 1: with a registration amount of the list -> ok
+        expect(responseDeployedGame).to.be.equal(ResponseCreatedGame)
+        // GameCreation task 2: should i repeat creation game to check if registration amount is available to throw error ?
+        const responseDeployedGame = await this.gameFactoryContract.deployed()
+        const ResponseCreatedGame = await this.GameFactoryContract()
+          .connect(responseAdmin)
+          .deploy(responseGameImplementationContract.address, responseHouseEdge, responseCreatorEdge, responseRegistrationAmount)
+        expect(responseAuthorizedAmounts).to.not.include(responseRegistrationAmount).should.throw("Authorized amounts must include registration amount")
+        })
     })
   })
 })

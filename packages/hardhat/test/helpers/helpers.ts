@@ -21,16 +21,33 @@ const beforeEachGameFactory = async function () {
   this.houseEdge = ethers.utils.parseEther('0.000005')
   this.creatorEdge = ethers.utils.parseEther('0.000005')
 
+
+  // TODO Create list of AuthorisedAmounts
+  this.authorizedAmounts = [
+    ethers.utils.parseEther('0.0001'),
+    ethers.utils.parseEther('0.00025'),
+    ethers.utils.parseEther('0.0005'),
+    ethers.utils.parseEther('0.00075'),
+    ethers.utils.parseEther('0.001'),
+    ethers.utils.parseEther('0.0015'),
+    ethers.utils.parseEther('0.002'),
+    ethers.utils.parseEther('0.005'),
+    ethers.utils.parseEther('0.01')
+  ]
+
   const GameFactoryContract = await ethers.getContractFactory('GameFactory')
   const GameImplementationContract = await ethers.getContractFactory(
     'GameImplementation'
   )
   const gameImplementationContract = await GameImplementationContract.deploy()
   await gameImplementationContract.deployed()
+
+  // TODO add my list of authorisedAmounts to the constructor.
   const gameFactoryContract = await GameFactoryContract.connect(owner).deploy(
     gameImplementationContract.address,
     this.houseEdge,
-    this.creatorEdge
+    this.creatorEdge,
+    this.authorizedAmounts
   )
   await gameFactoryContract.deployed()
 
@@ -67,6 +84,7 @@ const beforeEachGameImplementation = async function () {
     ethers.utils.parseEther('0.005'),
     ethers.utils.parseEther('0.01')
   ]
+
   this.prizeAmount = ethers.utils.parseEther('0.0009') // prizeAmount equals total prize amount minus house edge
   this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
   this.zeroRegistrationAmount = ethers.utils.parseEther('0')
@@ -78,6 +96,9 @@ const beforeEachGameImplementation = async function () {
   this.mockKeeper = players[18]
   this.generalAdmin = players[17]
 
+  // May be not right place to update authorized amounts
+  const newAuthorizedAmounts = await updateAuthorizedAmounts(this.authorisedAmounts)
+
   const GameFactoryContract = await ethers.getContractFactory('GameFactory')
   const GameImplementationContract = await ethers.getContractFactory(
     'GameImplementation'
@@ -86,7 +107,7 @@ const beforeEachGameImplementation = async function () {
   await gameImplementationContract.deployed()
   const gameFactoryContract = await GameFactoryContract.connect(
     this.generalAdmin
-  ).deploy(gameImplementationContract.address, this.houseEdge, this.creatorEdge)
+  ).deploy(gameImplementationContract.address, this.houseEdge, this.creatorEdge, this.registrationAmount)
   await gameFactoryContract.deployed()
   await gameFactoryContract
     .connect(creator)
