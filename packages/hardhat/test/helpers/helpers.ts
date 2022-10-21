@@ -21,7 +21,6 @@ const beforeEachGameFactory = async function () {
   this.houseEdge = ethers.utils.parseEther('0.000005')
   this.creatorEdge = ethers.utils.parseEther('0.000005')
 
-
   // TODO Create list of AuthorisedAmounts
   this.authorizedAmounts = [
     ethers.utils.parseEther('0.0001'),
@@ -32,7 +31,7 @@ const beforeEachGameFactory = async function () {
     ethers.utils.parseEther('0.0015'),
     ethers.utils.parseEther('0.002'),
     ethers.utils.parseEther('0.005'),
-    ethers.utils.parseEther('0.01')
+    ethers.utils.parseEther('0.01'),
   ]
 
   const GameFactoryContract = await ethers.getContractFactory('GameFactory')
@@ -42,7 +41,6 @@ const beforeEachGameFactory = async function () {
   const gameImplementationContract = await GameImplementationContract.deploy()
   await gameImplementationContract.deployed()
 
-  // TODO add my list of authorisedAmounts to the constructor.
   const gameFactoryContract = await GameFactoryContract.connect(owner).deploy(
     gameImplementationContract.address,
     this.houseEdge,
@@ -82,7 +80,7 @@ const beforeEachGameImplementation = async function () {
     ethers.utils.parseEther('0.0015'),
     ethers.utils.parseEther('0.002'),
     ethers.utils.parseEther('0.005'),
-    ethers.utils.parseEther('0.01')
+    ethers.utils.parseEther('0.01'),
   ]
 
   this.prizeAmount = ethers.utils.parseEther('0.0009') // prizeAmount equals total prize amount minus house edge
@@ -96,9 +94,6 @@ const beforeEachGameImplementation = async function () {
   this.mockKeeper = players[18]
   this.generalAdmin = players[17]
 
-  // May be not right place to update authorized amounts
-  const newAuthorizedAmounts = await updateAuthorizedAmounts(this.authorisedAmounts)
-
   const GameFactoryContract = await ethers.getContractFactory('GameFactory')
   const GameImplementationContract = await ethers.getContractFactory(
     'GameImplementation'
@@ -107,12 +102,18 @@ const beforeEachGameImplementation = async function () {
   await gameImplementationContract.deployed()
   const gameFactoryContract = await GameFactoryContract.connect(
     this.generalAdmin
-  ).deploy(gameImplementationContract.address, this.houseEdge, this.creatorEdge, this.registrationAmount)
+  ).deploy(
+    gameImplementationContract.address,
+    this.houseEdge,
+    this.creatorEdge,
+    this.authorizedAmounts
+  )
   await gameFactoryContract.deployed()
   await gameFactoryContract
     .connect(creator)
     .createNewGame(10, 2, this.correctRegistrationAmount)
   const clonedContract = await gameFactoryContract.deployedGames('0')
+
   this.contract = await GameImplementationContract.attach(
     clonedContract.deployedAddress
   )

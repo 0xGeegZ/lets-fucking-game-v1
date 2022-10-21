@@ -132,14 +132,14 @@ describe('GameFactoryContract', function () {
           .createNewGame(
             this.maxPlayers,
             this.roundLength,
-            this.registrationAmount
+            this.authorizedAmounts[1]
           )
         await this.gameFactoryContract
           .connect(this.thirdAccount)
           .createNewGame(
             this.maxPlayers,
             this.roundLength,
-            this.registrationAmount
+            this.authorizedAmounts[2]
           )
 
         const firstGame = await this.gameFactoryContract.deployedGames(0)
@@ -176,14 +176,14 @@ describe('GameFactoryContract', function () {
         .createNewGame(
           this.maxPlayers,
           this.roundLength,
-          this.registrationAmount
+          this.authorizedAmounts[1]
         )
       await this.gameFactoryContract
         .connect(this.thirdAccount)
         .createNewGame(
           this.maxPlayers,
           this.roundLength,
-          this.registrationAmount
+          this.authorizedAmounts[2]
         )
 
       const deployedGames = await this.gameFactoryContract

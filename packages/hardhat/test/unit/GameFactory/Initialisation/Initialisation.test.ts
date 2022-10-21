@@ -3,6 +3,7 @@ import { beforeEachGameFactory } from '../../../helpers/helpers'
 import { ethers } from 'hardhat'
 import { expect } from 'chai'
 import { expectRevert } from '@openzeppelin/test-helpers'
+
 describe('GameFactoryContract', function () {
   beforeEach(beforeEachGameFactory)
   context('GameImplementation deployed', function () {
@@ -13,7 +14,7 @@ describe('GameFactoryContract', function () {
             _initializer: this.secondAccount.address,
             _factoryOwner: this.owner.address,
             _gameImplementationVersion: '0',
-            _gameLineId: '0',
+            _gameId: '0',
             _roundLength: this.roundLength,
             _maxPlayers: this.maxPlayers,
             _registrationAmount: this.registrationAmount,
@@ -29,14 +30,12 @@ describe('GameFactoryContract', function () {
       it('should revert with the correct message', async function () {
         await this.gameFactoryContract
           .connect(this.secondAccount)
-          .createNewGameLine(
+          .createNewGame(
             this.maxPlayers,
             this.roundLength,
             this.registrationAmount
           )
-        const clonedContract = await this.gameFactoryContract.deployedGameLines(
-          0
-        )
+        const clonedContract = await this.gameFactoryContract.deployedGames(0)
         const clonedGameContract = await this.GameImplementationContract.attach(
           clonedContract.deployedAddress
         )
@@ -45,7 +44,7 @@ describe('GameFactoryContract', function () {
             _initializer: this.secondAccount.address,
             _factoryOwner: this.owner.address,
             _gameImplementationVersion: '0',
-            _gameLineId: '0',
+            _gameId: '0',
             _roundLength: this.roundLength,
             _maxPlayers: this.maxPlayers,
             _registrationAmount: this.registrationAmount,
@@ -70,7 +69,9 @@ describe('GameFactoryContract', function () {
         const responseOwner = await this.gameFactoryContract.owner()
         const responseHouseEdge = await this.gameFactoryContract.houseEdge()
         const responseCreatorEdge = await this.gameFactoryContract.creatorEdge()
-        const responseAuthorizedAmounts = await this.gameFactoryContract.authorizedAmounts()
+        const responseAuthorizedAmounts =
+          await this.gameFactoryContract.getAuthorisedAmounts()
+
         expect(responseOwner).to.be.equal(this.owner.address)
         expect(responseLatestGameImplementationVersionId).to.be.equal('0')
         expect(responseGameImplementation.deployedAddress).to.be.equal(
@@ -78,43 +79,37 @@ describe('GameFactoryContract', function () {
         )
         expect(responseHouseEdge).to.be.equal(this.houseEdge)
         expect(responseCreatorEdge).to.be.equal(this.creatorEdge)
-        expect(responseAuthorizedAmounts).to.be.equal(this.authorizedAmounts)
-        // Constructor tasks
-        expect(responseAuthorizedAmounts).to.be.empty.should.throw("Authorized amounts list should not be empty")
-        expect(responseAuthorizedAmounts).to.have.lengthOf(1)
-        expect(responseAuthorizedAmounts).to.have.lengthOf(10)
-        expect(responseAuthorizedAmounts).to.have.same.members.should.throw("Authorized amounts list should not contains same value twice")
+        expect(responseAuthorizedAmounts.toString()).to.be.equal(
+          this.authorizedAmounts.toString()
+        )
       })
     })
   })
   context('GameFactory create game', function () {
-    describe("when amount authorized is available", function () {
-      it('should create game', function () {
-        // I tried to write test of creation game with all arguments needed but not sur of this implementation
-        const responseGameImplementationContract = await this.gameImplementationContract()
-        const responseHouseEdge = await this.gameFactoryContract.houseEdge()
-        const responseCreatorEdge = await this.gameFactoryContract.creatorEdge()
-        const responseAuthorizedAmounts = await this.gameFactoryContract.authorizedAmounts()
-        const responseRegistrationAmount = await this.correctRegistrationAmount()
-        const responseIncorrectRegistrationAmount = await this.incorrectRegistrationAmount()
-        const responseZeroRegistrationAmount = await this.zeroRegistrationAmount()
-        const responseAdmin = await this.generalAdmin()
-        const responseDeployedGame = await this.gameFactoryContract.deployed()
-        const ResponseCreatedGame = await GameFactoryContract()
-          .connect(responseAdmin)
-          .deploy(responseGameImplementationContract.address, responseHouseEdge, responseCreatorEdge, responseRegistrationAmount)
-        // GameCreation task 3: check correct registration amount
-        expect(responseAuthorizedAmounts).to.not.include(responseIncorrectRegistrationAmount).should.throw("Registration amount must be authorized")
-        expect(responseAuthorizedAmounts).to.not.include(responseZeroRegistrationAmount).should.throw("Registration amount must be authorized")
-        // GameCreation task 1: with a registration amount of the list -> ok
-        expect(responseDeployedGame).to.be.equal(ResponseCreatedGame)
-        // GameCreation task 2: should i repeat creation game to check if registration amount is available to throw error ?
-        const responseDeployedGame = await this.gameFactoryContract.deployed()
-        const ResponseCreatedGame = await this.GameFactoryContract()
-          .connect(responseAdmin)
-          .deploy(responseGameImplementationContract.address, responseHouseEdge, responseCreatorEdge, responseRegistrationAmount)
-        expect(responseAuthorizedAmounts).to.not.include(responseRegistrationAmount).should.throw("Authorized amounts must include registration amount")
-        })
+    describe('when amount authorized is available', function () {
+      it('should create a game', async function () {
+        const gameFactoryContract = await this.GameFactoryContract.connect(
+          this.owner
+        ).deploy(
+          this.gameImplementationContract.address,
+          this.houseEdge,
+          this.creatorEdge,
+          this.authorizedAmounts
+        )
+        await gameFactoryContract.deployed()
+      })
+      it('should revert create game with no authorizedAmounts', async function () {
+        const emptyauthorizedAmounts = []
+        await expectRevert(
+          this.GameFactoryContract.connect(this.owner).deploy(
+            this.gameImplementationContract.address,
+            this.houseEdge,
+            this.creatorEdge,
+            emptyauthorizedAmounts
+          ),
+          'authorizedAmounts should be greather or equal to 1'
+        )
+      })
     })
   })
 })

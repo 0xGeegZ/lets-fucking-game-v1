@@ -12,10 +12,12 @@ contract GameFactory is Pausable, Ownable {
     uint256 public creatorEdge;
     uint256 public latestGameImplementationVersionId;
     GameImplementationVersion[] public gameImplementations;
-    uint256 public gameLineId = 0;
-    GameLine[] public deployedGameLines;
-    AuthorizedAmount[] public authorizedAmounts;
-    mapping(AuthorizedAmount => bool) public usedAuthorizedAmounts;
+    uint256 public gameId = 0;
+    Game[] public deployedGames;
+
+    uint256[] authorizedAmounts;
+    mapping(uint256 => AuthorizedAmount) public usedAuthorisedAmounts;
+
     ///
     ///STRUCTS
     ///
@@ -27,7 +29,7 @@ contract GameFactory is Pausable, Ownable {
         uint256 id;
         address deployedAddress;
     }
-    struct GameLine {
+    struct Game {
         uint256 id;
         uint256 versionId;
         address creator;
@@ -36,27 +38,28 @@ contract GameFactory is Pausable, Ownable {
     ///
     ///EVENTS
     ///
-    event GameLineCreated(
-        uint256 gameLineId,
-        address gameAddress,
-        uint256 implementationVersion,
-        address creatorAddress
-    );
+    event GameCreated(uint256 gameId, address gameAddress, uint256 implementationVersion, address creatorAddress);
     event FailedTransfer(address receiver, uint256 amount);
 
     constructor(
         address _gameImplementation,
         uint256 _houseEdge,
         uint256 _creatorEdge,
-        uint256[] _authorizedAmounts
+        uint256[] memory _authorizedAmounts
     ) onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts) {
         houseEdge = _houseEdge;
         creatorEdge = _creatorEdge;
         gameImplementations.push(
             GameImplementationVersion({ id: latestGameImplementationVersionId, deployedAddress: _gameImplementation })
         );
-        // For each amount, create an AuthorizedAmount with amount & isUsed = false
+
         authorizedAmounts = _authorizedAmounts;
+        for (uint256 i = 0; i < authorizedAmounts.length; i++) {
+            usedAuthorisedAmounts[authorizedAmounts[i]] = AuthorizedAmount({
+                isUsed: false,
+                amount: authorizedAmounts[i]
+            });
+        }
     }
 
     ///
@@ -76,19 +79,21 @@ contract GameFactory is Pausable, Ownable {
         require(_roundLength < 9, "roundLength should not be bigger than 8");
         _;
     }
+
     modifier onlyAllowedRegistrationAmount(uint256 _registrationAmount) {
-        require(_registrationAmount > 0, "registrationAmount should be bigger than 0");
-        require(_registrationAmount <= 1 ether, "registrationAmount should not be bigger or equal to 1");
-        _;
-    }
-    modifier onlyIfAuthorizedAmounts(uint256 _registrationAmount) {
         require(
-            authorizedAmounts[_registrationAmount].isUsed = false,
-            "_registrationAmout that match with AuthorizedAmout should not be used"
+            usedAuthorisedAmounts[_registrationAmount].amount == _registrationAmount,
+            "registrationAmout is not allowed"
         );
         _;
     }
-    modifier onlyIfAuthorizedAmountsIsNotEmpty(uint256[] _authorizedAmounts) {
+
+    modifier onlyIfNotUsedRegistrationAmounts(uint256 _registrationAmount) {
+        require(usedAuthorisedAmounts[_registrationAmount].isUsed == false, "registrationAmout is already used");
+        _;
+    }
+
+    modifier onlyIfAuthorizedAmountsIsNotEmpty(uint256[] memory _authorizedAmounts) {
         require(_authorizedAmounts.length >= 1, "authorizedAmounts should be greather or equal to 1");
         _;
     }
@@ -96,8 +101,8 @@ contract GameFactory is Pausable, Ownable {
     ///
     ///BUSINESS LOGIC FUNCTIONS
     ///
-    // TODO add Name and image url as argument to createNewGameLine & initialize functions
-    function createNewGameLine(
+    // TODO add Name and image url as argument to createNewGame & initialize functions
+    function createNewGame(
         uint256 _maxPlayers,
         uint256 _roundLength,
         uint256 _registrationAmount
@@ -107,7 +112,7 @@ contract GameFactory is Pausable, Ownable {
         onlyAllowedNumberOfPlayers(_maxPlayers)
         onlyAllowedRoundLength(_roundLength)
         onlyAllowedRegistrationAmount(_registrationAmount)
-        onlyIfAuthorizedAmounts(_registrationAmount)
+        onlyIfNotUsedRegistrationAmounts(_registrationAmount)
         returns (address game)
     {
         address latestGameImplementationAddress = gameImplementations[latestGameImplementationVersionId]
@@ -118,7 +123,7 @@ contract GameFactory is Pausable, Ownable {
                 _initializer: msg.sender,
                 _factoryOwner: owner(),
                 _gameImplementationVersion: latestGameImplementationVersionId,
-                _gameLineId: gameLineId,
+                _gameId: gameId,
                 _roundLength: _roundLength,
                 _maxPlayers: _maxPlayers,
                 _registrationAmount: _registrationAmount,
@@ -126,17 +131,17 @@ contract GameFactory is Pausable, Ownable {
                 _creatorEdge: creatorEdge
             })
         );
-        deployedGameLines.push(
-            GameLine({
-                id: gameLineId,
+        deployedGames.push(
+            Game({
+                id: gameId,
                 versionId: latestGameImplementationVersionId,
                 creator: msg.sender,
                 deployedAddress: newGameAddress
             })
         );
-        emit GameLineCreated(gameLineId, newGameAddress, latestGameImplementationVersionId, msg.sender);
-        gameLineId += 1;
-        // TODO : Pass AuthorizedAmount.isUsed to true.
+        emit GameCreated(gameId, newGameAddress, latestGameImplementationVersionId, msg.sender);
+        gameId += 1;
+        usedAuthorisedAmounts[_registrationAmount].isUsed = true;
         return newGameAddress;
     }
 
@@ -151,6 +156,15 @@ contract GameFactory is Pausable, Ownable {
             emit FailedTransfer(receiver, amount);
             require(false, "Transfer failed.");
         }
+    }
+
+    function _isExistAuthorizedAmounts(uint256 _authorizedAmount) internal view returns (bool) {
+        for (uint256 i = 0; i < authorizedAmounts.length; i++) {
+            if (authorizedAmounts[i] == _authorizedAmount) {
+                return true;
+            }
+        }
+        return false;
     }
 
     ///
@@ -179,14 +193,30 @@ contract GameFactory is Pausable, Ownable {
         _unpause();
     }
 
-    function updateAuthorizedAmounts(uint256[] _authorizedAmounts) public onlyAdmin {
-        authorizedAmounts = _authorizedAmounts;
+    function addAuthorizedAmounts(uint256[] memory _authorizedAmounts) public onlyAdmin {
+        for (uint256 i = 0; i < _authorizedAmounts.length; i++) {
+            if (!_isExistAuthorizedAmounts(_authorizedAmounts[i])) {
+                authorizedAmounts.push(_authorizedAmounts[i]);
+                usedAuthorisedAmounts[_authorizedAmounts[i]] = AuthorizedAmount({
+                    isUsed: false,
+                    amount: _authorizedAmounts[i]
+                });
+            }
+        }
     }
 
     ///
     ///GETTER FUNCTIONS
     ///
-    function getDeployedGameLines() external view returns (GameLine[] memory) {
-        return deployedGameLines;
+    function getDeployedGames() external view returns (Game[] memory) {
+        return deployedGames;
+    }
+
+    function getAuthorisedAmounts() external view returns (uint256[] memory) {
+        return authorizedAmounts;
+    }
+
+    function getAuthorisedAmount(uint256 _authorizedAmount) external view returns (AuthorizedAmount memory) {
+        return usedAuthorisedAmounts[_authorizedAmount];
     }
 }

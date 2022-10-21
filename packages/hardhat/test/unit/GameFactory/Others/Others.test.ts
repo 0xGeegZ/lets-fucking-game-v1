@@ -77,23 +77,63 @@ describe('GameFactoryContract', function () {
         )
       })
     })
-    
-    context('GameFactory updateAuthorizedAmounts', function () {
-      describe('when authorized amounts is going to be update', function () {
-        it('should be updated with correct amounts', async function () {
-          const responseAuthorizedAmounts = await this.authorisedAmounts
-          const responseNewAuthorizedAmounts = await this.newAuthorizedAmounts
-          // Setter tasks
-          expect(responseNewAuthorizedAmounts).to.be.an('array').and.to.be.empty.should.throw('New list of authorized amounts can not be empty')
-          expect(responseNewAuthorizedAmounts).to.be.an('array').and.to.have.lengthOf(1).that.includes.same.members(responseAuthorizedAmounts).should.throw('New list of authorized amounts can not be already exists in authorized amounts')
-          expect(responseNewAuthorizedAmounts).to.be.an('array').and.to.have.lengthOf(2).that.includes.same.members(responseAuthorizedAmounts).should.throw('New list of authorized amounts can not be already exists in authorized amounts')
-          expect(responseNewAuthorizedAmounts).to.be.an('array').to.not.include.same.members(responseAuthorizedAmounts).and.to.have.lengthOf(1)
-          expect(responseNewAuthorizedAmounts).to.be.an('array').to.not.include.same.members(responseAuthorizedAmounts).and.to.have.lengthOf(10)
-          // i didn't find better solution to check if all values are unique
-          // https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
-          const arrayWithUniqueValues = responseNewAuthorizedAmounts.filter((v, i, a) => a.indexOf(v) === i)
-          expect(arrayWithUniqueValues).to.be.an('array').and.to.not.have.lengthOf(lengthOf(responseNewAuthorizedAmounts)).should.throw('New list of authorized amounts must contains unique values')
-        })
+  })
+  context('GameFactory addAuthorizedAmounts', function () {
+    describe('when admin update authorisedAmounts', function () {
+      it('should be updated with correct amounts', async function () {
+        const toUpdateAuthorisedAmounts = [ethers.utils.parseEther('999')]
+
+        const responseAuthorizedAmountsBefore = await this.gameFactoryContract
+          .connect(this.owner)
+          .getAuthorisedAmounts()
+
+        await this.gameFactoryContract
+          .connect(this.owner)
+          .addAuthorizedAmounts(toUpdateAuthorisedAmounts)
+
+        const responseAuthorizedAmountsAfter = await this.gameFactoryContract
+          .connect(this.owner)
+          .getAuthorisedAmounts()
+
+        expect(responseAuthorizedAmountsBefore.length + 1).to.be.equal(
+          responseAuthorizedAmountsAfter.length
+        )
+      })
+
+      it('should be updated with no duplicates amounts', async function () {
+        const toUpdateAuthorisedAmounts = [
+          ...this.authorizedAmounts,
+          ethers.utils.parseEther('999'),
+          ethers.utils.parseEther('999'),
+        ]
+
+        const responseAuthorizedAmountsBefore = await this.gameFactoryContract
+          .connect(this.owner)
+          .getAuthorisedAmounts()
+
+        await this.gameFactoryContract
+          .connect(this.owner)
+          .addAuthorizedAmounts(toUpdateAuthorisedAmounts)
+
+        const responseAuthorizedAmountsAfter = await this.gameFactoryContract
+          .connect(this.owner)
+          .getAuthorisedAmounts()
+
+        expect(responseAuthorizedAmountsBefore.length + 1).to.be.equal(
+          responseAuthorizedAmountsAfter.length
+        )
+      })
+    })
+    describe('when called by non admin', function () {
+      it('should revert with correct message', async function () {
+        const toUpdateAuthorisedAmounts = [ethers.utils.parseEther('999')]
+
+        await expectRevert(
+          this.gameFactoryContract
+            .connect(this.thirdAccount)
+            .addAuthorizedAmounts(toUpdateAuthorisedAmounts),
+          'Caller is not the admin'
+        )
       })
     })
   })
