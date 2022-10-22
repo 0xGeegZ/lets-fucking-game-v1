@@ -14,6 +14,7 @@ contract GameImplementation {
     address public factory;
     address public keeper;
     string public keeperCron;
+    bytes public encodedCron;
 
     uint256 public registrationAmount;
     uint256 public houseEdge;
@@ -37,7 +38,28 @@ contract GameImplementation {
     mapping(address => Player) public players;
     mapping(uint256 => Winner) public gameWinners;
 
+    Game public game;
+
     ///STRUCTS
+    struct Game {
+        bytes encodedCron;
+        uint256 registrationAmount;
+        uint256 houseEdge;
+        uint256 creatorEdge;
+        uint256 gameId;
+        uint256 roundId;
+        string gameName;
+        string gameImage;
+        uint256 gameImplementationVersion;
+        uint256 roundLength;
+        uint256 maxPlayers;
+        uint256 numPlayers;
+        bool gameInProgress;
+        address[] playerAddresses;
+        mapping(address => Player) players;
+        mapping(uint256 => Winner) gameWinners;
+    }
+
     struct Player {
         address playerAddress;
         uint256 roundRangeLowerLimit;
@@ -91,16 +113,16 @@ contract GameImplementation {
         factory = msg.sender;
         randNonce = 0;
 
-        registrationAmount = initialization._registrationAmount;
-        houseEdge = initialization._houseEdge;
-        creatorEdge = initialization._creatorEdge;
+        game.registrationAmount = initialization._registrationAmount;
+        game.houseEdge = initialization._houseEdge;
+        game.creatorEdge = initialization._creatorEdge;
 
         gameId = initialization._gameId;
-        gameImplementationVersion = initialization._gameImplementationVersion;
+        game.gameImplementationVersion = initialization._gameImplementationVersion;
 
         roundId = 0;
-        roundLength = initialization._roundLength;
-        maxPlayers = initialization._maxPlayers;
+        game.roundLength = initialization._roundLength;
+        game.maxPlayers = initialization._maxPlayers;
 
         // TODO (Will need a big refacto for tests cases) reactivate to ensure that keeper is initialised
         // pause contract by default as we need to set keeper data to unpause contract
@@ -450,7 +472,20 @@ contract GameImplementation {
     /// GETTERS FUNCTIONS
     ///
 
-    function getStatus()
+    function getStatus(
+        address creator,
+        uint256 roundId,
+        string memory gameName,
+        string memory gameImage,
+        uint256 numPlayers,
+        uint256 maxPlayers,
+        uint256 registrationAmount,
+        uint256 roundLength,
+        uint256 houseEdge,
+        uint256 creatorEdge,
+        bool contractPaused,
+        bool gameInProgress
+    )
         external
         view
         returns (
@@ -469,7 +504,6 @@ contract GameImplementation {
         )
     {
         // uint256 balance = address(this).balance;
-
         return (
             creator,
             roundId,
