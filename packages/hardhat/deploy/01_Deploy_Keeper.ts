@@ -5,25 +5,24 @@ import { ethers } from 'hardhat'
 const func: DeployFunction = async function ({
   deployments,
   getNamedAccounts,
-  getExtendedArtifactFromFolders,
-  getChainId,
 }: HardhatRuntimeEnvironment) {
-  const { deploy } = deployments
+  const { deploy, log } = deployments
   const { deployer } = await getNamedAccounts()
-  const chainId = await getChainId()
 
-  // if (chainId === '31337') {
+  log('Deploying CronUpkeepDelegate contract')
   const cronUpkeepDelegate = await deploy('CronUpkeepDelegate', {
     from: deployer,
     log: true,
   })
 
-  const cron = await deploy('CronExternal', {
+  log('Deploying CronExternal contract')
+  const cronExternal = await deploy('CronExternal', {
     from: deployer,
     contract: '@chainlink/contracts/src/v0.8/libraries/external/Cron.sol:Cron',
     log: true,
   })
 
+  log('Deploying CronUpkeep contract')
   await deploy('CronUpkeep', {
     from: deployer,
     log: true,
@@ -34,10 +33,9 @@ const func: DeployFunction = async function ({
       ethers.utils.toUtf8Bytes(''),
     ],
     libraries: {
-      Cron: cron.address,
+      Cron: cronExternal.address,
     },
   })
-  // }
 }
 
 func.tags = ['all', 'lfg', 'main', 'keeper']

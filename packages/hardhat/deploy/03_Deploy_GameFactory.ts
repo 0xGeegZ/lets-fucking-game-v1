@@ -5,41 +5,29 @@ import { ethers } from 'hardhat'
 const func: DeployFunction = async function ({
   deployments,
   getNamedAccounts,
-  getChainId,
 }: HardhatRuntimeEnvironment) {
-  const { deploy } = deployments
+  const { deploy, log } = deployments
   const { deployer } = await getNamedAccounts()
-  const chainId = await getChainId()
 
-  let gameImplementationAddress: string
-  let cronUpkeepAddress: string
-  // if (chainId === '31337') {
-  const GameImplementation = await deployments.get('GameImplementation')
-  gameImplementationAddress = GameImplementation.address
+  const cronExternal = await deployments.get('CronExternal')
 
-  const Cron = await deployments.get('CronExternal')
-  const CronUpkeep = await deployments.get('CronUpkeep', {
+  const gameImplementation = await deployments.get('GameImplementation', {
     libraries: {
-      Cron: Cron.address,
+      Cron: cronExternal.address,
     },
   })
-  cronUpkeepAddress = CronUpkeep.address
 
-  // } else {
-  //   gameImplementationAddress = networkConfig[chainId]
-  //     .gameImplementation as string
-  // }
-
-  // TODO Display Log
-  if (!gameImplementationAddress) return
-  if (!cronUpkeepAddress) return
+  const cronUpkeep = await deployments.get('CronUpkeep', {
+    libraries: {
+      Cron: cronExternal.address,
+    },
+  })
 
   // TODO add interface for constructorArgs
   // const constructorArgs: Array<string | number | Array<string | number>> = [
   //   '100000000000000',
   // ];
 
-  // const registrationAmount = ethers.utils.parseUnits('0.1', 'gwei');
   const houseEdge = ethers.utils.parseUnits('0.01', 'gwei')
   const creatorEdge = ethers.utils.parseUnits('0.005', 'gwei')
 
@@ -57,17 +45,20 @@ const func: DeployFunction = async function ({
     ethers.utils.parseEther('10'),
   ]
 
-  await deploy('GameFactory', {
+  log('Deploying GameFactory contract')
+  const gameFactory = await await deploy('GameFactory', {
     from: deployer,
     args: [
-      gameImplementationAddress,
-      cronUpkeepAddress,
+      gameImplementation.address,
+      cronUpkeep.address,
       houseEdge,
       creatorEdge,
       authorizedAmounts,
     ],
     log: true,
   })
+  log('Adding GameFactory to Keeper delegators')
+  cronUpkeep.connect(deployer).addDelegator(gameFactory.address)
 }
 
 func.tags = ['all', 'lfg', 'main', 'game-factory']

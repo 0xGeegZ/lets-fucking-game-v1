@@ -4,28 +4,25 @@ import { DeployFunction } from 'hardhat-deploy/types'
 const func: DeployFunction = async function ({
   deployments,
   getNamedAccounts,
-  getChainId,
 }: HardhatRuntimeEnvironment) {
-  const { deploy } = deployments
+  const { deploy, log } = deployments
   const { deployer } = await getNamedAccounts()
-  const chainId = await getChainId()
 
-  let gameImplementationAddress: string
+  const cronExternal = await deployments.get('CronExternal')
 
-  // if (chainId === '31337') {
-  //   const gameImplementation = await deployments.get('GameImplementation')
-  //   gameImplementationAddress = gameImplementation.address
-  // } else {
+  log('Deploying GameImplementation contract')
   const gameImplementation = await deploy('GameImplementation', {
     from: deployer,
     log: true,
+    libraries: {
+      Cron: cronExternal.address,
+    },
   })
 
-  // await gameImplementation.deployed()
+  const cronUpkeep = await deployments.get('CronUpkeep')
 
-  gameImplementationAddress = gameImplementation.address
-  // }
-  console.log('GameImplementation address:', gameImplementationAddress)
+  log('Adding GameImplementation to Keeper delegators')
+  cronUpkeep.connect(deployer).addDelegator(gameImplementation.address)
 }
 
 func.tags = ['all', 'lfg', 'main', 'game-implementation']
