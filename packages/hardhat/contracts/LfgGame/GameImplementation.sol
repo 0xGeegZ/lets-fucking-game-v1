@@ -71,7 +71,7 @@ contract GameImplementation {
     event RegisteredForGame(address playerAddress, uint256 playersCount);
     event StartedGame(uint256 timelock, uint256 playersCount);
     event ResetGame(uint256 timelock, uint256 resetGameId);
-    event GameLost(uint256 roundId, address playerAddress);
+    event GameLost(uint256 roundId, address playerAddress, uint256 roundCount);
     event PlayedRound(address playerAddress);
     event GameWon(uint256 roundId, address playerAddress, uint256 amountWon);
     event FailedTransfer(address receiver, uint256 amount);
@@ -391,7 +391,7 @@ contract GameImplementation {
         player.hasLost = true;
         player.isSplitOk = false;
 
-        emit GameLost(roundId, player.playerAddress);
+        emit GameLost(roundId, player.playerAddress, player.roundCount);
     }
 
     /// CREATOR FUNCTIONS
@@ -465,7 +465,8 @@ contract GameImplementation {
             uint256,
             uint256,
             bool,
-            bool
+            bool,
+            uint256
         )
     {
         // uint256 balance = address(this).balance;
@@ -482,7 +483,8 @@ contract GameImplementation {
             houseEdge,
             creatorEdge,
             contractPaused,
-            gameInProgress
+            gameInProgress,
+            player.roundCount,
         );
     }
 
