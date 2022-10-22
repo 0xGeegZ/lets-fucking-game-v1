@@ -20,7 +20,7 @@ describe('GameImplementationContract - Others', function () {
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.contract.connect(this.generalAdmin).setGameName('New name'),
+            this.game.connect(this.generalAdmin).setGameName('New name'),
             'Caller is not the creator'
           )
         })
@@ -29,8 +29,8 @@ describe('GameImplementationContract - Others', function () {
       describe('when caller is the creator', function () {
         it('should change the name of the Game Line', async function () {
           const newName = 'New name'
-          await this.contract.connect(this.creator).setGameName(newName)
-          const updatedName = await this.contract.gameName()
+          await this.game.connect(this.creator).setGameName(newName)
+          const updatedName = await this.game.gameName()
           expect(updatedName).to.be.equal(newName)
         })
       })
@@ -40,7 +40,7 @@ describe('GameImplementationContract - Others', function () {
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.contract
+            this.game
               .connect(this.generalAdmin)
               .setGameImage('https://www.new-ipfs-image.com'),
             'Caller is not the creator'
@@ -51,8 +51,8 @@ describe('GameImplementationContract - Others', function () {
       describe('when caller is the creator', function () {
         it('should change the image link of the Game Line', async function () {
           const newImageLink = 'https://www.new-ipfs-image.com'
-          await this.contract.connect(this.creator).setGameImage(newImageLink)
-          const updatedImage = await this.contract.gameImage()
+          await this.game.connect(this.creator).setGameImage(newImageLink)
+          const updatedImage = await this.game.gameImage()
           expect(updatedImage).to.be.equal(newImageLink)
         })
       })
@@ -62,7 +62,7 @@ describe('GameImplementationContract - Others', function () {
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.contract.connect(this.generalAdmin).withdrawCreatorEdge(),
+            this.game.connect(this.generalAdmin).withdrawCreatorEdge(),
             'Caller is not the creator'
           )
         })
@@ -72,26 +72,25 @@ describe('GameImplementationContract - Others', function () {
         it('should withdraw the creator edge', async function () {
           await setUpGameReadyToPlay({
             players: this.players,
-            contract: this.contract,
+            contract: this.game,
             amount: this.correctRegistrationAmount,
+
             mockKeeper: this.mockKeeper,
           })
           const initialContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const initialCreatorBalance = await ethers.provider.getBalance(
             this.creator.address
           )
-          const tx = await this.contract
-            .connect(this.creator)
-            .withdrawCreatorEdge()
+          const tx = await this.game.connect(this.creator).withdrawCreatorEdge()
 
           const receipt = await tx.wait()
           const gasPrice = tx.gasPrice
           const gasUsed = receipt.gasUsed
 
           const updatedContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const updatedCreatorBalance = await ethers.provider.getBalance(
             this.creator.address
@@ -115,7 +114,7 @@ describe('GameImplementationContract - Others', function () {
       describe('when caller is not the general admin', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.contract.connect(this.creator).withdrawAdminEdge(),
+            this.game.connect(this.creator).withdrawAdminEdge(),
             'Caller is not the creator'
           )
         })
@@ -125,17 +124,18 @@ describe('GameImplementationContract - Others', function () {
         it('should withdraw the general admin edge', async function () {
           await setUpGameReadyToPlay({
             players: this.players,
-            contract: this.contract,
+            contract: this.game,
             amount: this.correctRegistrationAmount,
+
             mockKeeper: this.mockKeeper,
           })
           const initialContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const initialAdminBalance = await ethers.provider.getBalance(
             this.generalAdmin.address
           )
-          const tx = await this.contract
+          const tx = await this.game
             .connect(this.generalAdmin)
             .withdrawAdminEdge()
 
@@ -144,7 +144,7 @@ describe('GameImplementationContract - Others', function () {
           const gasUsed = receipt.gasUsed
 
           const updatedContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const updatedAdminBalance = await ethers.provider.getBalance(
             this.generalAdmin.address
@@ -166,7 +166,7 @@ describe('GameImplementationContract - Others', function () {
       describe('when caller is not the general admin or creator', function () {
         it('should revert with correct message', async function () {
           await expectRevert(
-            this.contract
+            this.game
               .connect(this.players[5])
               .withdrawFunds(this.players[5].address),
             'Caller is not the creator'
@@ -179,23 +179,24 @@ describe('GameImplementationContract - Others', function () {
           const fundReceiverAddress = this.players[5].address
           await setUpGameReadyToPlay({
             players: this.players,
-            contract: this.contract,
+            contract: this.game,
             amount: this.correctRegistrationAmount,
+
             mockKeeper: this.mockKeeper,
           })
           const initialContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const initialReceiverBalance = await ethers.provider.getBalance(
             fundReceiverAddress
           )
 
-          await this.contract
+          await this.game
             .connect(this.generalAdmin)
             .withdrawFunds(fundReceiverAddress)
 
           const updatedContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const updatedReceiverBalance = await ethers.provider.getBalance(
             fundReceiverAddress
@@ -213,23 +214,24 @@ describe('GameImplementationContract - Others', function () {
           const fundReceiverAddress = this.players[5].address
           await setUpGameReadyToPlay({
             players: this.players,
-            contract: this.contract,
+            contract: this.game,
             amount: this.correctRegistrationAmount,
+
             mockKeeper: this.mockKeeper,
           })
           const initialContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const initialReceiverBalance = await ethers.provider.getBalance(
             fundReceiverAddress
           )
 
-          await this.contract
+          await this.game
             .connect(this.creator)
             .withdrawFunds(fundReceiverAddress)
 
           const updatedContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const updatedReceiverBalance = await ethers.provider.getBalance(
             fundReceiverAddress

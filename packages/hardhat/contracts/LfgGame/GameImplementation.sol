@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts/utils/Address.sol";
+
+import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
+import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
 contract GameImplementation {
     using Address for address;
@@ -12,25 +15,31 @@ contract GameImplementation {
     address public generalAdmin;
     address public creator;
     address public factory;
-    address public keeper;
-    string public keeperCron;
+
+    address public cronUpkeep;
+    bytes public encodedCron;
 
     uint256 public registrationAmount;
     uint256 public houseEdge;
     uint256 public creatorEdge;
 
+    // gameId is fix and represent the fixed id for the game
     uint256 public gameId;
-    uint256 public roundId; // This gets incremented every time the game restarts
+    // roundId gets incremented every time the game restarts
+    uint256 public roundId;
+
     string public gameName;
     string public gameImage;
 
     uint256 public gameImplementationVersion;
 
-    uint256 public roundLength; // Time length of a round in hours
+    // Time length of a round in hours
+    uint256 public roundLength;
     uint256 public maxPlayers;
     uint256 public numPlayers;
 
-    bool public gameInProgress; // Helps the keeper determine if a game has started or if we need to start it
+    // Helps the keeper determine if a game has started or if we need to start it
+    bool public gameInProgress;
     bool public contractPaused;
 
     address[] public playerAddresses;
@@ -58,6 +67,7 @@ contract GameImplementation {
     struct Initialization {
         address _initializer;
         address _factoryOwner;
+        address _cronUpkeep;
         uint256 _gameImplementationVersion;
         uint256 _gameId;
         uint256 _roundLength;
@@ -65,6 +75,7 @@ contract GameImplementation {
         uint256 _registrationAmount;
         uint256 _houseEdge;
         uint256 _creatorEdge;
+        string _encodedCron;
     }
 
     ///EVENTS
@@ -102,12 +113,22 @@ contract GameImplementation {
         roundLength = initialization._roundLength;
         maxPlayers = initialization._maxPlayers;
 
-        // TODO (Will need a big refacto for tests cases) reactivate to ensure that keeper is initialised
-        // pause contract by default as we need to set keeper data to unpause contract
-        // contractPaused = true;
+        // TODO verify cron limitation : not less than every hour
+        // verify that should not contains "*/" in first value
+        // Pattern is : * * * * *
+        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
+
+        encodedCron = CronExternal.toEncodedSpec(initialization._encodedCron);
+        cronUpkeep = initialization._cronUpkeep;
+
+        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
+            address(this),
+            bytes("triggerDailyCheckpoint()"),
+            encodedCron
+        );
     }
 
-    // TODO remove in next smart contract version
+    // TODO for development use remove in next smart contract version
     function startGame() external onlyCreatorOrAdmin onlyNotPaused onlyIfFull {
         _startGame();
     }
@@ -136,14 +157,19 @@ contract GameImplementation {
         _;
     }
 
+    modifier onlyKeeperOrAdmin() {
+        require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the keeper");
+        _;
+    }
+
     modifier onlyKeeper() {
-        require(msg.sender == keeper, "Caller is not the keeper");
+        require(msg.sender == cronUpkeep, "Caller is not the keeper");
         _;
     }
 
     modifier onlyIfKeeperDataInit() {
-        require(keeper != address(0), "Keeper need to be initialised");
-        require(bytes(keeperCron).length != 0, "Keeper cron need to be initialised");
+        require(cronUpkeep != address(0), "Keeper need to be initialised");
+        require(bytes(encodedCron).length != 0, "Keeper cron need to be initialised");
         _;
     }
 
@@ -264,8 +290,9 @@ contract GameImplementation {
         }
     }
 
-    // This function gets called every 24 hours
-    function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
+    // TODO remoove onlyKeeperOrAdmin and make test works
+    function triggerDailyCheckpoint() external onlyKeeperOrAdmin onlyNotPaused {
+        // function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
         if (gameInProgress == true) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
@@ -428,21 +455,26 @@ contract GameImplementation {
     ///
 
     // TODO create a function to set keeper address & keeper cron
-    function setKeeper(address _keeper) external onlyCreatorOrAdmin {
-        keeper = _keeper;
+    function setCronUpkeep(address _cronUpkeep) public onlyCreatorOrAdmin {
+        require(_cronUpkeep != address(0), "Keeper need to be initialised");
+        // cronUpkeep = CronUpkeepInterface(_cronUpkeep);
+        cronUpkeep = _cronUpkeep;
+        // TODO add parameter to know if it's needed to register encodedCron again
     }
 
-    function setKeeperCron(string memory _keeperCron) external onlyCreatorOrAdmin {
-        keeperCron = _keeperCron;
+    function setEncodedCron(bytes memory _encodedCron) external onlyCreatorOrAdmin {
+        encodedCron = _encodedCron;
     }
 
     function pause() external onlyCreatorOrAdmin onlyNotPaused {
+        // TODO pause Keeper JOB
         contractPaused = true;
     }
 
     // TODO (Will need a big refactor for tests cases) reactivate to ensure that keeper is initialised
     // function unpause() external onlyCreatorOrAdmin onlyPaused onlyIfKeeperDataInit {
     function unpause() external onlyCreatorOrAdmin onlyPaused onlyIfKeeperDataInit {
+        // TODO unpause Keeper JOB
         contractPaused = false;
     }
 

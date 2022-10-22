@@ -16,14 +16,14 @@ describe('GameImplementationContract - Initialisation', function () {
   context('Contract Initialisation', function () {
     describe('when generalAdmin has deployed the Factory Contract', async function () {
       it('should be set as the generalAdmin of the created game', async function () {
-        const contractAdmin = await this.contract.generalAdmin()
+        const contractAdmin = await this.game.generalAdmin()
         expect(this.generalAdmin.address).to.equal(contractAdmin)
       })
     })
 
     describe('when creator creates the game', async function () {
       it('should be set as the creator of the game', async function () {
-        const contractCreator = await this.contract.creator()
+        const contractCreator = await this.game.creator()
         expect(this.creator.address).to.equal(contractCreator)
       })
     })

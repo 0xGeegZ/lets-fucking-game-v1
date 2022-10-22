@@ -4,22 +4,22 @@ import { DeployFunction } from 'hardhat-deploy/types'
 const func: DeployFunction = async function ({
   deployments,
   getNamedAccounts,
-  getChainId,
-}: HardhatRuntimeEnvironment) {
-  const { deploy } = deployments
+}: // getChainId,
+HardhatRuntimeEnvironment) {
+  const { deploy, log } = deployments
   const { deployer } = await getNamedAccounts()
-  console.log(
-    '🚀 ~ file: 00_Deploy_Multicall.ts ~ line 11 ~ deployer',
-    deployer
-  )
-  const chainId = await getChainId()
-  console.log('🚀 ~ file: 00_Deploy_Multicall.ts ~ line 13 ~ chainId', chainId)
 
-  if (chainId === '31337') {
-    await deploy('Multicall', { from: deployer })
-  }
+  log('Deploying Multicall contract')
+  await deploy('Multicall', { from: deployer })
+
+  // const chainId = await getChainId()
+
+  // if (chainId === '31337') {
+  //   log('Local Network Detected, Deploying external contracts')
+  //   await deploy('Multicall', { from: deployer })
+  // }
 }
 
-func.tags = ['all', 'main']
+func.tags = ['all', 'multicall']
 
 export default func
