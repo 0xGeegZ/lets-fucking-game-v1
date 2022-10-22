@@ -13,28 +13,28 @@ contract GameImplementation {
     address public creator;
     address public factory;
     address public keeper;
-    string public keeperCron;
-    bytes public encodedCron;
 
-    uint256 public registrationAmount;
-    uint256 public houseEdge;
-    uint256 public creatorEdge;
+    // bytes public encodedCron;
 
-    uint256 public gameId;
-    uint256 public roundId; // This gets incremented every time the game restarts
-    string public gameName;
-    string public gameImage;
+    // uint256 public registrationAmount;
+    // uint256 public houseEdge;
+    // uint256 public creatorEdge;
 
-    uint256 public gameImplementationVersion;
+    // uint256 public gameId;
+    // uint256 public roundId; // This gets incremented every time the game restarts
+    // string public gameName;
+    // string public gameImage;
 
-    uint256 public roundLength; // Time length of a round in hours
-    uint256 public maxPlayers;
-    uint256 public numPlayers;
+    // uint256 public gameImplementationVersion;
 
-    bool public gameInProgress; // Helps the keeper determine if a game has started or if we need to start it
-    bool public contractPaused;
+    // uint256 public roundLength; // Time length of a round in hours
+    // uint256 public maxPlayers;
+    // uint256 public numPlayers;
 
-    address[] public playerAddresses;
+    // bool public gameInProgress; // Helps the keeper determine if a game has started or if we need to start it
+    // bool public contractPaused;
+
+    // address[] public playerAddresses;
     mapping(address => Player) public players;
     mapping(uint256 => Winner) public gameWinners;
 
@@ -56,8 +56,8 @@ contract GameImplementation {
         uint256 numPlayers;
         bool gameInProgress;
         address[] playerAddresses;
-        mapping(address => Player) players;
-        mapping(uint256 => Winner) gameWinners;
+        // mapping(address => Player) players;
+        // mapping(uint256 => Winner) gameWinners;
     }
 
     struct Player {
@@ -472,52 +472,8 @@ contract GameImplementation {
     /// GETTERS FUNCTIONS
     ///
 
-    function getStatus(
-        address creator,
-        uint256 roundId,
-        string memory gameName,
-        string memory gameImage,
-        uint256 numPlayers,
-        uint256 maxPlayers,
-        uint256 registrationAmount,
-        uint256 roundLength,
-        uint256 houseEdge,
-        uint256 creatorEdge,
-        bool contractPaused,
-        bool gameInProgress
-    )
-        external
-        view
-        returns (
-            address,
-            uint256,
-            string memory,
-            string memory,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            bool,
-            bool
-        )
-    {
-        // uint256 balance = address(this).balance;
-        return (
-            creator,
-            roundId,
-            gameName,
-            gameImage,
-            numPlayers,
-            maxPlayers,
-            registrationAmount,
-            roundLength,
-            houseEdge,
-            creatorEdge,
-            contractPaused,
-            gameInProgress
-        );
+    function getStatus() external view returns (Game memory) {
+        return game;
     }
 
     function getPlayerAddresses() external view returns (address[] memory) {
