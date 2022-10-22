@@ -66,7 +66,6 @@ contract GameImplementation {
     struct Initialization {
         address _initializer;
         address _factoryOwner;
-        // TODO update tests for _cronUpkeep
         address _cronUpkeep;
         uint256 _gameImplementationVersion;
         uint256 _gameId;
@@ -113,21 +112,10 @@ contract GameImplementation {
         roundLength = initialization._roundLength;
         maxPlayers = initialization._maxPlayers;
 
-        // Set the keeper contract references
-        // cronUpkeep = CronUpkeepInterface(initialization._cronUpkeep);
+        // TODO verify cron limitation
         encodedCron = CronExternal.toEncodedSpec(initialization._encodedCron);
         cronUpkeep = initialization._cronUpkeep;
 
-        // TODO verify cron limitation
-        // CronUpkeepInterface(cronUpkeep).addDelegator(address(this));
-        /**
-         * @notice Creates a cron job from the given encoded spec
-         * @param target the destination contract of a cron job
-         * @param handler the function signature on the target contract to call
-         * @param encodedCronSpec abi encoding of a cron spec
-         */
-
-        // bytes memory encodedCronSpec = CronExternal.toEncodedSpec(encodedCron);
         CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
             address(this),
             bytes("triggerDailyCheckpoint()"),
@@ -135,7 +123,7 @@ contract GameImplementation {
         );
     }
 
-    // TODO remove in next smart contract version
+    // TODO for development use remove in next smart contract version
     function startGame() external onlyCreatorOrAdmin onlyNotPaused onlyIfFull {
         _startGame();
     }

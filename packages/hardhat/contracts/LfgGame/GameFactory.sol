@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.6;
 
-// import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
@@ -11,7 +10,6 @@ import { GameImplementation } from "./GameImplementation.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 
 contract GameFactory is Pausable, Ownable {
-    // CronUpkeepInterface public cronUpkeep;
     address public cronUpkeep;
 
     // TODO should be entered as percent
@@ -49,17 +47,13 @@ contract GameFactory is Pausable, Ownable {
     event GameCreated(uint256 gameId, address gameAddress, uint256 implementationVersion, address creatorAddress);
     event FailedTransfer(address receiver, uint256 amount);
 
-    // ConfirmedOwner(owner)
     constructor(
-        // address owner,
         address _gameImplementation,
-        // TODO update tests for _cronUpkeep
         address _cronUpkeep,
         uint256 _houseEdge,
         uint256 _creatorEdge,
         uint256[] memory _authorizedAmounts
     ) onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts) {
-        // cronUpkeep = CronUpkeepInterface(_cronUpkeep);
         cronUpkeep = _cronUpkeep;
 
         houseEdge = _houseEdge;
@@ -123,7 +117,6 @@ contract GameFactory is Pausable, Ownable {
         uint256 _maxPlayers,
         uint256 _roundLength,
         uint256 _registrationAmount,
-        // TODO update tests for _encodedCron
         string memory _encodedCron
     )
         public

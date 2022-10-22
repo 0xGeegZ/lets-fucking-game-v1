@@ -55,10 +55,10 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
     error TickTooOld();
     error TickDoesntMatchSpec();
 
-    address[] s_delegators;
-
     address immutable s_delegate;
     uint256 public immutable s_maxJobs;
+    address[] s_delegators;
+
     uint256 private s_nextCronJobID = 1;
     EnumerableSet.UintSet private s_activeCronJobIDs;
 
