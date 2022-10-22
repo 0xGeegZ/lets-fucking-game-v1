@@ -406,7 +406,7 @@ TESTS
       it('should revert transaction with correct message', async function () {
         await this.game.pause()
         await expectRevert(
-          this.game.connect(this.cronUpkeepContract).triggerDailyCheckpoint(),
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint(),
           'Contract is paused'
         )
       })
@@ -424,7 +424,7 @@ TESTS
           }
 
           await expect(
-            this.game.connect(this.cronUpkeepContract).triggerDailyCheckpoint()
+            this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
           ).to.not.emit(this.game, 'StartedGame')
         })
       })
@@ -440,7 +440,7 @@ TESTS
           }
 
           await expect(
-            this.game.connect(this.cronUpkeepContract).triggerDailyCheckpoint()
+            this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
           )
             .to.emit(this.game, 'StartedGame')
             .withArgs(anyValue, '10')
@@ -460,7 +460,7 @@ TESTS
         await ethers.provider.send('evm_increaseTime', [OneDayInSeconds])
 
         await expect(
-          this.game.connect(this.cronUpkeepContract).triggerDailyCheckpoint()
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
         ).to.not.emit(this.game, 'StartedGame')
       })
 
@@ -475,7 +475,7 @@ TESTS
         await ethers.provider.send('evm_increaseTime', [OneDayInSeconds])
 
         await expect(
-          this.game.connect(this.cronUpkeepContract).triggerDailyCheckpoint()
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
         ).to.emit(this.game, 'GameLost')
       })
 
@@ -490,7 +490,7 @@ TESTS
         await ethers.provider.send('evm_increaseTime', [OneDayInSeconds])
 
         await expect(
-          this.game.connect(this.cronUpkeepContract).triggerDailyCheckpoint()
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
         ).to.emit(this.game, 'ResetGame')
       })
     })

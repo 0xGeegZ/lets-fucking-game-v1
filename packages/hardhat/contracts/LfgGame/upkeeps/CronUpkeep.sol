@@ -44,6 +44,8 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
     event CronJobCreated(uint256 indexed id, address target, bytes handler);
     event CronJobUpdated(uint256 indexed id, address target, bytes handler);
     event CronJobDeleted(uint256 indexed id);
+    event DelegatorAdded(address target);
+    event DelegatorRemoved(address target);
 
     error CallFailed(uint256 id, string reason);
     error CronJobIDNotFound(uint256 id);
@@ -52,6 +54,8 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
     error TickInFuture();
     error TickTooOld();
     error TickDoesntMatchSpec();
+
+    address[] s_delegators;
 
     address immutable s_delegate;
     uint256 public immutable s_maxJobs;
@@ -112,7 +116,10 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
         address target,
         bytes memory handler,
         bytes memory encodedCronSpec
-    ) external onlyOwner {
+    )
+        external
+        onlyOwnerOrDelegator /*onlyOwner*/
+    {
         if (s_activeCronJobIDs.length() >= s_maxJobs) {
             revert ExceedsMaxJobs();
         }
@@ -157,6 +164,30 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
     }
 
     /**
+     * @notice Add a delegator to the smart contract.
+     * @param delegator the address of delegator to add
+     */
+    function addDelegator(address delegator) external onlyOwnerOrDelegator {
+        if (!_isExistDelegator(delegator)) {
+            s_delegators.push(delegator);
+            emit DelegatorAdded(delegator);
+        }
+    }
+
+    /**
+     * @notice Remove a delegator to the smart contract.
+     * @param delegator the address of delegator to remove
+     */
+    function removeDelegator(address delegator) external onlyOwnerOrDelegator {
+        for (uint256 i = 0; i < s_delegators.length; i++) {
+            if (s_delegators[i] == delegator) {
+                delete s_delegators[i];
+                emit DelegatorRemoved(delegator);
+            }
+        }
+    }
+
+    /**
      * @notice Pauses the contract, which prevents executing performUpkeep
      */
     function pause() external onlyOwner {
@@ -190,6 +221,14 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
             jobIDs[idx] = s_activeCronJobIDs.at(idx);
         }
         return jobIDs;
+    }
+
+    /**
+     * @notice gets a list of all delegators
+     * @return list of adelegators address
+     */
+    function getDelegators() external view returns (address[] memory) {
+        return s_delegators;
     }
 
     /**
@@ -241,6 +280,15 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
         return s_delegate;
     }
 
+    function _isExistDelegator(address delegator) internal view returns (bool) {
+        for (uint256 i = 0; i < s_delegators.length; i++) {
+            if (s_delegators[i] == delegator) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @notice validates the input to performUpkeep
      * @param id the id of the cron job
@@ -283,6 +331,11 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
         if (!s_activeCronJobIDs.contains(id)) {
             revert CronJobIDNotFound(id);
         }
+        _;
+    }
+
+    modifier onlyOwnerOrDelegator() {
+        require(msg.sender == owner() || _isExistDelegator(msg.sender), "Caller is not the owner or a delegator");
         _;
     }
 }

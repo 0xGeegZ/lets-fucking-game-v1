@@ -74,7 +74,8 @@ describe('GameImplementationContract - Others', function () {
             players: this.players,
             contract: this.game,
             amount: this.correctRegistrationAmount,
-            mockKeeper: this.cronUpkeepContract,
+
+            mockKeeper: this.mockKeeper,
           })
           const initialContractBalance = await ethers.provider.getBalance(
             this.game.address
@@ -125,7 +126,8 @@ describe('GameImplementationContract - Others', function () {
             players: this.players,
             contract: this.game,
             amount: this.correctRegistrationAmount,
-            mockKeeper: this.cronUpkeepContract,
+
+            mockKeeper: this.mockKeeper,
           })
           const initialContractBalance = await ethers.provider.getBalance(
             this.game.address
@@ -179,7 +181,8 @@ describe('GameImplementationContract - Others', function () {
             players: this.players,
             contract: this.game,
             amount: this.correctRegistrationAmount,
-            mockKeeper: this.cronUpkeepContract,
+
+            mockKeeper: this.mockKeeper,
           })
           const initialContractBalance = await ethers.provider.getBalance(
             this.game.address
@@ -213,7 +216,8 @@ describe('GameImplementationContract - Others', function () {
             players: this.players,
             contract: this.game,
             amount: this.correctRegistrationAmount,
-            mockKeeper: this.cronUpkeepContract,
+
+            mockKeeper: this.mockKeeper,
           })
           const initialContractBalance = await ethers.provider.getBalance(
             this.game.address

@@ -20,7 +20,8 @@ const beforeEachGameFactory = async function () {
   this.registrationAmount = ethers.utils.parseEther('0.0001')
   this.houseEdge = ethers.utils.parseEther('0.000005')
   this.creatorEdge = ethers.utils.parseEther('0.000005')
-  this.encodedCron = ethers.utils.toUtf8Bytes('0 18 * * *')
+  this.encodedCron = '0 18 * * *'
+  // this.encodedCron =  ethers.utils.toUtf8Bytes('0 18 * * *')
 
   this.authorizedAmounts = [
     ethers.utils.parseEther('0.0001'),
@@ -36,16 +37,22 @@ const beforeEachGameFactory = async function () {
     ethers.utils.parseEther('10'),
   ]
 
-  const GameFactoryContract = await ethers.getContractFactory('GameFactory')
-  const GameImplementationContract = await ethers.getContractFactory(
-    'GameImplementation'
-  )
-
   const CronContract = await ethers.getContractFactory(
     '@chainlink/contracts/src/v0.8/libraries/external/Cron.sol:Cron'
   )
   const cronContract = await CronContract.deploy()
   await cronContract.deployed()
+
+  const GameFactoryContract = await ethers.getContractFactory('GameFactory')
+
+  const GameImplementationContract = await ethers.getContractFactory(
+    'GameImplementation',
+    {
+      libraries: {
+        Cron: cronContract.address,
+      },
+    }
+  )
 
   const CronUpkeepDelegateContract = await ethers.getContractFactory(
     'CronUpkeepDelegate'
@@ -70,6 +77,10 @@ const beforeEachGameFactory = async function () {
   const gameImplementationContract = await GameImplementationContract.deploy()
   await gameImplementationContract.deployed()
 
+  await cronUpkeepContract
+    .connect(this.owner)
+    .addDelegator(gameImplementationContract.address)
+
   const gameFactoryContract = await GameFactoryContract.connect(owner).deploy(
     gameImplementationContract.address,
     cronUpkeepContract.address,
@@ -79,9 +90,20 @@ const beforeEachGameFactory = async function () {
   )
   await gameFactoryContract.deployed()
 
+  await cronUpkeepContract
+    .connect(this.owner)
+    .addDelegator(gameFactoryContract.address)
+
   const secondGameImplementationContract =
     await GameImplementationContract.deploy()
   await secondGameImplementationContract.deployed()
+  await cronUpkeepContract
+    .connect(this.owner)
+    .addDelegator(secondGameImplementationContract.address)
+
+  const delegators = await cronUpkeepContract
+    .connect(this.owner)
+    .getDelegators()
 
   this.GameImplementationContract = GameImplementationContract
   this.GameFactoryContract = GameFactoryContract
@@ -102,7 +124,8 @@ const beforeEachGameImplementation = async function () {
   this.correctRegistrationAmount = ethers.utils.parseEther('0.0001')
   this.houseEdge = ethers.utils.parseEther('0.00005')
   this.creatorEdge = ethers.utils.parseEther('0.00005')
-  this.encodedCron = ethers.utils.toUtf8Bytes('0 18 * * *')
+  this.encodedCron = '0 18 * * *'
+  // this.encodedCron =  ethers.utils.toUtf8Bytes('0 18 * * *')
 
   this.authorizedAmounts = [
     ethers.utils.parseEther('0.0001'),
@@ -128,16 +151,21 @@ const beforeEachGameImplementation = async function () {
   this.underMaxDuration = 60 * 60 * 20
   this.generalAdmin = players[17]
 
-  const GameFactoryContract = await ethers.getContractFactory('GameFactory')
-  const GameImplementationContract = await ethers.getContractFactory(
-    'GameImplementation'
-  )
-
   const CronContract = await ethers.getContractFactory(
     '@chainlink/contracts/src/v0.8/libraries/external/Cron.sol:Cron'
   )
   const cronContract = await CronContract.deploy()
   await cronContract.deployed()
+
+  const GameFactoryContract = await ethers.getContractFactory('GameFactory')
+  const GameImplementationContract = await ethers.getContractFactory(
+    'GameImplementation',
+    {
+      libraries: {
+        Cron: cronContract.address,
+      },
+    }
+  )
 
   const CronUpkeepDelegateContract = await ethers.getContractFactory(
     'CronUpkeepDelegate'
@@ -162,6 +190,10 @@ const beforeEachGameImplementation = async function () {
   const gameImplementationContract = await GameImplementationContract.deploy()
   await gameImplementationContract.deployed()
 
+  await cronUpkeepContract
+    .connect(this.generalAdmin)
+    .addDelegator(gameImplementationContract.address)
+
   const gameFactoryContract = await GameFactoryContract.connect(
     this.generalAdmin
   ).deploy(
@@ -172,6 +204,9 @@ const beforeEachGameImplementation = async function () {
     this.authorizedAmounts
   )
   await gameFactoryContract.deployed()
+  await cronUpkeepContract
+    .connect(this.generalAdmin)
+    .addDelegator(gameFactoryContract.address)
 
   await gameFactoryContract
     .connect(creator)
@@ -182,6 +217,8 @@ const beforeEachGameImplementation = async function () {
   this.GameFactoryContract = GameFactoryContract
 
   this.cronUpkeepContract = cronUpkeepContract
+  // TODO Implement business logic to cover keeper in test
+  this.mockKeeper = this.generalAdmin
   this.cronUpkeepDelegateContract = cronUpkeepDelegateContract
 
   this.gameFactoryContract = gameFactoryContract

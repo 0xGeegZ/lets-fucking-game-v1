@@ -192,10 +192,10 @@ describe('GameImplementationContract - Mecanism', function () {
     })
 
     describe('when triggerDailyCheckpoint called during paused contract', function () {
-      it.only('should revert transaction with correct message', async function () {
+      it('should revert transaction with correct message', async function () {
         await this.game.pause()
         await expectRevert(
-          this.game.connect(this.cronUpkeepContract).triggerDailyCheckpoint(),
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint(),
           'Contract is paused'
         )
       })
@@ -213,7 +213,7 @@ describe('GameImplementationContract - Mecanism', function () {
           }
 
           await expect(
-            this.game.connect(this.cronUpkeepContract).triggerDailyCheckpoint()
+            this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
           ).to.not.emit(this.game, 'StartedGame')
         })
       })
@@ -229,7 +229,7 @@ describe('GameImplementationContract - Mecanism', function () {
           }
 
           await expect(
-            this.game.connect(this.cronUpkeepContract).triggerDailyCheckpoint()
+            this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
           )
             .to.emit(this.game, 'StartedGame')
             .withArgs(anyValue, '10')
@@ -243,14 +243,14 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+          mockKeeper: this.mockKeeper,
         })
 
         // A day passes until the next checkpoint
         await ethers.provider.send('evm_increaseTime', [ONE_DAY_IN_SECONDS])
 
         await expect(
-          this.game.connect(this.cronUpkeepContract).triggerDailyCheckpoint()
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
         ).to.not.emit(this.game, 'StartedGame')
       })
 
@@ -259,14 +259,15 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
 
         // A day passes until the next checkpoint
         await ethers.provider.send('evm_increaseTime', [ONE_DAY_IN_SECONDS])
 
         await expect(
-          this.game.connect(this.cronUpkeepContract).triggerDailyCheckpoint()
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
         ).to.emit(this.game, 'GameLost')
       })
 
@@ -275,14 +276,15 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
 
         // A day passes until the next checkpoint
         await ethers.provider.send('evm_increaseTime', [ONE_DAY_IN_SECONDS])
 
         await expect(
-          this.game.connect(this.cronUpkeepContract).triggerDailyCheckpoint()
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
         ).to.emit(this.game, 'ResetGame')
       })
     })
@@ -294,7 +296,8 @@ describe('GameImplementationContract - Mecanism', function () {
         players: this.players,
         contract: this.game,
         amount: this.correctRegistrationAmount,
-        mockKeeper: this.cronUpkeepContract,
+
+        mockKeeper: this.mockKeeper,
       })
 
       const isStartedGame = await this.game.gameInProgress()
@@ -306,7 +309,7 @@ describe('GameImplementationContract - Mecanism', function () {
         players: this.players,
         contract: this.game,
         amount: this.correctRegistrationAmount,
-        mockKeeper: this.cronUpkeepContract,
+        mockKeeper: this.mockKeeper,
       })
 
       const currentBlock = await ethers.provider.send('eth_getBlockByNumber', [
@@ -348,7 +351,8 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
       ).to.emit(this.game, 'StartedGame')
     })
@@ -409,7 +413,8 @@ describe('GameImplementationContract - Mecanism', function () {
             players: this.players,
             contract: this.game,
             amount: this.correctRegistrationAmount,
-            mockKeeper: this.cronUpkeepContract,
+
+            mockKeeper: this.mockKeeper,
           })
           const initialPlayer = await this.game.players(
             this.players[playerIndex].address
@@ -440,7 +445,8 @@ describe('GameImplementationContract - Mecanism', function () {
             players: this.players,
             contract: this.game,
             amount: this.correctRegistrationAmount,
-            mockKeeper: this.cronUpkeepContract,
+
+            mockKeeper: this.mockKeeper,
           })
           const initialPlayer = await this.game.players(
             this.players[playerIndex].address
@@ -472,7 +478,8 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
         const initialPlayer = await this.game.players(
           this.players[playerIndex].address
@@ -504,7 +511,8 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
         const initialPlayer = await this.game.players(
           this.players[playerIndex].address
@@ -533,7 +541,8 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
         const initialPlayer = await this.game.players(
           this.players[playerIndex].address
@@ -558,7 +567,8 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
         const initialPlayer = await this.game.players(
           this.players[playerIndex].address
@@ -591,7 +601,8 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
         const initialPlayer = await this.game.players(
           this.players[playerIndex].address
@@ -620,7 +631,8 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
         const initialPlayer = await this.game.players(
           this.players[playerIndex].address
@@ -649,7 +661,8 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
         const initialPlayer = await this.game.players(
           this.players[playerIndex].address
@@ -679,7 +692,8 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
 
         const startedGameBlock = await ethers.provider.getBlock()
@@ -695,7 +709,8 @@ describe('GameImplementationContract - Mecanism', function () {
           player1Index: finalistIndex,
           player2Index: secondFinalistIndex,
           startedGameTimestamp,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
 
         const looserUpdatedData = await this.game.players(
@@ -714,7 +729,8 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
         const startedGameBlock = await ethers.provider.getBlock()
         const startedGameTimestamp = startedGameBlock.timestamp
@@ -729,7 +745,8 @@ describe('GameImplementationContract - Mecanism', function () {
           player1Index: finalistIndex,
           player2Index: secondFinalistIndex,
           startedGameTimestamp,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
 
         const looserUpdatedData = await this.game.players(
@@ -747,7 +764,8 @@ describe('GameImplementationContract - Mecanism', function () {
           players: this.players,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
 
         const startedGameBlock = await ethers.provider.getBlock()
@@ -763,7 +781,8 @@ describe('GameImplementationContract - Mecanism', function () {
           player1Index: finalistIndex,
           player2Index: secondFinalistIndex,
           startedGameTimestamp,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
         const looserUpdatedData = await this.game.players(
           this.players[looserIndex].address
@@ -785,7 +804,8 @@ describe('GameImplementationContract - Mecanism', function () {
           winnerIndex,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
 
         const newWinner = await this.game.gameWinners(roundId)
@@ -807,7 +827,8 @@ describe('GameImplementationContract - Mecanism', function () {
             winnerIndex,
             contract: this.game,
             amount: this.correctRegistrationAmount,
-            mockKeeper: this.cronUpkeepContract,
+
+            mockKeeper: this.mockKeeper,
           })
         )
           .to.emit(this.game, 'GameWon')
@@ -827,7 +848,8 @@ describe('GameImplementationContract - Mecanism', function () {
           winnerIndex,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
         const updatedPlayersAmount = await this.game.numPlayers()
         const updatedPlayerAddressesList = await this.game.getPlayerAddresses()
@@ -853,7 +875,8 @@ describe('GameImplementationContract - Mecanism', function () {
             winnerIndex,
             contract: this.game,
             amount: this.correctRegistrationAmount,
-            mockKeeper: this.cronUpkeepContract,
+
+            mockKeeper: this.mockKeeper,
           })
         ).to.emit(this.game, 'ResetGame')
       })
@@ -870,7 +893,8 @@ describe('GameImplementationContract - Mecanism', function () {
           winnerIndex,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
         await expectRevert(
           this.game
@@ -891,7 +915,8 @@ describe('GameImplementationContract - Mecanism', function () {
           winnerIndex,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
 
         await expectRevert(
@@ -914,7 +939,8 @@ describe('GameImplementationContract - Mecanism', function () {
           winnerIndex,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
         await this.game
           .connect(this.players[winnerIndex])
@@ -941,7 +967,8 @@ describe('GameImplementationContract - Mecanism', function () {
           winnerIndex,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
 
         const initialContractBalance = await ethers.provider.getBalance(
@@ -982,7 +1009,8 @@ describe('GameImplementationContract - Mecanism', function () {
           winnerIndex,
           contract: this.game,
           amount: this.correctRegistrationAmount,
-          mockKeeper: this.cronUpkeepContract,
+
+          mockKeeper: this.mockKeeper,
         })
 
         await expect(

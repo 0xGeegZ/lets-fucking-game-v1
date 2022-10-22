@@ -75,6 +75,18 @@ interface CronUpkeepInterface {
     function deleteCronJob(uint256 id) external;
 
     /**
+     * @notice Add a delegator to the smart contract.
+     * @param delegator the address of delegator to add
+     */
+    function addDelegator(address delegator) external;
+
+    /**
+     * @notice Remove a delegator to the smart contract.
+     * @param delegator the address of delegator to remove
+     */
+    function removeDelegator(address delegator) external;
+
+    /**
      * @notice Pauses the contract, which prevents executing performUpkeep
      */
     function pause() external;

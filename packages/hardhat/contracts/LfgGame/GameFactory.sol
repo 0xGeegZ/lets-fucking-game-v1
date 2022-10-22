@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.6;
+
+// import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+
 import { GameImplementation } from "./GameImplementation.sol";
 
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
@@ -46,7 +49,9 @@ contract GameFactory is Pausable, Ownable {
     event GameCreated(uint256 gameId, address gameAddress, uint256 implementationVersion, address creatorAddress);
     event FailedTransfer(address receiver, uint256 amount);
 
+    // ConfirmedOwner(owner)
     constructor(
+        // address owner,
         address _gameImplementation,
         // TODO update tests for _cronUpkeep
         address _cronUpkeep,
@@ -119,7 +124,7 @@ contract GameFactory is Pausable, Ownable {
         uint256 _roundLength,
         uint256 _registrationAmount,
         // TODO update tests for _encodedCron
-        bytes memory _encodedCron
+        string memory _encodedCron
     )
         public
         whenNotPaused
@@ -132,6 +137,9 @@ contract GameFactory is Pausable, Ownable {
         address latestGameImplementationAddress = gameImplementations[latestGameImplementationVersionId]
             .deployedAddress;
         address payable newGameAddress = payable(Clones.clone(latestGameImplementationAddress));
+
+        CronUpkeepInterface(cronUpkeep).addDelegator(newGameAddress);
+
         GameImplementation(newGameAddress).initialize(
             GameImplementation.Initialization({
                 _initializer: msg.sender,

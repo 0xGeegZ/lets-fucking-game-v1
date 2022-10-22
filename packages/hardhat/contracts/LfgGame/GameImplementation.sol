@@ -4,6 +4,7 @@ pragma solidity ^0.8.6;
 import "@openzeppelin/contracts/utils/Address.sol";
 
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
+import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
 contract GameImplementation {
     using Address for address;
@@ -74,7 +75,7 @@ contract GameImplementation {
         uint256 _registrationAmount;
         uint256 _houseEdge;
         uint256 _creatorEdge;
-        bytes _encodedCron;
+        string _encodedCron;
     }
 
     ///EVENTS
@@ -114,22 +115,24 @@ contract GameImplementation {
 
         // Set the keeper contract references
         // cronUpkeep = CronUpkeepInterface(initialization._cronUpkeep);
+        encodedCron = CronExternal.toEncodedSpec(initialization._encodedCron);
         cronUpkeep = initialization._cronUpkeep;
 
         // TODO verify cron limitation
-        // TODO call cronUpkeep.createCronJobFromEncodedSpec
+        // CronUpkeepInterface(cronUpkeep).addDelegator(address(this));
         /**
          * @notice Creates a cron job from the given encoded spec
          * @param target the destination contract of a cron job
          * @param handler the function signature on the target contract to call
          * @param encodedCronSpec abi encoding of a cron spec
          */
-        // CronUpkeepInterface(_cronUpkeep);
-        // function createCronJobFromEncodedSpec(
-        //     address target,
-        //     bytes memory handler,
-        //     bytes memory encodedCronSpec
-        // ) external;
+
+        // bytes memory encodedCronSpec = CronExternal.toEncodedSpec(encodedCron);
+        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
+            address(this),
+            bytes("triggerDailyCheckpoint()"),
+            encodedCron
+        );
     }
 
     // TODO remove in next smart contract version
@@ -162,7 +165,7 @@ contract GameImplementation {
     }
 
     modifier onlyKeeperOrAdmin() {
-        require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the creator or admin");
+        require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the keeper");
         _;
     }
 
@@ -295,8 +298,8 @@ contract GameImplementation {
     }
 
     // TODO remoove onlyKeeperOrAdmin and make test works
-    // function triggerDailyCheckpoint() external onlyKeeperOrAdmin onlyNotPaused {
-    function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
+    function triggerDailyCheckpoint() external onlyKeeperOrAdmin onlyNotPaused {
+        // function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
         if (gameInProgress == true) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
