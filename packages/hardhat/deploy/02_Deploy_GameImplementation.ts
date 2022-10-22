@@ -28,6 +28,6 @@ const func: DeployFunction = async function ({
   console.log('GameImplementation address:', gameImplementationAddress)
 }
 
-func.tags = ['all', 'lfg', 'main']
+func.tags = ['all', 'lfg', 'main', 'game-implementation']
 
 export default func

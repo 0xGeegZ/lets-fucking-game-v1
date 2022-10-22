@@ -1,11 +1,16 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.6;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import { GameImplementation } from "./GameImplementation.sol";
 
+import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
+
 contract GameFactory is Pausable, Ownable {
+    // CronUpkeepInterface public cronUpkeep;
+    address public cronUpkeep;
+
     // TODO should be entered as percent
     uint256 public houseEdge;
     // TODO should be entered as percent
@@ -43,10 +48,15 @@ contract GameFactory is Pausable, Ownable {
 
     constructor(
         address _gameImplementation,
+        // TODO update tests for _cronUpkeep
+        address _cronUpkeep,
         uint256 _houseEdge,
         uint256 _creatorEdge,
         uint256[] memory _authorizedAmounts
     ) onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts) {
+        // cronUpkeep = CronUpkeepInterface(_cronUpkeep);
+        cronUpkeep = _cronUpkeep;
+
         houseEdge = _houseEdge;
         creatorEdge = _creatorEdge;
         gameImplementations.push(
@@ -107,7 +117,9 @@ contract GameFactory is Pausable, Ownable {
     function createNewGame(
         uint256 _maxPlayers,
         uint256 _roundLength,
-        uint256 _registrationAmount
+        uint256 _registrationAmount,
+        // TODO update tests for _encodedCron
+        bytes memory _encodedCron
     )
         public
         whenNotPaused
@@ -124,13 +136,15 @@ contract GameFactory is Pausable, Ownable {
             GameImplementation.Initialization({
                 _initializer: msg.sender,
                 _factoryOwner: owner(),
+                _cronUpkeep: cronUpkeep,
                 _gameImplementationVersion: latestGameImplementationVersionId,
                 _gameId: gameId,
                 _roundLength: _roundLength,
                 _maxPlayers: _maxPlayers,
                 _registrationAmount: _registrationAmount,
                 _houseEdge: houseEdge,
-                _creatorEdge: creatorEdge
+                _creatorEdge: creatorEdge,
+                _encodedCron: _encodedCron
             })
         );
         deployedGames.push(
@@ -176,6 +190,14 @@ contract GameFactory is Pausable, Ownable {
         transferOwnership(_adminAddress);
     }
 
+    function setCronUpkeep(address _cronUpkeep) public onlyAdmin {
+        require(_cronUpkeep != address(0), "Keeper need to be initialised");
+        cronUpkeep = _cronUpkeep;
+        // cronUpkeep = CronUpkeepInterface(_cronUpkeep);
+        // TODO set cronUpKeep for all Games
+        // TODO add parameter to know if it's needed to register encodedCron again
+    }
+
     function withdrawFunds(address receiver) public onlyAdmin {
         _safeTransfert(receiver, address(this).balance);
     }
@@ -185,14 +207,6 @@ contract GameFactory is Pausable, Ownable {
         gameImplementations.push(
             GameImplementationVersion({ id: latestGameImplementationVersionId, deployedAddress: _gameImplementation })
         );
-    }
-
-    function pause() public onlyAdmin whenNotPaused {
-        _pause();
-    }
-
-    function unpause() public onlyAdmin whenPaused {
-        _unpause();
     }
 
     function addAuthorizedAmounts(uint256[] memory _authorizedAmounts) public onlyAdmin {
@@ -205,6 +219,16 @@ contract GameFactory is Pausable, Ownable {
                 });
             }
         }
+    }
+
+    // TODO create a function to pause all games and the cronupKeep
+
+    function pause() public onlyAdmin whenNotPaused {
+        _pause();
+    }
+
+    function unpause() public onlyAdmin whenPaused {
+        _unpause();
     }
 
     ///

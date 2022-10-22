@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts/utils/Address.sol";
+
+import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 
 contract GameImplementation {
     using Address for address;
@@ -12,8 +14,13 @@ contract GameImplementation {
     address public generalAdmin;
     address public creator;
     address public factory;
-    address public keeper;
-    string public keeperCron;
+
+    // address public keeper;
+    // string public keeperCron;
+
+    // CronUpkeepInterface public cronUpkeep;
+    address public cronUpkeep;
+    bytes public encodedCron;
 
     uint256 public registrationAmount;
     uint256 public houseEdge;
@@ -58,6 +65,8 @@ contract GameImplementation {
     struct Initialization {
         address _initializer;
         address _factoryOwner;
+        // TODO update tests for _cronUpkeep
+        address _cronUpkeep;
         uint256 _gameImplementationVersion;
         uint256 _gameId;
         uint256 _roundLength;
@@ -65,6 +74,7 @@ contract GameImplementation {
         uint256 _registrationAmount;
         uint256 _houseEdge;
         uint256 _creatorEdge;
+        bytes _encodedCron;
     }
 
     ///EVENTS
@@ -102,9 +112,24 @@ contract GameImplementation {
         roundLength = initialization._roundLength;
         maxPlayers = initialization._maxPlayers;
 
-        // TODO (Will need a big refacto for tests cases) reactivate to ensure that keeper is initialised
-        // pause contract by default as we need to set keeper data to unpause contract
-        // contractPaused = true;
+        // Set the keeper contract references
+        // cronUpkeep = CronUpkeepInterface(initialization._cronUpkeep);
+        cronUpkeep = initialization._cronUpkeep;
+
+        // TODO verify cron limitation
+        // TODO call cronUpkeep.createCronJobFromEncodedSpec
+        /**
+         * @notice Creates a cron job from the given encoded spec
+         * @param target the destination contract of a cron job
+         * @param handler the function signature on the target contract to call
+         * @param encodedCronSpec abi encoding of a cron spec
+         */
+        // CronUpkeepInterface(_cronUpkeep);
+        // function createCronJobFromEncodedSpec(
+        //     address target,
+        //     bytes memory handler,
+        //     bytes memory encodedCronSpec
+        // ) external;
     }
 
     // TODO remove in next smart contract version
@@ -137,13 +162,13 @@ contract GameImplementation {
     }
 
     modifier onlyKeeper() {
-        require(msg.sender == keeper, "Caller is not the keeper");
+        require(msg.sender == cronUpkeep, "Caller is not the keeper");
         _;
     }
 
     modifier onlyIfKeeperDataInit() {
-        require(keeper != address(0), "Keeper need to be initialised");
-        require(bytes(keeperCron).length != 0, "Keeper cron need to be initialised");
+        require(cronUpkeep != address(0), "Keeper need to be initialised");
+        require(bytes(encodedCron).length != 0, "Keeper cron need to be initialised");
         _;
     }
 
@@ -264,8 +289,8 @@ contract GameImplementation {
         }
     }
 
-    // This function gets called every 24 hours
     function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
+        // function triggerDailyCheckpoint() external {
         if (gameInProgress == true) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
@@ -428,21 +453,26 @@ contract GameImplementation {
     ///
 
     // TODO create a function to set keeper address & keeper cron
-    function setKeeper(address _keeper) external onlyCreatorOrAdmin {
-        keeper = _keeper;
+    function setCronUpkeep(address _cronUpkeep) public onlyCreatorOrAdmin {
+        require(_cronUpkeep != address(0), "Keeper need to be initialised");
+        // cronUpkeep = CronUpkeepInterface(_cronUpkeep);
+        cronUpkeep = _cronUpkeep;
+        // TODO add parameter to know if it's needed to register encodedCron again
     }
 
-    function setKeeperCron(string memory _keeperCron) external onlyCreatorOrAdmin {
-        keeperCron = _keeperCron;
+    function setEncodedCron(bytes memory _encodedCron) external onlyCreatorOrAdmin {
+        encodedCron = _encodedCron;
     }
 
     function pause() external onlyCreatorOrAdmin onlyNotPaused {
+        // TODO pause Keeper JOB
         contractPaused = true;
     }
 
     // TODO (Will need a big refactor for tests cases) reactivate to ensure that keeper is initialised
     // function unpause() external onlyCreatorOrAdmin onlyPaused onlyIfKeeperDataInit {
     function unpause() external onlyCreatorOrAdmin onlyPaused onlyIfKeeperDataInit {
+        // TODO unpause Keeper JOB
         contractPaused = false;
     }
 

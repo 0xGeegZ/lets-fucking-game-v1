@@ -19,7 +19,8 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               this.maxPlayers,
               this.roundLength,
-              this.registrationAmount
+              this.registrationAmount,
+              this.encodedCron
             ),
           'Pausable: paused'
         )
@@ -37,7 +38,8 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               outOfRangeMaxPlayers1,
               this.roundLength,
-              this.registrationAmount
+              this.registrationAmount,
+              this.encodedCron
             ),
           'maxPlayers should not be bigger than 20'
         )
@@ -48,7 +50,8 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               outOfRangeMaxPlayers2,
               this.roundLength,
-              this.registrationAmount
+              this.registrationAmount,
+              this.encodedCron
             ),
           'maxPlayers should be bigger than or equal to 2'
         )
@@ -66,7 +69,8 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               this.maxPlayers,
               outOfRangeRoundLength1,
-              this.registrationAmount
+              this.registrationAmount,
+              this.encodedCron
             ),
           'roundLength should not be bigger than 8'
         )
@@ -77,7 +81,8 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               this.maxPlayers,
               outOfRangeRoundLength2,
-              this.registrationAmount
+              this.registrationAmount,
+              this.encodedCron
             ),
           'roundLength should be bigger than 0'
         )
@@ -91,7 +96,8 @@ describe('GameFactoryContract', function () {
           .createNewGame(
             this.maxPlayers,
             this.roundLength,
-            this.registrationAmount
+            this.registrationAmount,
+            this.encodedCron
           )
 
         const newGame = await this.gameFactoryContract.deployedGames(0)
@@ -132,14 +138,16 @@ describe('GameFactoryContract', function () {
           .createNewGame(
             this.maxPlayers,
             this.roundLength,
-            this.authorizedAmounts[1]
+            this.authorizedAmounts[1],
+            this.encodedCron
           )
         await this.gameFactoryContract
           .connect(this.thirdAccount)
           .createNewGame(
             this.maxPlayers,
             this.roundLength,
-            this.authorizedAmounts[2]
+            this.authorizedAmounts[2],
+            this.encodedCron
           )
 
         const firstGame = await this.gameFactoryContract.deployedGames(0)
@@ -160,7 +168,8 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               this.maxPlayers,
               this.roundLength,
-              this.registrationAmount
+              this.registrationAmount,
+              this.encodedCron
             )
         )
           .to.emit(this.gameFactoryContract, 'GameCreated')
@@ -176,14 +185,16 @@ describe('GameFactoryContract', function () {
         .createNewGame(
           this.maxPlayers,
           this.roundLength,
-          this.authorizedAmounts[1]
+          this.authorizedAmounts[1],
+          this.encodedCron
         )
       await this.gameFactoryContract
         .connect(this.thirdAccount)
         .createNewGame(
           this.maxPlayers,
           this.roundLength,
-          this.authorizedAmounts[2]
+          this.authorizedAmounts[2],
+          this.encodedCron
         )
 
       const deployedGames = await this.gameFactoryContract
