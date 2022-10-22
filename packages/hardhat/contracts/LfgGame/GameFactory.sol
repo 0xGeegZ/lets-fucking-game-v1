@@ -194,7 +194,6 @@ contract GameFactory is Pausable, Ownable {
     function setCronUpkeep(address _cronUpkeep) public onlyAdmin {
         require(_cronUpkeep != address(0), "Keeper need to be initialised");
         cronUpkeep = _cronUpkeep;
-        // cronUpkeep = CronUpkeepInterface(_cronUpkeep);
         // TODO set cronUpKeep for all Games
         // TODO add parameter to know if it's needed to register encodedCron again
     }

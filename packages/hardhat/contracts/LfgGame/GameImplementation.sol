@@ -16,10 +16,6 @@ contract GameImplementation {
     address public creator;
     address public factory;
 
-    // address public keeper;
-    // string public keeperCron;
-
-    // CronUpkeepInterface public cronUpkeep;
     address public cronUpkeep;
     bytes public encodedCron;
 
@@ -27,18 +23,23 @@ contract GameImplementation {
     uint256 public houseEdge;
     uint256 public creatorEdge;
 
+    // gameId is fix and represent the fixed id for the game
     uint256 public gameId;
-    uint256 public roundId; // This gets incremented every time the game restarts
+    // roundId gets incremented every time the game restarts
+    uint256 public roundId;
+
     string public gameName;
     string public gameImage;
 
     uint256 public gameImplementationVersion;
 
-    uint256 public roundLength; // Time length of a round in hours
+    // Time length of a round in hours
+    uint256 public roundLength;
     uint256 public maxPlayers;
     uint256 public numPlayers;
 
-    bool public gameInProgress; // Helps the keeper determine if a game has started or if we need to start it
+    // Helps the keeper determine if a game has started or if we need to start it
+    bool public gameInProgress;
     bool public contractPaused;
 
     address[] public playerAddresses;
@@ -112,7 +113,11 @@ contract GameImplementation {
         roundLength = initialization._roundLength;
         maxPlayers = initialization._maxPlayers;
 
-        // TODO verify cron limitation
+        // TODO verify cron limitation : not less than every hour
+        // verify that should not contains "*/" in first value
+        // Pattern is : * * * * *
+        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
+
         encodedCron = CronExternal.toEncodedSpec(initialization._encodedCron);
         cronUpkeep = initialization._cronUpkeep;
 
