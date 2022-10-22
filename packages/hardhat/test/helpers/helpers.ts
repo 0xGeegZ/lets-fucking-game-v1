@@ -126,8 +126,6 @@ const beforeEachGameImplementation = async function () {
   this.RoundMaximumDuration = ONE_DAY_IN_SECONDS * 2
   this.upperMaxDuration = 60 * 60 * 24
   this.underMaxDuration = 60 * 60 * 20
-  // TODO use this.cronUpkeepContract as keeper
-  // this.cronUpkeepContract = players[18]
   this.generalAdmin = players[17]
 
   const GameFactoryContract = await ethers.getContractFactory('GameFactory')

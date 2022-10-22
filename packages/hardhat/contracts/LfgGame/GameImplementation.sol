@@ -161,6 +161,11 @@ contract GameImplementation {
         _;
     }
 
+    modifier onlyKeeperOrAdmin() {
+        require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the creator or admin");
+        _;
+    }
+
     modifier onlyKeeper() {
         require(msg.sender == cronUpkeep, "Caller is not the keeper");
         _;
@@ -289,8 +294,9 @@ contract GameImplementation {
         }
     }
 
+    // TODO remoove onlyKeeperOrAdmin and make test works
+    // function triggerDailyCheckpoint() external onlyKeeperOrAdmin onlyNotPaused {
     function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
-        // function triggerDailyCheckpoint() external {
         if (gameInProgress == true) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
