@@ -101,10 +101,6 @@ const beforeEachGameFactory = async function () {
     .connect(this.owner)
     .addDelegator(secondGameImplementationContract.address)
 
-  const delegators = await cronUpkeepContract
-    .connect(this.owner)
-    .getDelegators()
-
   this.GameImplementationContract = GameImplementationContract
   this.GameFactoryContract = GameFactoryContract
 
@@ -125,7 +121,6 @@ const beforeEachGameImplementation = async function () {
   this.houseEdge = ethers.utils.parseEther('0.00005')
   this.creatorEdge = ethers.utils.parseEther('0.00005')
   this.encodedCron = '0 18 * * *'
-  // this.encodedCron =  ethers.utils.toUtf8Bytes('0 18 * * *')
 
   this.authorizedAmounts = [
     ethers.utils.parseEther('0.0001'),
@@ -141,7 +136,8 @@ const beforeEachGameImplementation = async function () {
     ethers.utils.parseEther('10'),
   ]
 
-  this.prizeAmount = ethers.utils.parseEther('0.0009') // prizeAmount equals total prize amount minus house edge
+  // prizeAmount equals total prize amount minus house edge
+  this.prizeAmount = ethers.utils.parseEther('0.0009')
   this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
   this.zeroRegistrationAmount = ethers.utils.parseEther('0')
   this.launchDuration = 60 * 60 * 25
