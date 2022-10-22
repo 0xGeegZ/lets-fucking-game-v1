@@ -465,8 +465,7 @@ contract GameImplementation {
             uint256,
             uint256,
             bool,
-            bool,
-            uint256
+            bool
         )
     {
         // uint256 balance = address(this).balance;
@@ -483,8 +482,7 @@ contract GameImplementation {
             houseEdge,
             creatorEdge,
             contractPaused,
-            gameInProgress,
-            player.roundCount,
+            gameInProgress
         );
     }
 
