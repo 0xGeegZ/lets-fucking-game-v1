@@ -27,7 +27,7 @@ describe('GameImplementationContract', function () {
     this.RoundMaximumDuration = OneDayInSeconds * 2
     this.upperMaxDuration = 60 * 60 * 24
     this.underMaxDuration = 60 * 60 * 20
-    this.mockKeeper = players[18]
+    this.cronUpkeepContract = players[18]
     this.generalAdmin = players[17]
 
     GameFactoryContract = await ethers.getContractFactory('GameFactory')
@@ -48,11 +48,11 @@ describe('GameImplementationContract', function () {
       .connect(creator)
       .createNewGame(10, 2, this.correctRegistrationAmount)
     const clonedContract = await gameFactoryContract.deployedGames('0')
-    this.contract = await GameImplementationContract.attach(
+    this.game = await GameImplementationContract.attach(
       clonedContract.deployedAddress
     )
 
-    await this.contract
+    await this.game
       .connect(this.generalAdmin)
       .setKeeper(players[18].address)
   })
@@ -220,14 +220,14 @@ TESTS
   context('Contract Initialisation', function () {
     describe('when generalAdmin has deployed the Factory Contract', async function () {
       it('should be set as the generalAdmin of the created game', async function () {
-        const contractAdmin = await this.contract.generalAdmin()
+        const contractAdmin = await this.game.generalAdmin()
         expect(this.generalAdmin.address).to.equal(contractAdmin)
       })
     })
 
     describe('when creator creates the game', async function () {
       it('should be set as the creator of the game', async function () {
-        const contractCreator = await this.contract.creator()
+        const contractCreator = await this.game.creator()
         expect(creator.address).to.equal(contractCreator)
       })
     })
@@ -237,9 +237,9 @@ TESTS
     describe("User can't register to the game", function () {
       context('when game is paused', async function () {
         it('should not allow user to register to the game', async function () {
-          await this.contract.pause()
+          await this.game.pause()
           await expectRevert(
-            this.contract.connect(players[0]).registerForGame({
+            this.game.connect(players[0]).registerForGame({
               value: this.correctRegistrationAmount,
             }),
             'Contract is paused'
@@ -250,7 +250,7 @@ TESTS
       context('when user is the creator of the Game', async function () {
         it('should not allow user to register to the game', async function () {
           await expectRevert(
-            this.contract.connect(creator).registerForGame({
+            this.game.connect(creator).registerForGame({
               value: this.correctRegistrationAmount,
             }),
             "Caller can't be the creator"
@@ -264,12 +264,12 @@ TESTS
           for (let i = 0; i < maxAmountOfUser; i++) {
             await registerPlayer(
               i,
-              this.contract,
+              this.game,
               this.correctRegistrationAmount
             )
           }
           await expectRevert(
-            this.contract.connect(players[10]).registerForGame({
+            this.game.connect(players[10]).registerForGame({
               value: this.correctRegistrationAmount,
             }),
             'This game is full'
@@ -280,10 +280,10 @@ TESTS
       context('when user already joined the game', async function () {
         it('should not allow user to register to the game', async function () {
           const player = players[0]
-          await registerPlayer(0, this.contract, this.correctRegistrationAmount)
+          await registerPlayer(0, this.game, this.correctRegistrationAmount)
 
           await expectRevert(
-            this.contract.connect(player).registerForGame({
+            this.game.connect(player).registerForGame({
               value: this.correctRegistrationAmount,
             }),
             'Player already entered in this game'
@@ -298,7 +298,7 @@ TESTS
             const player = players[0]
 
             await expectRevert(
-              this.contract.connect(player).registerForGame({
+              this.game.connect(player).registerForGame({
                 value: this.incorrectRegistrationAmount,
               }),
               'Only game amount is allowed'
@@ -312,7 +312,7 @@ TESTS
           const player = players[0]
 
           await expectRevert(
-            this.contract.connect(player).registerForGame({
+            this.game.connect(player).registerForGame({
               value: this.zeroRegistrationAmount,
             }),
             'Only game amount is allowed'
@@ -324,9 +324,9 @@ TESTS
     describe('User can register to the game', function () {
       context('when one user registers to the game', async function () {
         it('should increase the number of registered players', async function () {
-          const initialNumberOfPlayers = await this.contract.numPlayers()
-          await registerPlayer(0, this.contract, this.correctRegistrationAmount)
-          const updatedNumberOfPlayers = await this.contract.numPlayers()
+          const initialNumberOfPlayers = await this.game.numPlayers()
+          await registerPlayer(0, this.game, this.correctRegistrationAmount)
+          const updatedNumberOfPlayers = await this.game.numPlayers()
           expect(updatedNumberOfPlayers).to.equal(initialNumberOfPlayers + 1)
         })
 
@@ -334,14 +334,14 @@ TESTS
           const newPlayerIndex = 0
           const newPlayerAddress = players[newPlayerIndex].address
           const intialPlayerAddressesList =
-            await this.contract.getPlayerAddresses()
+            await this.game.getPlayerAddresses()
           await registerPlayer(
             newPlayerIndex,
-            this.contract,
+            this.game,
             this.correctRegistrationAmount
           )
           const updatedPlayerAddressesList =
-            await this.contract.getPlayerAddresses()
+            await this.game.getPlayerAddresses()
           expect(updatedPlayerAddressesList.length).to.equal(
             +intialPlayerAddressesList.length + 1
           )
@@ -355,10 +355,10 @@ TESTS
           const newPlayerAddress = players[newPlayerIndex].address
           await registerPlayer(
             newPlayerIndex,
-            this.contract,
+            this.game,
             this.correctRegistrationAmount
           )
-          const playerFromMapping = await this.contract.players(
+          const playerFromMapping = await this.game.players(
             newPlayerAddress
           )
           expect(playerFromMapping.playerAddress).to.equal(newPlayerAddress)
@@ -377,12 +377,12 @@ TESTS
             for (let i = 0; i < 10; i++) {
               await registerPlayer(
                 i,
-                this.contract,
+                this.game,
                 this.correctRegistrationAmount
               )
             }
-            const numPlayers = await this.contract.numPlayers()
-            const playerAddresses = await this.contract.getPlayerAddresses()
+            const numPlayers = await this.game.numPlayers()
+            const playerAddresses = await this.game.getPlayerAddresses()
             expect(numPlayers.toNumber()).to.equal(10) // No risk of using toNumber() here
             expect(playerAddresses.length).to.equal(10)
           })
@@ -396,7 +396,7 @@ TESTS
       it('should revert transaction with correct message', async function () {
         const wrongCaller = players[17]
         await expectRevert(
-          this.contract.connect(wrongCaller).triggerDailyCheckpoint(),
+          this.game.connect(wrongCaller).triggerDailyCheckpoint(),
           'Caller is not the keeper'
         )
       })
@@ -404,9 +404,9 @@ TESTS
 
     describe('when triggerDailyCheckpoint called during paused contract', function () {
       it('should revert transaction with correct message', async function () {
-        await this.contract.pause()
+        await this.game.pause()
         await expectRevert(
-          this.contract.connect(this.mockKeeper).triggerDailyCheckpoint(),
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint(),
           'Contract is paused'
         )
       })
@@ -418,14 +418,14 @@ TESTS
           for (let i = 0; i < 8; i++) {
             await registerPlayer(
               i,
-              this.contract,
+              this.game,
               this.correctRegistrationAmount
             )
           }
 
           await expect(
-            this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
-          ).to.not.emit(this.contract, 'StartedGame')
+            this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
+          ).to.not.emit(this.game, 'StartedGame')
         })
       })
 
@@ -434,15 +434,15 @@ TESTS
           for (let i = 0; i < 10; i++) {
             await registerPlayer(
               i,
-              this.contract,
+              this.game,
               this.correctRegistrationAmount
             )
           }
 
           await expect(
-            this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
+            this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
           )
-            .to.emit(this.contract, 'StartedGame')
+            .to.emit(this.game, 'StartedGame')
             .withArgs(anyValue, '10')
         })
       })
@@ -451,47 +451,47 @@ TESTS
     describe('when there is a game currently playing', function () {
       it('should not start a new game', async function () {
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
 
         // A day passes until the next checkpoint
         await ethers.provider.send('evm_increaseTime', [OneDayInSeconds])
 
         await expect(
-          this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
-        ).to.not.emit(this.contract, 'StartedGame')
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
+        ).to.not.emit(this.game, 'StartedGame')
       })
 
       it("should refresh players' statuses", async function () {
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
 
         // A day passes until the next checkpoint
         await ethers.provider.send('evm_increaseTime', [OneDayInSeconds])
 
         await expect(
-          this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
-        ).to.emit(this.contract, 'GameLost')
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
+        ).to.emit(this.game, 'GameLost')
       })
 
       it('should check if game ended and close it', async function () {
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
 
         // A day passes until the next checkpoint
         await ethers.provider.send('evm_increaseTime', [OneDayInSeconds])
 
         await expect(
-          this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
-        ).to.emit(this.contract, 'ResetGame')
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
+        ).to.emit(this.game, 'ResetGame')
       })
     })
   })
@@ -499,20 +499,20 @@ TESTS
   context('When game gets started', function () {
     it('should set the game as started', async function () {
       await setUpGameReadyToPlay(
-        this.contract,
+        this.game,
         this.correctRegistrationAmount,
-        this.mockKeeper
+        this.cronUpkeepContract
       )
 
-      const isStartedGame = await this.contract.gameInProgress()
+      const isStartedGame = await this.game.gameInProgress()
       expect(isStartedGame).to.be.true
     })
 
     it("should set each player's round limits to a new random timestamp in the next 24 hours", async function () {
       await setUpGameReadyToPlay(
-        this.contract,
+        this.game,
         this.correctRegistrationAmount,
-        this.mockKeeper
+        this.cronUpkeepContract
       )
 
       const currentBlock = await ethers.provider.send('eth_getBlockByNumber', [
@@ -522,7 +522,7 @@ TESTS
       const currentBlockTimestamp = currentBlock.timestamp
       const nextCheckpointTimestamp = currentBlockTimestamp + OneDayInSeconds
       for (let i = 0; i < 10; i++) {
-        const player = await this.contract.players(players[i].address)
+        const player = await this.game.players(players[i].address)
         expect(
           player.roundRangeLowerLimit.gte(
             ethers.BigNumber.from(currentBlockTimestamp.toString())
@@ -551,11 +551,11 @@ TESTS
     it('should emit the StartedGame event', async function () {
       await expect(
         setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-      ).to.emit(this.contract, 'StartedGame')
+      ).to.emit(this.game, 'StartedGame')
     })
   })
 
@@ -563,9 +563,9 @@ TESTS
     describe("User can't play a round", function () {
       context('when game is paused', async function () {
         it('should not allow the user to play the round', async function () {
-          await this.contract.pause()
+          await this.game.pause()
           await expectRevert(
-            this.contract.connect(players[0]).playRound(),
+            this.game.connect(players[0]).playRound(),
             'Contract is paused'
           )
         })
@@ -577,12 +577,12 @@ TESTS
           for (let i = 0; i < maxAmountOfUser - 1; i++) {
             await registerPlayer(
               i,
-              this.contract,
+              this.game,
               this.correctRegistrationAmount
             )
           }
           await expectRevert(
-            this.contract.connect(players[0]).playRound(),
+            this.game.connect(players[0]).playRound(),
             'This game is not full'
           )
         })
@@ -595,13 +595,13 @@ TESTS
           for (let i = 0; i < maxAmountOfUser; i++) {
             await registerPlayer(
               i,
-              this.contract,
+              this.game,
               this.correctRegistrationAmount
             )
           }
 
           await expectRevert(
-            this.contract.connect(players[notRegisteredUserIndex]).playRound(),
+            this.game.connect(players[notRegisteredUserIndex]).playRound(),
             'Player has not entered in this game'
           )
         })
@@ -611,17 +611,17 @@ TESTS
         it('should not allow the user to play the round', async function () {
           const playerIndex = 0
           await setUpGameReadyToPlay(
-            this.contract,
+            this.game,
             this.correctRegistrationAmount,
-            this.mockKeeper
+            this.cronUpkeepContract
           )
-          const initialPlayer = await this.contract.players(
+          const initialPlayer = await this.game.players(
             players[playerIndex].address
           )
           const initialPlayerRangeLowerLimit =
             initialPlayer.roundRangeLowerLimit
 
-          await this.contract.connect(players[playerIndex]).playRound()
+          await this.game.connect(players[playerIndex]).playRound()
 
           // Time passes until we reach player's range
           const insidePlayerRange =
@@ -631,7 +631,7 @@ TESTS
           ])
 
           await expectRevert(
-            this.contract.connect(players[playerIndex]).playRound(),
+            this.game.connect(players[playerIndex]).playRound(),
             'Player has already lost'
           )
         })
@@ -641,11 +641,11 @@ TESTS
         it('should not allow the user to play again', async function () {
           const playerIndex = 0
           await setUpGameReadyToPlay(
-            this.contract,
+            this.game,
             this.correctRegistrationAmount,
-            this.mockKeeper
+            this.cronUpkeepContract
           )
-          const initialPlayer = await this.contract.players(
+          const initialPlayer = await this.game.players(
             players[playerIndex].address
           )
           const initialPlayerRangeLowerLimit =
@@ -658,10 +658,10 @@ TESTS
             insidePlayerRange.toNumber(),
           ])
 
-          await this.contract.connect(players[playerIndex]).playRound()
+          await this.game.connect(players[playerIndex]).playRound()
 
           await expectRevert(
-            this.contract.connect(players[playerIndex]).playRound(),
+            this.game.connect(players[playerIndex]).playRound(),
             'Player has already played in this round'
           )
         })
@@ -672,11 +672,11 @@ TESTS
       it("should update player's round count", async function () {
         const playerIndex = 0
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           players[playerIndex].address
         )
         const initialPlayerRoundCount = initialPlayer.roundCount
@@ -689,8 +689,8 @@ TESTS
           insidePlayerRange.toNumber(),
         ])
 
-        await this.contract.connect(players[playerIndex]).playRound()
-        const updatedPlayer = await this.contract.players(
+        await this.game.connect(players[playerIndex]).playRound()
+        const updatedPlayer = await this.game.players(
           players[playerIndex].address
         )
         const updatedPlayerRoundCount = updatedPlayer.roundCount
@@ -703,11 +703,11 @@ TESTS
       it("should set the player's hasPlayed field to true", async function () {
         const playerIndex = 0
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           players[playerIndex].address
         )
         const initialPlayerRangeLowerLimit = initialPlayer.roundRangeLowerLimit
@@ -719,9 +719,9 @@ TESTS
           insidePlayerRange.toNumber(),
         ])
 
-        await this.contract.connect(players[playerIndex]).playRound()
+        await this.game.connect(players[playerIndex]).playRound()
 
-        const updatedPlayer = await this.contract.players(
+        const updatedPlayer = await this.game.players(
           players[playerIndex].address
         )
         expect(initialPlayer.hasPlayedRound).to.be.false
@@ -731,11 +731,11 @@ TESTS
       it('should emit the PlayedRound event with the correct data', async function () {
         const playerIndex = 0
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           players[playerIndex].address
         )
         const initialPlayerRangeLowerLimit = initialPlayer.roundRangeLowerLimit
@@ -747,19 +747,19 @@ TESTS
           insidePlayerRange.toNumber(),
         ])
 
-        await expect(this.contract.connect(players[playerIndex]).playRound())
-          .to.emit(this.contract, 'PlayedRound')
+        await expect(this.game.connect(players[playerIndex]).playRound())
+          .to.emit(this.game, 'PlayedRound')
           .withArgs(players[playerIndex].address)
       })
 
       it("should keep player's hasLost field to false", async function () {
         const playerIndex = 0
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           players[playerIndex].address
         )
         const initialPlayerRangeLowerLimit = initialPlayer.roundRangeLowerLimit
@@ -771,9 +771,9 @@ TESTS
           insidePlayerRange.toNumber(),
         ])
 
-        await this.contract.connect(players[playerIndex]).playRound()
+        await this.game.connect(players[playerIndex]).playRound()
 
-        const updatedPlayer = await this.contract.players(
+        const updatedPlayer = await this.game.players(
           players[playerIndex].address
         )
         expect(initialPlayer.hasLost).to.be.false
@@ -787,11 +787,11 @@ TESTS
       it("should set the player's hasLost field to true", async function () {
         const playerIndex = 0
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           players[playerIndex].address
         )
         const initialPlayerRangeUpperLimit = initialPlayer.roundRangeUpperLimit
@@ -803,9 +803,9 @@ TESTS
           beyondPlayerRange.toNumber(),
         ])
 
-        await this.contract.connect(players[playerIndex]).playRound()
+        await this.game.connect(players[playerIndex]).playRound()
 
-        const updatedPlayer = await this.contract.players(
+        const updatedPlayer = await this.game.players(
           players[playerIndex].address
         )
         expect(initialPlayer.hasLost).to.be.false
@@ -815,11 +815,11 @@ TESTS
       it("should keep the player's isSplitOk field to false", async function () {
         const playerIndex = 0
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           players[playerIndex].address
         )
         const initialPlayerRangeUpperLimit = initialPlayer.roundRangeUpperLimit
@@ -831,9 +831,9 @@ TESTS
           beyondPlayerRange.toNumber(),
         ])
 
-        await this.contract.connect(players[playerIndex]).playRound()
+        await this.game.connect(players[playerIndex]).playRound()
 
-        const updatedPlayer = await this.contract.players(
+        const updatedPlayer = await this.game.players(
           players[playerIndex].address
         )
         expect(initialPlayer.isSplitOk).to.be.false
@@ -843,11 +843,11 @@ TESTS
       it('should emit the event notifying the user lost the game', async function () {
         const playerIndex = 0
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           players[playerIndex].address
         )
         const initialPlayerRangeUpperLimit = initialPlayer.roundRangeUpperLimit
@@ -859,8 +859,8 @@ TESTS
           beyondPlayerRange.toNumber(),
         ])
 
-        await expect(this.contract.connect(players[playerIndex]).playRound())
-          .to.emit(this.contract, 'GameLost')
+        await expect(this.game.connect(players[playerIndex]).playRound())
+          .to.emit(this.game, 'GameLost')
           .withArgs('0', players[playerIndex].address)
       })
     })
@@ -871,21 +871,21 @@ TESTS
         const otherPlayerIndex = 2
         const otherPlayerIndex2 = 3
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
 
-        const looserInitialData = await this.contract.players(
+        const looserInitialData = await this.game.players(
           players[looserIndex].address
         )
         await getTwoPlayersInFinal(
-          this.contract,
+          this.game,
           otherPlayerIndex,
           otherPlayerIndex2,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        const looserUpdatedData = await this.contract.players(
+        const looserUpdatedData = await this.game.players(
           players[looserIndex].address
         )
         expect(looserInitialData.hasLost).to.be.false
@@ -897,20 +897,20 @@ TESTS
         const otherPlayerIndex = 2
         const otherPlayerIndex2 = 3
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        const looserInitialData = await this.contract.players(
+        const looserInitialData = await this.game.players(
           players[looserIndex].address
         )
         await getTwoPlayersInFinal(
-          this.contract,
+          this.game,
           otherPlayerIndex,
           otherPlayerIndex2,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        const looserUpdatedData = await this.contract.players(
+        const looserUpdatedData = await this.game.players(
           players[looserIndex].address
         )
         expect(looserInitialData.isSplitOk).to.be.false
@@ -922,19 +922,19 @@ TESTS
         const otherPlayerIndex = 2
         const otherPlayerIndex2 = 3
         await setUpGameReadyToPlay(
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
         await expect(
           getTwoPlayersInFinal(
-            this.contract,
+            this.game,
             otherPlayerIndex,
             otherPlayerIndex2,
-            this.mockKeeper
+            this.cronUpkeepContract
           )
         )
-          .to.emit(this.contract, 'GameLost')
+          .to.emit(this.game, 'GameLost')
           .withArgs('0', players[looserIndex].address)
       })
     })
@@ -947,11 +947,11 @@ TESTS
         const winnerIndex = 4
         await setUpGameWithAWinner(
           winnerIndex,
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        const newWinner = await this.contract.gameWinners(roundId)
+        const newWinner = await this.game.gameWinners(roundId)
         expect(newWinner.playerAddress).to.equal(players[winnerIndex].address)
         expect(newWinner.amountWon.eq(this.prizeAmount)).to.be.true
         expect(newWinner.prizeClaimed).to.be.false
@@ -964,12 +964,12 @@ TESTS
         await expect(
           setUpGameWithAWinner(
             winnerIndex,
-            this.contract,
+            this.game,
             this.correctRegistrationAmount,
-            this.mockKeeper
+            this.cronUpkeepContract
           )
         )
-          .to.emit(this.contract, 'GameWon')
+          .to.emit(this.game, 'GameWon')
           .withArgs(
             '0',
             players[winnerIndex].address,
@@ -982,14 +982,14 @@ TESTS
         const winnerIndex = 4
         await setUpGameWithAWinner(
           winnerIndex,
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        const updatedPlayersAmount = await this.contract.numPlayers()
+        const updatedPlayersAmount = await this.game.numPlayers()
         const updatedPlayerAddressesList =
-          await this.contract.getPlayerAddresses()
-        const updatedGameId = await this.contract.roundId()
+          await this.game.getPlayerAddresses()
+        const updatedGameId = await this.game.roundId()
         expect(updatedPlayersAmount).to.equal(0)
         for (let i = 0; i < updatedPlayerAddressesList.length; i++) {
           expect(updatedPlayerAddressesList[i]).to.equal(
@@ -1005,11 +1005,11 @@ TESTS
         await expect(
           setUpGameWithAWinner(
             winnerIndex,
-            this.contract,
+            this.game,
             this.correctRegistrationAmount,
-            this.mockKeeper
+            this.cronUpkeepContract
           )
-        ).to.emit(this.contract, 'ResetGame')
+        ).to.emit(this.game, 'ResetGame')
       })
     })
   })
@@ -1021,12 +1021,12 @@ TESTS
         const inexistantGameId = 10
         await setUpGameWithAWinner(
           winnerIndex,
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
         await expectRevert(
-          this.contract
+          this.game
             .connect(players[winnerIndex])
             .claimPrize(inexistantGameId),
           'This game does not exist'
@@ -1041,13 +1041,13 @@ TESTS
         const existantGameId = 0
         await setUpGameWithAWinner(
           winnerIndex,
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
 
         await expectRevert(
-          this.contract
+          this.game
             .connect(players[impostorIndex])
             .claimPrize(existantGameId),
           'Player did not win this game'
@@ -1061,16 +1061,16 @@ TESTS
         const existantGameId = 0
         await setUpGameWithAWinner(
           winnerIndex,
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
-        await this.contract
+        await this.game
           .connect(players[winnerIndex])
           .claimPrize(existantGameId)
 
         await expectRevert(
-          this.contract
+          this.game
             .connect(players[winnerIndex])
             .claimPrize(existantGameId),
           'Prize for this game already claimed'
@@ -1085,18 +1085,18 @@ TESTS
 
         await setUpGameWithAWinner(
           winnerIndex,
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
 
         const initialContractBalance = await ethers.provider.getBalance(
-          this.contract.address
+          this.game.address
         )
         const initialWinnerBalance = await ethers.provider.getBalance(
           players[winnerIndex].address
         )
-        const tx = await this.contract
+        const tx = await this.game
           .connect(players[winnerIndex])
           .claimPrize(existantGameId)
 
@@ -1105,7 +1105,7 @@ TESTS
         const gasUsed = receipt.gasUsed
 
         const updatedContractBalance = await ethers.provider.getBalance(
-          this.contract.address
+          this.game.address
         )
         const updatedWinnerBalance = await ethers.provider.getBalance(
           players[winnerIndex].address
@@ -1124,15 +1124,15 @@ TESTS
         const existantGameId = 0
         await setUpGameWithAWinner(
           winnerIndex,
-          this.contract,
+          this.game,
           this.correctRegistrationAmount,
-          this.mockKeeper
+          this.cronUpkeepContract
         )
 
         await expect(
-          this.contract.connect(players[winnerIndex]).claimPrize(existantGameId)
+          this.game.connect(players[winnerIndex]).claimPrize(existantGameId)
         )
-          .to.emit(this.contract, 'GamePrizeClaimed')
+          .to.emit(this.game, 'GamePrizeClaimed')
           .withArgs(
             players[winnerIndex].address,
             existantGameId,
@@ -1147,7 +1147,7 @@ TESTS
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.contract.connect(this.generalAdmin).setGameName('New name'),
+            this.game.connect(this.generalAdmin).setGameName('New name'),
             'Caller is not the creator'
           )
         })
@@ -1156,8 +1156,8 @@ TESTS
       describe('when caller is the creator', function () {
         it('should change the name of the Game Line', async function () {
           const newName = 'New name'
-          await this.contract.connect(creator).setGameName(newName)
-          const updatedName = await this.contract.gameName()
+          await this.game.connect(creator).setGameName(newName)
+          const updatedName = await this.game.gameName()
           expect(updatedName).to.be.equal(newName)
         })
       })
@@ -1167,7 +1167,7 @@ TESTS
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.contract
+            this.game
               .connect(this.generalAdmin)
               .setGameImage('https://www.new-ipfs-image.com'),
             'Caller is not the creator'
@@ -1178,8 +1178,8 @@ TESTS
       describe('when caller is the creator', function () {
         it('should change the image link of the Game Line', async function () {
           const newImageLink = 'https://www.new-ipfs-image.com'
-          await this.contract.connect(creator).setGameImage(newImageLink)
-          const updatedImage = await this.contract.gameImage()
+          await this.game.connect(creator).setGameImage(newImageLink)
+          const updatedImage = await this.game.gameImage()
           expect(updatedImage).to.be.equal(newImageLink)
         })
       })
@@ -1189,7 +1189,7 @@ TESTS
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.contract.connect(this.generalAdmin).withdrawCreatorEdge(),
+            this.game.connect(this.generalAdmin).withdrawCreatorEdge(),
             'Caller is not the creator'
           )
         })
@@ -1198,24 +1198,24 @@ TESTS
       describe('when caller is the creator', function () {
         it('should withdraw the creator edge', async function () {
           await setUpGameReadyToPlay(
-            this.contract,
+            this.game,
             this.correctRegistrationAmount,
-            this.mockKeeper
+            this.cronUpkeepContract
           )
           const initialContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const initialCreatorBalance = await ethers.provider.getBalance(
             creator.address
           )
-          const tx = await this.contract.connect(creator).withdrawCreatorEdge()
+          const tx = await this.game.connect(creator).withdrawCreatorEdge()
 
           const receipt = await tx.wait()
           const gasPrice = tx.gasPrice
           const gasUsed = receipt.gasUsed
 
           const updatedContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const updatedCreatorBalance = await ethers.provider.getBalance(
             creator.address
@@ -1239,7 +1239,7 @@ TESTS
       describe('when caller is not the general admin', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.contract.connect(creator).withdrawAdminEdge(),
+            this.game.connect(creator).withdrawAdminEdge(),
             'Caller is not the creator'
           )
         })
@@ -1248,17 +1248,17 @@ TESTS
       describe('when caller is the general admin', function () {
         it('should withdraw the general admin edge', async function () {
           await setUpGameReadyToPlay(
-            this.contract,
+            this.game,
             this.correctRegistrationAmount,
-            this.mockKeeper
+            this.cronUpkeepContract
           )
           const initialContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const initialAdminBalance = await ethers.provider.getBalance(
             this.generalAdmin.address
           )
-          const tx = await this.contract
+          const tx = await this.game
             .connect(this.generalAdmin)
             .withdrawAdminEdge()
 
@@ -1267,7 +1267,7 @@ TESTS
           const gasUsed = receipt.gasUsed
 
           const updatedContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const updatedAdminBalance = await ethers.provider.getBalance(
             this.generalAdmin.address
@@ -1289,7 +1289,7 @@ TESTS
       describe('when caller is not the general admin or creator', function () {
         it('should revert with correct message', async function () {
           await expectRevert(
-            this.contract.connect(players[5]).withdrawFunds(players[5].address),
+            this.game.connect(players[5]).withdrawFunds(players[5].address),
             'Caller is not the creator'
           )
         })
@@ -1299,23 +1299,23 @@ TESTS
         it('should withdraw all the contract funds and transfer them to the given address', async function () {
           const fundReceiverAddress = players[5].address
           await setUpGameReadyToPlay(
-            this.contract,
+            this.game,
             this.correctRegistrationAmount,
-            this.mockKeeper
+            this.cronUpkeepContract
           )
           const initialContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const initialReceiverBalance = await ethers.provider.getBalance(
             fundReceiverAddress
           )
 
-          await this.contract
+          await this.game
             .connect(this.generalAdmin)
             .withdrawFunds(fundReceiverAddress)
 
           const updatedContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const updatedReceiverBalance = await ethers.provider.getBalance(
             fundReceiverAddress
@@ -1332,23 +1332,23 @@ TESTS
         it('should withdraw all the contract funds and transfer them to the given address', async function () {
           const fundReceiverAddress = players[5].address
           await setUpGameReadyToPlay(
-            this.contract,
+            this.game,
             this.correctRegistrationAmount,
-            this.mockKeeper
+            this.cronUpkeepContract
           )
           const initialContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const initialReceiverBalance = await ethers.provider.getBalance(
             fundReceiverAddress
           )
 
-          await this.contract
+          await this.game
             .connect(creator)
             .withdrawFunds(fundReceiverAddress)
 
           const updatedContractBalance = await ethers.provider.getBalance(
-            this.contract.address
+            this.game.address
           )
           const updatedReceiverBalance = await ethers.provider.getBalance(
             fundReceiverAddress

@@ -20,9 +20,9 @@ describe('GameImplementationContract - Mecanism', function () {
     describe("User can't register to the game", function () {
       context('when game is paused', async function () {
         it('should not allow user to register to the game', async function () {
-          await this.contract.pause()
+          await this.game.pause()
           await expectRevert(
-            this.contract.connect(this.players[0]).registerForGame({
+            this.game.connect(this.players[0]).registerForGame({
               value: this.correctRegistrationAmount,
             }),
             'Contract is paused'
@@ -33,7 +33,7 @@ describe('GameImplementationContract - Mecanism', function () {
       context('when user is the creator of the Game', async function () {
         it('should not allow user to register to the game', async function () {
           await expectRevert(
-            this.contract.connect(this.creator).registerForGame({
+            this.game.connect(this.creator).registerForGame({
               value: this.correctRegistrationAmount,
             }),
             "Caller can't be the creator"
@@ -47,12 +47,12 @@ describe('GameImplementationContract - Mecanism', function () {
           for (let i = 0; i < maxAmountOfUser; i++) {
             await registerPlayer({
               player: this.players[i],
-              contract: this.contract,
+              contract: this.game,
               value: this.correctRegistrationAmount,
             })
           }
           await expectRevert(
-            this.contract.connect(this.players[10]).registerForGame({
+            this.game.connect(this.players[10]).registerForGame({
               value: this.correctRegistrationAmount,
             }),
             'This game is full'
@@ -65,12 +65,12 @@ describe('GameImplementationContract - Mecanism', function () {
           const player = this.players[0]
           await registerPlayer({
             player: this.players[0],
-            contract: this.contract,
+            contract: this.game,
             value: this.correctRegistrationAmount,
           })
 
           await expectRevert(
-            this.contract.connect(player).registerForGame({
+            this.game.connect(player).registerForGame({
               value: this.correctRegistrationAmount,
             }),
             'Player already entered in this game'
@@ -85,7 +85,7 @@ describe('GameImplementationContract - Mecanism', function () {
             const player = this.players[0]
 
             await expectRevert(
-              this.contract.connect(player).registerForGame({
+              this.game.connect(player).registerForGame({
                 value: this.incorrectRegistrationAmount,
               }),
               'Only game amount is allowed'
@@ -99,7 +99,7 @@ describe('GameImplementationContract - Mecanism', function () {
           const player = this.players[0]
 
           await expectRevert(
-            this.contract.connect(player).registerForGame({
+            this.game.connect(player).registerForGame({
               value: this.zeroRegistrationAmount,
             }),
             'Only game amount is allowed'
@@ -111,28 +111,27 @@ describe('GameImplementationContract - Mecanism', function () {
     describe('User can register to the game', function () {
       context('when one user registers to the game', async function () {
         it('should increase the number of registered players', async function () {
-          const initialNumberOfPlayers = await this.contract.numPlayers()
+          const initialNumberOfPlayers = await this.game.numPlayers()
           await registerPlayer({
             player: this.players[0],
-            contract: this.contract,
+            contract: this.game,
             value: this.correctRegistrationAmount,
           })
-          const updatedNumberOfPlayers = await this.contract.numPlayers()
+          const updatedNumberOfPlayers = await this.game.numPlayers()
           expect(updatedNumberOfPlayers).to.equal(initialNumberOfPlayers + 1)
         })
 
         it("should add the new player's address to the playerAddresses list", async function () {
           const newPlayerIndex = 0
           const newPlayerAddress = this.players[newPlayerIndex].address
-          const intialPlayerAddressesList =
-            await this.contract.getPlayerAddresses()
+          const intialPlayerAddressesList = await this.game.getPlayerAddresses()
           await registerPlayer({
             player: this.players[newPlayerIndex],
-            contract: this.contract,
+            contract: this.game,
             value: this.correctRegistrationAmount,
           })
           const updatedPlayerAddressesList =
-            await this.contract.getPlayerAddresses()
+            await this.game.getPlayerAddresses()
           expect(updatedPlayerAddressesList.length).to.equal(
             +intialPlayerAddressesList.length + 1
           )
@@ -146,13 +145,11 @@ describe('GameImplementationContract - Mecanism', function () {
           const newPlayerAddress = this.players[newPlayerIndex].address
           await registerPlayer({
             player: this.players[newPlayerIndex],
-            contract: this.contract,
+            contract: this.game,
             value: this.correctRegistrationAmount,
           })
 
-          const playerFromMapping = await this.contract.players(
-            newPlayerAddress
-          )
+          const playerFromMapping = await this.game.players(newPlayerAddress)
           expect(playerFromMapping.playerAddress).to.equal(newPlayerAddress)
           expect(playerFromMapping.roundCount.isZero()).to.be.true
           expect(playerFromMapping.hasLost).to.be.false
@@ -169,12 +166,12 @@ describe('GameImplementationContract - Mecanism', function () {
             for (let i = 0; i < 10; i++) {
               await registerPlayer({
                 player: this.players[i],
-                contract: this.contract,
+                contract: this.game,
                 value: this.correctRegistrationAmount,
               })
             }
-            const numPlayers = await this.contract.numPlayers()
-            const playerAddresses = await this.contract.getPlayerAddresses()
+            const numPlayers = await this.game.numPlayers()
+            const playerAddresses = await this.game.getPlayerAddresses()
             expect(numPlayers.toNumber()).to.equal(10) // No risk of using toNumber() here
             expect(playerAddresses.length).to.equal(10)
           })
@@ -186,9 +183,9 @@ describe('GameImplementationContract - Mecanism', function () {
   context('Calling daily checkpoint', function () {
     describe('when triggerDailyCheckpoint caller is not the keeper', function () {
       it('should revert transaction with correct message', async function () {
-        const wrongCaller = this.players[17]
+        const wrongCaller = this.players[0]
         await expectRevert(
-          this.contract.connect(wrongCaller).triggerDailyCheckpoint(),
+          this.game.connect(wrongCaller).triggerDailyCheckpoint(),
           'Caller is not the keeper'
         )
       })
@@ -196,9 +193,9 @@ describe('GameImplementationContract - Mecanism', function () {
 
     describe('when triggerDailyCheckpoint called during paused contract', function () {
       it('should revert transaction with correct message', async function () {
-        await this.contract.pause()
+        await this.game.pause()
         await expectRevert(
-          this.contract.connect(this.mockKeeper).triggerDailyCheckpoint(),
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint(),
           'Contract is paused'
         )
       })
@@ -210,14 +207,14 @@ describe('GameImplementationContract - Mecanism', function () {
           for (let i = 0; i < 8; i++) {
             await registerPlayer({
               player: this.players[i],
-              contract: this.contract,
+              contract: this.game,
               value: this.correctRegistrationAmount,
             })
           }
 
           await expect(
-            this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
-          ).to.not.emit(this.contract, 'StartedGame')
+            this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
+          ).to.not.emit(this.game, 'StartedGame')
         })
       })
 
@@ -226,15 +223,15 @@ describe('GameImplementationContract - Mecanism', function () {
           for (let i = 0; i < 10; i++) {
             await registerPlayer({
               player: this.players[i],
-              contract: this.contract,
+              contract: this.game,
               value: this.correctRegistrationAmount,
             })
           }
 
           await expect(
-            this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
+            this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
           )
-            .to.emit(this.contract, 'StartedGame')
+            .to.emit(this.game, 'StartedGame')
             .withArgs(anyValue, '10')
         })
       })
@@ -244,7 +241,7 @@ describe('GameImplementationContract - Mecanism', function () {
       it('should not start a new game', async function () {
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
           mockKeeper: this.mockKeeper,
         })
@@ -253,15 +250,16 @@ describe('GameImplementationContract - Mecanism', function () {
         await ethers.provider.send('evm_increaseTime', [ONE_DAY_IN_SECONDS])
 
         await expect(
-          this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
-        ).to.not.emit(this.contract, 'StartedGame')
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
+        ).to.not.emit(this.game, 'StartedGame')
       })
 
       it("should refresh players' statuses", async function () {
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
 
@@ -269,15 +267,16 @@ describe('GameImplementationContract - Mecanism', function () {
         await ethers.provider.send('evm_increaseTime', [ONE_DAY_IN_SECONDS])
 
         await expect(
-          this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
-        ).to.emit(this.contract, 'GameLost')
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
+        ).to.emit(this.game, 'GameLost')
       })
 
       it('should check if game ended and close it', async function () {
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
 
@@ -285,8 +284,8 @@ describe('GameImplementationContract - Mecanism', function () {
         await ethers.provider.send('evm_increaseTime', [ONE_DAY_IN_SECONDS])
 
         await expect(
-          this.contract.connect(this.mockKeeper).triggerDailyCheckpoint()
-        ).to.emit(this.contract, 'ResetGame')
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
+        ).to.emit(this.game, 'ResetGame')
       })
     })
   })
@@ -295,19 +294,20 @@ describe('GameImplementationContract - Mecanism', function () {
     it('should set the game as started', async function () {
       await setUpGameReadyToPlay({
         players: this.players,
-        contract: this.contract,
+        contract: this.game,
         amount: this.correctRegistrationAmount,
+
         mockKeeper: this.mockKeeper,
       })
 
-      const isStartedGame = await this.contract.gameInProgress()
+      const isStartedGame = await this.game.gameInProgress()
       expect(isStartedGame).to.be.true
     })
 
     it("should set each player's round limits to a new random timestamp in the next 24 hours", async function () {
       await setUpGameReadyToPlay({
         players: this.players,
-        contract: this.contract,
+        contract: this.game,
         amount: this.correctRegistrationAmount,
         mockKeeper: this.mockKeeper,
       })
@@ -319,7 +319,7 @@ describe('GameImplementationContract - Mecanism', function () {
       const currentBlockTimestamp = currentBlock.timestamp
       const nextCheckpointTimestamp = currentBlockTimestamp + ONE_DAY_IN_SECONDS
       for (let i = 0; i < 10; i++) {
-        const player = await this.contract.players(this.players[i].address)
+        const player = await this.game.players(this.players[i].address)
         expect(
           player.roundRangeLowerLimit.gte(
             ethers.BigNumber.from(currentBlockTimestamp.toString())
@@ -349,11 +349,12 @@ describe('GameImplementationContract - Mecanism', function () {
       await expect(
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
-      ).to.emit(this.contract, 'StartedGame')
+      ).to.emit(this.game, 'StartedGame')
     })
   })
 
@@ -361,9 +362,9 @@ describe('GameImplementationContract - Mecanism', function () {
     describe("User can't play a round", function () {
       context('when game is paused', async function () {
         it('should not allow the user to play the round', async function () {
-          await this.contract.pause()
+          await this.game.pause()
           await expectRevert(
-            this.contract.connect(this.players[0]).playRound(),
+            this.game.connect(this.players[0]).playRound(),
             'Contract is paused'
           )
         })
@@ -375,12 +376,12 @@ describe('GameImplementationContract - Mecanism', function () {
           for (let i = 0; i < maxAmountOfUser - 1; i++) {
             await registerPlayer({
               player: this.players[i],
-              contract: this.contract,
+              contract: this.game,
               value: this.correctRegistrationAmount,
             })
           }
           await expectRevert(
-            this.contract.connect(this.players[0]).playRound(),
+            this.game.connect(this.players[0]).playRound(),
             'This game is not full'
           )
         })
@@ -393,15 +394,13 @@ describe('GameImplementationContract - Mecanism', function () {
           for (let i = 0; i < maxAmountOfUser; i++) {
             await registerPlayer({
               player: this.players[i],
-              contract: this.contract,
+              contract: this.game,
               value: this.correctRegistrationAmount,
             })
           }
 
           await expectRevert(
-            this.contract
-              .connect(this.players[notRegisteredUserIndex])
-              .playRound(),
+            this.game.connect(this.players[notRegisteredUserIndex]).playRound(),
             'Player has not entered in this game'
           )
         })
@@ -412,17 +411,18 @@ describe('GameImplementationContract - Mecanism', function () {
           const playerIndex = 0
           await setUpGameReadyToPlay({
             players: this.players,
-            contract: this.contract,
+            contract: this.game,
             amount: this.correctRegistrationAmount,
+
             mockKeeper: this.mockKeeper,
           })
-          const initialPlayer = await this.contract.players(
+          const initialPlayer = await this.game.players(
             this.players[playerIndex].address
           )
           const initialPlayerRangeLowerLimit =
             initialPlayer.roundRangeLowerLimit
 
-          await this.contract.connect(this.players[playerIndex]).playRound()
+          await this.game.connect(this.players[playerIndex]).playRound()
 
           // Time passes until we reach player's range
           const insidePlayerRange =
@@ -432,7 +432,7 @@ describe('GameImplementationContract - Mecanism', function () {
           ])
 
           await expectRevert(
-            this.contract.connect(this.players[playerIndex]).playRound(),
+            this.game.connect(this.players[playerIndex]).playRound(),
             'Player has already lost'
           )
         })
@@ -443,11 +443,12 @@ describe('GameImplementationContract - Mecanism', function () {
           const playerIndex = 0
           await setUpGameReadyToPlay({
             players: this.players,
-            contract: this.contract,
+            contract: this.game,
             amount: this.correctRegistrationAmount,
+
             mockKeeper: this.mockKeeper,
           })
-          const initialPlayer = await this.contract.players(
+          const initialPlayer = await this.game.players(
             this.players[playerIndex].address
           )
           const initialPlayerRangeLowerLimit =
@@ -460,10 +461,10 @@ describe('GameImplementationContract - Mecanism', function () {
             insidePlayerRange.toNumber(),
           ])
 
-          await this.contract.connect(this.players[playerIndex]).playRound()
+          await this.game.connect(this.players[playerIndex]).playRound()
 
           await expectRevert(
-            this.contract.connect(this.players[playerIndex]).playRound(),
+            this.game.connect(this.players[playerIndex]).playRound(),
             'Player has already played in this round'
           )
         })
@@ -475,11 +476,12 @@ describe('GameImplementationContract - Mecanism', function () {
         const playerIndex = 0
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           this.players[playerIndex].address
         )
         const initialPlayerRoundCount = initialPlayer.roundCount
@@ -492,8 +494,8 @@ describe('GameImplementationContract - Mecanism', function () {
           insidePlayerRange.toNumber(),
         ])
 
-        await this.contract.connect(this.players[playerIndex]).playRound()
-        const updatedPlayer = await this.contract.players(
+        await this.game.connect(this.players[playerIndex]).playRound()
+        const updatedPlayer = await this.game.players(
           this.players[playerIndex].address
         )
         const updatedPlayerRoundCount = updatedPlayer.roundCount
@@ -507,11 +509,12 @@ describe('GameImplementationContract - Mecanism', function () {
         const playerIndex = 0
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           this.players[playerIndex].address
         )
         const initialPlayerRangeLowerLimit = initialPlayer.roundRangeLowerLimit
@@ -523,9 +526,9 @@ describe('GameImplementationContract - Mecanism', function () {
           insidePlayerRange.toNumber(),
         ])
 
-        await this.contract.connect(this.players[playerIndex]).playRound()
+        await this.game.connect(this.players[playerIndex]).playRound()
 
-        const updatedPlayer = await this.contract.players(
+        const updatedPlayer = await this.game.players(
           this.players[playerIndex].address
         )
         expect(initialPlayer.hasPlayedRound).to.be.false
@@ -536,11 +539,12 @@ describe('GameImplementationContract - Mecanism', function () {
         const playerIndex = 0
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           this.players[playerIndex].address
         )
         const initialPlayerRangeLowerLimit = initialPlayer.roundRangeLowerLimit
@@ -552,10 +556,8 @@ describe('GameImplementationContract - Mecanism', function () {
           insidePlayerRange.toNumber(),
         ])
 
-        await expect(
-          this.contract.connect(this.players[playerIndex]).playRound()
-        )
-          .to.emit(this.contract, 'PlayedRound')
+        await expect(this.game.connect(this.players[playerIndex]).playRound())
+          .to.emit(this.game, 'PlayedRound')
           .withArgs(this.players[playerIndex].address)
       })
 
@@ -563,11 +565,12 @@ describe('GameImplementationContract - Mecanism', function () {
         const playerIndex = 0
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           this.players[playerIndex].address
         )
         const initialPlayerRangeLowerLimit = initialPlayer.roundRangeLowerLimit
@@ -579,9 +582,9 @@ describe('GameImplementationContract - Mecanism', function () {
           insidePlayerRange.toNumber(),
         ])
 
-        await this.contract.connect(this.players[playerIndex]).playRound()
+        await this.game.connect(this.players[playerIndex]).playRound()
 
-        const updatedPlayer = await this.contract.players(
+        const updatedPlayer = await this.game.players(
           this.players[playerIndex].address
         )
         expect(initialPlayer.hasLost).to.be.false
@@ -596,11 +599,12 @@ describe('GameImplementationContract - Mecanism', function () {
         const playerIndex = 0
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           this.players[playerIndex].address
         )
         const initialPlayerRangeUpperLimit = initialPlayer.roundRangeUpperLimit
@@ -612,9 +616,9 @@ describe('GameImplementationContract - Mecanism', function () {
           beyondPlayerRange.toNumber(),
         ])
 
-        await this.contract.connect(this.players[playerIndex]).playRound()
+        await this.game.connect(this.players[playerIndex]).playRound()
 
-        const updatedPlayer = await this.contract.players(
+        const updatedPlayer = await this.game.players(
           this.players[playerIndex].address
         )
         expect(initialPlayer.hasLost).to.be.false
@@ -625,11 +629,12 @@ describe('GameImplementationContract - Mecanism', function () {
         const playerIndex = 0
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           this.players[playerIndex].address
         )
         const initialPlayerRangeUpperLimit = initialPlayer.roundRangeUpperLimit
@@ -641,9 +646,9 @@ describe('GameImplementationContract - Mecanism', function () {
           beyondPlayerRange.toNumber(),
         ])
 
-        await this.contract.connect(this.players[playerIndex]).playRound()
+        await this.game.connect(this.players[playerIndex]).playRound()
 
-        const updatedPlayer = await this.contract.players(
+        const updatedPlayer = await this.game.players(
           this.players[playerIndex].address
         )
         expect(initialPlayer.isSplitOk).to.be.false
@@ -654,11 +659,12 @@ describe('GameImplementationContract - Mecanism', function () {
         const playerIndex = 0
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
-        const initialPlayer = await this.contract.players(
+        const initialPlayer = await this.game.players(
           this.players[playerIndex].address
         )
         const initialPlayerRangeUpperLimit = initialPlayer.roundRangeUpperLimit
@@ -671,10 +677,10 @@ describe('GameImplementationContract - Mecanism', function () {
         ])
 
         await expect(
-          this.contract.connect(this.players[playerIndex]).playRound()
-        )
-          .to.emit(this.contract, 'GameLost')
-          .withArgs('0', this.players[playerIndex].address)
+          this.game.connect(this.players[playerIndex]).playRound()
+        ).to.emit(this.game, 'GameLost')
+        // Add params  event GameLost(uint256 roundId, address playerAddress, uint256 roundCount);
+        // .withArgs('0', this.players[playerIndex].address)
       })
     })
 
@@ -686,28 +692,30 @@ describe('GameImplementationContract - Mecanism', function () {
 
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
 
         const startedGameBlock = await ethers.provider.getBlock()
         const startedGameTimestamp = startedGameBlock.timestamp
 
-        const looserInitialData = await this.contract.players(
+        const looserInitialData = await this.game.players(
           this.players[looserIndex].address
         )
 
         await getTwoPlayersInFinal({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           player1Index: finalistIndex,
           player2Index: secondFinalistIndex,
           startedGameTimestamp,
+
           mockKeeper: this.mockKeeper,
         })
 
-        const looserUpdatedData = await this.contract.players(
+        const looserUpdatedData = await this.game.players(
           this.players[looserIndex].address
         )
         expect(looserInitialData.hasLost).to.be.false
@@ -721,27 +729,29 @@ describe('GameImplementationContract - Mecanism', function () {
 
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
         const startedGameBlock = await ethers.provider.getBlock()
         const startedGameTimestamp = startedGameBlock.timestamp
 
-        const looserInitialData = await this.contract.players(
+        const looserInitialData = await this.game.players(
           this.players[looserIndex].address
         )
 
         await getTwoPlayersInFinal({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           player1Index: finalistIndex,
           player2Index: secondFinalistIndex,
           startedGameTimestamp,
+
           mockKeeper: this.mockKeeper,
         })
 
-        const looserUpdatedData = await this.contract.players(
+        const looserUpdatedData = await this.game.players(
           this.players[looserIndex].address
         )
         expect(looserInitialData.isSplitOk).to.be.false
@@ -754,27 +764,29 @@ describe('GameImplementationContract - Mecanism', function () {
         const secondFinalistIndex = 3
         await setUpGameReadyToPlay({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
 
         const startedGameBlock = await ethers.provider.getBlock()
         const startedGameTimestamp = startedGameBlock.timestamp
 
-        const looserInitialData = await this.contract.players(
+        const looserInitialData = await this.game.players(
           this.players[looserIndex].address
         )
 
         await getTwoPlayersInFinal({
           players: this.players,
-          contract: this.contract,
+          contract: this.game,
           player1Index: finalistIndex,
           player2Index: secondFinalistIndex,
           startedGameTimestamp,
+
           mockKeeper: this.mockKeeper,
         })
-        const looserUpdatedData = await this.contract.players(
+        const looserUpdatedData = await this.game.players(
           this.players[looserIndex].address
         )
         expect(looserInitialData.hasLost).to.be.false
@@ -792,12 +804,13 @@ describe('GameImplementationContract - Mecanism', function () {
         await setUpGameWithAWinner({
           players: this.players,
           winnerIndex,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
 
-        const newWinner = await this.contract.gameWinners(roundId)
+        const newWinner = await this.game.gameWinners(roundId)
         expect(newWinner.playerAddress).to.equal(
           this.players[winnerIndex].address
         )
@@ -814,12 +827,13 @@ describe('GameImplementationContract - Mecanism', function () {
           await setUpGameWithAWinner({
             players: this.players,
             winnerIndex,
-            contract: this.contract,
+            contract: this.game,
             amount: this.correctRegistrationAmount,
+
             mockKeeper: this.mockKeeper,
           })
         )
-          .to.emit(this.contract, 'GameWon')
+          .to.emit(this.game, 'GameWon')
           .withArgs(
             '0',
             this.players[winnerIndex].address,
@@ -834,15 +848,15 @@ describe('GameImplementationContract - Mecanism', function () {
         await setUpGameWithAWinner({
           players: this.players,
           winnerIndex,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
-        const updatedPlayersAmount = await this.contract.numPlayers()
-        const updatedPlayerAddressesList =
-          await this.contract.getPlayerAddresses()
+        const updatedPlayersAmount = await this.game.numPlayers()
+        const updatedPlayerAddressesList = await this.game.getPlayerAddresses()
 
-        const updatedGameId = await this.contract.roundId()
+        const updatedGameId = await this.game.roundId()
 
         expect(updatedPlayersAmount).to.equal(0)
         for (let i = 0; i < updatedPlayerAddressesList.length; i++) {
@@ -861,11 +875,12 @@ describe('GameImplementationContract - Mecanism', function () {
           await setUpGameWithAWinner({
             players: this.players,
             winnerIndex,
-            contract: this.contract,
+            contract: this.game,
             amount: this.correctRegistrationAmount,
+
             mockKeeper: this.mockKeeper,
           })
-        ).to.emit(this.contract, 'ResetGame')
+        ).to.emit(this.game, 'ResetGame')
       })
     })
   })
@@ -878,12 +893,13 @@ describe('GameImplementationContract - Mecanism', function () {
         await setUpGameWithAWinner({
           players: this.players,
           winnerIndex,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
         await expectRevert(
-          this.contract
+          this.game
             .connect(this.players[winnerIndex])
             .claimPrize(inexistantGameId),
           'This game does not exist'
@@ -899,13 +915,14 @@ describe('GameImplementationContract - Mecanism', function () {
         await setUpGameWithAWinner({
           players: this.players,
           winnerIndex,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
 
         await expectRevert(
-          this.contract
+          this.game
             .connect(this.players[impostorIndex])
             .claimPrize(existantGameId),
           'Player did not win this game'
@@ -922,16 +939,17 @@ describe('GameImplementationContract - Mecanism', function () {
         await setUpGameWithAWinner({
           players: this.players,
           winnerIndex,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
-        await this.contract
+        await this.game
           .connect(this.players[winnerIndex])
           .claimPrize(existantGameId)
 
         await expectRevert(
-          this.contract
+          this.game
             .connect(this.players[winnerIndex])
             .claimPrize(existantGameId),
           'Prize for this game already claimed'
@@ -949,18 +967,19 @@ describe('GameImplementationContract - Mecanism', function () {
         await setUpGameWithAWinner({
           players: this.players,
           winnerIndex,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
 
         const initialContractBalance = await ethers.provider.getBalance(
-          this.contract.address
+          this.game.address
         )
         const initialWinnerBalance = await ethers.provider.getBalance(
           this.players[winnerIndex].address
         )
-        const tx = await this.contract
+        const tx = await this.game
           .connect(this.players[winnerIndex])
           .claimPrize(existantGameId)
 
@@ -969,7 +988,7 @@ describe('GameImplementationContract - Mecanism', function () {
         const gasUsed = receipt.gasUsed
 
         const updatedContractBalance = await ethers.provider.getBalance(
-          this.contract.address
+          this.game.address
         )
         const updatedWinnerBalance = await ethers.provider.getBalance(
           this.players[winnerIndex].address
@@ -990,17 +1009,18 @@ describe('GameImplementationContract - Mecanism', function () {
         await setUpGameWithAWinner({
           players: this.players,
           winnerIndex,
-          contract: this.contract,
+          contract: this.game,
           amount: this.correctRegistrationAmount,
+
           mockKeeper: this.mockKeeper,
         })
 
         await expect(
-          this.contract
+          this.game
             .connect(this.players[winnerIndex])
             .claimPrize(existantGameId)
         )
-          .to.emit(this.contract, 'GamePrizeClaimed')
+          .to.emit(this.game, 'GamePrizeClaimed')
           .withArgs(
             this.players[winnerIndex].address,
             existantGameId,
