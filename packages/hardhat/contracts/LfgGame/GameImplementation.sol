@@ -35,10 +35,11 @@ contract GameImplementation {
     bool public contractPaused;
 
     address[] public playerAddresses;
-    mapping(address => Player) public players;
-    mapping(uint256 => Winner) public gameWinners;
 
     Game public game;
+
+    mapping(address => Player) players;
+    mapping(uint256 => Winner) gameWinners;
 
     ///STRUCTS
     struct Game {
@@ -55,9 +56,6 @@ contract GameImplementation {
         uint256 maxPlayers;
         uint256 numPlayers;
         bool gameInProgress;
-        address[] playerAddresses;
-        mapping(address => Player) players;
-        mapping(uint256 => Winner) gameWinners;
     }
 
     struct Player {
@@ -472,52 +470,9 @@ contract GameImplementation {
     /// GETTERS FUNCTIONS
     ///
 
-    function getStatus(
-        address creator,
-        uint256 roundId,
-        string memory gameName,
-        string memory gameImage,
-        uint256 numPlayers,
-        uint256 maxPlayers,
-        uint256 registrationAmount,
-        uint256 roundLength,
-        uint256 houseEdge,
-        uint256 creatorEdge,
-        bool contractPaused,
-        bool gameInProgress
-    )
-        external
-        view
-        returns (
-            address,
-            uint256,
-            string memory,
-            string memory,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            bool,
-            bool
-        )
-    {
+    function getStatus() external view returns (Game memory) {
         // uint256 balance = address(this).balance;
-        return (
-            creator,
-            roundId,
-            gameName,
-            gameImage,
-            numPlayers,
-            maxPlayers,
-            registrationAmount,
-            roundLength,
-            houseEdge,
-            creatorEdge,
-            contractPaused,
-            gameInProgress
-        );
+        return game;
     }
 
     function getPlayerAddresses() external view returns (address[] memory) {
