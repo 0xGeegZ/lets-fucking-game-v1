@@ -203,6 +203,11 @@ contract GameImplementation {
         _;
     }
 
+    modifier onlyIfPlayersLowerHalfRemaining() {
+        require(numPlayers < maxPlayers / 2, "Remaining players must be lower than the maximum number of players");
+        _;
+    }
+
     modifier onlyHumans() {
         uint256 size;
         address addr = msg.sender;
@@ -419,6 +424,32 @@ contract GameImplementation {
         player.isSplitOk = false;
 
         emit GameLost(roundId, player.playerAddress, player.roundCount);
+    }
+
+    function _voteRequests() internal onlyIfPlayersLowerHalfRemaining {
+        remainingPlayersLength = getRemainingPlayersCount();
+        for (uint256 i = 0; i < remainingPlayersLength; i++) {
+            Player memory currentPlayer = players[playerAddresses[i]];
+            _voteToSplit(currentPlayer);
+        }
+    }
+
+    function _voteToSplit(Player storage player) internal {
+        player.isSplitOk = true;
+    }
+
+    function _splitPot() internal {
+        truthyVoteCount = 0;
+        remainingPlayersLength = getRemainingPlayersCount();
+        for (uint256 i = 0; i < remainingPlayersLength; i++) {
+            Player memory currentPlayer = players[playerAddresses[i]];
+            if (currentPlayer.isSplitOk) {
+                truthyVoteCount++;
+            }
+        }
+        if (truthyVoteCount <= remainingPlayersLength / 2) {
+            // didn't find way to dispatch rewards yet. Does it exists ? Should i create it ?
+        }
     }
 
     /// CREATOR FUNCTIONS
