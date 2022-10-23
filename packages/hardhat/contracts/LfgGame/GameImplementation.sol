@@ -15,34 +15,10 @@ contract GameImplementation {
     address public generalAdmin;
     address public creator;
     address public factory;
+    address public keeper;
 
-    address public cronUpkeep;
-    bytes public encodedCron;
-
-    uint256 public registrationAmount;
-    uint256 public houseEdge;
-    uint256 public creatorEdge;
-
-    // gameId is fix and represent the fixed id for the game
-    uint256 public gameId;
-    // roundId gets incremented every time the game restarts
-    uint256 public roundId;
-
-    string public gameName;
-    string public gameImage;
-
-    uint256 public gameImplementationVersion;
-
-    // Time length of a round in hours
-    uint256 public roundLength;
-    uint256 public maxPlayers;
-    uint256 public numPlayers;
-
-    // Helps the keeper determine if a game has started or if we need to start it
-    bool public gameInProgress;
-    bool public contractPaused;
-
-    address[] public playerAddresses;
+    mapping(address => Player) public players;
+    mapping(uint256 => Winner) public gameWinners;
 
     Game public game;
 
@@ -64,6 +40,7 @@ contract GameImplementation {
         uint256 maxPlayers;
         uint256 numPlayers;
         bool gameInProgress;
+        address[] playerAddresses;
     }
 
     struct Player {
@@ -502,7 +479,6 @@ contract GameImplementation {
     ///
 
     function getStatus() external view returns (Game memory) {
-        // uint256 balance = address(this).balance;
         return game;
     }
 
