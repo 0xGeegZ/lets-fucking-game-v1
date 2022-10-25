@@ -22,6 +22,9 @@ const beforeEachGameFactory = async function () {
   this.correctRegistrationAmount = ethers.utils.parseEther('0.0001')
   this.houseEdge = ethers.utils.parseEther('0.000005')
   this.creatorEdge = ethers.utils.parseEther('0.000005')
+  //   this.correctRegistrationAmount = ethers.utils.parseEther('0.0001')
+  // this.houseEdge = ethers.utils.parseEther('0.00005')
+  // this.creatorEdge = ethers.utils.parseEther('0.00005')
 
   // prizeAmount equals total prize amount minus house edge
   this.prizeAmount = ethers.utils.parseEther('0.0009')
@@ -122,6 +125,15 @@ const beforeEachGameFactory = async function () {
   this.gameFactoryContract = gameFactoryContract
   this.gameImplementationContract = gameImplementationContract
   this.secondGameImplementationContract = secondGameImplementationContract
+
+  await this.gameFactoryContract
+    .connect(this.owner)
+    .createNewGame(10, 2, this.correctRegistrationAmount, this.encodedCron)
+  const gameContract = await this.gameFactoryContract.deployedGames('0')
+
+  this.game = await GameImplementationContract.attach(
+    gameContract.deployedAddress
+  )
 }
 
 const beforeEachGameImplementation = async function () {

@@ -34,10 +34,15 @@ describe('GameFactoryContract', function () {
           .createNewGame(
             this.maxPlayers,
             this.playTimeRange,
-            this.correctRegistrationAmount,
+            this.authorizedAmounts[this.authorizedAmounts.length - 1],
             this.encodedCron
           )
-        const clonedContract = await this.gameFactoryContract.deployedGames(0)
+
+        const deployedGames = await this.gameFactoryContract
+          .connect(this.owner)
+          .getDeployedGames()
+
+        const clonedContract = deployedGames[deployedGames.length - 1]
         const clonedGameContract = await this.GameImplementationContract.attach(
           clonedContract.deployedAddress
         )
