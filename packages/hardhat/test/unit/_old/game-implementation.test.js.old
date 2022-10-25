@@ -28,7 +28,7 @@ describe('GameImplementationContract', function () {
     this.upperMaxDuration = 60 * 60 * 24
     this.underMaxDuration = 60 * 60 * 20
     this.cronUpkeepContract = players[18]
-    this.generalAdmin = players[17]
+    this.owner = players[17]
 
     GameFactoryContract = await ethers.getContractFactory('GameFactory')
     GameImplementationContract = await ethers.getContractFactory(
@@ -37,7 +37,7 @@ describe('GameImplementationContract', function () {
     gameImplementationContract = await GameImplementationContract.deploy()
     await gameImplementationContract.deployed()
     gameFactoryContract = await GameFactoryContract.connect(
-      this.generalAdmin
+      this.owner
     ).deploy(
       gameImplementationContract.address,
       this.houseEdge,
@@ -53,7 +53,7 @@ describe('GameImplementationContract', function () {
     )
 
     await this.game
-      .connect(this.generalAdmin)
+      .connect(this.owner)
       .setKeeper(players[18].address)
   })
   /*
@@ -221,7 +221,7 @@ TESTS
     describe('when generalAdmin has deployed the Factory Contract', async function () {
       it('should be set as the generalAdmin of the created game', async function () {
         const contractAdmin = await this.game.generalAdmin()
-        expect(this.generalAdmin.address).to.equal(contractAdmin)
+        expect(this.owner.address).to.equal(contractAdmin)
       })
     })
 
@@ -1147,7 +1147,7 @@ TESTS
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.game.connect(this.generalAdmin).setGameName('New name'),
+            this.game.connect(this.owner).setGameName('New name'),
             'Caller is not the creator'
           )
         })
@@ -1168,7 +1168,7 @@ TESTS
         it('should revert with correct error message', async function () {
           await expectRevert(
             this.game
-              .connect(this.generalAdmin)
+              .connect(this.owner)
               .setGameImage('https://www.new-ipfs-image.com'),
             'Caller is not the creator'
           )
@@ -1189,7 +1189,7 @@ TESTS
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.game.connect(this.generalAdmin).withdrawCreatorEdge(),
+            this.game.connect(this.owner).withdrawCreatorEdge(),
             'Caller is not the creator'
           )
         })
@@ -1256,10 +1256,10 @@ TESTS
             this.game.address
           )
           const initialAdminBalance = await ethers.provider.getBalance(
-            this.generalAdmin.address
+            this.owner.address
           )
           const tx = await this.game
-            .connect(this.generalAdmin)
+            .connect(this.owner)
             .withdrawAdminEdge()
 
           const receipt = await tx.wait()
@@ -1270,7 +1270,7 @@ TESTS
             this.game.address
           )
           const updatedAdminBalance = await ethers.provider.getBalance(
-            this.generalAdmin.address
+            this.owner.address
           )
 
           expect(updatedContractBalance).to.be.equal(
@@ -1311,7 +1311,7 @@ TESTS
           )
 
           await this.game
-            .connect(this.generalAdmin)
+            .connect(this.owner)
             .withdrawFunds(fundReceiverAddress)
 
           const updatedContractBalance = await ethers.provider.getBalance(

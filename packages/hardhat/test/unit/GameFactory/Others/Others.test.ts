@@ -11,8 +11,8 @@ describe('GameFactoryContract', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
           this.gameFactoryContract
-            .connect(this.thirdAccount)
-            .setAdmin(this.thirdAccount.address),
+            .connect(this.alice)
+            .setAdmin(this.alice.address),
           'Caller is not the admin'
         )
       })
@@ -22,10 +22,10 @@ describe('GameFactoryContract', function () {
       it('should transfer the administration to given address', async function () {
         await this.gameFactoryContract
           .connect(this.owner)
-          .setAdmin(this.thirdAccount.address)
+          .setAdmin(this.alice.address)
         const newAdmin = await this.gameFactoryContract.owner()
 
-        expect(newAdmin).to.be.equal(this.thirdAccount.address)
+        expect(newAdmin).to.be.equal(this.alice.address)
       })
     })
   })
@@ -35,8 +35,8 @@ describe('GameFactoryContract', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
           this.gameFactoryContract
-            .connect(this.thirdAccount)
-            .withdrawFunds(this.thirdAccount.address),
+            .connect(this.alice)
+            .withdrawFunds(this.alice.address),
           'Caller is not the admin'
         )
       })
@@ -48,7 +48,7 @@ describe('GameFactoryContract', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
           this.gameFactoryContract
-            .connect(this.thirdAccount)
+            .connect(this.alice)
             .setNewGameImplementation(this.gameImplementationContract.address),
           'Caller is not the admin'
         )
@@ -130,7 +130,7 @@ describe('GameFactoryContract', function () {
 
         await expectRevert(
           this.gameFactoryContract
-            .connect(this.thirdAccount)
+            .connect(this.alice)
             .addAuthorizedAmounts(toUpdateAuthorisedAmounts),
           'Caller is not the admin'
         )

@@ -11,7 +11,7 @@ describe('GameFactoryContract', function () {
       it('should revert with the correct reason', async function () {
         await expectRevert(
           this.gameImplementationContract.initialize({
-            _initializer: this.secondAccount.address,
+            _initializer: this.bob.address,
             _factoryOwner: this.owner.address,
             _cronUpkeep: this.cronUpkeepContract.address,
             _gameImplementationVersion: '0',
@@ -30,7 +30,7 @@ describe('GameFactoryContract', function () {
     describe('when the creator tries to initialize a game already initialized', function () {
       it('should revert with the correct message', async function () {
         await this.gameFactoryContract
-          .connect(this.secondAccount)
+          .connect(this.bob)
           .createNewGame(
             this.maxPlayers,
             this.playTimeRange,
@@ -48,7 +48,7 @@ describe('GameFactoryContract', function () {
         )
         await expectRevert(
           clonedGameContract.initialize({
-            _initializer: this.secondAccount.address,
+            _initializer: this.bob.address,
             _factoryOwner: this.owner.address,
             _cronUpkeep: this.cronUpkeepContract.address,
             _gameImplementationVersion: '0',
@@ -123,7 +123,7 @@ describe('GameFactoryContract', function () {
       it('should revert create game with already used amount', async function () {
         const sameRegistrationAmount = this.authorizedAmounts[1]
         await this.gameFactoryContract
-          .connect(this.secondAccount)
+          .connect(this.bob)
           .createNewGame(
             this.maxPlayers,
             this.playTimeRange,
@@ -133,7 +133,7 @@ describe('GameFactoryContract', function () {
 
         await expectRevert(
           this.gameFactoryContract
-            .connect(this.thirdAccount)
+            .connect(this.alice)
             .createNewGame(
               this.maxPlayers,
               this.playTimeRange,

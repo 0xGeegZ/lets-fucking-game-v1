@@ -8,15 +8,15 @@ const ONE_DAY_IN_SECONDS = ONE_HOUR_IN_SECOND * 24
 const beforeEachGameFactory = async function () {
   let owner = null,
     players = null,
-    secondAccount = null,
-    thirdAccount = null
+    bob = null,
+    alice = null
 
-  ;[owner, secondAccount, thirdAccount, ...players] = await ethers.getSigners()
+  ;[owner, bob, alice, ...players] = await ethers.getSigners()
 
   this.owner = owner
   this.players = players
-  this.secondAccount = secondAccount
-  this.thirdAccount = thirdAccount
+  this.bob = bob
+  this.alice = alice
   this.playTimeRange = 2
   this.maxPlayers = 10
   this.correctRegistrationAmount = ethers.utils.parseEther('0.0001')
@@ -36,7 +36,6 @@ const beforeEachGameFactory = async function () {
   this.RoundMaximumDuration = ONE_DAY_IN_SECONDS * 2
   this.upperMaxDuration = 60 * 60 * 24
   this.underMaxDuration = 60 * 60 * 20
-  this.generalAdmin = players[players.length - 1]
 
   this.encodedCron = '0 18 * * *'
 
@@ -125,6 +124,8 @@ const beforeEachGameFactory = async function () {
   this.gameFactoryContract = gameFactoryContract
   this.gameImplementationContract = gameImplementationContract
   this.secondGameImplementationContract = secondGameImplementationContract
+  // TODO Implement business logic to cover keeper in test
+  this.mockKeeper = this.owner
 
   await this.gameFactoryContract
     .connect(this.owner)
@@ -138,11 +139,17 @@ const beforeEachGameFactory = async function () {
 
 const beforeEachGameImplementation = async function () {
   let owner = null,
-    players = null
+    players = null,
+    bob = null,
+    alice = null
 
-  ;[owner, ...players] = await ethers.getSigners()
+  ;[owner, bob, alice, ...players] = await ethers.getSigners()
+
   this.owner = owner
   this.players = players
+  this.bob = bob
+  this.alice = alice
+
   this.correctRegistrationAmount = ethers.utils.parseEther('0.0001')
   this.houseEdge = ethers.utils.parseEther('0.00005')
   this.creatorEdge = ethers.utils.parseEther('0.00005')
@@ -171,7 +178,6 @@ const beforeEachGameImplementation = async function () {
   this.RoundMaximumDuration = ONE_DAY_IN_SECONDS * 2
   this.upperMaxDuration = 60 * 60 * 24
   this.underMaxDuration = 60 * 60 * 20
-  this.generalAdmin = players[17]
 
   const CronContract = await ethers.getContractFactory(
     '@chainlink/contracts/src/v0.8/libraries/external/Cron.sol:Cron'
@@ -202,7 +208,7 @@ const beforeEachGameImplementation = async function () {
   await cronUpkeepDelegateContract.deployed()
 
   const cronUpkeepContract = await CronUpkeepContract.deploy(
-    this.generalAdmin.address,
+    this.owner.address,
     cronUpkeepDelegateContract.address,
     10,
     ethers.utils.toUtf8Bytes('')
@@ -213,11 +219,11 @@ const beforeEachGameImplementation = async function () {
   await gameImplementationContract.deployed()
 
   await cronUpkeepContract
-    .connect(this.generalAdmin)
+    .connect(this.owner)
     .addDelegator(gameImplementationContract.address)
 
   const gameFactoryContract = await GameFactoryContract.connect(
-    this.generalAdmin
+    this.owner
   ).deploy(
     gameImplementationContract.address,
     cronUpkeepContract.address,
@@ -227,7 +233,7 @@ const beforeEachGameImplementation = async function () {
   )
   await gameFactoryContract.deployed()
   await cronUpkeepContract
-    .connect(this.generalAdmin)
+    .connect(this.owner)
     .addDelegator(gameFactoryContract.address)
 
   await gameFactoryContract
@@ -240,7 +246,7 @@ const beforeEachGameImplementation = async function () {
 
   this.cronUpkeepContract = cronUpkeepContract
   // TODO Implement business logic to cover keeper in test
-  this.mockKeeper = this.generalAdmin
+  this.mockKeeper = this.owner
   this.cronUpkeepDelegateContract = cronUpkeepDelegateContract
 
   this.gameFactoryContract = gameFactoryContract

@@ -15,7 +15,7 @@ describe('GameFactoryContract', function () {
 
         await expectRevert(
           this.gameFactoryContract
-            .connect(this.secondAccount)
+            .connect(this.bob)
             .createNewGame(
               this.maxPlayers,
               this.playTimeRange,
@@ -34,7 +34,7 @@ describe('GameFactoryContract', function () {
 
         await expectRevert(
           this.gameFactoryContract
-            .connect(this.secondAccount)
+            .connect(this.bob)
             .createNewGame(
               outOfRangeMaxPlayers1,
               this.playTimeRange,
@@ -46,7 +46,7 @@ describe('GameFactoryContract', function () {
 
         await expectRevert(
           this.gameFactoryContract
-            .connect(this.secondAccount)
+            .connect(this.bob)
             .createNewGame(
               outOfRangeMaxPlayers2,
               this.playTimeRange,
@@ -65,7 +65,7 @@ describe('GameFactoryContract', function () {
 
         await expectRevert(
           this.gameFactoryContract
-            .connect(this.secondAccount)
+            .connect(this.bob)
             .createNewGame(
               this.maxPlayers,
               outOfRangePlayTimeRange1,
@@ -77,7 +77,7 @@ describe('GameFactoryContract', function () {
 
         await expectRevert(
           this.gameFactoryContract
-            .connect(this.secondAccount)
+            .connect(this.bob)
             .createNewGame(
               this.maxPlayers,
               outOfRangePlayTimeRange2,
@@ -94,7 +94,7 @@ describe('GameFactoryContract', function () {
         const registrationAmount =
           this.authorizedAmounts[this.authorizedAmounts.length - 1]
         await this.gameFactoryContract
-          .connect(this.secondAccount)
+          .connect(this.bob)
           .createNewGame(
             this.maxPlayers,
             this.playTimeRange,
@@ -125,7 +125,7 @@ describe('GameFactoryContract', function () {
         const responseCreatorEdge = await clonedGameContract.creatorEdge()
 
         expect(responseGeneralAdmin).to.be.equal(this.owner.address)
-        expect(responseCreator).to.be.equal(this.secondAccount.address)
+        expect(responseCreator).to.be.equal(this.bob.address)
         expect(responseFactory).to.be.equal(this.gameFactoryContract.address)
         expect(responseGameId).to.be.equal('0')
         expect(responseGameImplementationVersion).to.be.equal('0')
@@ -148,7 +148,7 @@ describe('GameFactoryContract', function () {
             .latestGameImplementationVersionId()
 
         await this.gameFactoryContract
-          .connect(this.secondAccount)
+          .connect(this.bob)
           .createNewGame(
             this.maxPlayers,
             this.playTimeRange,
@@ -156,7 +156,7 @@ describe('GameFactoryContract', function () {
             this.encodedCron
           )
         await this.gameFactoryContract
-          .connect(this.thirdAccount)
+          .connect(this.alice)
           .createNewGame(
             this.maxPlayers,
             this.playTimeRange,
@@ -175,12 +175,12 @@ describe('GameFactoryContract', function () {
         expect(firstGame.versionId).to.be.equal(
           currentGameImplementationVersionId
         )
-        expect(firstGame.creator).to.be.equal(this.secondAccount.address)
+        expect(firstGame.creator).to.be.equal(this.bob.address)
         expect(secondGame.id).to.be.equal(+currentId + 1)
         expect(secondGame.versionId).to.be.equal(
           currentGameImplementationVersionId
         )
-        expect(secondGame.creator).to.be.equal(this.thirdAccount.address)
+        expect(secondGame.creator).to.be.equal(this.alice.address)
       })
 
       it('should emit the GameCreated event with the correct data', async function () {
@@ -190,7 +190,7 @@ describe('GameFactoryContract', function () {
 
         await expect(
           this.gameFactoryContract
-            .connect(this.secondAccount)
+            .connect(this.bob)
             .createNewGame(
               this.maxPlayers,
               this.playTimeRange,
@@ -199,7 +199,7 @@ describe('GameFactoryContract', function () {
             )
         )
           .to.emit(this.gameFactoryContract, 'GameCreated')
-          .withArgs(currentId, anyValue, '0', this.secondAccount.address)
+          .withArgs(currentId, anyValue, '0', this.bob.address)
       })
     })
   })
@@ -211,7 +211,7 @@ describe('GameFactoryContract', function () {
         .getDeployedGames()
 
       await this.gameFactoryContract
-        .connect(this.secondAccount)
+        .connect(this.bob)
         .createNewGame(
           this.maxPlayers,
           this.playTimeRange,
@@ -219,7 +219,7 @@ describe('GameFactoryContract', function () {
           this.encodedCron
         )
       await this.gameFactoryContract
-        .connect(this.thirdAccount)
+        .connect(this.alice)
         .createNewGame(
           this.maxPlayers,
           this.playTimeRange,

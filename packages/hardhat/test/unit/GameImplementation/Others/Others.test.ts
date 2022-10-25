@@ -20,7 +20,7 @@ describe('GameImplementationContract - Others', function () {
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.game.connect(this.generalAdmin).setGameName('New name'),
+            this.game.connect(this.bob).setGameName('New name'),
             'Caller is not the creator'
           )
         })
@@ -41,7 +41,7 @@ describe('GameImplementationContract - Others', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
             this.game
-              .connect(this.generalAdmin)
+              .connect(this.bob)
               .setGameImage('https://www.new-ipfs-image.com'),
             'Caller is not the creator'
           )
@@ -62,7 +62,7 @@ describe('GameImplementationContract - Others', function () {
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.game.connect(this.generalAdmin).withdrawCreatorEdge(),
+            this.game.connect(this.bob).withdrawCreatorEdge(),
             'Caller is not the creator'
           )
         })
@@ -114,7 +114,7 @@ describe('GameImplementationContract - Others', function () {
       describe('when caller is not the general admin', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.game.connect(this.owner).withdrawAdminEdge(),
+            this.game.connect(this.bob).withdrawAdminEdge(),
             'Caller is not the creator'
           )
         })
@@ -133,11 +133,9 @@ describe('GameImplementationContract - Others', function () {
             this.game.address
           )
           const initialAdminBalance = await ethers.provider.getBalance(
-            this.generalAdmin.address
+            this.owner.address
           )
-          const tx = await this.game
-            .connect(this.generalAdmin)
-            .withdrawAdminEdge()
+          const tx = await this.game.connect(this.owner).withdrawAdminEdge()
 
           const receipt = await tx.wait()
           const gasPrice = tx.gasPrice
@@ -147,7 +145,7 @@ describe('GameImplementationContract - Others', function () {
             this.game.address
           )
           const updatedAdminBalance = await ethers.provider.getBalance(
-            this.generalAdmin.address
+            this.owner.address
           )
 
           expect(updatedContractBalance).to.be.equal(
@@ -191,9 +189,7 @@ describe('GameImplementationContract - Others', function () {
             fundReceiverAddress
           )
 
-          await this.game
-            .connect(this.generalAdmin)
-            .withdrawFunds(fundReceiverAddress)
+          await this.game.connect(this.owner).withdrawFunds(fundReceiverAddress)
 
           const updatedContractBalance = await ethers.provider.getBalance(
             this.game.address
