@@ -132,7 +132,7 @@
                 },
                 {
                   "internalType": "uint256",
-                  "name": "_roundLength",
+                  "name": "_playTimeRange",
                   "type": "uint256"
                 },
                 {
@@ -966,7 +966,7 @@
                     },
                     {
                       "internalType": "uint256",
-                      "name": "_roundLength",
+                      "name": "_playTimeRange",
                       "type": "uint256"
                     },
                     {
@@ -1156,7 +1156,7 @@
             },
             {
               "inputs": [],
-              "name": "roundLength",
+              "name": "playTimeRange",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -2135,7 +2135,7 @@
                     },
                     {
                       "internalType": "uint256",
-                      "name": "_roundLength",
+                      "name": "_playTimeRange",
                       "type": "uint256"
                     },
                     {
@@ -2325,7 +2325,7 @@
             },
             {
               "inputs": [],
-              "name": "roundLength",
+              "name": "playTimeRange",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -2570,7 +2570,7 @@
                 },
                 {
                   "internalType": "uint256",
-                  "name": "_roundLength",
+                  "name": "_playTimeRange",
                   "type": "uint256"
                 },
                 {
