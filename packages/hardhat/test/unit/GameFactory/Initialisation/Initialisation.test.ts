@@ -18,7 +18,7 @@ describe('GameFactoryContract', function () {
             _gameId: '0',
             _playTimeRange: this.playTimeRange,
             _maxPlayers: this.maxPlayers,
-            _registrationAmount: this.registrationAmount,
+            _registrationAmount: this.correctRegistrationAmount,
             _houseEdge: this.houseEdge,
             _creatorEdge: this.creatorEdge,
             _encodedCron: this.encodedCron,
@@ -34,7 +34,7 @@ describe('GameFactoryContract', function () {
           .createNewGame(
             this.maxPlayers,
             this.playTimeRange,
-            this.registrationAmount,
+            this.correctRegistrationAmount,
             this.encodedCron
           )
         const clonedContract = await this.gameFactoryContract.deployedGames(0)
@@ -50,7 +50,7 @@ describe('GameFactoryContract', function () {
             _gameId: '0',
             _playTimeRange: this.playTimeRange,
             _maxPlayers: this.maxPlayers,
-            _registrationAmount: this.registrationAmount,
+            _registrationAmount: this.correctRegistrationAmount,
             _houseEdge: this.houseEdge,
             _creatorEdge: this.creatorEdge,
             _encodedCron: this.encodedCron,

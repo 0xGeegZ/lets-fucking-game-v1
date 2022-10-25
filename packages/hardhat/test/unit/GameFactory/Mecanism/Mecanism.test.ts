@@ -19,7 +19,7 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               this.maxPlayers,
               this.playTimeRange,
-              this.registrationAmount,
+              this.correctRegistrationAmount,
               this.encodedCron
             ),
           'Pausable: paused'
@@ -38,7 +38,7 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               outOfRangeMaxPlayers1,
               this.playTimeRange,
-              this.registrationAmount,
+              this.correctRegistrationAmount,
               this.encodedCron
             ),
           'maxPlayers should not be bigger than 20'
@@ -50,7 +50,7 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               outOfRangeMaxPlayers2,
               this.playTimeRange,
-              this.registrationAmount,
+              this.correctRegistrationAmount,
               this.encodedCron
             ),
           'maxPlayers should be bigger than or equal to 2'
@@ -69,7 +69,7 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               this.maxPlayers,
               outOfRangePlayTimeRange1,
-              this.registrationAmount,
+              this.correctRegistrationAmount,
               this.encodedCron
             ),
           'playTimeRange should not be bigger than 8'
@@ -81,7 +81,7 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               this.maxPlayers,
               outOfRangePlayTimeRange2,
-              this.registrationAmount,
+              this.correctRegistrationAmount,
               this.encodedCron
             ),
           'playTimeRange should be bigger than 0'
@@ -96,7 +96,7 @@ describe('GameFactoryContract', function () {
           .createNewGame(
             this.maxPlayers,
             this.playTimeRange,
-            this.registrationAmount,
+            this.correctRegistrationAmount,
             this.encodedCron
           )
 
@@ -127,7 +127,9 @@ describe('GameFactoryContract', function () {
         expect(responseGameId).to.be.equal('0')
         expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
-        expect(responseRegistrationAmount).to.be.equal(this.registrationAmount)
+        expect(responseRegistrationAmount).to.be.equal(
+          this.correctRegistrationAmount
+        )
         expect(responseHouseEdge).to.be.equal(this.houseEdge)
         expect(responseCreatorEdge).to.be.equal(this.creatorEdge)
       })
@@ -168,7 +170,7 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               this.maxPlayers,
               this.playTimeRange,
-              this.registrationAmount,
+              this.correctRegistrationAmount,
               this.encodedCron
             )
         )

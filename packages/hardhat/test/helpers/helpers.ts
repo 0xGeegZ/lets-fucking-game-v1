@@ -7,21 +7,35 @@ const ONE_DAY_IN_SECONDS = ONE_HOUR_IN_SECOND * 24
 
 const beforeEachGameFactory = async function () {
   let owner = null,
+    players = null,
     secondAccount = null,
     thirdAccount = null
 
-  ;[owner, secondAccount, thirdAccount] = await ethers.getSigners()
+  ;[owner, secondAccount, thirdAccount, ...players] = await ethers.getSigners()
 
   this.owner = owner
+  this.players = players
   this.secondAccount = secondAccount
   this.thirdAccount = thirdAccount
   this.playTimeRange = 2
   this.maxPlayers = 10
-  this.registrationAmount = ethers.utils.parseEther('0.0001')
+  this.correctRegistrationAmount = ethers.utils.parseEther('0.0001')
   this.houseEdge = ethers.utils.parseEther('0.000005')
   this.creatorEdge = ethers.utils.parseEther('0.000005')
+
+  // prizeAmount equals total prize amount minus house edge
+  this.prizeAmount = ethers.utils.parseEther('0.0009')
+  this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
+  this.zeroRegistrationAmount = ethers.utils.parseEther('0')
+
+  this.launchDuration = 60 * 60 * 25
+  this.nextAllowedPlay = ONE_DAY_IN_SECONDS
+  this.RoundMaximumDuration = ONE_DAY_IN_SECONDS * 2
+  this.upperMaxDuration = 60 * 60 * 24
+  this.underMaxDuration = 60 * 60 * 20
+  this.generalAdmin = players[players.length - 1]
+
   this.encodedCron = '0 18 * * *'
-  // this.encodedCron =  ethers.utils.toUtf8Bytes('0 18 * * *')
 
   this.authorizedAmounts = [
     ethers.utils.parseEther('0.0001'),
@@ -111,11 +125,11 @@ const beforeEachGameFactory = async function () {
 }
 
 const beforeEachGameImplementation = async function () {
-  let creator = null,
+  let owner = null,
     players = null
 
-  ;[creator, ...players] = await ethers.getSigners()
-  this.creator = creator
+  ;[owner, ...players] = await ethers.getSigners()
+  this.owner = owner
   this.players = players
   this.correctRegistrationAmount = ethers.utils.parseEther('0.0001')
   this.houseEdge = ethers.utils.parseEther('0.00005')
@@ -205,7 +219,7 @@ const beforeEachGameImplementation = async function () {
     .addDelegator(gameFactoryContract.address)
 
   await gameFactoryContract
-    .connect(creator)
+    .connect(owner)
     .createNewGame(10, 2, this.correctRegistrationAmount, this.encodedCron)
   const gameContract = await gameFactoryContract.deployedGames('0')
 

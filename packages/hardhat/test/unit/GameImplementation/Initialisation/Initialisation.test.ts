@@ -24,7 +24,7 @@ describe('GameImplementationContract - Initialisation', function () {
     describe('when creator creates the game', async function () {
       it('should be set as the creator of the game', async function () {
         const contractCreator = await this.game.creator()
-        expect(this.creator.address).to.equal(contractCreator)
+        expect(this.owner.address).to.equal(contractCreator)
       })
     })
   })

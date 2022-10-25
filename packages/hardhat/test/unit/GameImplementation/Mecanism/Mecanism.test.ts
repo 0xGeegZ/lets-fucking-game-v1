@@ -33,7 +33,7 @@ describe('GameImplementationContract - Mecanism', function () {
       context('when user is the creator of the Game', async function () {
         it('should not allow user to register to the game', async function () {
           await expectRevert(
-            this.game.connect(this.creator).registerForGame({
+            this.game.connect(this.owner).registerForGame({
               value: this.correctRegistrationAmount,
             }),
             "Caller can't be the creator"
