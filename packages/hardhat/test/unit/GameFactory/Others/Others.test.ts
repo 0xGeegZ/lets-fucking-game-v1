@@ -1,11 +1,12 @@
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-import { beforeEachGameFactory } from '../../../helpers/helpers'
 import { ethers } from 'hardhat'
 import { expect } from 'chai'
 import { expectRevert } from '@openzeppelin/test-helpers'
 
+import { initialiseTestData } from '../../../factories/setup'
+
 describe('GameFactoryContract', function () {
-  beforeEach(beforeEachGameFactory)
+  beforeEach(initialiseTestData)
   context('GameFactory setAdmin', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {

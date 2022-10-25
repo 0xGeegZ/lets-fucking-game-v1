@@ -4,7 +4,6 @@ import { expect } from 'chai'
 import { ethers } from 'hardhat'
 
 import {
-  beforeEachGameImplementation,
   getTwoPlayersInFinal,
   ONE_DAY_IN_SECONDS,
   ONE_HOUR_IN_SECOND,
@@ -13,8 +12,10 @@ import {
   setUpGameWithAWinner,
 } from '../../../helpers/helpers'
 
+import { initialiseTestData } from '../../../factories/setup'
+
 describe('GameImplementationContract - Mecanism', function () {
-  beforeEach(beforeEachGameImplementation)
+  beforeEach(initialiseTestData)
 
   context('Registering to game', function () {
     describe("User can't register to the game", function () {
@@ -798,7 +799,6 @@ describe('GameImplementationContract - Mecanism', function () {
   context('Winning a game', function () {
     describe('when there is only one user left', async function () {
       it('should create a new Winner and add it to the gameWinners mapping', async function () {
-        // TODO this case test fail
         const roundId = 0
         const winnerIndex = 4
         await setUpGameWithAWinner({
@@ -820,7 +820,6 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should emit the GameWon event with the correct data', async function () {
-        // TODO this case test fail
         const winnerIndex = 4
 
         await expect(
@@ -842,7 +841,6 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should reset the game', async function () {
-        // TODO this case test fail
         const previousGameId = 0
         const winnerIndex = 4
         await setUpGameWithAWinner({
@@ -932,7 +930,6 @@ describe('GameImplementationContract - Mecanism', function () {
 
     describe('when the prize for the game as been claimed already', function () {
       it('should revert', async function () {
-        // TODO this case test fail
         // TODO GUIGUI
         const winnerIndex = 0
         const existantGameId = 0
@@ -959,7 +956,6 @@ describe('GameImplementationContract - Mecanism', function () {
 
     describe('when the user did win an existing game not already claimed', function () {
       it('should transfer the prize to the winner', async function () {
-        // TODO this case test fail
         // TODO GUIGUI
         const winnerIndex = 3
         const existantGameId = 0
@@ -1003,7 +999,6 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should emit the GamePrizeClaimed event with the correct data', async function () {
-        // TODO this case test fail
         const winnerIndex = 0
         const existantGameId = 0
         await setUpGameWithAWinner({

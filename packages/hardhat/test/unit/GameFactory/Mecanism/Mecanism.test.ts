@@ -3,10 +3,10 @@ import { expectRevert } from '@openzeppelin/test-helpers'
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
 
-import { beforeEachGameFactory } from '../../../helpers/helpers'
+import { initialiseTestData } from '../../../factories/setup'
 
 describe('GameFactoryContract', function () {
-  beforeEach(beforeEachGameFactory)
+  beforeEach(initialiseTestData)
 
   context('GameFactory createNewGame', function () {
     describe('when contract is paused', function () {

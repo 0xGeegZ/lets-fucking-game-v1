@@ -1,11 +1,11 @@
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-import { beforeEachGameFactory } from '../../../helpers/helpers'
+import { initialiseTestData } from '../../../factories/setup'
 import { ethers } from 'hardhat'
 import { expect } from 'chai'
 import { expectRevert } from '@openzeppelin/test-helpers'
 
 describe('GameFactoryContract', function () {
-  beforeEach(beforeEachGameFactory)
+  beforeEach(initialiseTestData)
   context('GameImplementation deployed', function () {
     describe('when an account tries to initialize the base contract', function () {
       it('should revert with the correct reason', async function () {

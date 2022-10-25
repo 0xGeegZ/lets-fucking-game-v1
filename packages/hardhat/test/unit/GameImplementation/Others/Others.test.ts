@@ -3,7 +3,6 @@ import { expect } from 'chai'
 import { ethers } from 'hardhat'
 
 import {
-  beforeEachGameImplementation,
   getTwoPlayersInFinal,
   ONE_DAY_IN_SECONDS,
   ONE_HOUR_IN_SECOND,
@@ -12,8 +11,10 @@ import {
   setUpGameWithAWinner,
 } from '../../../helpers/helpers'
 
+import { initialiseTestData } from '../../../factories/setup'
+
 describe('GameImplementationContract - Others', function () {
-  beforeEach(beforeEachGameImplementation)
+  beforeEach(initialiseTestData)
 
   context('Creator functions', function () {
     describe('setGameName', function () {

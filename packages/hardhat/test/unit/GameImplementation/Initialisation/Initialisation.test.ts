@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 
 import {
-  beforeEachGameImplementation,
   getTwoPlayersInFinal,
   ONE_DAY_IN_SECONDS,
   ONE_HOUR_IN_SECOND,
@@ -10,8 +9,10 @@ import {
   setUpGameWithAWinner,
 } from '../../../helpers/helpers'
 
+import { initialiseTestData } from '../../../factories/setup'
+
 describe('GameImplementationContract - Initialisation', function () {
-  beforeEach(beforeEachGameImplementation)
+  beforeEach(initialiseTestData)
 
   context('Contract Initialisation', function () {
     describe('when generalAdmin has deployed the Factory Contract', async function () {
