@@ -36,7 +36,7 @@ contract GameImplementation {
         string gameName;
         string gameImage;
         uint256 gameImplementationVersion;
-        uint256 roundLength;
+        uint256 playTimeRange;
         uint256 maxPlayers;
         uint256 numPlayers;
         bool gameInProgress;
@@ -66,7 +66,7 @@ contract GameImplementation {
         address _cronUpkeep;
         uint256 _gameImplementationVersion;
         uint256 _gameId;
-        uint256 _roundLength;
+        uint256 _playTimeRange;
         uint256 _maxPlayers;
         uint256 _registrationAmount;
         uint256 _houseEdge;
@@ -106,7 +106,7 @@ contract GameImplementation {
         game.gameImplementationVersion = initialization._gameImplementationVersion;
 
         roundId = 0;
-        game.roundLength = initialization._roundLength;
+        game.playTimeRange = initialization._playTimeRange;
         game.maxPlayers = initialization._maxPlayers;
 
         // TODO verify cron limitation : not less than every hour
@@ -398,7 +398,7 @@ contract GameImplementation {
     function _randMod(address playerAddress) internal returns (uint256) {
         // increase nonce
         randNonce++;
-        uint256 maxUpperRange = 25 - roundLength; // We use 25 because modulo excludes the higher limit
+        uint256 maxUpperRange = 25 - playTimeRange; // We use 25 because modulo excludes the higher limit
         uint256 randomNumber = uint256(keccak256(abi.encodePacked(block.timestamp, playerAddress, randNonce))) %
             maxUpperRange;
         return randomNumber;
@@ -407,7 +407,7 @@ contract GameImplementation {
     function _resetRoundRange(Player storage player) internal {
         uint256 newRoundLowerLimit = _randMod(player.playerAddress);
         player.roundRangeLowerLimit = block.timestamp + newRoundLowerLimit * 60 * 60;
-        player.roundRangeUpperLimit = player.roundRangeLowerLimit + roundLength * 60 * 60;
+        player.roundRangeUpperLimit = player.roundRangeLowerLimit + playTimeRange * 60 * 60;
     }
 
     function _setPlayerAsHavingLost(Player storage player) internal {
@@ -478,8 +478,45 @@ contract GameImplementation {
     /// GETTERS FUNCTIONS
     ///
 
+<<<<<<< HEAD
     function getStatus() external view returns (Game memory) {
         return game;
+=======
+    function getStatus()
+        external
+        view
+        returns (
+            address,
+            uint256,
+            string memory,
+            string memory,
+            uint256,
+            uint256,
+            uint256,
+            uint256,
+            uint256,
+            uint256,
+            bool,
+            bool
+        )
+    {
+        // uint256 balance = address(this).balance;
+
+        return (
+            creator,
+            roundId,
+            gameName,
+            gameImage,
+            numPlayers,
+            maxPlayers,
+            registrationAmount,
+            playTimeRange,
+            houseEdge,
+            creatorEdge,
+            contractPaused,
+            gameInProgress
+        );
+>>>>>>> 41401336d7e352356560456ee087d5bb2503827b
     }
 
     function getPlayerAddresses() external view returns (address[] memory) {

@@ -16,7 +16,7 @@ describe('GameFactoryContract', function () {
             _cronUpkeep: this.cronUpkeepContract.address,
             _gameImplementationVersion: '0',
             _gameId: '0',
-            _roundLength: this.roundLength,
+            _playTimeRange: this.playTimeRange,
             _maxPlayers: this.maxPlayers,
             _registrationAmount: this.registrationAmount,
             _houseEdge: this.houseEdge,
@@ -33,7 +33,7 @@ describe('GameFactoryContract', function () {
           .connect(this.secondAccount)
           .createNewGame(
             this.maxPlayers,
-            this.roundLength,
+            this.playTimeRange,
             this.registrationAmount,
             this.encodedCron
           )
@@ -48,7 +48,7 @@ describe('GameFactoryContract', function () {
             _cronUpkeep: this.cronUpkeepContract.address,
             _gameImplementationVersion: '0',
             _gameId: '0',
-            _roundLength: this.roundLength,
+            _playTimeRange: this.playTimeRange,
             _maxPlayers: this.maxPlayers,
             _registrationAmount: this.registrationAmount,
             _houseEdge: this.houseEdge,
@@ -121,7 +121,7 @@ describe('GameFactoryContract', function () {
           .connect(this.secondAccount)
           .createNewGame(
             this.maxPlayers,
-            this.roundLength,
+            this.playTimeRange,
             sameRegistrationAmount,
             this.encodedCron
           )
@@ -131,7 +131,7 @@ describe('GameFactoryContract', function () {
             .connect(this.thirdAccount)
             .createNewGame(
               this.maxPlayers,
-              this.roundLength,
+              this.playTimeRange,
               sameRegistrationAmount,
               this.encodedCron
             ),

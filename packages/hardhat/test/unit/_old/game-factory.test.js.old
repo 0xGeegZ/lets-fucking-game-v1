@@ -12,7 +12,7 @@ let gameFactoryContract,
   secondGameImplementationContract,
   thirdAccount
 
-const roundLength = 2
+const playTimeRange = 2
 const maxPlayers = 10
 const registrationAmount = ethers.utils.parseEther('0.0001')
 const houseEdge = ethers.utils.parseEther('0.000005')
@@ -38,7 +38,7 @@ describe('GameFactoryContract', function () {
             _factoryOwner: owner.address,
             _gameImplementationVersion: '0',
             _gameId: '0',
-            _roundLength: roundLength,
+            _playTimeRange: playTimeRange,
             _maxPlayers: maxPlayers,
             _registrationAmount: registrationAmount,
             _houseEdge: houseEdge,
@@ -54,7 +54,7 @@ describe('GameFactoryContract', function () {
         await createAndDeployContracts()
         await gameFactoryContract
           .connect(secondAccount)
-          .createNewGame(maxPlayers, roundLength, registrationAmount)
+          .createNewGame(maxPlayers, playTimeRange, registrationAmount)
 
         const clonedContract = await gameFactoryContract.deployedGames(0)
         const clonedGameContract = await GameImplementationContract.attach(
@@ -67,7 +67,7 @@ describe('GameFactoryContract', function () {
             _factoryOwner: owner.address,
             _gameImplementationVersion: '0',
             _gameId: '0',
-            _roundLength: roundLength,
+            _playTimeRange: playTimeRange,
             _maxPlayers: maxPlayers,
             _registrationAmount: registrationAmount,
             _houseEdge: houseEdge,
@@ -115,7 +115,7 @@ describe('GameFactoryContract', function () {
         await expectRevert(
           gameFactoryContract
             .connect(secondAccount)
-            .createNewGame(maxPlayers, roundLength, registrationAmount),
+            .createNewGame(maxPlayers, playTimeRange, registrationAmount),
           'Pausable: paused'
         )
       })
@@ -132,7 +132,7 @@ describe('GameFactoryContract', function () {
             .connect(secondAccount)
             .createNewGame(
               outOfRangeMaxPlayers1,
-              roundLength,
+              playTimeRange,
               registrationAmount
             ),
           'maxPlayers should not be bigger than 20'
@@ -143,7 +143,7 @@ describe('GameFactoryContract', function () {
             .connect(secondAccount)
             .createNewGame(
               outOfRangeMaxPlayers2,
-              roundLength,
+              playTimeRange,
               registrationAmount
             ),
           'maxPlayers should be bigger than or equal to 2'
@@ -151,10 +151,10 @@ describe('GameFactoryContract', function () {
       })
     })
 
-    describe('when the given roundLength is not in authorized range', function () {
+    describe('when the given playTimeRange is not in authorized range', function () {
       it('should revert with correct message', async function () {
-        const outOfRangeRoundLength1 = 9
-        const outOfRangeRoundLength2 = 0
+        const outOfRangePlayTimeRange1 = 9
+        const outOfRangePlayTimeRange2 = 0
         await createAndDeployContracts()
 
         await expectRevert(
@@ -162,10 +162,10 @@ describe('GameFactoryContract', function () {
             .connect(secondAccount)
             .createNewGame(
               maxPlayers,
-              outOfRangeRoundLength1,
+              outOfRangePlayTimeRange1,
               registrationAmount
             ),
-          'roundLength should not be bigger than 8'
+          'playTimeRange should not be bigger than 8'
         )
 
         await expectRevert(
@@ -173,10 +173,10 @@ describe('GameFactoryContract', function () {
             .connect(secondAccount)
             .createNewGame(
               maxPlayers,
-              outOfRangeRoundLength2,
+              outOfRangePlayTimeRange2,
               registrationAmount
             ),
-          'roundLength should be bigger than 0'
+          'playTimeRange should be bigger than 0'
         )
       })
     })
@@ -186,7 +186,7 @@ describe('GameFactoryContract', function () {
         await createAndDeployContracts()
         await gameFactoryContract
           .connect(secondAccount)
-          .createNewGame(maxPlayers, roundLength, registrationAmount)
+          .createNewGame(maxPlayers, playTimeRange, registrationAmount)
 
         const newGame = await gameFactoryContract.deployedGames(0)
 
@@ -200,7 +200,7 @@ describe('GameFactoryContract', function () {
         const responseGameId = await clonedGameContract.roundId()
         const responseGameImplementationVersion =
           await clonedGameContract.gameImplementationVersion()
-        const responseRoundLength = await clonedGameContract.roundLength()
+        const responsePlayTimeRange = await clonedGameContract.playTimeRange()
         const responseMaxPlayers = await clonedGameContract.maxPlayers()
         const responseRegistrationAmount =
           await clonedGameContract.registrationAmount()
@@ -213,7 +213,7 @@ describe('GameFactoryContract', function () {
         expect(responseGameId).to.be.equal('0')
         expect(responseGameImplementationVersion).to.be.equal('0')
         expect(responseGameId).to.be.equal('0')
-        expect(responseRoundLength).to.be.equal(roundLength)
+        expect(responsePlayTimeRange).to.be.equal(playTimeRange)
         expect(responseMaxPlayers).to.be.equal(maxPlayers)
         expect(responseRegistrationAmount).to.be.equal(registrationAmount)
         expect(responseHouseEdge).to.be.equal(houseEdge)
@@ -224,10 +224,10 @@ describe('GameFactoryContract', function () {
         await createAndDeployContracts()
         await gameFactoryContract
           .connect(secondAccount)
-          .createNewGame(maxPlayers, roundLength, registrationAmount)
+          .createNewGame(maxPlayers, playTimeRange, registrationAmount)
         await gameFactoryContract
           .connect(thirdAccount)
-          .createNewGame(maxPlayers, roundLength, registrationAmount)
+          .createNewGame(maxPlayers, playTimeRange, registrationAmount)
 
         const firstGame = await gameFactoryContract.deployedGames(0)
         const secondGame = await gameFactoryContract.deployedGames(1)
@@ -245,7 +245,7 @@ describe('GameFactoryContract', function () {
         await expect(
           gameFactoryContract
             .connect(secondAccount)
-            .createNewGame(maxPlayers, roundLength, registrationAmount)
+            .createNewGame(maxPlayers, playTimeRange, registrationAmount)
         )
           .to.emit(gameFactoryContract, 'GameCreated')
           .withArgs('0', anyValue, '0', secondAccount.address)
@@ -258,10 +258,10 @@ describe('GameFactoryContract', function () {
       await createAndDeployContracts()
       await gameFactoryContract
         .connect(secondAccount)
-        .createNewGame(maxPlayers, roundLength, registrationAmount)
+        .createNewGame(maxPlayers, playTimeRange, registrationAmount)
       await gameFactoryContract
         .connect(thirdAccount)
-        .createNewGame(maxPlayers, roundLength, registrationAmount)
+        .createNewGame(maxPlayers, playTimeRange, registrationAmount)
 
       const deployedGames = await gameFactoryContract
         .connect(secondAccount)
