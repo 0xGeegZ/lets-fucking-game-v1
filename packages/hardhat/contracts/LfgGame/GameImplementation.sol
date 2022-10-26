@@ -34,7 +34,7 @@ contract GameImplementation {
     uint256 public gameImplementationVersion;
 
     // Time length of a round in hours
-    uint256 public roundLength;
+    uint256 public playTimeRange;
     uint256 public maxPlayers;
     uint256 public numPlayers;
 
@@ -70,7 +70,7 @@ contract GameImplementation {
         address _cronUpkeep;
         uint256 _gameImplementationVersion;
         uint256 _gameId;
-        uint256 _roundLength;
+        uint256 _playTimeRange;
         uint256 _maxPlayers;
         uint256 _registrationAmount;
         uint256 _houseEdge;
@@ -110,7 +110,7 @@ contract GameImplementation {
         gameImplementationVersion = initialization._gameImplementationVersion;
 
         roundId = 0;
-        roundLength = initialization._roundLength;
+        playTimeRange = initialization._playTimeRange;
         maxPlayers = initialization._maxPlayers;
 
         // TODO verify cron limitation : not less than every hour
@@ -408,7 +408,7 @@ contract GameImplementation {
     function _randMod(address playerAddress) internal returns (uint256) {
         // increase nonce
         randNonce++;
-        uint256 maxUpperRange = 25 - roundLength; // We use 25 because modulo excludes the higher limit
+        uint256 maxUpperRange = 25 - playTimeRange; // We use 25 because modulo excludes the higher limit
         uint256 randomNumber = uint256(keccak256(abi.encodePacked(block.timestamp, playerAddress, randNonce))) %
             maxUpperRange;
         return randomNumber;
@@ -417,7 +417,7 @@ contract GameImplementation {
     function _resetRoundRange(Player storage player) internal {
         uint256 newRoundLowerLimit = _randMod(player.playerAddress);
         player.roundRangeLowerLimit = block.timestamp + newRoundLowerLimit * 60 * 60;
-        player.roundRangeUpperLimit = player.roundRangeLowerLimit + roundLength * 60 * 60;
+        player.roundRangeUpperLimit = player.roundRangeLowerLimit + playTimeRange * 60 * 60;
     }
 
     function _setPlayerAsHavingLost(Player storage player) internal {
@@ -539,7 +539,7 @@ contract GameImplementation {
             numPlayers,
             maxPlayers,
             registrationAmount,
-            roundLength,
+            playTimeRange,
             houseEdge,
             creatorEdge,
             contractPaused,

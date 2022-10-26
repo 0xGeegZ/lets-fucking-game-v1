@@ -18,7 +18,7 @@ describe('GameFactoryContract', function () {
             .connect(this.secondAccount)
             .createNewGame(
               this.maxPlayers,
-              this.roundLength,
+              this.playTimeRange,
               this.registrationAmount,
               this.encodedCron
             ),
@@ -37,7 +37,7 @@ describe('GameFactoryContract', function () {
             .connect(this.secondAccount)
             .createNewGame(
               outOfRangeMaxPlayers1,
-              this.roundLength,
+              this.playTimeRange,
               this.registrationAmount,
               this.encodedCron
             ),
@@ -49,7 +49,7 @@ describe('GameFactoryContract', function () {
             .connect(this.secondAccount)
             .createNewGame(
               outOfRangeMaxPlayers2,
-              this.roundLength,
+              this.playTimeRange,
               this.registrationAmount,
               this.encodedCron
             ),
@@ -58,21 +58,21 @@ describe('GameFactoryContract', function () {
       })
     })
 
-    describe('when the given this.roundLength is not in authorized range', function () {
+    describe('when the given this.playTimeRange is not in authorized range', function () {
       it('should revert with correct message', async function () {
-        const outOfRangeRoundLength1 = 9
-        const outOfRangeRoundLength2 = 0
+        const outOfRangePlayTimeRange1 = 9
+        const outOfRangePlayTimeRange2 = 0
 
         await expectRevert(
           this.gameFactoryContract
             .connect(this.secondAccount)
             .createNewGame(
               this.maxPlayers,
-              outOfRangeRoundLength1,
+              outOfRangePlayTimeRange1,
               this.registrationAmount,
               this.encodedCron
             ),
-          'roundLength should not be bigger than 8'
+          'playTimeRange should not be bigger than 8'
         )
 
         await expectRevert(
@@ -80,11 +80,11 @@ describe('GameFactoryContract', function () {
             .connect(this.secondAccount)
             .createNewGame(
               this.maxPlayers,
-              outOfRangeRoundLength2,
+              outOfRangePlayTimeRange2,
               this.registrationAmount,
               this.encodedCron
             ),
-          'roundLength should be bigger than 0'
+          'playTimeRange should be bigger than 0'
         )
       })
     })
@@ -95,7 +95,7 @@ describe('GameFactoryContract', function () {
           .connect(this.secondAccount)
           .createNewGame(
             this.maxPlayers,
-            this.roundLength,
+            this.playTimeRange,
             this.registrationAmount,
             this.encodedCron
           )
@@ -112,7 +112,7 @@ describe('GameFactoryContract', function () {
         const responseGameId = await clonedGameContract.roundId()
         const responseGameImplementationVersion =
           await clonedGameContract.gameImplementationVersion()
-        const responseRoundLength = await clonedGameContract.roundLength()
+        const responsePlayTimeRange = await clonedGameContract.playTimeRange()
         const responseMaxPlayers = await clonedGameContract.maxPlayers()
         const responseRegistrationAmount =
           await clonedGameContract.registrationAmount()
@@ -125,7 +125,7 @@ describe('GameFactoryContract', function () {
         expect(responseGameId).to.be.equal('0')
         expect(responseGameImplementationVersion).to.be.equal('0')
         expect(responseGameId).to.be.equal('0')
-        expect(responseRoundLength).to.be.equal(this.roundLength)
+        expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
         expect(responseRegistrationAmount).to.be.equal(this.registrationAmount)
         expect(responseHouseEdge).to.be.equal(this.houseEdge)
@@ -137,7 +137,7 @@ describe('GameFactoryContract', function () {
           .connect(this.secondAccount)
           .createNewGame(
             this.maxPlayers,
-            this.roundLength,
+            this.playTimeRange,
             this.authorizedAmounts[1],
             this.encodedCron
           )
@@ -145,7 +145,7 @@ describe('GameFactoryContract', function () {
           .connect(this.thirdAccount)
           .createNewGame(
             this.maxPlayers,
-            this.roundLength,
+            this.playTimeRange,
             this.authorizedAmounts[2],
             this.encodedCron
           )
@@ -167,7 +167,7 @@ describe('GameFactoryContract', function () {
             .connect(this.secondAccount)
             .createNewGame(
               this.maxPlayers,
-              this.roundLength,
+              this.playTimeRange,
               this.registrationAmount,
               this.encodedCron
             )
@@ -184,7 +184,7 @@ describe('GameFactoryContract', function () {
         .connect(this.secondAccount)
         .createNewGame(
           this.maxPlayers,
-          this.roundLength,
+          this.playTimeRange,
           this.authorizedAmounts[1],
           this.encodedCron
         )
@@ -192,7 +192,7 @@ describe('GameFactoryContract', function () {
         .connect(this.thirdAccount)
         .createNewGame(
           this.maxPlayers,
-          this.roundLength,
+          this.playTimeRange,
           this.authorizedAmounts[2],
           this.encodedCron
         )

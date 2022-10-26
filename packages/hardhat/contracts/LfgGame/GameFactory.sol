@@ -85,9 +85,9 @@ contract GameFactory is Pausable, Ownable {
         require(_maxPlayers < 21, "maxPlayers should not be bigger than 20");
         _;
     }
-    modifier onlyAllowedRoundLength(uint256 _roundLength) {
-        require(_roundLength > 0, "roundLength should be bigger than 0");
-        require(_roundLength < 9, "roundLength should not be bigger than 8");
+    modifier onlyAllowedPlayTimeRange(uint256 _playTimeRange) {
+        require(_playTimeRange > 0, "playTimeRange should be bigger than 0");
+        require(_playTimeRange < 9, "playTimeRange should not be bigger than 8");
         _;
     }
 
@@ -115,14 +115,14 @@ contract GameFactory is Pausable, Ownable {
     // TODO add Name and image url as argument to createNewGame & initialize functions
     function createNewGame(
         uint256 _maxPlayers,
-        uint256 _roundLength,
+        uint256 _playTimeRange,
         uint256 _registrationAmount,
         string memory _encodedCron
     )
         public
         whenNotPaused
         onlyAllowedNumberOfPlayers(_maxPlayers)
-        onlyAllowedRoundLength(_roundLength)
+        onlyAllowedPlayTimeRange(_playTimeRange)
         onlyAllowedRegistrationAmount(_registrationAmount)
         onlyIfNotUsedRegistrationAmounts(_registrationAmount)
         returns (address game)
@@ -140,7 +140,7 @@ contract GameFactory is Pausable, Ownable {
                 _cronUpkeep: cronUpkeep,
                 _gameImplementationVersion: latestGameImplementationVersionId,
                 _gameId: gameId,
-                _roundLength: _roundLength,
+                _playTimeRange: _playTimeRange,
                 _maxPlayers: _maxPlayers,
                 _registrationAmount: _registrationAmount,
                 _houseEdge: houseEdge,
