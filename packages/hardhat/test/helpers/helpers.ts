@@ -249,6 +249,8 @@ const setUpGameReadyToPlay = async function ({
   return contract.connect(mockKeeper).triggerDailyCheckpoint()
 }
 
+this.gameStatus = await getStatus
+
 const getTwoPlayersInFinal = async function ({
   players,
   contract,

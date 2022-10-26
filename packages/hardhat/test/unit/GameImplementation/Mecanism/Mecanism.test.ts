@@ -1,17 +1,18 @@
-import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-import { expectRevert } from '@openzeppelin/test-helpers'
-import { expect } from 'chai'
-import { ethers } from 'hardhat'
-
 import {
-  beforeEachGameImplementation,
-  getTwoPlayersInFinal,
   ONE_DAY_IN_SECONDS,
   ONE_HOUR_IN_SECOND,
+  beforeEachGameImplementation,
+  getStatus,
+  getTwoPlayersInFinal,
   registerPlayer,
   setUpGameReadyToPlay,
   setUpGameWithAWinner,
 } from '../../../helpers/helpers'
+
+import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
+import { ethers } from 'hardhat'
+import { expect } from 'chai'
+import { expectRevert } from '@openzeppelin/test-helpers'
 
 describe('GameImplementationContract - Mecanism', function () {
   beforeEach(beforeEachGameImplementation)
@@ -359,6 +360,15 @@ describe('GameImplementationContract - Mecanism', function () {
   })
 
   context('Playing a round', function () {
+    describe('User want to show game status', function () {
+      it('should display game status', async function () {
+        const responseGameStatus = await getStatus()
+        await expect(
+          this.game.connect(this.mockKeeper).getStatus()
+        ).to.be.equal(responseGameStatus)
+      })
+    })
+
     describe("User can't play a round", function () {
       context('when game is paused', async function () {
         it('should not allow the user to play the round', async function () {
