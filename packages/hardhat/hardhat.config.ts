@@ -191,6 +191,7 @@ const config: HardhatUserConfig = {
       saveDeployments: true,
     },
   },
+  // TODO user hardhat deploy ?? SEE : https://github.com/wighawag/hardhat-deploy#4-hardhat-etherscan-verify
   etherscan: {
     apiKey: {
       arbitrumTestnet: process.env.ARBISCAN_API_KEY || '',
