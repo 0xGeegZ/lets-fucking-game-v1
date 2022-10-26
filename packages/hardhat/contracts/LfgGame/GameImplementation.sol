@@ -22,9 +22,6 @@ contract GameImplementation {
 
     Game public game;
 
-    mapping(address => Player) players;
-    mapping(uint256 => Winner) gameWinners;
-
     ///STRUCTS
     struct Game {
         bytes encodedCron;
@@ -102,10 +99,10 @@ contract GameImplementation {
         game.houseEdge = initialization._houseEdge;
         game.creatorEdge = initialization._creatorEdge;
 
-        gameId = initialization._gameId;
+        game.gameId = initialization._gameId;
         game.gameImplementationVersion = initialization._gameImplementationVersion;
 
-        roundId = 0;
+        game.roundId = 0;
         game.playTimeRange = initialization._playTimeRange;
         game.maxPlayers = initialization._maxPlayers;
 
@@ -114,13 +111,13 @@ contract GameImplementation {
         // Pattern is : * * * * *
         // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
 
-        encodedCron = CronExternal.toEncodedSpec(initialization._encodedCron);
-        cronUpkeep = initialization._cronUpkeep;
+        game.encodedCron = CronExternal.toEncodedSpec(initialization._encodedCron);
+        game.cronUpkeep = initialization._cronUpkeep;
 
-        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
+        CronUpkeepInterface(game.cronUpkeep).createCronJobFromEncodedSpec(
             address(this),
             bytes("triggerDailyCheckpoint()"),
-            encodedCron
+            game.encodedCron
         );
     }
 
@@ -159,23 +156,23 @@ contract GameImplementation {
     }
 
     modifier onlyKeeper() {
-        require(msg.sender == cronUpkeep, "Caller is not the keeper");
+        require(msg.sender == game.cronUpkeep, "Caller is not the keeper");
         _;
     }
 
     modifier onlyIfKeeperDataInit() {
-        require(cronUpkeep != address(0), "Keeper need to be initialised");
-        require(bytes(encodedCron).length != 0, "Keeper cron need to be initialised");
+        require(game.cronUpkeep != address(0), "Keeper need to be initialised");
+        require(bytes(game.encodedCron).length != 0, "Keeper cron need to be initialised");
         _;
     }
 
     modifier onlyIfNotFull() {
-        require(numPlayers < maxPlayers, "This game is full");
+        require(game.numPlayers < game.maxPlayers, "This game is full");
         _;
     }
 
     modifier onlyIfFull() {
-        require(numPlayers == maxPlayers, "This game is not full");
+        require(game.numPlayers == game.maxPlayers, "This game is not full");
         _;
     }
 
@@ -210,7 +207,7 @@ contract GameImplementation {
     }
 
     modifier onlyRegistrationAmount() {
-        require(msg.value == registrationAmount, "Only game amount is allowed");
+        require(msg.value == game.registrationAmount, "Only game amount is allowed");
         _;
     }
 
@@ -227,12 +224,12 @@ contract GameImplementation {
     }
 
     modifier onlyNotPaused() {
-        require(contractPaused != true, "Contract is paused");
+        require(game.contractPaused != true, "Contract is paused");
         _;
     }
 
     modifier onlyPaused() {
-        require(contractPaused != false, "Contract is not paused");
+        require(game.contractPaused != false, "Contract is not paused");
         _;
     }
 
@@ -249,7 +246,7 @@ contract GameImplementation {
         onlyRegistrationAmount
         onlyNotCreator
     {
-        numPlayers++;
+        game.numPlayers++;
         players[msg.sender] = Player({
             playerAddress: msg.sender,
             roundCount: 0,
@@ -259,9 +256,9 @@ contract GameImplementation {
             roundRangeUpperLimit: 0,
             roundRangeLowerLimit: 0
         });
-        playerAddresses.push(msg.sender);
+        game.playerAddresses.push(msg.sender);
 
-        emit RegisteredForGame(players[msg.sender].playerAddress, numPlayers);
+        emit RegisteredForGame(players[msg.sender].playerAddress, game.numPlayers);
     }
 
     function playRound()
@@ -289,18 +286,18 @@ contract GameImplementation {
     // TODO remoove onlyKeeperOrAdmin and make test works
     function triggerDailyCheckpoint() external onlyKeeperOrAdmin onlyNotPaused {
         // function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
-        if (gameInProgress == true) {
+        if (game.gameInProgress == true) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
         } else {
-            if (numPlayers == maxPlayers) {
+            if (game.numPlayers == game.maxPlayers) {
                 _startGame();
             }
         }
     }
 
     function claimPrize(uint256 _roundId) external {
-        require(_roundId <= roundId, "This game does not exist");
+        require(_roundId <= game.roundId, "This game does not exist");
         require(msg.sender == gameWinners[_roundId].playerAddress, "Player did not win this game");
         require(gameWinners[_roundId].prizeClaimed == false, "Prize for this game already claimed");
         require(address(this).balance >= gameWinners[_roundId].amountWon, "Not enough funds in contract");
@@ -314,25 +311,25 @@ contract GameImplementation {
     /// INTERNAL FUNCTIONS
     ///
     function _startGame() internal {
-        for (uint256 i = 0; i < numPlayers; i++) {
-            Player storage player = players[playerAddresses[i]];
+        for (uint256 i = 0; i < game.numPlayers; i++) {
+            Player storage player = players[game.playerAddresses[i]];
             _resetRoundRange(player);
         }
 
-        gameInProgress = true;
-        emit StartedGame(block.timestamp, numPlayers);
+        game.gameInProgress = true;
+        emit StartedGame(block.timestamp, game.numPlayers);
     }
 
     function _resetGame() internal {
-        gameInProgress = false;
-        for (uint256 i = 0; i < numPlayers; i++) {
-            delete players[playerAddresses[i]];
-            delete playerAddresses[i];
+        game.gameInProgress = false;
+        for (uint256 i = 0; i < game.numPlayers; i++) {
+            delete players[game.playerAddresses[i]];
+            delete game.playerAddresses[i];
         }
-        numPlayers = 0;
+        game.numPlayers = 0;
 
-        emit ResetGame(block.timestamp, roundId);
-        roundId += 1;
+        emit ResetGame(block.timestamp, game.roundId);
+        game.roundId += 1;
     }
 
     function _safeTransfert(address receiver, uint256 amount) internal {
@@ -350,8 +347,8 @@ contract GameImplementation {
     function _checkIfGameEnded() internal {
         uint256 remainingPlayersCounter;
         address lastNonLoosingPlayerAddress;
-        for (uint256 i = 0; i < numPlayers; i++) {
-            Player memory currentPlayer = players[playerAddresses[i]];
+        for (uint256 i = 0; i < game.numPlayers; i++) {
+            Player memory currentPlayer = players[game.playerAddresses[i]];
             if (!currentPlayer.hasLost) {
                 remainingPlayersCounter += 1;
                 lastNonLoosingPlayerAddress = currentPlayer.playerAddress;
@@ -361,15 +358,15 @@ contract GameImplementation {
         //Game is over, set the last non loosing player as winner and reset game.
         if (remainingPlayersCounter == 1) {
             // TODO houseEdge + creatorEdge are cumultate.
-            uint256 prize = registrationAmount * numPlayers - houseEdge - creatorEdge;
-            gameWinners[roundId] = Winner({
+            uint256 prize = game.registrationAmount * game.numPlayers - game.houseEdge - game.creatorEdge;
+            gameWinners[game.roundId] = Winner({
                 playerAddress: lastNonLoosingPlayerAddress,
                 amountWon: prize,
                 prizeClaimed: false,
-                roundId: roundId
+                roundId: game.roundId
             });
 
-            emit GameWon(roundId, lastNonLoosingPlayerAddress, prize);
+            emit GameWon(game.roundId, lastNonLoosingPlayerAddress, prize);
 
             _resetGame();
         }
@@ -381,8 +378,8 @@ contract GameImplementation {
     }
 
     function _refreshPlayerStatus() internal {
-        for (uint256 i = 0; i < numPlayers; i++) {
-            Player storage player = players[playerAddresses[i]];
+        for (uint256 i = 0; i < game.numPlayers; i++) {
+            Player storage player = players[game.playerAddresses[i]];
             // Refresh player status to having lost if player has not played
             if (player.hasPlayedRound == false && player.hasLost == false) {
                 _setPlayerAsHavingLost(player);
@@ -398,7 +395,7 @@ contract GameImplementation {
     function _randMod(address playerAddress) internal returns (uint256) {
         // increase nonce
         randNonce++;
-        uint256 maxUpperRange = 25 - playTimeRange; // We use 25 because modulo excludes the higher limit
+        uint256 maxUpperRange = 25 - game.playTimeRange; // We use 25 because modulo excludes the higher limit
         uint256 randomNumber = uint256(keccak256(abi.encodePacked(block.timestamp, playerAddress, randNonce))) %
             maxUpperRange;
         return randomNumber;
@@ -407,35 +404,35 @@ contract GameImplementation {
     function _resetRoundRange(Player storage player) internal {
         uint256 newRoundLowerLimit = _randMod(player.playerAddress);
         player.roundRangeLowerLimit = block.timestamp + newRoundLowerLimit * 60 * 60;
-        player.roundRangeUpperLimit = player.roundRangeLowerLimit + playTimeRange * 60 * 60;
+        player.roundRangeUpperLimit = player.roundRangeLowerLimit + game.playTimeRange * 60 * 60;
     }
 
     function _setPlayerAsHavingLost(Player storage player) internal {
         player.hasLost = true;
         player.isSplitOk = false;
 
-        emit GameLost(roundId, player.playerAddress, player.roundCount);
+        emit GameLost(game.roundId, player.playerAddress, player.roundCount);
     }
 
     /// CREATOR FUNCTIONS
 
     function setGameName(string calldata _gameName) external onlyCreator {
-        gameName = _gameName;
+        game.gameName = _gameName;
     }
 
     function setGameImage(string calldata _gameImage) external onlyCreator {
-        gameImage = _gameImage;
+        game.gameImage = _gameImage;
     }
 
     function withdrawCreatorEdge() external onlyCreator {
-        require(address(this).balance >= creatorEdge);
-        _safeTransfert(creator, creatorEdge);
+        require(address(this).balance >= game.creatorEdge);
+        _safeTransfert(creator, game.creatorEdge);
     }
 
     /// ADMIN FUNCTIONS
     function withdrawAdminEdge() external onlyAdmin {
-        require(address(this).balance >= houseEdge);
-        _safeTransfert(generalAdmin, houseEdge);
+        require(address(this).balance >= game.houseEdge);
+        _safeTransfert(generalAdmin, game.houseEdge);
     }
 
     ///
@@ -454,73 +451,36 @@ contract GameImplementation {
     function setCronUpkeep(address _cronUpkeep) public onlyCreatorOrAdmin {
         require(_cronUpkeep != address(0), "Keeper need to be initialised");
         // cronUpkeep = CronUpkeepInterface(_cronUpkeep);
-        cronUpkeep = _cronUpkeep;
+        game.cronUpkeep = _cronUpkeep;
         // TODO add parameter to know if it's needed to register encodedCron again
     }
 
     function setEncodedCron(bytes memory _encodedCron) external onlyCreatorOrAdmin {
-        encodedCron = _encodedCron;
+        game.encodedCron = _encodedCron;
     }
 
     function pause() external onlyCreatorOrAdmin onlyNotPaused {
         // TODO pause Keeper JOB
-        contractPaused = true;
+        game.contractPaused = true;
     }
 
     // TODO (Will need a big refactor for tests cases) reactivate to ensure that keeper is initialised
     // function unpause() external onlyCreatorOrAdmin onlyPaused onlyIfKeeperDataInit {
     function unpause() external onlyCreatorOrAdmin onlyPaused onlyIfKeeperDataInit {
         // TODO unpause Keeper JOB
-        contractPaused = false;
+        game.contractPaused = false;
     }
 
     ///
     /// GETTERS FUNCTIONS
     ///
 
-<<<<<<< HEAD
     function getStatus() external view returns (Game memory) {
         return game;
-=======
-    function getStatus()
-        external
-        view
-        returns (
-            address,
-            uint256,
-            string memory,
-            string memory,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            bool,
-            bool
-        )
-    {
-        // uint256 balance = address(this).balance;
-
-        return (
-            creator,
-            roundId,
-            gameName,
-            gameImage,
-            numPlayers,
-            maxPlayers,
-            registrationAmount,
-            playTimeRange,
-            houseEdge,
-            creatorEdge,
-            contractPaused,
-            gameInProgress
-        );
->>>>>>> 41401336d7e352356560456ee087d5bb2503827b
     }
 
     function getPlayerAddresses() external view returns (address[] memory) {
-        return playerAddresses;
+        return game.playerAddresses;
     }
 
     function getPlayer(address player) external view returns (Player memory) {
@@ -533,8 +493,8 @@ contract GameImplementation {
 
     function getRemainingPlayersCount() external view returns (uint256) {
         uint256 remainingPlayers = 0;
-        for (uint256 i = 0; i < numPlayers; i++) {
-            if (!players[playerAddresses[i]].hasLost) {
+        for (uint256 i = 0; i < game.numPlayers; i++) {
+            if (!players[game.playerAddresses[i]].hasLost) {
                 remainingPlayers++;
             }
         }
