@@ -1,17 +1,17 @@
-import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-import { expectRevert } from '@openzeppelin/test-helpers'
-import { expect } from 'chai'
-import { ethers } from 'hardhat'
-
 import {
-  beforeEachGameImplementation,
-  getTwoPlayersInFinal,
   ONE_DAY_IN_SECONDS,
   ONE_HOUR_IN_SECOND,
+  beforeEachGameImplementation,
+  getTwoPlayersInFinal,
   registerPlayer,
   setUpGameReadyToPlay,
   setUpGameWithAWinner,
 } from '../../../helpers/helpers'
+
+import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
+import { ethers } from 'hardhat'
+import { expect } from 'chai'
+import { expectRevert } from '@openzeppelin/test-helpers'
 
 describe('GameImplementationContract - Mecanism', function () {
   beforeEach(beforeEachGameImplementation)
@@ -269,6 +269,10 @@ describe('GameImplementationContract - Mecanism', function () {
         await expect(
           this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
         ).to.emit(this.game, 'GameLost')
+      })
+
+      it('should check if prize have to be split', async function () {
+        //
       })
 
       it('should check if game ended and close it', async function () {

@@ -295,11 +295,12 @@ contract GameImplementation {
         }
     }
 
-    // TODO remoove onlyKeeperOrAdmin and make test works
+    // TODO remove onlyKeeperOrAdmin and make test works
     function triggerDailyCheckpoint() external onlyKeeperOrAdmin onlyNotPaused {
         // function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
         if (gameInProgress == true) {
             _refreshPlayerStatus();
+            _splitPot();
             _checkIfGameEnded();
         } else {
             if (numPlayers == maxPlayers) {
@@ -426,28 +427,25 @@ contract GameImplementation {
         emit GameLost(roundId, player.playerAddress, player.roundCount);
     }
 
-    function _voteRequests() internal onlyIfPlayersLowerHalfRemaining {
-        remainingPlayersLength = getRemainingPlayersCount();
-        for (uint256 i = 0; i < remainingPlayersLength; i++) {
-            Player memory currentPlayer = players[playerAddresses[i]];
-            _voteToSplit(currentPlayer);
+    function _voteRequests() external onlyIfPlayersLowerHalfRemaining {
+        Player memory player = players[playerAddresses[msg.sender]];
+
+        if (player && !player.hasLost) {
+            player.isSplitOk = true;
         }
     }
 
-    function _voteToSplit(Player storage player) internal {
-        player.isSplitOk = true;
-    }
-
     function _splitPot() internal {
-        truthyVoteCount = 0;
-        remainingPlayersLength = getRemainingPlayersCount();
+        uint256 truthyVoteCount = 0;
+        uint256 remainingPlayersLength = getRemainingPlayersCount();
         for (uint256 i = 0; i < remainingPlayersLength; i++) {
             Player memory currentPlayer = players[playerAddresses[i]];
             if (currentPlayer.isSplitOk) {
                 truthyVoteCount++;
             }
         }
-        if (truthyVoteCount <= remainingPlayersLength / 2) {
+        // if (truthyVoteCount <= remainingPlayersLength / 2) {
+        if (truthyVoteCount == remainingPlayersLength) {
             // didn't find way to dispatch rewards yet. Does it exists ? Should i create it ?
         }
     }
