@@ -11,9 +11,7 @@ describe('GameFactoryContract', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
-          this.gameFactoryContract
-            .connect(this.alice)
-            .setAdmin(this.alice.address),
+          this.gameFactory.connect(this.alice).setAdmin(this.alice.address),
           'Caller is not the admin'
         )
       })
@@ -21,10 +19,8 @@ describe('GameFactoryContract', function () {
 
     describe('when called by admin', function () {
       it('should transfer the administration to given address', async function () {
-        await this.gameFactoryContract
-          .connect(this.owner)
-          .setAdmin(this.alice.address)
-        const newAdmin = await this.gameFactoryContract.owner()
+        await this.gameFactory.connect(this.owner).setAdmin(this.alice.address)
+        const newAdmin = await this.gameFactory.owner()
 
         expect(newAdmin).to.be.equal(this.alice.address)
       })
@@ -35,7 +31,7 @@ describe('GameFactoryContract', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
-          this.gameFactoryContract
+          this.gameFactory
             .connect(this.alice)
             .withdrawFunds(this.alice.address),
           'Caller is not the admin'
@@ -48,9 +44,9 @@ describe('GameFactoryContract', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
-          this.gameFactoryContract
+          this.gameFactory
             .connect(this.alice)
-            .setNewGameImplementation(this.gameImplementationContract.address),
+            .setNewGameImplementation(this.gameImplementation.address),
           'Caller is not the admin'
         )
       })
@@ -58,23 +54,21 @@ describe('GameFactoryContract', function () {
 
     describe('when called by admin', function () {
       it('should add the new implementation version to gameImplementations', async function () {
-        await this.gameFactoryContract
+        await this.gameFactory
           .connect(this.owner)
-          .setNewGameImplementation(
-            this.secondGameImplementationContract.address
-          )
+          .setNewGameImplementation(this.secondGameImplementation.address)
         const responseGameImplementations1 =
-          await this.gameFactoryContract.gameImplementations('0')
+          await this.gameFactory.gameImplementations('0')
         const responseGameImplementations2 =
-          await this.gameFactoryContract.gameImplementations('1')
+          await this.gameFactory.gameImplementations('1')
 
         expect(responseGameImplementations1.id).to.be.equal('0')
         expect(responseGameImplementations1.deployedAddress).to.be.equal(
-          this.gameImplementationContract.address
+          this.gameImplementation.address
         )
         expect(responseGameImplementations2.id).to.be.equal('1')
         expect(responseGameImplementations2.deployedAddress).to.be.equal(
-          this.secondGameImplementationContract.address
+          this.secondGameImplementation.address
         )
       })
     })
@@ -84,15 +78,15 @@ describe('GameFactoryContract', function () {
       it('should be updated with correct amounts', async function () {
         const toUpdateAuthorisedAmounts = [ethers.utils.parseEther('999')]
 
-        const responseAuthorizedAmountsBefore = await this.gameFactoryContract
+        const responseAuthorizedAmountsBefore = await this.gameFactory
           .connect(this.owner)
           .getAuthorisedAmounts()
 
-        await this.gameFactoryContract
+        await this.gameFactory
           .connect(this.owner)
           .addAuthorizedAmounts(toUpdateAuthorisedAmounts)
 
-        const responseAuthorizedAmountsAfter = await this.gameFactoryContract
+        const responseAuthorizedAmountsAfter = await this.gameFactory
           .connect(this.owner)
           .getAuthorisedAmounts()
 
@@ -108,15 +102,15 @@ describe('GameFactoryContract', function () {
           ethers.utils.parseEther('999'),
         ]
 
-        const responseAuthorizedAmountsBefore = await this.gameFactoryContract
+        const responseAuthorizedAmountsBefore = await this.gameFactory
           .connect(this.owner)
           .getAuthorisedAmounts()
 
-        await this.gameFactoryContract
+        await this.gameFactory
           .connect(this.owner)
           .addAuthorizedAmounts(toUpdateAuthorisedAmounts)
 
-        const responseAuthorizedAmountsAfter = await this.gameFactoryContract
+        const responseAuthorizedAmountsAfter = await this.gameFactory
           .connect(this.owner)
           .getAuthorisedAmounts()
 
@@ -130,7 +124,7 @@ describe('GameFactoryContract', function () {
         const toUpdateAuthorisedAmounts = [ethers.utils.parseEther('999')]
 
         await expectRevert(
-          this.gameFactoryContract
+          this.gameFactory
             .connect(this.alice)
             .addAuthorizedAmounts(toUpdateAuthorisedAmounts),
           'Caller is not the admin'

@@ -1,30 +1,62 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { ethers } from 'hardhat'
 
 const func: DeployFunction = async function ({
   deployments,
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
   const { deploy, log } = deployments
-  const { deployer } = await getNamedAccounts()
+  const { deployer: deployerAddress } = await getNamedAccounts()
 
-  const cronExternal = await deployments.get('CronExternal')
+  const deployer = await ethers.getSigner(deployerAddress)
+
+  const options = {
+    from: deployerAddress,
+    log: true,
+  }
 
   log('Deploying GameImplementation contract')
-  const gameImplementation = await deploy('GameImplementation', {
-    from: deployer,
-    log: true,
+  const { address: cronExternalAddress } = await deployments.get('CronExternal')
+  const libraries = {
     libraries: {
-      Cron: cronExternal.address,
+      Cron: cronExternalAddress,
     },
-  })
+  }
 
-  const cronUpkeep = await deployments.get('CronUpkeep')
+  const {
+    address: gameImplementationAddress,
+    newlyDeployed: gameImplementationNewlyDeployed,
+    receipt: { gasUsed: gameImplementationGasUsed },
+  } = await deploy('GameImplementation', { ...options, ...libraries })
+
+  if (gameImplementationNewlyDeployed) {
+    log(
+      `Contract GameImplementation deployed at ${gameImplementationAddress} using ${gameImplementationGasUsed} gas`
+    )
+  }
 
   log('Adding GameImplementation to Keeper delegators')
-  cronUpkeep.connect(deployer).addDelegator(gameImplementation.address)
+
+  const { address: cronUpkeepAddress } = await deployments.get(
+    'CronUpkeep',
+    libraries
+  )
+
+  const { interface: cronUpkeepInterface } = await ethers.getContractFactory(
+    'CronUpkeep',
+    libraries
+  )
+
+  const cronUpkeep = new ethers.Contract(
+    cronUpkeepAddress,
+    cronUpkeepInterface,
+    deployer
+  )
+  cronUpkeep.addDelegator(gameImplementationAddress)
 }
 
 func.tags = ['all', 'lfg', 'main', 'game-implementation']
+module.exports.dependencies = ['keeper']
 
 export default func

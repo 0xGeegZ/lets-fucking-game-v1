@@ -1,4 +1,6 @@
-import { ethers } from 'hardhat'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
+
+import { ethers, deployments, getNamedAccounts } from 'hardhat'
 
 import { ONE_DAY_IN_SECONDS } from '../helpers/helpers'
 
@@ -7,15 +9,129 @@ const AUTHORIZED_AMOUNTS = [
 ]
 const MAX_CRON_JOB = 100
 
+const setupTest = deployments.createFixture(
+  async (
+    { deployments, getNamedAccounts, ethers: HardhatRuntimeEnvironment },
+    { maxPlayers, playTimeRange, correctRegistrationAmount, encodedCron }
+  ) => {
+    await deployments.fixture(['lfg'])
+
+    const { deploy, log } = deployments
+    const { deployer: deployerAddress } = await getNamedAccounts()
+
+    const deployer = await ethers.getSigner(deployerAddress)
+
+    const options = {
+      from: deployerAddress,
+      log: true,
+    }
+
+    const { address: cronExternalAddress } = await deployments.get(
+      'CronExternal'
+    )
+
+    const libraries = {
+      libraries: {
+        Cron: cronExternalAddress,
+      },
+    }
+
+    const gameFactoryContract = await deployments.get('GameFactory')
+
+    const gameImplementationContract = await deployments.get(
+      'GameImplementation',
+      libraries
+    )
+    const cronUpkeepDelegateContract = await deployments.get(
+      'CronUpkeepDelegate'
+    )
+    const cronUpkeepContract = await deployments.get('CronUpkeep', libraries)
+
+    const secondGameImplementationContract = await deploy(
+      'GameImplementation',
+      { ...options, ...libraries }
+    )
+
+    const gameImplementationInterface = await ethers.getContractFactory(
+      'GameImplementation',
+      libraries
+    )
+
+    const secondGameImplementation = new ethers.Contract(
+      secondGameImplementationContract.address,
+      gameImplementationInterface.interface,
+      deployer
+    )
+
+    const cronUpkeepInterface = await ethers.getContractFactory(
+      'CronUpkeep',
+      libraries
+    )
+
+    const cronUpkeep = new ethers.Contract(
+      cronUpkeepContract.address,
+      cronUpkeepInterface.interface,
+      deployer
+    )
+
+    const gameFactoryInterface = await ethers.getContractFactory('GameFactory')
+
+    const gameFactory = new ethers.Contract(
+      gameFactoryContract.address,
+      gameFactoryInterface.interface,
+      deployer
+    )
+
+    const gameImplementation = new ethers.Contract(
+      gameImplementationContract.address,
+      gameImplementationInterface.interface,
+      deployer
+    )
+
+    await gameFactory.createNewGame(
+      maxPlayers,
+      playTimeRange,
+      correctRegistrationAmount,
+      encodedCron
+    )
+
+    const game = await gameFactory.deployedGames('0')
+
+    const deployedGame = new ethers.Contract(
+      game.deployedAddress,
+      gameImplementationInterface.interface,
+      deployer
+    )
+
+    const GameFactoryContract = await ethers.getContractFactory('GameFactory')
+
+    const GameImplementationContract = await ethers.getContractFactory(
+      'GameImplementation',
+      libraries
+    )
+
+    return {
+      deployer,
+      GameFactoryContract,
+      GameImplementationContract,
+      gameFactory,
+      gameImplementation,
+      cronUpkeep,
+      secondGameImplementation,
+      deployedGame,
+    }
+  }
+)
+
 const initialiseTestData = async function () {
   let alice = null,
     bob = null,
-    owner = null,
+    mockKeeper = null,
     players = null
 
-  ;[owner, bob, alice, ...players] = await ethers.getSigners()
+  // first signer is deployer, associating to mockKeeeper
+  ;[mockKeeper, bob, alice, ...players] = await ethers.getSigners()
 
-  this.owner = owner
   this.players = players
   this.bob = bob
   this.alice = alice
@@ -40,98 +156,40 @@ const initialiseTestData = async function () {
   this.RoundMaximumDuration = ONE_DAY_IN_SECONDS * 2
 
   // TODO Implement business logic to cover keeper in test
-  this.mockKeeper = this.owner
+  this.mockKeeper = mockKeeper
+
   this.encodedCron = '0 18 * * *'
 
   this.authorizedAmounts = AUTHORIZED_AMOUNTS.map((amount) =>
     ethers.utils.parseEther(`${amount}`)
   )
 
-  const CronContract = await ethers.getContractFactory(
-    '@chainlink/contracts/src/v0.8/libraries/external/Cron.sol:Cron'
-  )
-  const cronContract = await CronContract.deploy()
-  await cronContract.deployed()
-
-  const GameFactoryContract = await ethers.getContractFactory('GameFactory')
-
-  const GameImplementationContract = await ethers.getContractFactory(
-    'GameImplementation',
-    {
-      libraries: {
-        Cron: cronContract.address,
-      },
-    }
-  )
-
-  const CronUpkeepDelegateContract = await ethers.getContractFactory(
-    'CronUpkeepDelegate'
-  )
-  const CronUpkeepContract = await ethers.getContractFactory('CronUpkeep', {
-    libraries: {
-      Cron: cronContract.address,
-    },
+  const {
+    deployer,
+    GameFactoryContract,
+    GameImplementationContract,
+    gameFactory,
+    gameImplementation,
+    cronUpkeep,
+    secondGameImplementation,
+    deployedGame,
+  } = await setupTest({
+    maxPlayers: this.maxPlayers,
+    playTimeRange: this.playTimeRange,
+    correctRegistrationAmount: this.correctRegistrationAmount,
+    encodedCron: this.encodedCron,
   })
 
-  const cronUpkeepDelegateContract = await CronUpkeepDelegateContract.deploy()
-  await cronUpkeepDelegateContract.deployed()
-
-  const cronUpkeepContract = await CronUpkeepContract.deploy(
-    this.owner.address,
-    cronUpkeepDelegateContract.address,
-    MAX_CRON_JOB,
-    ethers.utils.toUtf8Bytes('')
-  )
-  await cronUpkeepContract.deployed()
-
-  const gameImplementationContract = await GameImplementationContract.deploy()
-  await gameImplementationContract.deployed()
-
-  await cronUpkeepContract
-    .connect(this.owner)
-    .addDelegator(gameImplementationContract.address)
-
-  const gameFactoryContract = await GameFactoryContract.connect(owner).deploy(
-    gameImplementationContract.address,
-    cronUpkeepContract.address,
-    this.houseEdge,
-    this.creatorEdge,
-    this.authorizedAmounts
-  )
-  await gameFactoryContract.deployed()
-
-  await cronUpkeepContract
-    .connect(this.owner)
-    .addDelegator(gameFactoryContract.address)
-
-  const secondGameImplementationContract =
-    await GameImplementationContract.deploy()
-  await secondGameImplementationContract.deployed()
-  await cronUpkeepContract
-    .connect(this.owner)
-    .addDelegator(secondGameImplementationContract.address)
+  this.owner = deployer
 
   this.GameImplementationContract = GameImplementationContract
   this.GameFactoryContract = GameFactoryContract
 
-  this.cronUpkeepContract = cronUpkeepContract
-  this.gameFactoryContract = gameFactoryContract
-  this.gameImplementationContract = gameImplementationContract
-  this.secondGameImplementationContract = secondGameImplementationContract
-
-  await this.gameFactoryContract
-    .connect(this.owner)
-    .createNewGame(
-      this.maxPlayers,
-      this.playTimeRange,
-      this.correctRegistrationAmount,
-      this.encodedCron
-    )
-  const gameContract = await this.gameFactoryContract.deployedGames('0')
-
-  this.game = await GameImplementationContract.attach(
-    gameContract.deployedAddress
-  )
+  this.cronUpkeep = cronUpkeep
+  this.gameFactory = gameFactory
+  this.gameImplementation = gameImplementation
+  this.secondGameImplementation = secondGameImplementation
+  this.deployedGame = deployedGame
 }
 
 module.exports = {

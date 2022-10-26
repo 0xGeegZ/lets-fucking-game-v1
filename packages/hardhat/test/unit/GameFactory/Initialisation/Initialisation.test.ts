@@ -10,10 +10,10 @@ describe('GameFactoryContract', function () {
     describe('when an account tries to initialize the base contract', function () {
       it('should revert with the correct reason', async function () {
         await expectRevert(
-          this.gameImplementationContract.initialize({
+          this.gameImplementation.initialize({
             _initializer: this.bob.address,
             _factoryOwner: this.owner.address,
-            _cronUpkeep: this.cronUpkeepContract.address,
+            _cronUpkeep: this.cronUpkeep.address,
             _gameImplementationVersion: '0',
             _gameId: '0',
             _playTimeRange: this.playTimeRange,
@@ -29,7 +29,7 @@ describe('GameFactoryContract', function () {
     })
     describe('when the creator tries to initialize a game already initialized', function () {
       it('should revert with the correct message', async function () {
-        await this.gameFactoryContract
+        await this.gameFactory
           .connect(this.bob)
           .createNewGame(
             this.maxPlayers,
@@ -38,7 +38,7 @@ describe('GameFactoryContract', function () {
             this.encodedCron
           )
 
-        const deployedGames = await this.gameFactoryContract
+        const deployedGames = await this.gameFactory
           .connect(this.owner)
           .getDeployedGames()
 
@@ -50,7 +50,7 @@ describe('GameFactoryContract', function () {
           clonedGameContract.initialize({
             _initializer: this.bob.address,
             _factoryOwner: this.owner.address,
-            _cronUpkeep: this.cronUpkeepContract.address,
+            _cronUpkeep: this.cronUpkeep.address,
             _gameImplementationVersion: '0',
             _gameId: '0',
             _playTimeRange: this.playTimeRange,
@@ -69,21 +69,21 @@ describe('GameFactoryContract', function () {
     describe('when GameFactory gets deployed', function () {
       it('should set the correct values to state variables', async function () {
         const responseLatestGameImplementationVersionId =
-          await this.gameFactoryContract.latestGameImplementationVersionId()
+          await this.gameFactory.latestGameImplementationVersionId()
         const responseGameImplementation =
-          await this.gameFactoryContract.gameImplementations(
+          await this.gameFactory.gameImplementations(
             responseLatestGameImplementationVersionId
           )
-        const responseOwner = await this.gameFactoryContract.owner()
-        const responseHouseEdge = await this.gameFactoryContract.houseEdge()
-        const responseCreatorEdge = await this.gameFactoryContract.creatorEdge()
+        const responseOwner = await this.gameFactory.owner()
+        const responseHouseEdge = await this.gameFactory.houseEdge()
+        const responseCreatorEdge = await this.gameFactory.creatorEdge()
         const responseAuthorizedAmounts =
-          await this.gameFactoryContract.getAuthorisedAmounts()
+          await this.gameFactory.getAuthorisedAmounts()
 
         expect(responseOwner).to.be.equal(this.owner.address)
         expect(responseLatestGameImplementationVersionId).to.be.equal('0')
         expect(responseGameImplementation.deployedAddress).to.be.equal(
-          this.gameImplementationContract.address
+          this.gameImplementation.address
         )
         expect(responseHouseEdge).to.be.equal(this.houseEdge)
         expect(responseCreatorEdge).to.be.equal(this.creatorEdge)
@@ -99,8 +99,8 @@ describe('GameFactoryContract', function () {
         const gameFactoryContract = await this.GameFactoryContract.connect(
           this.owner
         ).deploy(
-          this.gameImplementationContract.address,
-          this.cronUpkeepContract.address,
+          this.gameImplementation.address,
+          this.cronUpkeep.address,
           this.houseEdge,
           this.creatorEdge,
           this.authorizedAmounts
@@ -111,8 +111,8 @@ describe('GameFactoryContract', function () {
         const emptyauthorizedAmounts = []
         await expectRevert(
           this.GameFactoryContract.connect(this.owner).deploy(
-            this.gameImplementationContract.address,
-            this.cronUpkeepContract.address,
+            this.gameImplementation.address,
+            this.cronUpkeep.address,
             this.houseEdge,
             this.creatorEdge,
             emptyauthorizedAmounts
@@ -122,7 +122,7 @@ describe('GameFactoryContract', function () {
       })
       it('should revert create game with already used amount', async function () {
         const sameRegistrationAmount = this.authorizedAmounts[1]
-        await this.gameFactoryContract
+        await this.gameFactory
           .connect(this.bob)
           .createNewGame(
             this.maxPlayers,
@@ -132,7 +132,7 @@ describe('GameFactoryContract', function () {
           )
 
         await expectRevert(
-          this.gameFactoryContract
+          this.gameFactory
             .connect(this.alice)
             .createNewGame(
               this.maxPlayers,

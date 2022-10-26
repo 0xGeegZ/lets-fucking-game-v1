@@ -7,29 +7,39 @@ const func: DeployFunction = async function ({
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
   const { deploy, log } = deployments
-  const { deployer } = await getNamedAccounts()
 
-  const cronExternal = await deployments.get('CronExternal')
+  const { deployer: deployerAddress } = await getNamedAccounts()
 
-  const gameImplementation = await deployments.get('GameImplementation', {
+  const deployer = await ethers.getSigner(deployerAddress)
+
+  const options = {
+    from: deployerAddress,
+    log: true,
+  }
+
+  const { address: cronExternalAddress } = await deployments.get('CronExternal')
+  const libraries = {
     libraries: {
-      Cron: cronExternal.address,
+      Cron: cronExternalAddress,
     },
-  })
+  }
 
-  const cronUpkeep = await deployments.get('CronUpkeep', {
-    libraries: {
-      Cron: cronExternal.address,
-    },
-  })
+  const { address: gameImplementationAddress } = await deployments.get(
+    'GameImplementation',
+    libraries
+  )
 
+  const { address: cronUpkeepAddress } = await deployments.get(
+    'CronUpkeep',
+    libraries
+  )
   // TODO add interface for constructorArgs
   // const constructorArgs: Array<string | number | Array<string | number>> = [
   //   '100000000000000',
   // ];
 
-  const houseEdge = ethers.utils.parseUnits('0.01', 'gwei')
-  const creatorEdge = ethers.utils.parseUnits('0.005', 'gwei')
+  const houseEdge = ethers.utils.parseUnits('0.00005')
+  const creatorEdge = ethers.utils.parseUnits('0.00005')
 
   const authorizedAmounts = [
     ethers.utils.parseEther('0.0001'),
@@ -46,21 +56,42 @@ const func: DeployFunction = async function ({
   ]
 
   log('Deploying GameFactory contract')
-  const gameFactory = await await deploy('GameFactory', {
-    from: deployer,
+  const {
+    address: gameFactoryAddress,
+    newlyDeployed: gameFactoryNewlyDeployed,
+    receipt: { gasUsed: gameFactoryGasUsed },
+  } = await deploy('GameFactory', {
+    ...options,
     args: [
-      gameImplementation.address,
-      cronUpkeep.address,
+      gameImplementationAddress,
+      cronUpkeepAddress,
       houseEdge,
       creatorEdge,
       authorizedAmounts,
     ],
-    log: true,
   })
+
+  if (gameFactoryNewlyDeployed) {
+    log(
+      `Contract GameFactory deployed at ${gameFactoryAddress} using ${gameFactoryGasUsed} gas`
+    )
+  }
+
   log('Adding GameFactory to Keeper delegators')
-  cronUpkeep.connect(deployer).addDelegator(gameFactory.address)
+  const { interface: cronUpkeepInterface } = await ethers.getContractFactory(
+    'CronUpkeep',
+    libraries
+  )
+
+  const cronUpkeep = new ethers.Contract(
+    cronUpkeepAddress,
+    cronUpkeepInterface,
+    deployer
+  )
+  cronUpkeep.addDelegator(gameFactoryAddress)
 }
 
 func.tags = ['all', 'lfg', 'main', 'game-factory']
+module.exports.dependencies = ['game-implementation', 'keeper']
 
 export default func

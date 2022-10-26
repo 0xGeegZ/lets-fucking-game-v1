@@ -9,33 +9,58 @@ const func: DeployFunction = async function ({
   const { deploy, log } = deployments
   const { deployer } = await getNamedAccounts()
 
-  log('Deploying CronUpkeepDelegate contract')
-  const cronUpkeepDelegate = await deploy('CronUpkeepDelegate', {
+  const CRON_MAX_JOBS = 100
+  const options = {
     from: deployer,
     log: true,
-  })
+  }
+
+  log('Deploying CronUpkeepDelegate contract')
+  const cronUpkeepDelegate = await deploy('CronUpkeepDelegate', options)
 
   log('Deploying CronExternal contract')
-  const cronExternal = await deploy('CronExternal', {
-    from: deployer,
+  const {
+    address: cronExternalAddress,
+    newlyDeployed: cronExternalNewlyDeployed,
+    receipt: { gasUsed: cronExternalGasUsed },
+  } = await deploy('CronExternal', {
+    ...options,
     contract: '@chainlink/contracts/src/v0.8/libraries/external/Cron.sol:Cron',
-    log: true,
   })
 
+  if (cronExternalNewlyDeployed) {
+    log(
+      `Contract CronExternal deployed at ${cronExternalAddress} using ${cronExternalGasUsed} gas`
+    )
+  }
+
+  const libraries = {
+    libraries: {
+      Cron: cronExternalAddress,
+    },
+  }
+
   log('Deploying CronUpkeep contract')
-  await deploy('CronUpkeep', {
-    from: deployer,
-    log: true,
+  const {
+    address: cronUpkeepAddress,
+    newlyDeployed: cronUpkeepNewlyDeployed,
+    receipt: { gasUsed: cronUpkeepGasUsed },
+  } = await deploy('CronUpkeep', {
+    ...options,
+    ...libraries,
     args: [
       deployer,
       cronUpkeepDelegate.address,
-      10,
+      CRON_MAX_JOBS,
       ethers.utils.toUtf8Bytes(''),
     ],
-    libraries: {
-      Cron: cronExternal.address,
-    },
   })
+
+  if (cronUpkeepNewlyDeployed) {
+    log(
+      `Contract CronUpkeep deployed at ${cronUpkeepAddress} using ${cronUpkeepGasUsed} gas`
+    )
+  }
 }
 
 func.tags = ['all', 'lfg', 'main', 'keeper']
