@@ -1,7 +1,6 @@
-import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-import { ethers } from 'hardhat'
-import { expect } from 'chai'
 import { expectRevert } from '@openzeppelin/test-helpers'
+import { expect } from 'chai'
+import { ethers } from 'hardhat'
 
 import { initialiseTestData } from '../../../factories/setup'
 

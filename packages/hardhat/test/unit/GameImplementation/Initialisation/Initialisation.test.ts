@@ -1,14 +1,5 @@
 import { expect } from 'chai'
 
-import {
-  getTwoPlayersInFinal,
-  ONE_DAY_IN_SECONDS,
-  ONE_HOUR_IN_SECOND,
-  registerPlayer,
-  setUpGameReadyToPlay,
-  setUpGameWithAWinner,
-} from '../../../helpers/helpers'
-
 import { initialiseTestData } from '../../../factories/setup'
 
 describe('GameImplementationContract - Initialisation', function () {

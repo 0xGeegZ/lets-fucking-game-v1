@@ -1,8 +1,7 @@
-import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-import { initialiseTestData } from '../../../factories/setup'
-import { ethers } from 'hardhat'
-import { expect } from 'chai'
 import { expectRevert } from '@openzeppelin/test-helpers'
+import { expect } from 'chai'
+
+import { initialiseTestData } from '../../../factories/setup'
 
 describe('GameFactoryContract', function () {
   beforeEach(initialiseTestData)

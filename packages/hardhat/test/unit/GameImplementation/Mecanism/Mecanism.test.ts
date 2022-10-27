@@ -3,6 +3,7 @@ import { expectRevert } from '@openzeppelin/test-helpers'
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
 
+import { initialiseTestData } from '../../../factories/setup'
 import {
   getTwoPlayersInFinal,
   ONE_DAY_IN_SECONDS,
@@ -10,9 +11,7 @@ import {
   registerPlayer,
   setUpGameReadyToPlay,
   setUpGameWithAWinner,
-} from '../../../helpers/helpers'
-
-import { initialiseTestData } from '../../../factories/setup'
+} from '../../../helpers'
 
 describe('GameImplementationContract - Mecanism', function () {
   beforeEach(initialiseTestData)

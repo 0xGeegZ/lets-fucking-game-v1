@@ -1,22 +1,22 @@
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-import { ethers } from 'hardhat'
 import { expect } from 'chai'
+import { ethers } from 'hardhat'
 
 const ONE_HOUR_IN_SECOND = 3600
 const ONE_DAY_IN_SECONDS = ONE_HOUR_IN_SECOND * 24
 
-const registerPlayer = async function ({ player, contract, value }) {
+const registerPlayer = async ({ player, contract, value }) => {
   await expect(contract.connect(player).registerForGame({ value }))
     .to.emit(contract, 'RegisteredForGame')
     .withArgs(player.address, anyValue)
 }
 
-const setUpGameReadyToPlay = async function ({
+const setUpGameReadyToPlay = async ({
   players,
   contract,
   amount,
   mockKeeper,
-}) {
+}) => {
   // 10 players register for the game.
   for (let i = 0; i < 10; i++) {
     await registerPlayer({ player: players[i], contract, value: amount })
@@ -29,14 +29,14 @@ const setUpGameReadyToPlay = async function ({
   return contract.connect(mockKeeper).triggerDailyCheckpoint()
 }
 
-const getTwoPlayersInFinal = async function ({
+const getTwoPlayersInFinal = async ({
   players,
   contract,
   player1Index,
   player2Index,
   startedGameTimestamp,
   mockKeeper,
-}) {
+}) => {
   const player1 = players[player1Index]
   const player2 = players[player2Index]
 
@@ -91,13 +91,13 @@ const getTwoPlayersInFinal = async function ({
   return contract.connect(mockKeeper).triggerDailyCheckpoint()
 }
 
-const setUpGameWithAWinner = async function ({
+const setUpGameWithAWinner = async ({
   players,
   winnerIndex,
   contract,
   amount,
   mockKeeper,
-}) {
+}) => {
   const secondPlayerIndex = 2
   await setUpGameReadyToPlay({
     players,

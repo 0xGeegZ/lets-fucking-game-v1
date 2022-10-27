@@ -48,6 +48,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@appliedblockchain/chainlink-plugins-fund-link": "^0.0.3",
     "@chainlink/contracts": "^0.5.1",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.1",
@@ -75,6 +76,7 @@
     "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard": "^17.0.0",
+    "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-mocha-no-only": "^1.1.1",

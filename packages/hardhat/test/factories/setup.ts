@@ -1,17 +1,16 @@
+import { deployments, ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
-import { ethers, deployments, getNamedAccounts } from 'hardhat'
-
-import { ONE_DAY_IN_SECONDS } from '../helpers/helpers'
+// import { ONE_DAY_IN_SECONDS } from '@/test/helpers'
+import { ONE_DAY_IN_SECONDS } from '../helpers'
 
 const AUTHORIZED_AMOUNTS = [
   0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
 ]
-const MAX_CRON_JOB = 100
 
 const setupTest = deployments.createFixture(
   async (
-    { deployments, getNamedAccounts, ethers: HardhatRuntimeEnvironment },
+    { deployments, getNamedAccounts, ethers }: HardhatRuntimeEnvironment,
     { maxPlayers, playTimeRange, correctRegistrationAmount, encodedCron }
   ) => {
     await deployments.fixture(['lfg'])
