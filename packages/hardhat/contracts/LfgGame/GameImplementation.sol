@@ -65,9 +65,8 @@ contract GameImplementation {
     }
 
     struct Winner {
-        // uint256 roundId;
-        mapping(address => WinnerPlayerData) gameWinners;
         address[] gameWinnerAddresses;
+        mapping(address => WinnerPlayerData) gameWinners;
     }
 
     struct Initialization {
@@ -91,7 +90,7 @@ contract GameImplementation {
     event GameLost(uint256 roundId, address playerAddress, uint256 roundCount);
     event PlayedRound(address playerAddress);
     event GameWon(uint256 roundId, address playerAddress, uint256 amountWon);
-    event GameSplited(uint256 roundId, address playerAddress, uint256 amountWon);
+    event GameSplitted(uint256 roundId, address playerAddress, uint256 amountWon);
     event VoteToSplitPot(uint256 roundId, address playerAddress);
     event FailedTransfer(address receiver, uint256 amount);
     event Received(address sender, uint256 amount);
@@ -399,15 +398,9 @@ contract GameImplementation {
             }
         }
 
-        //Game is over, set the last non loosing player as winner and reset game.
+        //Check if Game is over with one winner
         if (remainingPlayersCounter == 1) {
             Winner storage winner = winners[roundId];
-
-            // winner.roundId = roundId;
-            // WinnerPlayerData storage gameWinner = winner.gameWinners.push();
-            // gameWinner.playerAddress = lastNonLoosingPlayerAddress;
-            // gameWinner.amountWon = prize;
-            // gameWinner.prizeClaimed = false;
             winner.gameWinners[lastNonLoosingPlayerAddress] = WinnerPlayerData({
                 roundId: roundId,
                 playerAddress: lastNonLoosingPlayerAddress,
@@ -419,13 +412,6 @@ contract GameImplementation {
             emit GameWon(roundId, lastNonLoosingPlayerAddress, prize);
 
             _resetGame();
-            return;
-        }
-
-        // If no winner, the house keeps the prize and reset the game
-        if (remainingPlayersCounter == 0) {
-            _resetGame();
-            return;
         }
 
         // Check if remaining players have vote to split pot
@@ -433,10 +419,9 @@ contract GameImplementation {
 
         if (isAllPlayersSplitOk) {
             uint256 remainingPlayersLength = _getRemainingPlayersCount();
-            uint256 splitedPrize = prize / remainingPlayersLength;
+            uint256 splittedPrize = prize / remainingPlayersLength;
 
             Winner storage gameWinner = winners[roundId];
-            // gameWinner.roundId = roundId;
 
             for (uint256 i = 0; i < numPlayers; i++) {
                 Player memory currentPlayer = players[playerAddresses[i]];
@@ -444,16 +429,20 @@ contract GameImplementation {
                     gameWinner.gameWinners[currentPlayer.playerAddress] = WinnerPlayerData({
                         roundId: roundId,
                         playerAddress: currentPlayer.playerAddress,
-                        amountWon: splitedPrize,
+                        amountWon: splittedPrize,
                         prizeClaimed: false
                     });
                     gameWinner.gameWinnerAddresses.push(currentPlayer.playerAddress);
 
-                    emit GameSplited(roundId, currentPlayer.playerAddress, splitedPrize);
+                    emit GameSplitted(roundId, currentPlayer.playerAddress, splittedPrize);
                 }
             }
             _resetGame();
-            return;
+        }
+
+        // If no winner, the house keeps the prize and reset the game
+        if (remainingPlayersCounter == 0) {
+            _resetGame();
         }
     }
 
