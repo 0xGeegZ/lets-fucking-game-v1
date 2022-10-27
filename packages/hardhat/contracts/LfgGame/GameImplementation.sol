@@ -15,7 +15,9 @@ contract GameImplementation {
     address public generalAdmin;
     address public creator;
     address public factory;
-    address public keeper;
+    address public cronUpkeep;
+
+    bool public contractPaused;
 
     mapping(address => Player) public players;
     mapping(uint256 => Winner) public gameWinners;
@@ -112,9 +114,9 @@ contract GameImplementation {
         // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
 
         game.encodedCron = CronExternal.toEncodedSpec(initialization._encodedCron);
-        game.cronUpkeep = initialization._cronUpkeep;
+        cronUpkeep = initialization._cronUpkeep;
 
-        CronUpkeepInterface(game.cronUpkeep).createCronJobFromEncodedSpec(
+        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
             address(this),
             bytes("triggerDailyCheckpoint()"),
             game.encodedCron
@@ -156,12 +158,12 @@ contract GameImplementation {
     }
 
     modifier onlyKeeper() {
-        require(msg.sender == game.cronUpkeep, "Caller is not the keeper");
+        require(msg.sender == cronUpkeep, "Caller is not the keeper");
         _;
     }
 
     modifier onlyIfKeeperDataInit() {
-        require(game.cronUpkeep != address(0), "Keeper need to be initialised");
+        require(cronUpkeep != address(0), "Keeper need to be initialised");
         require(bytes(game.encodedCron).length != 0, "Keeper cron need to be initialised");
         _;
     }
@@ -224,12 +226,12 @@ contract GameImplementation {
     }
 
     modifier onlyNotPaused() {
-        require(game.contractPaused != true, "Contract is paused");
+        require(contractPaused != true, "Contract is paused");
         _;
     }
 
     modifier onlyPaused() {
-        require(game.contractPaused != false, "Contract is not paused");
+        require(contractPaused != false, "Contract is not paused");
         _;
     }
 
@@ -451,7 +453,7 @@ contract GameImplementation {
     function setCronUpkeep(address _cronUpkeep) public onlyCreatorOrAdmin {
         require(_cronUpkeep != address(0), "Keeper need to be initialised");
         // cronUpkeep = CronUpkeepInterface(_cronUpkeep);
-        game.cronUpkeep = _cronUpkeep;
+        cronUpkeep = _cronUpkeep;
         // TODO add parameter to know if it's needed to register encodedCron again
     }
 
@@ -461,14 +463,14 @@ contract GameImplementation {
 
     function pause() external onlyCreatorOrAdmin onlyNotPaused {
         // TODO pause Keeper JOB
-        game.contractPaused = true;
+        contractPaused = true;
     }
 
     // TODO (Will need a big refactor for tests cases) reactivate to ensure that keeper is initialised
     // function unpause() external onlyCreatorOrAdmin onlyPaused onlyIfKeeperDataInit {
     function unpause() external onlyCreatorOrAdmin onlyPaused onlyIfKeeperDataInit {
         // TODO unpause Keeper JOB
-        game.contractPaused = false;
+        contractPaused = false;
     }
 
     ///

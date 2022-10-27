@@ -18,7 +18,7 @@
     "deploy": "bin/deploy.sh",
     "deploy:all": "npx hardhat deploy --network hardhat --tags all --export-all ../dapp/contracts/hardhat_contracts.json",
     "verify": "hardhat verify --network",
-    "test": "hardhat test",
+    "test": "hardhat test --show-stack-traces",
     "test:trace": "hardhat test --trace",
     "test:fresh": "hardhat compile --force && hardhat test --no-compile --trace",
     "test:coverage": "hardhat coverage",
