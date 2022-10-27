@@ -78,7 +78,15 @@ module.exports = {
     'sonarjs/no-duplicate-string': 1,
     'sonarjs/cognitive-complexity': 1,
     'sonarjs/no-nested-template-literals': 0,
+    'import/extensions': 'off',
   },
-
+  settings: {
+    'import/resolver': {
+      node: {
+        paths: ['./'],
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
+    },
+  },
   ignorePatterns: ['dist', '**/*.d.ts'],
 }

@@ -1,14 +1,9 @@
-import * as dotenv from 'dotenv'
-import { HardhatUserConfig, task } from 'hardhat/config'
-
 import '@nomicfoundation/hardhat-toolbox'
-
 // import '@nomiclabs/hardhat-etherscan'
 // import '@nomiclabs/hardhat-ethers'
 // import 'hardhat-gas-reporter'
 // import 'solidity-coverage'
 // import '@typechain/hardhat'
-
 import 'hardhat-contract-sizer'
 import 'hardhat-deploy'
 import 'hardhat-docgen'
@@ -17,9 +12,13 @@ import 'hardhat-spdx-license-identifier'
 import '@tenderly/hardhat-tenderly'
 import '@nomicfoundation/hardhat-chai-matchers'
 import 'hardhat-storage-layout'
-
+import '@appliedblockchain/chainlink-plugins-fund-link'
 import './tasks/accounts'
 import './tasks/storage-layout'
+import './tasks/withdraw-link'
+
+import * as dotenv from 'dotenv'
+import { HardhatUserConfig } from 'hardhat/config'
 
 dotenv.config()
 
@@ -42,6 +41,9 @@ const config: HardhatUserConfig = {
       },
       {
         version: '0.8.6',
+      },
+      {
+        version: '0.4.24',
       },
     ],
     // version: process.env.SOLC_VERSION || '0.8.6',
@@ -191,6 +193,7 @@ const config: HardhatUserConfig = {
       saveDeployments: true,
     },
   },
+  // TODO user hardhat deploy ?? SEE : https://github.com/wighawag/hardhat-deploy#4-hardhat-etherscan-verify
   etherscan: {
     apiKey: {
       arbitrumTestnet: process.env.ARBISCAN_API_KEY || '',

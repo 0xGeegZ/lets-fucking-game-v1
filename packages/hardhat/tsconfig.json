@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    },
     "target": "es2021",
     "module": "commonjs",
     "strict": true,
@@ -7,6 +11,7 @@
     "outDir": "dist",
     "declaration": true
   },
-  "include": ["./scripts", "./test", "./typechain-types", "helpers"],
+  "include": ["./scripts", "./test", "./typechain-types", "helpers", "**/*.ts"],
+  "exclude": ["node_modules"],
   "files": ["./hardhat.config.ts"]
 }

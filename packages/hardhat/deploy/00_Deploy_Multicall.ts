@@ -10,7 +10,17 @@ HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts()
 
   log('Deploying Multicall contract')
-  await deploy('Multicall', { from: deployer })
+  const {
+    address: multicallAddress,
+    newlyDeployed: multicallNewlyDeployed,
+    receipt: { gasUsed: multicallGasUsed },
+  } = await deploy('Multicall', { from: deployer })
+
+  if (multicallAddress) {
+    log(
+      `Contract Multicall deployed at ${multicallNewlyDeployed} using ${multicallGasUsed} gas`
+    )
+  }
 
   // const chainId = await getChainId()
 
@@ -20,6 +30,6 @@ HardhatRuntimeEnvironment) {
   // }
 }
 
-func.tags = ['all', 'multicall']
+func.tags = ['all', 'main', 'multicall']
 
 export default func

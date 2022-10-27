@@ -1,25 +1,24 @@
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 import { expectRevert } from '@openzeppelin/test-helpers'
 import { expect } from 'chai'
-import { ethers } from 'hardhat'
 
-import { beforeEachGameFactory } from '../../../helpers/helpers'
+import { initialiseTestData } from '../../../factories/setup'
 
 describe('GameFactoryContract', function () {
-  beforeEach(beforeEachGameFactory)
+  beforeEach(initialiseTestData)
 
   context('GameFactory createNewGame', function () {
     describe('when contract is paused', function () {
       it('should revert with correct message', async function () {
-        await this.gameFactoryContract.connect(this.owner).pause()
+        await this.gameFactory.connect(this.owner).pause()
 
         await expectRevert(
-          this.gameFactoryContract
-            .connect(this.secondAccount)
+          this.gameFactory
+            .connect(this.bob)
             .createNewGame(
               this.maxPlayers,
               this.playTimeRange,
-              this.registrationAmount,
+              this.correctRegistrationAmount,
               this.encodedCron
             ),
           'Pausable: paused'
@@ -33,24 +32,24 @@ describe('GameFactoryContract', function () {
         const outOfRangeMaxPlayers2 = 1
 
         await expectRevert(
-          this.gameFactoryContract
-            .connect(this.secondAccount)
+          this.gameFactory
+            .connect(this.bob)
             .createNewGame(
               outOfRangeMaxPlayers1,
               this.playTimeRange,
-              this.registrationAmount,
+              this.correctRegistrationAmount,
               this.encodedCron
             ),
           'maxPlayers should not be bigger than 20'
         )
 
         await expectRevert(
-          this.gameFactoryContract
-            .connect(this.secondAccount)
+          this.gameFactory
+            .connect(this.bob)
             .createNewGame(
               outOfRangeMaxPlayers2,
               this.playTimeRange,
-              this.registrationAmount,
+              this.correctRegistrationAmount,
               this.encodedCron
             ),
           'maxPlayers should be bigger than or equal to 2'
@@ -64,24 +63,24 @@ describe('GameFactoryContract', function () {
         const outOfRangePlayTimeRange2 = 0
 
         await expectRevert(
-          this.gameFactoryContract
-            .connect(this.secondAccount)
+          this.gameFactory
+            .connect(this.bob)
             .createNewGame(
               this.maxPlayers,
               outOfRangePlayTimeRange1,
-              this.registrationAmount,
+              this.correctRegistrationAmount,
               this.encodedCron
             ),
           'playTimeRange should not be bigger than 8'
         )
 
         await expectRevert(
-          this.gameFactoryContract
-            .connect(this.secondAccount)
+          this.gameFactory
+            .connect(this.bob)
             .createNewGame(
               this.maxPlayers,
               outOfRangePlayTimeRange2,
-              this.registrationAmount,
+              this.correctRegistrationAmount,
               this.encodedCron
             ),
           'playTimeRange should be bigger than 0'
@@ -91,17 +90,22 @@ describe('GameFactoryContract', function () {
 
     describe('when new game gets created', function () {
       it('should create a new game with the correct data', async function () {
-        await this.gameFactoryContract
-          .connect(this.secondAccount)
+        const registrationAmount =
+          this.authorizedAmounts[this.authorizedAmounts.length - 1]
+        await this.gameFactory
+          .connect(this.bob)
           .createNewGame(
             this.maxPlayers,
             this.playTimeRange,
-            this.registrationAmount,
+            registrationAmount,
             this.encodedCron
           )
 
-        const newGame = await this.gameFactoryContract.deployedGames(0)
+        const deployedGames = await this.gameFactory
+          .connect(this.owner)
+          .getDeployedGames()
 
+        const newGame = deployedGames[deployedGames.length - 1]
         const clonedGameContract = await this.GameImplementationContract.attach(
           newGame.deployedAddress
         )
@@ -120,76 +124,96 @@ describe('GameFactoryContract', function () {
         const responseCreatorEdge = await clonedGameContract.creatorEdge()
 
         expect(responseGeneralAdmin).to.be.equal(this.owner.address)
-        expect(responseCreator).to.be.equal(this.secondAccount.address)
-        expect(responseFactory).to.be.equal(this.gameFactoryContract.address)
+        expect(responseCreator).to.be.equal(this.bob.address)
+        expect(responseFactory).to.be.equal(this.gameFactory.address)
         expect(responseGameId).to.be.equal('0')
         expect(responseGameImplementationVersion).to.be.equal('0')
         expect(responseGameId).to.be.equal('0')
         expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
-        expect(responseRegistrationAmount).to.be.equal(this.registrationAmount)
+        expect(responseRegistrationAmount).to.be.equal(registrationAmount)
         expect(responseHouseEdge).to.be.equal(this.houseEdge)
         expect(responseCreatorEdge).to.be.equal(this.creatorEdge)
       })
 
       it('should add the new game in deployedGames', async function () {
-        await this.gameFactoryContract
-          .connect(this.secondAccount)
+        const currentId = await this.gameFactory.connect(this.owner).gameId()
+
+        const currentGameImplementationVersionId = await this.gameFactory
+          .connect(this.owner)
+          .latestGameImplementationVersionId()
+
+        await this.gameFactory
+          .connect(this.bob)
           .createNewGame(
             this.maxPlayers,
             this.playTimeRange,
-            this.authorizedAmounts[1],
+            this.authorizedAmounts[this.authorizedAmounts.length - 1],
             this.encodedCron
           )
-        await this.gameFactoryContract
-          .connect(this.thirdAccount)
+        await this.gameFactory
+          .connect(this.alice)
           .createNewGame(
             this.maxPlayers,
             this.playTimeRange,
-            this.authorizedAmounts[2],
+            this.authorizedAmounts[this.authorizedAmounts.length - 2],
             this.encodedCron
           )
 
-        const firstGame = await this.gameFactoryContract.deployedGames(0)
-        const secondGame = await this.gameFactoryContract.deployedGames(1)
+        const deployedGames = await this.gameFactory
+          .connect(this.owner)
+          .getDeployedGames()
 
-        expect(firstGame.id).to.be.equal('0')
-        expect(firstGame.versionId).to.be.equal('0')
-        expect(firstGame.creator).to.be.equal(this.secondAccount.address)
-        expect(secondGame.id).to.be.equal('1')
-        expect(secondGame.versionId).to.be.equal('0')
-        expect(secondGame.creator).to.be.equal(this.thirdAccount.address)
+        const firstGame = deployedGames[deployedGames.length - 2]
+        const secondGame = deployedGames[deployedGames.length - 1]
+
+        expect(firstGame.id).to.be.equal(currentId)
+        expect(firstGame.versionId).to.be.equal(
+          currentGameImplementationVersionId
+        )
+        expect(firstGame.creator).to.be.equal(this.bob.address)
+        expect(secondGame.id).to.be.equal(+currentId + 1)
+        expect(secondGame.versionId).to.be.equal(
+          currentGameImplementationVersionId
+        )
+        expect(secondGame.creator).to.be.equal(this.alice.address)
       })
 
       it('should emit the GameCreated event with the correct data', async function () {
+        const currentId = await this.gameFactory.connect(this.owner).gameId()
+
         await expect(
-          this.gameFactoryContract
-            .connect(this.secondAccount)
+          this.gameFactory
+            .connect(this.bob)
             .createNewGame(
               this.maxPlayers,
               this.playTimeRange,
-              this.registrationAmount,
+              this.authorizedAmounts[this.authorizedAmounts.length - 1],
               this.encodedCron
             )
         )
-          .to.emit(this.gameFactoryContract, 'GameCreated')
-          .withArgs('0', anyValue, '0', this.secondAccount.address)
+          .to.emit(this.gameFactory, 'GameCreated')
+          .withArgs(currentId, anyValue, '0', this.bob.address)
       })
     })
   })
 
   context('GameFactory getDeployedGames', function () {
     it('should return all the deployed game lines', async function () {
-      await this.gameFactoryContract
-        .connect(this.secondAccount)
+      const deployedGamesBefore = await this.gameFactory
+        .connect(this.owner)
+        .getDeployedGames()
+
+      await this.gameFactory
+        .connect(this.bob)
         .createNewGame(
           this.maxPlayers,
           this.playTimeRange,
           this.authorizedAmounts[1],
           this.encodedCron
         )
-      await this.gameFactoryContract
-        .connect(this.thirdAccount)
+      await this.gameFactory
+        .connect(this.alice)
         .createNewGame(
           this.maxPlayers,
           this.playTimeRange,
@@ -197,11 +221,13 @@ describe('GameFactoryContract', function () {
           this.encodedCron
         )
 
-      const deployedGames = await this.gameFactoryContract
-        .connect(this.secondAccount)
+      const deployedGamesAfter = await this.gameFactory
+        .connect(this.owner)
         .getDeployedGames()
 
-      expect(deployedGames.length).to.be.equal(2)
+      expect(deployedGamesAfter.length).to.be.equal(
+        deployedGamesBefore.length + 2
+      )
     })
   })
 })
