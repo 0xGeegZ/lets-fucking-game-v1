@@ -32,8 +32,11 @@ const saveContract = ({ contractName, chainId, contractData }) => {
     }
   } else {
     const old = deployedContracts[chainId][contractName]
-    const olds = [old, ...deployedContracts[chainId][contractName].olds]
+    let olds = [old, ...deployedContracts[chainId][contractName].olds]
     delete old.olds
+
+    // Desactivating history on local chain
+    if (chainId === '31337') olds = []
 
     deployedContracts[chainId][contractName] = {
       ...contractData[chainId][contractName],

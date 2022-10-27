@@ -82,5 +82,8 @@
     ]
   },
   "hardhat.telemetry": false,
-  "cSpell.words": ["shellcheck", "solhint"]
+  "cSpell.words": ["shellcheck", "solhint"],
+  "[properties]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  }
 }
