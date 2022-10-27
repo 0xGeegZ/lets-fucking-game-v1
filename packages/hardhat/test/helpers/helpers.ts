@@ -319,6 +319,7 @@ const setUpGameWithAWinner = async function ({
   mockKeeper,
 }) {
   const secondPlayerIndex = 2
+
   await setUpGameReadyToPlay({
     players,
     contract,
@@ -388,6 +389,40 @@ const setUpGameWithAWinner = async function ({
   return contract.connect(mockKeeper).triggerDailyCheckpoint()
 }
 
+const getTwoLastPlayersVoteSplitPot = async function ({
+  players,
+  contract,
+  amount,
+  player1Index,
+  player2Index,
+  mockKeeper,
+}) {
+  await setUpGameReadyToPlay({
+    players,
+    contract,
+    amount,
+    mockKeeper,
+  })
+
+  const startedGameBlock = await ethers.provider.getBlock()
+  const startedGameTimestamp = startedGameBlock.timestamp
+
+  // 8 players lost for not playing, 2 players remain in second round
+  // 2 players remain in competition, winnerIndex & secondPlayerIndex
+  await getTwoPlayersInFinal({
+    players,
+    contract,
+    player1Index,
+    player2Index,
+    startedGameTimestamp,
+    mockKeeper,
+  })
+
+  contract.connect(players[player1Index]).voteToSplitPot()
+
+  contract.connect(players[player2Index]).voteToSplitPot()
+}
+
 module.exports = {
   ONE_HOUR_IN_SECOND,
   ONE_DAY_IN_SECONDS,
@@ -397,4 +432,5 @@ module.exports = {
   setUpGameReadyToPlay,
   getTwoPlayersInFinal,
   setUpGameWithAWinner,
+  getTwoLastPlayersVoteSplitPot,
 }

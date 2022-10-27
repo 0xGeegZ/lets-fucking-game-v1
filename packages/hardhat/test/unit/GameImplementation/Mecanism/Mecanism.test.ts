@@ -1,17 +1,18 @@
-import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-import { expectRevert } from '@openzeppelin/test-helpers'
-import { expect } from 'chai'
-import { ethers } from 'hardhat'
-
 import {
-  beforeEachGameImplementation,
-  getTwoPlayersInFinal,
   ONE_DAY_IN_SECONDS,
   ONE_HOUR_IN_SECOND,
+  beforeEachGameImplementation,
+  getTwoPlayersInFinal,
   registerPlayer,
   setUpGameReadyToPlay,
   setUpGameWithAWinner,
+  getTwoLastPlayersVoteSplitPot,
 } from '../../../helpers/helpers'
+
+import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
+import { ethers } from 'hardhat'
+import { expect } from 'chai'
+import { expectRevert } from '@openzeppelin/test-helpers'
 
 describe('GameImplementationContract - Mecanism', function () {
   beforeEach(beforeEachGameImplementation)
@@ -711,7 +712,6 @@ describe('GameImplementationContract - Mecanism', function () {
           player1Index: finalistIndex,
           player2Index: secondFinalistIndex,
           startedGameTimestamp,
-
           mockKeeper: this.mockKeeper,
         })
 
@@ -747,7 +747,6 @@ describe('GameImplementationContract - Mecanism', function () {
           player1Index: finalistIndex,
           player2Index: secondFinalistIndex,
           startedGameTimestamp,
-
           mockKeeper: this.mockKeeper,
         })
 
@@ -783,7 +782,6 @@ describe('GameImplementationContract - Mecanism', function () {
           player1Index: finalistIndex,
           player2Index: secondFinalistIndex,
           startedGameTimestamp,
-
           mockKeeper: this.mockKeeper,
         })
         const looserUpdatedData = await this.game.players(
@@ -798,9 +796,9 @@ describe('GameImplementationContract - Mecanism', function () {
   context('Winning a game', function () {
     describe('when there is only one user left', async function () {
       it('should create a new Winner and add it to the gameWinners mapping', async function () {
-        // TODO this case test fail
-        const roundId = 0
         const winnerIndex = 4
+        const roundId = await this.game.roundId()
+
         await setUpGameWithAWinner({
           players: this.players,
           winnerIndex,
@@ -810,7 +808,9 @@ describe('GameImplementationContract - Mecanism', function () {
           mockKeeper: this.mockKeeper,
         })
 
-        const newWinner = await this.game.gameWinners(roundId)
+        const winners = await this.game.getWinners(roundId)
+        const [newWinner] = winners
+
         expect(newWinner.playerAddress).to.equal(
           this.players[winnerIndex].address
         )
@@ -820,7 +820,6 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should emit the GameWon event with the correct data', async function () {
-        // TODO this case test fail
         const winnerIndex = 4
 
         await expect(
@@ -842,7 +841,6 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should reset the game', async function () {
-        // TODO this case test fail
         const previousGameId = 0
         const winnerIndex = 4
         await setUpGameWithAWinner({
@@ -932,8 +930,6 @@ describe('GameImplementationContract - Mecanism', function () {
 
     describe('when the prize for the game as been claimed already', function () {
       it('should revert', async function () {
-        // TODO this case test fail
-        // TODO GUIGUI
         const winnerIndex = 0
         const existantGameId = 0
         await setUpGameWithAWinner({
@@ -959,8 +955,6 @@ describe('GameImplementationContract - Mecanism', function () {
 
     describe('when the user did win an existing game not already claimed', function () {
       it('should transfer the prize to the winner', async function () {
-        // TODO this case test fail
-        // TODO GUIGUI
         const winnerIndex = 3
         const existantGameId = 0
 
@@ -1003,7 +997,6 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should emit the GamePrizeClaimed event with the correct data', async function () {
-        // TODO this case test fail
         const winnerIndex = 0
         const existantGameId = 0
         await setUpGameWithAWinner({
@@ -1026,6 +1019,136 @@ describe('GameImplementationContract - Mecanism', function () {
             existantGameId,
             this.prizeAmount
           )
+      })
+    })
+  })
+
+  context('Splitting the prize', function () {
+    describe('when users decide to split the prize', function () {
+      it('should allow players to split the pot', async function () {
+        const finalistIndex = 2
+        const secondFinalistIndex = 3
+        const roundId = await this.game.roundId()
+
+        await getTwoLastPlayersVoteSplitPot({
+          players: this.players,
+          contract: this.game,
+          player1Index: finalistIndex,
+          player2Index: secondFinalistIndex,
+          amount: this.correctRegistrationAmount,
+          mockKeeper: this.mockKeeper,
+        })
+
+        await expect(
+          this.game.connect(this.players[finalistIndex]).voteToSplitPot()
+        ).to.emit(this.game, 'VoteToSplitPot')
+
+        await expect(
+          this.game.connect(this.players[secondFinalistIndex]).voteToSplitPot()
+        ).to.emit(this.game, 'VoteToSplitPot')
+
+        const isAllPlayersSplitOk = await this.game
+          .connect(this.mockKeeper)
+          .isAllPlayersSplitOk()
+        expect(isAllPlayersSplitOk).to.be.true
+
+        const getRemainingPlayersCount = await this.game
+          .connect(this.mockKeeper)
+          .getRemainingPlayersCount()
+        expect(getRemainingPlayersCount.eq(2)).to.be.true
+
+        await expect(
+          this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
+        )
+          .to.emit(this.game, 'GameSplitted')
+          .to.emit(this.game, 'ResetGame')
+
+        const winners = await this.game.getWinners(roundId)
+
+        const [firstWinner, secondWinner] = winners
+
+        expect(firstWinner.playerAddress).to.equal(
+          this.players[finalistIndex].address
+        )
+        expect(firstWinner.amountWon.eq(this.prizeAmount / 2)).to.be.true
+        expect(firstWinner.prizeClaimed).to.be.false
+        expect(firstWinner.roundId).to.equal(roundId)
+
+        expect(secondWinner.playerAddress).to.equal(
+          this.players[secondFinalistIndex].address
+        )
+        expect(secondWinner.amountWon.eq(this.prizeAmount / 2)).to.be.true
+        expect(secondWinner.prizeClaimed).to.be.false
+        expect(secondWinner.roundId).to.equal(roundId)
+      })
+
+      it('should claim prize', async function () {
+        const finalistIndex = 2
+        const secondFinalistIndex = 3
+        const gameId = await this.game.roundId()
+
+        await getTwoLastPlayersVoteSplitPot({
+          players: this.players,
+          contract: this.game,
+          player1Index: finalistIndex,
+          player2Index: secondFinalistIndex,
+          amount: this.correctRegistrationAmount,
+          mockKeeper: this.mockKeeper,
+        })
+
+        await this.game.connect(this.mockKeeper).triggerDailyCheckpoint()
+
+        await expect(
+          this.game.connect(this.players[finalistIndex]).claimPrize(gameId)
+        )
+          .to.emit(this.game, 'GamePrizeClaimed')
+          .withArgs(
+            this.players[finalistIndex].address,
+            gameId,
+            this.prizeAmount / 2
+          )
+
+        await expect(
+          this.game
+            .connect(this.players[secondFinalistIndex])
+            .claimPrize(gameId)
+        )
+          .to.emit(this.game, 'GamePrizeClaimed')
+          .withArgs(
+            this.players[secondFinalistIndex].address,
+            gameId,
+            this.prizeAmount / 2
+          )
+      })
+
+      it('should revert if loosing player vote to split pot', async function () {
+        const finalistIndex = 2
+        const secondFinalistIndex = 3
+        const looserIndex = 4
+        const unregisteredIndex = this.players[this.players.length - 1]
+
+        await getTwoLastPlayersVoteSplitPot({
+          players: this.players,
+          contract: this.game,
+          player1Index: finalistIndex,
+          player2Index: secondFinalistIndex,
+          amount: this.correctRegistrationAmount,
+          mockKeeper: this.mockKeeper,
+        })
+
+        await expectRevert(
+          this.game.connect(this.players[looserIndex]).voteToSplitPot(),
+          'Player has already lost'
+        )
+
+        await expectRevert(
+          this.game.connect(unregisteredIndex).voteToSplitPot(),
+          'Player has not entered in this game'
+        )
+      })
+
+      it('should revert if remaining player are less than 50 % of total players', async function () {
+        // TODO
       })
     })
   })
