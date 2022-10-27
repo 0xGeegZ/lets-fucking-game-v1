@@ -801,12 +801,9 @@ describe('GameImplementationContract - Mecanism', function () {
 
   context('Winning a game', function () {
     describe('when there is only one user left', async function () {
-      it.only('should create a new Winner and add it to the gameWinners mapping', async function () {
-        const roundId = 0
+      it('should create a new Winner and add it to the gameWinners mapping', async function () {
         const winnerIndex = 4
-
-        const currentRoundId = await this.game.roundId()
-        console.log('🚀 ~ currentRoundId', currentRoundId)
+        const roundId = await this.game.roundId()
 
         await setUpGameWithAWinner({
           players: this.players,
@@ -817,35 +814,18 @@ describe('GameImplementationContract - Mecanism', function () {
           mockKeeper: this.mockKeeper,
         })
 
-        const currentRoundIdAfter = await this.game.roundId()
-        console.log('🚀 ~ currentRoundIdAfter', currentRoundIdAfter)
+        const winners = await this.game.getWinners(roundId)
+        const [newWinner] = winners
 
-        const winners = await this.game.winners(currentRoundId)
-        console.log('🚀 ~ winners', winners)
-
-        const isAllPlayersSplitOkTest =
-          await this.game.isAllPlayersSplitOkTest()
-        console.log('🚀 ~ isAllPlayersSplitOkTest', isAllPlayersSplitOkTest)
-
-        // const getRemainingPlayersCountTest =
-        //   await this.game.getRemainingPlayersCountTest()
-        // console.log(
-        //   '🚀 ~ file: Mecanism.test.ts ~ line 840 ~ getRemainingPlayersCountTest',
-        //   getRemainingPlayersCountTest
-        // )
-
-        // const newWinner = await this.game.gameWinners(roundId)
-        // console.log('🚀 ~ file: Mecanism.test.ts ~ line 817 ~ newWinner', newWinner)
-        // expect(newWinner.playerAddress).to.equal(
-        //   this.players[winnerIndex].address
-        // )
-        // expect(newWinner.amountWon.eq(this.prizeAmount)).to.be.true
-        // expect(newWinner.prizeClaimed).to.be.false
-        // expect(newWinner.roundId).to.equal(roundId)
+        expect(newWinner.playerAddress).to.equal(
+          this.players[winnerIndex].address
+        )
+        expect(newWinner.amountWon.eq(this.prizeAmount)).to.be.true
+        expect(newWinner.prizeClaimed).to.be.false
+        expect(newWinner.roundId).to.equal(roundId)
       })
 
       it('should emit the GameWon event with the correct data', async function () {
-        // TODO this case test fail
         const winnerIndex = 4
 
         await expect(
@@ -867,7 +847,6 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should reset the game', async function () {
-        // TODO this case test fail
         const previousGameId = 0
         const winnerIndex = 4
         await setUpGameWithAWinner({
@@ -957,7 +936,6 @@ describe('GameImplementationContract - Mecanism', function () {
 
     describe('when the prize for the game as been claimed already', function () {
       it('should revert', async function () {
-        // TODO this case test fail
         // TODO GUIGUI
         const winnerIndex = 0
         const existantGameId = 0
@@ -984,7 +962,6 @@ describe('GameImplementationContract - Mecanism', function () {
 
     describe('when the user did win an existing game not already claimed', function () {
       it('should transfer the prize to the winner', async function () {
-        // TODO this case test fail
         // TODO GUIGUI
         const winnerIndex = 3
         const existantGameId = 0
@@ -1028,7 +1005,6 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should emit the GamePrizeClaimed event with the correct data', async function () {
-        // TODO this case test fail
         const winnerIndex = 0
         const existantGameId = 0
         await setUpGameWithAWinner({

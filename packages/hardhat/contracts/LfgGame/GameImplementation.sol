@@ -44,7 +44,7 @@ contract GameImplementation {
 
     address[] public playerAddresses;
     mapping(address => Player) public players;
-    mapping(uint256 => Winner) public winners;
+    mapping(uint256 => Winner) winners;
 
     ///STRUCTS
     struct Player {
@@ -58,16 +58,15 @@ contract GameImplementation {
     }
 
     struct WinnerPlayerData {
+        uint256 roundId;
         address playerAddress;
         uint256 amountWon;
         bool prizeClaimed;
     }
 
     struct Winner {
-        uint256 roundId;
-        // WinnerPlayerData[] gameWinners;
+        // uint256 roundId;
         mapping(address => WinnerPlayerData) gameWinners;
-        // mapping(address => WinnerPlayerData) gameWinners;
         address[] gameWinnerAddresses;
     }
 
@@ -241,6 +240,11 @@ contract GameImplementation {
         _;
     }
 
+    modifier onlyIfRoundId(uint256 _roundId) {
+        require(_roundId <= roundId, "Wrong roundId");
+        _;
+    }
+
     // This makes sure we can't initialize the implementation contract.
     modifier onlyIfNotBase() {
         require(_isBase == false, "The implementation contract can't be initialized");
@@ -328,6 +332,7 @@ contract GameImplementation {
 
     function claimPrize(uint256 _roundId) external {
         WinnerPlayerData storage winnerPlayerData = winners[_roundId].gameWinners[msg.sender];
+
         require(_roundId <= roundId, "This game does not exist");
         require(winnerPlayerData.playerAddress == msg.sender, "Player did not win this game");
         require(winnerPlayerData.prizeClaimed == false, "Prize for this game already claimed");
@@ -335,7 +340,7 @@ contract GameImplementation {
 
         winnerPlayerData.prizeClaimed = true;
         _safeTransfert(msg.sender, winnerPlayerData.amountWon);
-        emit GamePrizeClaimed(msg.sender, winners[_roundId].roundId, winnerPlayerData.amountWon);
+        emit GamePrizeClaimed(msg.sender, _roundId, winnerPlayerData.amountWon);
     }
 
     function voteToSplitPot() external onlyIfAlreadyEntered onlyIfHasNotLost onlyIfPlayersLowerHalfRemaining {
@@ -382,6 +387,7 @@ contract GameImplementation {
     }
 
     function _checkIfGameEnded() internal {
+        // TODO houseEdge + creatorEdge are cumultate.
         uint256 prize = registrationAmount * numPlayers - houseEdge - creatorEdge;
         uint256 remainingPlayersCounter;
         address lastNonLoosingPlayerAddress;
@@ -395,16 +401,15 @@ contract GameImplementation {
 
         //Game is over, set the last non loosing player as winner and reset game.
         if (remainingPlayersCounter == 1) {
-            // TODO houseEdge + creatorEdge are cumultate.
-
             Winner storage winner = winners[roundId];
 
-            winner.roundId = roundId;
+            // winner.roundId = roundId;
             // WinnerPlayerData storage gameWinner = winner.gameWinners.push();
             // gameWinner.playerAddress = lastNonLoosingPlayerAddress;
             // gameWinner.amountWon = prize;
             // gameWinner.prizeClaimed = false;
             winner.gameWinners[lastNonLoosingPlayerAddress] = WinnerPlayerData({
+                roundId: roundId,
                 playerAddress: lastNonLoosingPlayerAddress,
                 amountWon: prize,
                 prizeClaimed: false
@@ -431,17 +436,18 @@ contract GameImplementation {
             uint256 splitedPrize = prize / remainingPlayersLength;
 
             Winner storage gameWinner = winners[roundId];
-            gameWinner.roundId = roundId;
+            // gameWinner.roundId = roundId;
 
             for (uint256 i = 0; i < numPlayers; i++) {
                 Player memory currentPlayer = players[playerAddresses[i]];
                 if (!currentPlayer.hasLost && currentPlayer.isSplitOk) {
                     gameWinner.gameWinners[currentPlayer.playerAddress] = WinnerPlayerData({
+                        roundId: roundId,
                         playerAddress: currentPlayer.playerAddress,
                         amountWon: splitedPrize,
                         prizeClaimed: false
                     });
-                    gameWinner.gameWinnerAddresses.push(lastNonLoosingPlayerAddress);
+                    gameWinner.gameWinnerAddresses.push(currentPlayer.playerAddress);
 
                     emit GameSplited(roundId, currentPlayer.playerAddress, splitedPrize);
                 }
@@ -486,14 +492,6 @@ contract GameImplementation {
         player.isSplitOk = false;
 
         emit GameLost(roundId, player.playerAddress, player.roundCount);
-    }
-
-    function isAllPlayersSplitOkTest() external view returns (bool) {
-        return _isAllPlayersSplitOk();
-    }
-
-    function getRemainingPlayersCountTest() external view returns (uint256) {
-        return _getRemainingPlayersCount();
     }
 
     function _isAllPlayersSplitOk() internal view returns (bool) {
@@ -614,7 +612,7 @@ contract GameImplementation {
         return players[player];
     }
 
-    function getWinners(uint256 _roundId) external view returns (WinnerPlayerData[] memory) {
+    function getWinners(uint256 _roundId) external view onlyIfRoundId(_roundId) returns (WinnerPlayerData[] memory) {
         uint256 gameWinnerAddressesLength = winners[_roundId].gameWinnerAddresses.length;
         WinnerPlayerData[] memory winnersPlayerData = new WinnerPlayerData[](gameWinnerAddressesLength);
 
