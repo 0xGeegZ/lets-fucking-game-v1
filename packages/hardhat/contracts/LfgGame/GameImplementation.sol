@@ -44,7 +44,7 @@ contract GameImplementation {
 
     address[] public playerAddresses;
     mapping(address => Player) public players;
-    mapping(uint256 => Winner) public gameWinners;
+    mapping(uint256 => Winner) winners;
 
     ///STRUCTS
     struct Player {
@@ -57,11 +57,16 @@ contract GameImplementation {
         bool isSplitOk;
     }
 
-    struct Winner {
+    struct WinnerPlayerData {
         uint256 roundId;
         address playerAddress;
         uint256 amountWon;
         bool prizeClaimed;
+    }
+
+    struct Winner {
+        address[] gameWinnerAddresses;
+        mapping(address => WinnerPlayerData) gameWinners;
     }
 
     struct Initialization {
@@ -85,6 +90,8 @@ contract GameImplementation {
     event GameLost(uint256 roundId, address playerAddress, uint256 roundCount);
     event PlayedRound(address playerAddress);
     event GameWon(uint256 roundId, address playerAddress, uint256 amountWon);
+    event GameSplitted(uint256 roundId, address playerAddress, uint256 amountWon);
+    event VoteToSplitPot(uint256 roundId, address playerAddress);
     event FailedTransfer(address receiver, uint256 amount);
     event Received(address sender, uint256 amount);
     event GamePrizeClaimed(address claimer, uint256 roundId, uint256 amountClaimed);
@@ -203,6 +210,20 @@ contract GameImplementation {
         _;
     }
 
+    modifier onlyIfPlayersLowerHalfRemaining() {
+        uint256 remainingPlayersLength = _getRemainingPlayersCount();
+        require(
+            remainingPlayersLength <= maxPlayers / 2,
+            "Remaining players must be less or equal than half of started players"
+        );
+        _;
+    }
+
+    modifier onlyIfGameIsInProgress() {
+        require(gameInProgress, "Game is not in progress");
+        _;
+    }
+
     modifier onlyHumans() {
         uint256 size;
         address addr = msg.sender;
@@ -215,6 +236,11 @@ contract GameImplementation {
 
     modifier onlyRegistrationAmount() {
         require(msg.value == registrationAmount, "Only game amount is allowed");
+        _;
+    }
+
+    modifier onlyIfRoundId(uint256 _roundId) {
+        require(_roundId <= roundId, "Wrong roundId");
         _;
     }
 
@@ -290,7 +316,7 @@ contract GameImplementation {
         }
     }
 
-    // TODO remoove onlyKeeperOrAdmin and make test works
+    // TODO remove onlyKeeperOrAdmin and make test works
     function triggerDailyCheckpoint() external onlyKeeperOrAdmin onlyNotPaused {
         // function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
         if (gameInProgress == true) {
@@ -304,14 +330,22 @@ contract GameImplementation {
     }
 
     function claimPrize(uint256 _roundId) external {
-        require(_roundId <= roundId, "This game does not exist");
-        require(msg.sender == gameWinners[_roundId].playerAddress, "Player did not win this game");
-        require(gameWinners[_roundId].prizeClaimed == false, "Prize for this game already claimed");
-        require(address(this).balance >= gameWinners[_roundId].amountWon, "Not enough funds in contract");
+        WinnerPlayerData storage winnerPlayerData = winners[_roundId].gameWinners[msg.sender];
 
-        gameWinners[_roundId].prizeClaimed = true;
-        _safeTransfert(msg.sender, gameWinners[_roundId].amountWon);
-        emit GamePrizeClaimed(msg.sender, gameWinners[_roundId].roundId, gameWinners[_roundId].amountWon);
+        // TODO pass all require to modifier
+        require(_roundId <= roundId, "This game does not exist");
+        require(winnerPlayerData.playerAddress == msg.sender, "Player did not win this game");
+        require(winnerPlayerData.prizeClaimed == false, "Prize for this game already claimed");
+        require(address(this).balance >= winnerPlayerData.amountWon, "Not enough funds in contract");
+
+        winnerPlayerData.prizeClaimed = true;
+        _safeTransfert(msg.sender, winnerPlayerData.amountWon);
+        emit GamePrizeClaimed(msg.sender, _roundId, winnerPlayerData.amountWon);
+    }
+
+    function voteToSplitPot() external onlyIfAlreadyEntered onlyIfHasNotLost onlyIfPlayersLowerHalfRemaining {
+        players[msg.sender].isSplitOk = true;
+        emit VoteToSplitPot(roundId, players[msg.sender].playerAddress);
     }
 
     ///
@@ -352,7 +386,10 @@ contract GameImplementation {
     }
 
     function _checkIfGameEnded() internal {
-        uint256 remainingPlayersCounter;
+        // TODO houseEdge + creatorEdge are cumultate.
+        uint256 prize = registrationAmount * numPlayers - houseEdge - creatorEdge;
+        uint256 remainingPlayersCounter = 0;
+
         address lastNonLoosingPlayerAddress;
         for (uint256 i = 0; i < numPlayers; i++) {
             Player memory currentPlayer = players[playerAddresses[i]];
@@ -362,19 +399,42 @@ contract GameImplementation {
             }
         }
 
-        //Game is over, set the last non loosing player as winner and reset game.
+        //Check if Game is over with one winner
         if (remainingPlayersCounter == 1) {
-            // TODO houseEdge + creatorEdge are cumultate.
-            uint256 prize = registrationAmount * numPlayers - houseEdge - creatorEdge;
-            gameWinners[roundId] = Winner({
+            Winner storage winner = winners[roundId];
+            winner.gameWinners[lastNonLoosingPlayerAddress] = WinnerPlayerData({
+                roundId: roundId,
                 playerAddress: lastNonLoosingPlayerAddress,
                 amountWon: prize,
-                prizeClaimed: false,
-                roundId: roundId
+                prizeClaimed: false
             });
+            winner.gameWinnerAddresses.push(lastNonLoosingPlayerAddress);
 
             emit GameWon(roundId, lastNonLoosingPlayerAddress, prize);
 
+            _resetGame();
+        }
+
+        // Check if remaining players have vote to split pot
+        if (_isAllPlayersSplitOk()) {
+            uint256 splittedPrize = prize / remainingPlayersCounter;
+
+            Winner storage gameWinner = winners[roundId];
+
+            for (uint256 i = 0; i < numPlayers; i++) {
+                Player memory currentPlayer = players[playerAddresses[i]];
+                if (!currentPlayer.hasLost && currentPlayer.isSplitOk) {
+                    gameWinner.gameWinners[currentPlayer.playerAddress] = WinnerPlayerData({
+                        roundId: roundId,
+                        playerAddress: currentPlayer.playerAddress,
+                        amountWon: splittedPrize,
+                        prizeClaimed: false
+                    });
+                    gameWinner.gameWinnerAddresses.push(currentPlayer.playerAddress);
+
+                    emit GameSplitted(roundId, currentPlayer.playerAddress, splittedPrize);
+                }
+            }
             _resetGame();
         }
 
@@ -385,6 +445,9 @@ contract GameImplementation {
     }
 
     function _refreshPlayerStatus() internal {
+        // if everyone is ok to split, we wait
+        if (_isAllPlayersSplitOk()) return;
+
         for (uint256 i = 0; i < numPlayers; i++) {
             Player storage player = players[playerAddresses[i]];
             // Refresh player status to having lost if player has not played
@@ -419,6 +482,29 @@ contract GameImplementation {
         player.isSplitOk = false;
 
         emit GameLost(roundId, player.playerAddress, player.roundCount);
+    }
+
+    function _isAllPlayersSplitOk() internal view returns (bool) {
+        uint256 remainingPlayersSplitOkCounter = 0;
+        uint256 remainingPlayersLength = _getRemainingPlayersCount();
+        for (uint256 i = 0; i < numPlayers; i++) {
+            Player memory currentPlayer = players[playerAddresses[i]];
+            if (currentPlayer.isSplitOk) {
+                remainingPlayersSplitOkCounter++;
+            }
+        }
+
+        return remainingPlayersLength != 0 && remainingPlayersSplitOkCounter == remainingPlayersLength;
+    }
+
+    function _getRemainingPlayersCount() internal view returns (uint256) {
+        uint256 remainingPlayers = 0;
+        for (uint256 i = 0; i < numPlayers; i++) {
+            if (!players[playerAddresses[i]].hasLost) {
+                remainingPlayers++;
+            }
+        }
+        return remainingPlayers;
     }
 
     /// CREATOR FUNCTIONS
@@ -526,18 +612,23 @@ contract GameImplementation {
         return players[player];
     }
 
-    ///
-    /// HELPERS FUNCTIONS
-    ///
+    function getWinners(uint256 _roundId) external view onlyIfRoundId(_roundId) returns (WinnerPlayerData[] memory) {
+        uint256 gameWinnerAddressesLength = winners[_roundId].gameWinnerAddresses.length;
+        WinnerPlayerData[] memory winnersPlayerData = new WinnerPlayerData[](gameWinnerAddressesLength);
+
+        for (uint256 i = 0; i < gameWinnerAddressesLength; i++) {
+            address currentWinnerAddress = winners[_roundId].gameWinnerAddresses[i];
+            winnersPlayerData[i] = winners[_roundId].gameWinners[currentWinnerAddress];
+        }
+        return winnersPlayerData;
+    }
+
+    function isAllPlayersSplitOk() external view returns (bool) {
+        return _isAllPlayersSplitOk();
+    }
 
     function getRemainingPlayersCount() external view returns (uint256) {
-        uint256 remainingPlayers = 0;
-        for (uint256 i = 0; i < numPlayers; i++) {
-            if (!players[playerAddresses[i]].hasLost) {
-                remainingPlayers++;
-            }
-        }
-        return remainingPlayers;
+        return _getRemainingPlayersCount();
     }
 
     ///
