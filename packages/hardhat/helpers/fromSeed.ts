@@ -1,6 +1,7 @@
-const ethers = require('ethers')
+import dotenv from 'dotenv'
+import ethers from 'ethers'
 
-require('dotenv').config()
+dotenv.config()
 
 const mnemonicWallet = ethers.Wallet.fromMnemonic(process.env.MNEMONIC)
 

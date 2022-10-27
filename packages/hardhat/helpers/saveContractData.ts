@@ -1,4 +1,4 @@
-const fs = require('fs')
+import fs from 'fs'
 
 const contractsDir = __dirname + '/../build'
 const filePath = contractsDir + '/deployedContracts.json'
