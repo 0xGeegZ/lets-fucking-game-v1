@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers'
 import { ethers } from 'hardhat'
 
-import { networkConfig } from './helperNetworkConfig'
+import { networkConfig } from '../config/networkConfig'
 
 export const autoFundCheck = async (
   contractAddr: string,

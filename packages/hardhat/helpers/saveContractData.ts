@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-const contractsDir = __dirname + '/../../build'
+const contractsDir = __dirname + '/../build'
 const filePath = contractsDir + '/deployedContracts.json'
 
 const saveContract = ({ contractName, chainId, contractData }) => {

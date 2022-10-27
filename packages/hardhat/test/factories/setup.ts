@@ -13,7 +13,8 @@ const setupTest = deployments.createFixture(
     { deployments, getNamedAccounts, ethers }: HardhatRuntimeEnvironment,
     { maxPlayers, playTimeRange, correctRegistrationAmount, encodedCron }
   ) => {
-    await deployments.fixture(['lfg'])
+    // await deployments.fixture(['lfg'])
+    await deployments.fixture()
 
     const { deploy, log } = deployments
     const { deployer: deployerAddress } = await getNamedAccounts()

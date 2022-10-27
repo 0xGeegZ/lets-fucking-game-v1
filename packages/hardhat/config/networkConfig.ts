@@ -21,6 +21,18 @@ export const networkConfig: Record<
     fee: '100000000000000000',
     fundAmount: '1000000000000000000',
   },
+  '56': {
+    name: 'bnb',
+    linkToken: '0x404460C6A5EdE2D891e8297795264fDe62ADBB75',
+    fee: '100000000000000000',
+    fundAmount: '1000000000000000000',
+  },
+  '97': {
+    name: 'bnb_testnet',
+    linkToken: '0x84b9B910527Ad5C03A9Ca831909E21e236EA7b06',
+    fee: '100000000000000000',
+    fundAmount: '1000000000000000000',
+  },
   '4': {
     name: 'rinkeby',
     linkToken: '0x01be23585060835e02b77ef475b0cc51aa1e0709',

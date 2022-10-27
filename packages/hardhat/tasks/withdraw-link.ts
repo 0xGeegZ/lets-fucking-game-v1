@@ -1,7 +1,7 @@
 import { BigNumber, ContractTransaction } from 'ethers'
 import { task } from 'hardhat/config'
 
-import { networkConfig } from '../helpers/helperNetworkConfig'
+import { networkConfig } from '../config/networkConfig'
 
 task('withdraw-link', 'Returns any LINK left in deployed contract')
   .addParam('contract', 'The address of the contract')
