@@ -320,6 +320,15 @@ contract GameImplementation {
         emit GamePrizeClaimed(msg.sender, gameWinners[_roundId].roundId, gameWinners[_roundId].amountWon);
     }
 
+    function voteToSplitPot() external view onlyIfPlayersLowerHalfRemaining {
+        Player memory currentPlayer = players[msg.sender];
+
+        // if ((currentPlayer) && !currentPlayer.hasLost) {
+        if (!currentPlayer.hasLost) {
+            currentPlayer.isSplitOk = true;
+        }
+    }
+
     ///
     /// INTERNAL FUNCTIONS
     ///
@@ -427,26 +436,18 @@ contract GameImplementation {
         emit GameLost(roundId, player.playerAddress, player.roundCount);
     }
 
-    function _voteRequests() external onlyIfPlayersLowerHalfRemaining {
-        Player memory player = players[playerAddresses[msg.sender]];
-
-        if (player && !player.hasLost) {
-            player.isSplitOk = true;
-        }
-    }
-
     function _splitPot() internal {
         uint256 truthyVoteCount = 0;
-        uint256 remainingPlayersLength = getRemainingPlayersCount();
+        uint256 remainingPlayersLength = _getRemainingPlayersCount();
         for (uint256 i = 0; i < remainingPlayersLength; i++) {
             Player memory currentPlayer = players[playerAddresses[i]];
             if (currentPlayer.isSplitOk) {
                 truthyVoteCount++;
             }
         }
-        // if (truthyVoteCount <= remainingPlayersLength / 2) {
+
         if (truthyVoteCount == remainingPlayersLength) {
-            // didn't find way to dispatch rewards yet. Does it exists ? Should i create it ?
+            // TODO store all remaining players as winner for the game with correct amount.
         }
     }
 
@@ -560,6 +561,10 @@ contract GameImplementation {
     ///
 
     function getRemainingPlayersCount() external view returns (uint256) {
+        return _getRemainingPlayersCount();
+    }
+
+    function _getRemainingPlayersCount() internal view returns (uint256) {
         uint256 remainingPlayers = 0;
         for (uint256 i = 0; i < numPlayers; i++) {
             if (!players[playerAddresses[i]].hasLost) {
