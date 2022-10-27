@@ -1,6 +1,6 @@
+import { ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
-import { ethers } from 'hardhat'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -38,10 +38,7 @@ const func: DeployFunction = async function ({
 
   log('Adding GameImplementation to Keeper delegators')
 
-  const { address: cronUpkeepAddress } = await deployments.get(
-    'CronUpkeep',
-    libraries
-  )
+  const { address: cronUpkeepAddress } = await deployments.get('CronUpkeep')
 
   const { interface: cronUpkeepInterface } = await ethers.getContractFactory(
     'CronUpkeep',

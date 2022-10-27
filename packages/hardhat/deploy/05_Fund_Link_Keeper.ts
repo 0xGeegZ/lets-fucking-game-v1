@@ -21,14 +21,7 @@ const func: DeployFunction = async function ({
     linkTokenAddress = networkConfig[chainId].linkToken as string
   }
 
-  const { address: cronExternalAddress } = await deployments.get('CronExternal')
-  const libraries = {
-    libraries: {
-      Cron: cronExternalAddress,
-    },
-  }
-
-  const CronUpkeep = await deployments.get('CronUpkeep', libraries)
+  const CronUpkeep = await deployments.get('CronUpkeep')
   const cronUpkeep = await ethers.getContractAt(
     'CronUpkeep',
     CronUpkeep.address

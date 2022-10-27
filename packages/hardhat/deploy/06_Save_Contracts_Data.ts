@@ -11,6 +11,12 @@ const func: DeployFunction = async function ({
   const gameImplementation = await deployments.get('GameImplementation')
   const gameFactory = await deployments.get('GameImplementation')
 
+  // const multiCall = await deployments.get('Multicall')
+
+  const cronExternal = await deployments.get('CronExternal')
+  const cronUpkeep = await deployments.get('CronUpkeep')
+  const cronUpkeepDelegate = await deployments.get('CronUpkeepDelegate')
+
   saveContractData({
     [chainId]: {
       GameFactory: {
@@ -20,6 +26,24 @@ const func: DeployFunction = async function ({
       GameImplementation: {
         // transactionHash: gameImplementation.deployTransaction.hash,
         address: gameImplementation.address,
+        libraries: {
+          Cron: cronExternal.address,
+        },
+      },
+      // MultiCall: {
+      //   address: multiCall.address,
+      // },
+      CronExternal: {
+        address: cronExternal.address,
+      },
+      CronUpkeep: {
+        address: cronUpkeep.address,
+        libraries: {
+          Cron: cronExternal.address,
+        },
+      },
+      CronUpkeepDelegate: {
+        address: cronUpkeepDelegate.address,
       },
     },
   })
