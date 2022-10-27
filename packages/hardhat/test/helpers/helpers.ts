@@ -319,6 +319,7 @@ const setUpGameWithAWinner = async function ({
   mockKeeper,
 }) {
   const secondPlayerIndex = 2
+
   await setUpGameReadyToPlay({
     players,
     contract,
@@ -328,6 +329,12 @@ const setUpGameWithAWinner = async function ({
 
   const startedGameBlock = await ethers.provider.getBlock()
   const startedGameTimestamp = startedGameBlock.timestamp
+
+  const isAllPlayersSplitOkTest = await contract.isAllPlayersSplitOkTest()
+  console.log(
+    '🚀 ~ BBBBBBBB ~ isAllPlayersSplitOkTest',
+    isAllPlayersSplitOkTest
+  )
 
   // 8 players lost for not playing, 2 players remain in second round
   // 2 players remain in competition, winnerIndex & secondPlayerIndex
@@ -352,6 +359,13 @@ const setUpGameWithAWinner = async function ({
 
   const winnerRangeStart = winnerData.roundRangeLowerLimit
   const looserRangeEnd = looserData.roundRangeUpperLimit
+
+  const getRemainingPlayersCountTestAfter =
+    await contract.getRemainingPlayersCountTest()
+  console.log(
+    '🚀 ~ AAAAAAA getRemainingPlayersCountTestAfter',
+    getRemainingPlayersCountTestAfter
+  )
 
   // Time passes beyond looser's round range and until winner's round range
   // Both play and looser looses
