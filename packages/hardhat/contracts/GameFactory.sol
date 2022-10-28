@@ -18,7 +18,7 @@ contract GameFactory is Pausable, Ownable {
     uint256 public creatorEdge;
     uint256 public latestGameImplementationVersionId;
     GameImplementationVersion[] public gameImplementations;
-    uint256 public gameId = 0;
+    uint256 public nextGameId = 0;
     Game[] public deployedGames;
 
     uint256[] authorizedAmounts;
@@ -44,7 +44,7 @@ contract GameFactory is Pausable, Ownable {
     ///
     ///EVENTS
     ///
-    event GameCreated(uint256 gameId, address gameAddress, uint256 implementationVersion, address creatorAddress);
+    event GameCreated(uint256 nextGameId, address gameAddress, uint256 implementationVersion, address creatorAddress);
     event FailedTransfer(address receiver, uint256 amount);
 
     constructor(
@@ -139,7 +139,7 @@ contract GameFactory is Pausable, Ownable {
                 _factoryOwner: owner(),
                 _cronUpkeep: cronUpkeep,
                 _gameImplementationVersion: latestGameImplementationVersionId,
-                _gameId: gameId,
+                _gameId: nextGameId,
                 _playTimeRange: _playTimeRange,
                 _maxPlayers: _maxPlayers,
                 _registrationAmount: _registrationAmount,
@@ -150,14 +150,14 @@ contract GameFactory is Pausable, Ownable {
         );
         deployedGames.push(
             Game({
-                id: gameId,
+                id: nextGameId,
                 versionId: latestGameImplementationVersionId,
                 creator: msg.sender,
                 deployedAddress: newGameAddress
             })
         );
-        emit GameCreated(gameId, newGameAddress, latestGameImplementationVersionId, msg.sender);
-        gameId += 1;
+        emit GameCreated(nextGameId, newGameAddress, latestGameImplementationVersionId, msg.sender);
+        nextGameId += 1;
         usedAuthorisedAmounts[_registrationAmount].isUsed = true;
         return newGameAddress;
     }

@@ -137,7 +137,9 @@ describe('GameFactoryContract', function () {
       })
 
       it('should add the new game in deployedGames', async function () {
-        const currentId = await this.gameFactory.connect(this.owner).gameId()
+        const currentId = await this.gameFactory
+          .connect(this.owner)
+          .nextGameId()
 
         const currentGameImplementationVersionId = await this.gameFactory
           .connect(this.owner)
@@ -180,7 +182,9 @@ describe('GameFactoryContract', function () {
       })
 
       it('should emit the GameCreated event with the correct data', async function () {
-        const currentId = await this.gameFactory.connect(this.owner).gameId()
+        const currentId = await this.gameFactory
+          .connect(this.owner)
+          .nextGameId()
 
         await expect(
           this.gameFactory
