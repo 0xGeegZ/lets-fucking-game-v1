@@ -29,7 +29,10 @@ describe('GameFactoryContract', function () {
 
     describe('when the given this.maxPlayers is not in authorized range', function () {
       it('should revert with correct message', async function () {
-        const outOfRangeMaxPlayers1 = 21
+        const registrationAmount =
+          this.authorizedAmounts[this.authorizedAmounts.length - 1]
+
+        const outOfRangeMaxPlayers1 = 101
         const outOfRangeMaxPlayers2 = 1
 
         await expectRevert(
@@ -38,11 +41,11 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               outOfRangeMaxPlayers1,
               this.playTimeRange,
-              this.correctRegistrationAmount,
+              registrationAmount,
               this.creatorEdge,
               this.encodedCron
             ),
-          'maxPlayers should not be bigger than 20'
+          'maxPlayers should not be bigger than 100'
         )
 
         await expectRevert(
@@ -51,7 +54,7 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               outOfRangeMaxPlayers2,
               this.playTimeRange,
-              this.correctRegistrationAmount,
+              registrationAmount,
               this.creatorEdge,
               this.encodedCron
             ),
@@ -62,6 +65,9 @@ describe('GameFactoryContract', function () {
 
     describe('when the given this.playTimeRange is not in authorized range', function () {
       it('should revert with correct message', async function () {
+        const registrationAmount =
+          this.authorizedAmounts[this.authorizedAmounts.length - 1]
+
         const outOfRangePlayTimeRange1 = 9
         const outOfRangePlayTimeRange2 = 0
 
@@ -71,7 +77,7 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               this.maxPlayers,
               outOfRangePlayTimeRange1,
-              this.correctRegistrationAmount,
+              registrationAmount,
               this.creatorEdge,
               this.encodedCron
             ),
@@ -84,7 +90,7 @@ describe('GameFactoryContract', function () {
             .createNewGame(
               this.maxPlayers,
               outOfRangePlayTimeRange2,
-              this.correctRegistrationAmount,
+              registrationAmount,
               this.creatorEdge,
               this.encodedCron
             ),

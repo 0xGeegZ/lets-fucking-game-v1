@@ -111,8 +111,14 @@ contract GameImplementation {
         _isBase = true;
     }
 
-    // TODO GUIGUI add only admin here
-    function initialize(Initialization calldata initialization) external onlyIfNotBase onlyIfNotAlreadyInitialized {
+    function initialize(Initialization calldata initialization)
+        external
+        onlyIfNotBase
+        onlyIfNotAlreadyInitialized
+        onlyAllowedNumberOfPlayers(initialization._maxPlayers)
+        onlyAllowedPlayTimeRange(initialization._playTimeRange)
+    {
+        // TODO create modifier for this require
         // TODO create constant for max house edge
         // require(initialization._creatorEdge <= 5, "Creator Edge need to be less or equal to 10");
 
@@ -418,7 +424,14 @@ contract GameImplementation {
     }
 
     // TODO GUIGUI (the game need to not be in progress)
-    // function setMaxPlayers(uint256 _maxPlayers) external;
+    function setMaxPlayers(uint256 _maxPlayers)
+        external
+        onlyCreatorOrAdmin
+        onlyAllowedNumberOfPlayers(_maxPlayers)
+        onlyIfGameIsNotInProgress
+    {
+        maxPlayers = _maxPlayers;
+    }
 
     function withdrawCreatorEdge() external onlyCreator {
         require(address(this).balance >= creatorEdge);
@@ -709,6 +722,17 @@ contract GameImplementation {
     // This makes sure we can't initialize a cloned contract twice.
     modifier onlyIfNotAlreadyInitialized() {
         require(creator == address(0), "Contract already initialized");
+        _;
+    }
+
+    modifier onlyAllowedNumberOfPlayers(uint256 _maxPlayers) {
+        require(_maxPlayers > 1, "maxPlayers should be bigger than or equal to 2");
+        require(_maxPlayers <= 100, "maxPlayers should not be bigger than 100");
+        _;
+    }
+    modifier onlyAllowedPlayTimeRange(uint256 _playTimeRange) {
+        require(_playTimeRange > 0, "playTimeRange should be bigger than 0");
+        require(_playTimeRange < 9, "playTimeRange should not be bigger than 8");
         _;
     }
 

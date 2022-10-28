@@ -55,7 +55,7 @@ contract GameFactory is Pausable, Ownable {
         // uint256 _creatorEdge,
         uint256[] memory _authorizedAmounts
     ) onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts) {
-        // TODO transfor requires to modifiers
+        // TODO transfor requires to modifiers (SEE: onlyAllowedNumberOfPlayers)
         require(_gameImplementation != address(0), "Game Implementation need to be initialised");
         require(_cronUpkeep != address(0), "Keeper need to be initialised");
         // TODO create constant for max house edge
@@ -93,8 +93,6 @@ contract GameFactory is Pausable, Ownable {
     )
         public
         whenNotPaused
-        onlyAllowedNumberOfPlayers(_maxPlayers)
-        onlyAllowedPlayTimeRange(_playTimeRange)
         onlyAllowedRegistrationAmount(_registrationAmount)
         onlyIfNotUsedRegistrationAmounts(_registrationAmount)
         returns (address game)
@@ -225,16 +223,6 @@ contract GameFactory is Pausable, Ownable {
     ///
     modifier onlyAdmin() {
         require(msg.sender == owner(), "Caller is not the admin");
-        _;
-    }
-    modifier onlyAllowedNumberOfPlayers(uint256 _maxPlayers) {
-        require(_maxPlayers > 1, "maxPlayers should be bigger than or equal to 2");
-        require(_maxPlayers < 21, "maxPlayers should not be bigger than 20");
-        _;
-    }
-    modifier onlyAllowedPlayTimeRange(uint256 _playTimeRange) {
-        require(_playTimeRange > 0, "playTimeRange should be bigger than 0");
-        require(_playTimeRange < 9, "playTimeRange should not be bigger than 8");
         _;
     }
 
