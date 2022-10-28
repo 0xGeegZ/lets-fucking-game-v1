@@ -102,6 +102,11 @@ interface GameImplementationInterface {
     event GamePrizeClaimed(address claimer, uint256 roundId, uint256 amountClaimed);
 
     /**
+     * @notice Called when the creator or admin update Keeper
+     */
+    event UpkeepUpdated(address cronUpkeep, string encodedCron, uint256 jobId);
+
+    /**
      * @notice Create a new Game Implementation by cloning the base contract
      * @param initialization the initialisation data with params as follow :
      *  @param initialization._initializer the game creator
@@ -158,6 +163,20 @@ interface GameImplementationInterface {
      */
     function withdrawAdminEdge() external;
 
+    /// ADMIN FUNCTIONS
+    /**
+     * @notice Allow admin to update keeper
+     * @param _cronUpkeep the new cron keeper address
+     * @param _encodedCron the new cron
+     */
+    function updateUpKeep(address _cronUpkeep, string memory _encodedCron) external;
+
+    /**
+     * @notice Allow admin or creator to update keeper cron
+     * @param _encodedCron the new cron
+     */
+    function updateUpKeepCron(string memory _encodedCron) external;
+
     ///
     /// SETTERS FUNCTIONS
     ///
@@ -184,18 +203,6 @@ interface GameImplementationInterface {
      * @notice Allow creator to withdraw his Edge
      */
     function withdrawCreatorEdge() external;
-
-    /**
-     * @notice Set the cron keeper address
-     * @param _cronUpkeep the new cron keeper address
-     */
-    function setCronUpkeep(address _cronUpkeep) external;
-
-    /**
-     * @notice Set the cron
-     * @param _encodedCron the new cron
-     */
-    function setEncodedCron(bytes memory _encodedCron) external;
 
     /**
      * @notice Pause the current game and associated keeper job

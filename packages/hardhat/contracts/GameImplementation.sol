@@ -6,6 +6,10 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
+import "hardhat/console.sol";
+
+// console.log("jobIdLength creating job %s", nextCronJobIDs);
+
 contract GameImplementation {
     using Address for address;
 
@@ -18,6 +22,7 @@ contract GameImplementation {
 
     address public cronUpkeep;
     bytes public encodedCron;
+    uint256 private cronUpkeepJobId;
 
     uint256 public registrationAmount;
     uint256 public houseEdge;
@@ -95,6 +100,7 @@ contract GameImplementation {
     event FailedTransfer(address receiver, uint256 amount);
     event Received(address sender, uint256 amount);
     event GamePrizeClaimed(address claimer, uint256 roundId, uint256 amountClaimed);
+    event UpkeepUpdated(address cronUpkeep, string encodedCron, uint256 jobId);
 
     ///
     /// CONSTRUCTOR AND DEFAULT
@@ -128,6 +134,9 @@ contract GameImplementation {
         encodedCron = CronExternal.toEncodedSpec(initialization._encodedCron);
         cronUpkeep = initialization._cronUpkeep;
 
+        uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
+        cronUpkeepJobId = nextCronJobIDs;
+
         CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
             address(this),
             bytes("triggerDailyCheckpoint()"),
@@ -148,6 +157,7 @@ contract GameImplementation {
         payable
         onlyHumans
         onlyNotPaused
+        onlyIfGameIsNotInProgress
         onlyIfNotFull
         onlyIfNotAlreadyEntered
         onlyRegistrationAmount
@@ -172,6 +182,7 @@ contract GameImplementation {
         external
         onlyHumans
         onlyNotPaused
+        onlyIfGameIsInProgress
         onlyIfFull
         onlyIfAlreadyEntered
         onlyIfHasNotLost
@@ -190,8 +201,7 @@ contract GameImplementation {
         }
     }
 
-    // TODO remove onlyKeeperOrAdmin and make test works
-    function triggerDailyCheckpoint() external onlyKeeperOrAdmin onlyNotPaused {
+    function triggerDailyCheckpoint() external onlyKeeperOrAdmin onlyNotPaused onlyIfGameIsInProgress {
         // function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
         if (gameInProgress == true) {
             _refreshPlayerStatus();
@@ -201,6 +211,17 @@ contract GameImplementation {
                 _startGame();
             }
         }
+    }
+
+    function voteToSplitPot()
+        external
+        onlyIfGameIsInProgress
+        onlyIfAlreadyEntered
+        onlyIfHasNotLost
+        onlyIfPlayersLowerHalfRemaining
+    {
+        players[msg.sender].isSplitOk = true;
+        emit VoteToSplitPot(roundId, players[msg.sender].playerAddress);
     }
 
     function claimPrize(uint256 _roundId) external {
@@ -215,11 +236,6 @@ contract GameImplementation {
         winnerPlayerData.prizeClaimed = true;
         _safeTransfert(msg.sender, winnerPlayerData.amountWon);
         emit GamePrizeClaimed(msg.sender, _roundId, winnerPlayerData.amountWon);
-    }
-
-    function voteToSplitPot() external onlyIfAlreadyEntered onlyIfHasNotLost onlyIfPlayersLowerHalfRemaining {
-        players[msg.sender].isSplitOk = true;
-        emit VoteToSplitPot(roundId, players[msg.sender].playerAddress);
     }
 
     ///
@@ -409,36 +425,62 @@ contract GameImplementation {
         _safeTransfert(generalAdmin, houseEdge);
     }
 
-    // TODO create a function to set keeper address & keeper cron
-    function setCronUpkeep(address _cronUpkeep) external onlyCreatorOrAdmin {
+    function updateUpKeep(address _cronUpkeep, string memory _encodedCron) external onlyAdmin {
         require(_cronUpkeep != address(0), "Keeper need to be initialised");
-        // cronUpkeep = CronUpkeepInterface(_cronUpkeep);
-        cronUpkeep = _cronUpkeep;
-        // TODO add parameter to know if it's needed to register encodedCron again
-    }
+        require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
 
-    // TODO GUIGUI update param to String and call ExternalCron librairie like in initialize function
-    // function setEncodedCron(bytes memory _encodedCron) external onlyCreatorOrAdmin {
-    // encodedCron = _encodedCron;
-    // }
-    function setEncodedCron(string memory _encodedCron) external onlyCreatorOrAdmin {
         encodedCron = CronExternal.toEncodedSpec(_encodedCron);
-        // CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
-        //     address(this),
-        //     bytes("triggerDailyCheckpoint()"),
-        //     encodedCron
-        // );
+        cronUpkeep = _cronUpkeep;
+
+        CronUpkeepInterface(cronUpkeep).updateCronJob(
+            cronUpkeepJobId,
+            address(this),
+            bytes("triggerDailyCheckpoint()"),
+            encodedCron
+        );
+        emit UpkeepUpdated(cronUpkeep, _encodedCron, 0);
     }
 
-    function pause() external onlyCreatorOrAdmin onlyNotPaused {
-        // TODO pause Keeper JOB
+    function updateUpKeepCron(string memory _encodedCron) external onlyCreatorOrAdmin {
+        require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
+
+        encodedCron = CronExternal.toEncodedSpec(_encodedCron);
+
+        CronUpkeepInterface(cronUpkeep).updateCronJob(
+            cronUpkeepJobId,
+            address(this),
+            bytes("triggerDailyCheckpoint()"),
+            encodedCron
+        );
+        emit UpkeepUpdated(cronUpkeep, _encodedCron, 0);
+    }
+
+    function pause() external onlyAdmin onlyNotPaused {
+        // pause first to ensure no more interaction with contract
         contractPaused = true;
+        CronUpkeepInterface(cronUpkeep).deleteCronJob(cronUpkeepJobId);
     }
 
-    // TODO (Will need a big refactor for tests cases) reactivate to ensure that keeper is initialised
-    // function unpause() external onlyCreatorOrAdmin onlyPaused onlyIfKeeperDataInit {
-    function unpause() external onlyCreatorOrAdmin onlyPaused onlyIfKeeperDataInit {
-        // TODO unpause Keeper JOB
+    function unpause() external onlyAdmin onlyPaused onlyIfKeeperDataInit {
+        uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
+        cronUpkeepJobId = nextCronJobIDs;
+
+        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
+            address(this),
+            bytes("triggerDailyCheckpoint()"),
+            encodedCron
+        );
+
+        // Reset round limits and round status for each remaining user
+        for (uint256 i = 0; i < numPlayers; i++) {
+            Player storage player = players[playerAddresses[i]];
+            if (player.hasLost == false) {
+                _resetRoundRange(player);
+                player.hasPlayedRound = false;
+            }
+        }
+
+        // unpause last to ensure that everything is ok
         contractPaused = false;
     }
 
@@ -507,6 +549,28 @@ contract GameImplementation {
 
     function getRemainingPlayersCount() external view returns (uint256) {
         return _getRemainingPlayersCount();
+    }
+
+    ///
+    /// EMERGENCY
+    ///
+
+    function withdrawFunds(address receiver) external onlyCreatorOrAdmin {
+        _safeTransfert(receiver, address(this).balance);
+    }
+
+    ///
+    /// FALLBACK FUNCTIONS
+    ///
+
+    // Called for empty calldata (and any value)
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
+    }
+
+    // Called when no other function matches (not even the receive function). Optionally payable
+    fallback() external payable {
+        emit Received(msg.sender, msg.value);
     }
 
     ///
@@ -589,7 +653,14 @@ contract GameImplementation {
     }
 
     modifier onlyIfGameIsInProgress() {
-        require(gameInProgress, "Game is not in progress");
+        // TODO GUIGUI
+        // require(gameInProgress, "Game is not in progress");
+        _;
+    }
+
+    modifier onlyIfGameIsNotInProgress() {
+        // TODO GUIGUI
+        // require(!gameInProgress, "Game is already in progress");
         _;
     }
 
@@ -626,34 +697,12 @@ contract GameImplementation {
     }
 
     modifier onlyNotPaused() {
-        require(contractPaused != true, "Contract is paused");
+        require(!contractPaused, "Contract is paused");
         _;
     }
 
     modifier onlyPaused() {
-        require(contractPaused != false, "Contract is not paused");
+        require(contractPaused, "Contract is not paused");
         _;
-    }
-
-    ///
-    /// EMERGENCY
-    ///
-
-    function withdrawFunds(address receiver) external onlyCreatorOrAdmin {
-        _safeTransfert(receiver, address(this).balance);
-    }
-
-    ///
-    /// FALLBACK FUNCTIONS
-    ///
-
-    // Called for empty calldata (and any value)
-    receive() external payable {
-        emit Received(msg.sender, msg.value);
-    }
-
-    // Called when no other function matches (not even the receive function). Optionally payable
-    fallback() external payable {
-        emit Received(msg.sender, msg.value);
     }
 }

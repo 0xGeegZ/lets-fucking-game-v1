@@ -139,7 +139,7 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
         address newTarget,
         bytes memory newHandler,
         bytes memory newEncodedCronSpec
-    ) external onlyOwner onlyValidCronID(id) {
+    ) external onlyOwnerOrDelegator onlyValidCronID(id) {
         Spec memory newSpec = abi.decode(newEncodedCronSpec, (Spec));
         s_targets[id] = newTarget;
         s_handlers[id] = newHandler;
@@ -153,7 +153,7 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
      * the id is not found.
      * @param id the id of the cron job to delete
      */
-    function deleteCronJob(uint256 id) external onlyOwner onlyValidCronID(id) {
+    function deleteCronJob(uint256 id) external onlyOwnerOrDelegator onlyValidCronID(id) {
         delete s_lastRuns[id];
         delete s_specs[id];
         delete s_targets[id];
@@ -221,6 +221,14 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
             jobIDs[idx] = s_activeCronJobIDs.at(idx);
         }
         return jobIDs;
+    }
+
+    /**
+     * @notice gets the next cron job IDs
+     * @return next cron job IDs
+     */
+    function getNextCronJobIDs() external view returns (uint256) {
+        return s_nextCronJobID;
     }
 
     /**
