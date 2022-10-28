@@ -191,6 +191,8 @@ contract GameFactory is Pausable, Ownable {
         transferOwnership(_adminAddress);
     }
 
+    // TODO create a function to set house Edge to Factory and all smart contracts
+
     function setCronUpkeep(address _cronUpkeep) public onlyAdmin {
         require(_cronUpkeep != address(0), "Keeper need to be initialised");
         cronUpkeep = _cronUpkeep;
