@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
-import { GameImplementation } from "./GameImplementation.sol";
+import { GameImplementationInterface } from "./interfaces/GameImplementationInterface.sol";
 
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 
@@ -133,8 +133,8 @@ contract GameFactory is Pausable, Ownable {
 
         CronUpkeepInterface(cronUpkeep).addDelegator(newGameAddress);
 
-        GameImplementation(newGameAddress).initialize(
-            GameImplementation.Initialization({
+        GameImplementationInterface(newGameAddress).initialize(
+            GameImplementationInterface.Initialization({
                 _initializer: msg.sender,
                 _factoryOwner: owner(),
                 _cronUpkeep: cronUpkeep,

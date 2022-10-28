@@ -141,132 +141,6 @@ contract GameImplementation {
     }
 
     ///
-    /// MODIFIERS
-    ///
-
-    modifier onlyAdmin() {
-        require(msg.sender == generalAdmin, "Caller is not the creator");
-        _;
-    }
-
-    modifier onlyCreator() {
-        require(msg.sender == creator, "Caller is not the creator");
-        _;
-    }
-
-    modifier onlyNotCreator() {
-        require(msg.sender != creator, "Caller can't be the creator");
-        _;
-    }
-
-    modifier onlyCreatorOrAdmin() {
-        require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the creator or admin");
-        _;
-    }
-
-    modifier onlyKeeperOrAdmin() {
-        require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the keeper");
-        _;
-    }
-
-    modifier onlyKeeper() {
-        require(msg.sender == cronUpkeep, "Caller is not the keeper");
-        _;
-    }
-
-    modifier onlyIfKeeperDataInit() {
-        require(cronUpkeep != address(0), "Keeper need to be initialised");
-        require(bytes(encodedCron).length != 0, "Keeper cron need to be initialised");
-        _;
-    }
-
-    modifier onlyIfNotFull() {
-        require(numPlayers < maxPlayers, "This game is full");
-        _;
-    }
-
-    modifier onlyIfFull() {
-        require(numPlayers == maxPlayers, "This game is not full");
-        _;
-    }
-
-    modifier onlyIfNotAlreadyEntered() {
-        require(players[msg.sender].playerAddress == address(0), "Player already entered in this game");
-        _;
-    }
-
-    modifier onlyIfAlreadyEntered() {
-        require(players[msg.sender].playerAddress != address(0), "Player has not entered in this game");
-        _;
-    }
-
-    modifier onlyIfHasNotLost() {
-        require(!players[msg.sender].hasLost, "Player has already lost");
-        _;
-    }
-
-    modifier onlyIfHasNotPlayedThisRound() {
-        require(!players[msg.sender].hasPlayedRound, "Player has already played in this round");
-        _;
-    }
-
-    modifier onlyIfPlayersLowerHalfRemaining() {
-        uint256 remainingPlayersLength = _getRemainingPlayersCount();
-        require(
-            remainingPlayersLength <= maxPlayers / 2,
-            "Remaining players must be less or equal than half of started players"
-        );
-        _;
-    }
-
-    modifier onlyIfGameIsInProgress() {
-        require(gameInProgress, "Game is not in progress");
-        _;
-    }
-
-    modifier onlyHumans() {
-        uint256 size;
-        address addr = msg.sender;
-        assembly {
-            size := extcodesize(addr)
-        }
-        require(size == 0, "No contract allowed");
-        _;
-    }
-
-    modifier onlyRegistrationAmount() {
-        require(msg.value == registrationAmount, "Only game amount is allowed");
-        _;
-    }
-
-    modifier onlyIfRoundId(uint256 _roundId) {
-        require(_roundId <= roundId, "Wrong roundId");
-        _;
-    }
-
-    // This makes sure we can't initialize the implementation contract.
-    modifier onlyIfNotBase() {
-        require(_isBase == false, "The implementation contract can't be initialized");
-        _;
-    }
-
-    // This makes sure we can't initialize a cloned contract twice.
-    modifier onlyIfNotAlreadyInitialized() {
-        require(creator == address(0), "Contract already initialized");
-        _;
-    }
-
-    modifier onlyNotPaused() {
-        require(contractPaused != true, "Contract is paused");
-        _;
-    }
-
-    modifier onlyPaused() {
-        require(contractPaused != false, "Contract is not paused");
-        _;
-    }
-
-    ///
     /// MAIN FUNCTIONS
     ///
     function registerForGame()
@@ -507,6 +381,10 @@ contract GameImplementation {
         return remainingPlayers;
     }
 
+    ///
+    /// SETTERS FUNCTIONS
+    ///
+
     /// CREATOR FUNCTIONS
 
     function setGameName(string calldata _gameName) external onlyCreator {
@@ -516,6 +394,9 @@ contract GameImplementation {
     function setGameImage(string calldata _gameImage) external onlyCreator {
         gameImage = _gameImage;
     }
+
+    // TODO GUIGUI (the game need to not be in progress)
+    // function setMaxPlayers(uint256 _maxPlayers) external;
 
     function withdrawCreatorEdge() external onlyCreator {
         require(address(this).balance >= creatorEdge);
@@ -528,28 +409,25 @@ contract GameImplementation {
         _safeTransfert(generalAdmin, houseEdge);
     }
 
-    ///
-    /// EMERGENCY
-    ///
-
-    function withdrawFunds(address receiver) external onlyCreatorOrAdmin {
-        _safeTransfert(receiver, address(this).balance);
-    }
-
-    ///
-    /// SETTERS FUNCTIONS
-    ///
-
     // TODO create a function to set keeper address & keeper cron
-    function setCronUpkeep(address _cronUpkeep) public onlyCreatorOrAdmin {
+    function setCronUpkeep(address _cronUpkeep) external onlyCreatorOrAdmin {
         require(_cronUpkeep != address(0), "Keeper need to be initialised");
         // cronUpkeep = CronUpkeepInterface(_cronUpkeep);
         cronUpkeep = _cronUpkeep;
         // TODO add parameter to know if it's needed to register encodedCron again
     }
 
-    function setEncodedCron(bytes memory _encodedCron) external onlyCreatorOrAdmin {
-        encodedCron = _encodedCron;
+    // TODO GUIGUI update param to String and call ExternalCron librairie like in initialize function
+    // function setEncodedCron(bytes memory _encodedCron) external onlyCreatorOrAdmin {
+    // encodedCron = _encodedCron;
+    // }
+    function setEncodedCron(string memory _encodedCron) external onlyCreatorOrAdmin {
+        encodedCron = CronExternal.toEncodedSpec(_encodedCron);
+        // CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
+        //     address(this),
+        //     bytes("triggerDailyCheckpoint()"),
+        //     encodedCron
+        // );
     }
 
     function pause() external onlyCreatorOrAdmin onlyNotPaused {
@@ -629,6 +507,140 @@ contract GameImplementation {
 
     function getRemainingPlayersCount() external view returns (uint256) {
         return _getRemainingPlayersCount();
+    }
+
+    ///
+    /// MODIFIERS
+    ///
+
+    modifier onlyAdmin() {
+        require(msg.sender == generalAdmin, "Caller is not the creator");
+        _;
+    }
+
+    modifier onlyCreator() {
+        require(msg.sender == creator, "Caller is not the creator");
+        _;
+    }
+
+    modifier onlyNotCreator() {
+        require(msg.sender != creator, "Caller can't be the creator");
+        _;
+    }
+
+    modifier onlyCreatorOrAdmin() {
+        require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the creator or admin");
+        _;
+    }
+
+    modifier onlyKeeperOrAdmin() {
+        require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the keeper");
+        _;
+    }
+
+    modifier onlyKeeper() {
+        require(msg.sender == cronUpkeep, "Caller is not the keeper");
+        _;
+    }
+
+    modifier onlyIfKeeperDataInit() {
+        require(cronUpkeep != address(0), "Keeper need to be initialised");
+        require(bytes(encodedCron).length != 0, "Keeper cron need to be initialised");
+        _;
+    }
+
+    modifier onlyIfNotFull() {
+        require(numPlayers < maxPlayers, "This game is full");
+        _;
+    }
+
+    modifier onlyIfFull() {
+        require(numPlayers == maxPlayers, "This game is not full");
+        _;
+    }
+
+    modifier onlyIfNotAlreadyEntered() {
+        require(players[msg.sender].playerAddress == address(0), "Player already entered in this game");
+        _;
+    }
+
+    modifier onlyIfAlreadyEntered() {
+        require(players[msg.sender].playerAddress != address(0), "Player has not entered in this game");
+        _;
+    }
+
+    modifier onlyIfHasNotLost() {
+        require(!players[msg.sender].hasLost, "Player has already lost");
+        _;
+    }
+
+    modifier onlyIfHasNotPlayedThisRound() {
+        require(!players[msg.sender].hasPlayedRound, "Player has already played in this round");
+        _;
+    }
+
+    modifier onlyIfPlayersLowerHalfRemaining() {
+        uint256 remainingPlayersLength = _getRemainingPlayersCount();
+        require(
+            remainingPlayersLength <= maxPlayers / 2,
+            "Remaining players must be less or equal than half of started players"
+        );
+        _;
+    }
+
+    modifier onlyIfGameIsInProgress() {
+        require(gameInProgress, "Game is not in progress");
+        _;
+    }
+
+    modifier onlyHumans() {
+        uint256 size;
+        address addr = msg.sender;
+        assembly {
+            size := extcodesize(addr)
+        }
+        require(size == 0, "No contract allowed");
+        _;
+    }
+
+    modifier onlyRegistrationAmount() {
+        require(msg.value == registrationAmount, "Only game amount is allowed");
+        _;
+    }
+
+    modifier onlyIfRoundId(uint256 _roundId) {
+        require(_roundId <= roundId, "Wrong roundId");
+        _;
+    }
+
+    // This makes sure we can't initialize the implementation contract.
+    modifier onlyIfNotBase() {
+        require(_isBase == false, "The implementation contract can't be initialized");
+        _;
+    }
+
+    // This makes sure we can't initialize a cloned contract twice.
+    modifier onlyIfNotAlreadyInitialized() {
+        require(creator == address(0), "Contract already initialized");
+        _;
+    }
+
+    modifier onlyNotPaused() {
+        require(contractPaused != true, "Contract is paused");
+        _;
+    }
+
+    modifier onlyPaused() {
+        require(contractPaused != false, "Contract is not paused");
+        _;
+    }
+
+    ///
+    /// EMERGENCY
+    ///
+
+    function withdrawFunds(address receiver) external onlyCreatorOrAdmin {
+        _safeTransfert(receiver, address(this).balance);
     }
 
     ///
