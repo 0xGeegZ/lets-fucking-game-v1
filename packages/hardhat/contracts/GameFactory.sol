@@ -105,8 +105,8 @@ contract GameFactory is Pausable, Ownable {
 
         GameImplementationInterface(newGameAddress).initialize(
             GameImplementationInterface.Initialization({
-                _initializer: msg.sender,
-                _factoryOwner: owner(),
+                _creator: msg.sender,
+                _generalAdmin: owner(),
                 _cronUpkeep: cronUpkeep,
                 _gameImplementationVersion: latestGameImplementationVersionId,
                 _gameId: nextGameId,

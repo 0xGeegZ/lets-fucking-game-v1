@@ -77,8 +77,8 @@ contract GameImplementation {
     }
 
     struct Initialization {
-        address _initializer;
-        address _factoryOwner;
+        address _creator;
+        address _generalAdmin;
         address _cronUpkeep;
         uint256 _gameImplementationVersion;
         uint256 _gameId;
@@ -127,8 +127,8 @@ contract GameImplementation {
         // Pattern is : * * * * *
         // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
 
-        generalAdmin = initialization._factoryOwner;
-        creator = initialization._initializer;
+        generalAdmin = initialization._generalAdmin;
+        creator = initialization._creator;
         factory = msg.sender;
         randNonce = 0;
 
@@ -423,7 +423,6 @@ contract GameImplementation {
         gameImage = _gameImage;
     }
 
-    // TODO GUIGUI (the game need to not be in progress)
     function setMaxPlayers(uint256 _maxPlayers)
         external
         onlyCreatorOrAdmin
