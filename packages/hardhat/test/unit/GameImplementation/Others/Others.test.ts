@@ -164,7 +164,7 @@ describe('GameImplementationContract - Others', function () {
             this.deployedGame
               .connect(this.players[5])
               .withdrawFunds(this.players[5].address),
-            'Caller is not the creator'
+            'Caller is not the factory or admin'
           )
         })
       })

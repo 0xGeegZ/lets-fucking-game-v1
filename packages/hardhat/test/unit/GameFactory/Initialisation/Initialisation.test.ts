@@ -10,8 +10,8 @@ describe('GameFactoryContract', function () {
       it('should revert with the correct reason', async function () {
         await expectRevert(
           this.gameImplementation.initialize({
-            _initializer: this.bob.address,
-            _factoryOwner: this.owner.address,
+            _creator: this.bob.address,
+            _generalAdmin: this.owner.address,
             _cronUpkeep: this.cronUpkeep.address,
             _gameImplementationVersion: '0',
             _gameId: '0',
@@ -48,8 +48,8 @@ describe('GameFactoryContract', function () {
         )
         await expectRevert(
           clonedGameContract.initialize({
-            _initializer: this.bob.address,
-            _factoryOwner: this.owner.address,
+            _creator: this.bob.address,
+            _generalAdmin: this.owner.address,
             _cronUpkeep: this.cronUpkeep.address,
             _gameImplementationVersion: '0',
             _gameId: '0',

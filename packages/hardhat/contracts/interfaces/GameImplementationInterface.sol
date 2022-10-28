@@ -42,8 +42,8 @@ interface GameImplementationInterface {
      * @notice Initialization structure that contain all the data that are needed to create a new game
      */
     struct Initialization {
-        address _initializer;
-        address _factoryOwner;
+        address _generalAdmin;
+        address _creator;
         address _cronUpkeep;
         uint256 _gameImplementationVersion;
         uint256 _gameId;
@@ -109,8 +109,8 @@ interface GameImplementationInterface {
     /**
      * @notice Create a new Game Implementation by cloning the base contract
      * @param initialization the initialisation data with params as follow :
-     *  @param initialization._initializer the game creator
-     *  @param initialization._factoryOwner the general admin address
+     *  @param initialization._creator the game creator
+     *  @param initialization._generalAdmin the general admin address
      *  @param initialization._cronUpkeep the cron upkeep address
      *  @param initialization._gameImplementationVersion the version of the game implementation
      *  @param initialization._gameId the unique game id (fix)

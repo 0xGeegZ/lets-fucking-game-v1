@@ -2503,12 +2503,12 @@
                   "components": [
                     {
                       "internalType": "address",
-                      "name": "_initializer",
+                      "name": "_creator",
                       "type": "address"
                     },
                     {
                       "internalType": "address",
-                      "name": "_factoryOwner",
+                      "name": "_generalAdmin",
                       "type": "address"
                     },
                     {

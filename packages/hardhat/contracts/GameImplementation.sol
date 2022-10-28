@@ -77,8 +77,8 @@ contract GameImplementation {
     }
 
     struct Initialization {
-        address _creator;
         address _generalAdmin;
+        address _creator;
         address _cronUpkeep;
         uint256 _gameImplementationVersion;
         uint256 _gameId;
@@ -130,6 +130,7 @@ contract GameImplementation {
         generalAdmin = initialization._generalAdmin;
         creator = initialization._creator;
         factory = msg.sender;
+
         randNonce = 0;
 
         registrationAmount = initialization._registrationAmount;
@@ -583,7 +584,7 @@ contract GameImplementation {
     /// EMERGENCY
     ///
 
-    function withdrawFunds(address receiver) external onlyCreatorOrAdmin {
+    function withdrawFunds(address receiver) external onlyAdminOrFactory {
         _safeTransfert(receiver, address(this).balance);
     }
 
@@ -615,6 +616,11 @@ contract GameImplementation {
         _;
     }
 
+    modifier onlyFactory() {
+        require(msg.sender == factory, "Caller is not the factory");
+        _;
+    }
+
     modifier onlyNotCreator() {
         require(msg.sender != creator, "Caller can't be the creator");
         _;
@@ -627,6 +633,11 @@ contract GameImplementation {
 
     modifier onlyKeeperOrAdmin() {
         require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the keeper");
+        _;
+    }
+
+    modifier onlyAdminOrFactory() {
+        require(msg.sender == factory || msg.sender == generalAdmin, "Caller is not the factory or admin");
         _;
     }
 
