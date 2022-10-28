@@ -1,6 +1,6 @@
 import { ethers, run } from 'hardhat'
-import { DeployFunction, DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction, DeployFunction } from 'hardhat-deploy/types'
 
 import { networkConfig } from '../config/networkConfig'
 import { autoFundCheck } from '../helpers/autoFundCheck'
@@ -35,5 +35,6 @@ const func: DeployFunction = async function ({
 }
 
 func.tags = ['all', 'lfg', 'main', 'fund-link']
+module.exports.dependencies = ['keeper']
 
 export default func

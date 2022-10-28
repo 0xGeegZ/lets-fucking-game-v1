@@ -17,6 +17,7 @@ const func: DeployFunction = async function ({
   const cronUpkeep = await deployments.get('CronUpkeep')
   const cronUpkeepDelegate = await deployments.get('CronUpkeepDelegate')
 
+  // TODO remove unecessary libraries links
   saveContractData({
     [chainId]: {
       GameFactory: {
@@ -50,5 +51,11 @@ const func: DeployFunction = async function ({
 }
 
 func.tags = ['all']
+module.exports.dependencies = [
+  'game-factory',
+  'game-implementation',
+  'keeper',
+  'multicall',
+]
 
 export default func

@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -35,7 +35,7 @@ const func: DeployFunction = async function ({
   // ];
 
   const houseEdge = ethers.utils.parseUnits('0.00005')
-  const creatorEdge = ethers.utils.parseUnits('0.00005')
+  // const creatorEdge = ethers.utils.parseUnits('0.00005')
 
   const authorizedAmounts = [
     ethers.utils.parseEther('0.0001'),
@@ -62,7 +62,6 @@ const func: DeployFunction = async function ({
       gameImplementationAddress,
       cronUpkeepAddress,
       houseEdge,
-      creatorEdge,
       authorizedAmounts,
     ],
   })

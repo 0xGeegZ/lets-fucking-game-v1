@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
+// TODO REMOVE AFTER TEST
 import "hardhat/console.sol";
 
 // console.log("jobIdLength creating job %s", nextCronJobIDs);
@@ -16,6 +17,7 @@ contract GameImplementation {
     bool private _isBase;
     uint256 private randNonce;
 
+    // TODO GUIGUI rename generalAdmin to factory?
     address public generalAdmin;
     address public creator;
     address public factory;
@@ -109,7 +111,16 @@ contract GameImplementation {
         _isBase = true;
     }
 
+    // TODO GUIGUI add only admin here
     function initialize(Initialization calldata initialization) external onlyIfNotBase onlyIfNotAlreadyInitialized {
+        // TODO create constant for max house edge
+        // require(initialization._creatorEdge <= 5, "Creator Edge need to be less or equal to 10");
+
+        // TODO verify cron limitation : not less than every hour
+        // verify that should not contains "*/" in first value
+        // Pattern is : * * * * *
+        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
+
         generalAdmin = initialization._factoryOwner;
         creator = initialization._initializer;
         factory = msg.sender;
@@ -126,11 +137,6 @@ contract GameImplementation {
         playTimeRange = initialization._playTimeRange;
         maxPlayers = initialization._maxPlayers;
 
-        // TODO verify cron limitation : not less than every hour
-        // verify that should not contains "*/" in first value
-        // Pattern is : * * * * *
-        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
-
         encodedCron = CronExternal.toEncodedSpec(initialization._encodedCron);
         cronUpkeep = initialization._cronUpkeep;
 
@@ -144,7 +150,7 @@ contract GameImplementation {
         );
     }
 
-    // TODO for development use remove in next smart contract version
+    // TODO IMPORTANT for development use remove in next smart contract version
     function startGame() external onlyCreatorOrAdmin onlyNotPaused onlyIfFull {
         _startGame();
     }
@@ -429,6 +435,11 @@ contract GameImplementation {
         require(_cronUpkeep != address(0), "Keeper need to be initialised");
         require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
 
+        // TODO verify cron limitation : not less than every hour
+        // verify that should not contains "*/" in first value
+        // Pattern is : * * * * *
+        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
+
         encodedCron = CronExternal.toEncodedSpec(_encodedCron);
         cronUpkeep = _cronUpkeep;
 
@@ -443,6 +454,11 @@ contract GameImplementation {
 
     function updateUpKeepCron(string memory _encodedCron) external onlyCreatorOrAdmin {
         require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
+
+        // TODO verify cron limitation : not less than every hour
+        // verify that should not contains "*/" in first value
+        // Pattern is : * * * * *
+        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
 
         encodedCron = CronExternal.toEncodedSpec(_encodedCron);
 
@@ -578,7 +594,7 @@ contract GameImplementation {
     ///
 
     modifier onlyAdmin() {
-        require(msg.sender == generalAdmin, "Caller is not the creator");
+        require(msg.sender == generalAdmin, "Caller is not the admin");
         _;
     }
 

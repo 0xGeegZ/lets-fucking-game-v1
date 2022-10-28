@@ -11,7 +11,13 @@ const AUTHORIZED_AMOUNTS = [
 const setupTest = deployments.createFixture(
   async (
     { deployments, getNamedAccounts, ethers }: HardhatRuntimeEnvironment,
-    { maxPlayers, playTimeRange, correctRegistrationAmount, encodedCron }
+    {
+      maxPlayers,
+      playTimeRange,
+      correctRegistrationAmount,
+      creatorEdge,
+      encodedCron,
+    }
   ) => {
     // await deployments.fixture(['lfg'])
     await deployments.fixture()
@@ -92,6 +98,7 @@ const setupTest = deployments.createFixture(
       maxPlayers,
       playTimeRange,
       correctRegistrationAmount,
+      creatorEdge,
       encodedCron
     )
 
@@ -177,6 +184,7 @@ const initialiseTestData = async function () {
     maxPlayers: this.maxPlayers,
     playTimeRange: this.playTimeRange,
     correctRegistrationAmount: this.correctRegistrationAmount,
+    creatorEdge: this.creatorEdge,
     encodedCron: this.encodedCron,
   })
 

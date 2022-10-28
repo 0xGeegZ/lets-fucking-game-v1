@@ -15,7 +15,7 @@ contract GameFactory is Pausable, Ownable {
     // TODO should be entered as percent
     uint256 public houseEdge;
     // TODO should be entered as percent
-    uint256 public creatorEdge;
+    // uint256 public creatorEdge;
     uint256 public latestGameImplementationVersionId;
     GameImplementationVersion[] public gameImplementations;
     uint256 public nextGameId = 0;
@@ -47,17 +47,24 @@ contract GameFactory is Pausable, Ownable {
     event GameCreated(uint256 nextGameId, address gameAddress, uint256 implementationVersion, address creatorAddress);
     event FailedTransfer(address receiver, uint256 amount);
 
+    // TODO add game amount to pay when creating a new game
     constructor(
         address _gameImplementation,
         address _cronUpkeep,
         uint256 _houseEdge,
-        uint256 _creatorEdge,
+        // uint256 _creatorEdge,
         uint256[] memory _authorizedAmounts
     ) onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts) {
+        // TODO transfor requires to modifiers
+        require(_gameImplementation != address(0), "Game Implementation need to be initialised");
+        require(_cronUpkeep != address(0), "Keeper need to be initialised");
+        // TODO create constant for max house edge
+        // require(_houseEdge <= 10, "House Edge need to be less or equal to 10");
+
         cronUpkeep = _cronUpkeep;
 
         houseEdge = _houseEdge;
-        creatorEdge = _creatorEdge;
+        // creatorEdge = _creatorEdge;
         gameImplementations.push(
             GameImplementationVersion({ id: latestGameImplementationVersionId, deployedAddress: _gameImplementation })
         );
@@ -74,42 +81,6 @@ contract GameFactory is Pausable, Ownable {
     }
 
     ///
-    /// MODIFIERS
-    ///
-    modifier onlyAdmin() {
-        require(msg.sender == owner(), "Caller is not the admin");
-        _;
-    }
-    modifier onlyAllowedNumberOfPlayers(uint256 _maxPlayers) {
-        require(_maxPlayers > 1, "maxPlayers should be bigger than or equal to 2");
-        require(_maxPlayers < 21, "maxPlayers should not be bigger than 20");
-        _;
-    }
-    modifier onlyAllowedPlayTimeRange(uint256 _playTimeRange) {
-        require(_playTimeRange > 0, "playTimeRange should be bigger than 0");
-        require(_playTimeRange < 9, "playTimeRange should not be bigger than 8");
-        _;
-    }
-
-    modifier onlyAllowedRegistrationAmount(uint256 _registrationAmount) {
-        require(
-            usedAuthorisedAmounts[_registrationAmount].amount == _registrationAmount,
-            "registrationAmout is not allowed"
-        );
-        _;
-    }
-
-    modifier onlyIfNotUsedRegistrationAmounts(uint256 _registrationAmount) {
-        require(usedAuthorisedAmounts[_registrationAmount].isUsed == false, "registrationAmout is already used");
-        _;
-    }
-
-    modifier onlyIfAuthorizedAmountsIsNotEmpty(uint256[] memory _authorizedAmounts) {
-        require(_authorizedAmounts.length >= 1, "authorizedAmounts should be greather or equal to 1");
-        _;
-    }
-
-    ///
     ///BUSINESS LOGIC FUNCTIONS
     ///
     // TODO add Name and image url as argument to createNewGame & initialize functions
@@ -117,6 +88,7 @@ contract GameFactory is Pausable, Ownable {
         uint256 _maxPlayers,
         uint256 _playTimeRange,
         uint256 _registrationAmount,
+        uint256 _creatorEdge,
         string memory _encodedCron
     )
         public
@@ -144,7 +116,7 @@ contract GameFactory is Pausable, Ownable {
                 _maxPlayers: _maxPlayers,
                 _registrationAmount: _registrationAmount,
                 _houseEdge: houseEdge,
-                _creatorEdge: creatorEdge,
+                _creatorEdge: _creatorEdge,
                 _encodedCron: _encodedCron
             })
         );
@@ -246,5 +218,41 @@ contract GameFactory is Pausable, Ownable {
 
     function getAuthorisedAmount(uint256 _authorizedAmount) external view returns (AuthorizedAmount memory) {
         return usedAuthorisedAmounts[_authorizedAmount];
+    }
+
+    ///
+    /// MODIFIERS
+    ///
+    modifier onlyAdmin() {
+        require(msg.sender == owner(), "Caller is not the admin");
+        _;
+    }
+    modifier onlyAllowedNumberOfPlayers(uint256 _maxPlayers) {
+        require(_maxPlayers > 1, "maxPlayers should be bigger than or equal to 2");
+        require(_maxPlayers < 21, "maxPlayers should not be bigger than 20");
+        _;
+    }
+    modifier onlyAllowedPlayTimeRange(uint256 _playTimeRange) {
+        require(_playTimeRange > 0, "playTimeRange should be bigger than 0");
+        require(_playTimeRange < 9, "playTimeRange should not be bigger than 8");
+        _;
+    }
+
+    modifier onlyAllowedRegistrationAmount(uint256 _registrationAmount) {
+        require(
+            usedAuthorisedAmounts[_registrationAmount].amount == _registrationAmount,
+            "registrationAmout is not allowed"
+        );
+        _;
+    }
+
+    modifier onlyIfNotUsedRegistrationAmounts(uint256 _registrationAmount) {
+        require(usedAuthorisedAmounts[_registrationAmount].isUsed == false, "registrationAmout is already used");
+        _;
+    }
+
+    modifier onlyIfAuthorizedAmountsIsNotEmpty(uint256[] memory _authorizedAmounts) {
+        require(_authorizedAmounts.length >= 1, "authorizedAmounts should be greather or equal to 1");
+        _;
     }
 }

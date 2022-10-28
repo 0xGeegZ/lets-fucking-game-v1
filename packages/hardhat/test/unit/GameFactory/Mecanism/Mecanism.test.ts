@@ -19,6 +19,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               this.playTimeRange,
               this.correctRegistrationAmount,
+              this.creatorEdge,
               this.encodedCron
             ),
           'Pausable: paused'
@@ -38,6 +39,7 @@ describe('GameFactoryContract', function () {
               outOfRangeMaxPlayers1,
               this.playTimeRange,
               this.correctRegistrationAmount,
+              this.creatorEdge,
               this.encodedCron
             ),
           'maxPlayers should not be bigger than 20'
@@ -50,6 +52,7 @@ describe('GameFactoryContract', function () {
               outOfRangeMaxPlayers2,
               this.playTimeRange,
               this.correctRegistrationAmount,
+              this.creatorEdge,
               this.encodedCron
             ),
           'maxPlayers should be bigger than or equal to 2'
@@ -69,6 +72,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               outOfRangePlayTimeRange1,
               this.correctRegistrationAmount,
+              this.creatorEdge,
               this.encodedCron
             ),
           'playTimeRange should not be bigger than 8'
@@ -81,6 +85,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               outOfRangePlayTimeRange2,
               this.correctRegistrationAmount,
+              this.creatorEdge,
               this.encodedCron
             ),
           'playTimeRange should be bigger than 0'
@@ -98,6 +103,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
+            this.creatorEdge,
             this.encodedCron
           )
 
@@ -151,6 +157,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 1],
+            this.creatorEdge,
             this.encodedCron
           )
         await this.gameFactory
@@ -159,6 +166,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 2],
+            this.creatorEdge,
             this.encodedCron
           )
 
@@ -193,6 +201,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               this.playTimeRange,
               this.authorizedAmounts[this.authorizedAmounts.length - 1],
+              this.creatorEdge,
               this.encodedCron
             )
         )
@@ -214,6 +223,7 @@ describe('GameFactoryContract', function () {
           this.maxPlayers,
           this.playTimeRange,
           this.authorizedAmounts[1],
+          this.creatorEdge,
           this.encodedCron
         )
       await this.gameFactory
@@ -222,6 +232,7 @@ describe('GameFactoryContract', function () {
           this.maxPlayers,
           this.playTimeRange,
           this.authorizedAmounts[2],
+          this.creatorEdge,
           this.encodedCron
         )
 

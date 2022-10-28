@@ -110,7 +110,7 @@ describe('GameImplementationContract - Others', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
             this.deployedGame.connect(this.bob).withdrawAdminEdge(),
-            'Caller is not the creator'
+            'Caller is not the admin'
           )
         })
       })

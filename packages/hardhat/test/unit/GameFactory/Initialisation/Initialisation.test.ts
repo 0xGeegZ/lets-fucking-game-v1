@@ -34,6 +34,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 1],
+            this.creatorEdge,
             this.encodedCron
           )
 
@@ -75,7 +76,7 @@ describe('GameFactoryContract', function () {
           )
         const responseOwner = await this.gameFactory.owner()
         const responseHouseEdge = await this.gameFactory.houseEdge()
-        const responseCreatorEdge = await this.gameFactory.creatorEdge()
+        // const responseCreatorEdge = await this.gameFactory.creatorEdge()
         const responseAuthorizedAmounts =
           await this.gameFactory.getAuthorisedAmounts()
 
@@ -85,7 +86,7 @@ describe('GameFactoryContract', function () {
           this.gameImplementation.address
         )
         expect(responseHouseEdge).to.be.equal(this.houseEdge)
-        expect(responseCreatorEdge).to.be.equal(this.creatorEdge)
+        // expect(responseCreatorEdge).to.be.equal(this.creatorEdge)
         expect(responseAuthorizedAmounts.toString()).to.be.equal(
           this.authorizedAmounts.toString()
         )
@@ -101,7 +102,7 @@ describe('GameFactoryContract', function () {
           this.gameImplementation.address,
           this.cronUpkeep.address,
           this.houseEdge,
-          this.creatorEdge,
+          // this.creatorEdge,
           this.authorizedAmounts
         )
         await gameFactoryContract.deployed()
@@ -113,7 +114,7 @@ describe('GameFactoryContract', function () {
             this.gameImplementation.address,
             this.cronUpkeep.address,
             this.houseEdge,
-            this.creatorEdge,
+            // this.creatorEdge,
             emptyauthorizedAmounts
           ),
           'authorizedAmounts should be greather or equal to 1'
@@ -127,6 +128,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             sameRegistrationAmount,
+            this.creatorEdge,
             this.encodedCron
           )
 
@@ -137,6 +139,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               this.playTimeRange,
               sameRegistrationAmount,
+              this.creatorEdge,
               this.encodedCron
             ),
           'registrationAmout is already used'
