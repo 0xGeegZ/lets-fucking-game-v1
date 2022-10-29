@@ -34,6 +34,8 @@ const func: DeployFunction = async function ({
   //   '100000000000000',
   // ];
 
+  const gameCreationAmount = ethers.utils.parseEther('0.1')
+
   const houseEdge = ethers.utils.parseUnits('0.00005')
   // const creatorEdge = ethers.utils.parseUnits('0.00005')
 
@@ -61,6 +63,7 @@ const func: DeployFunction = async function ({
     args: [
       gameImplementationAddress,
       cronUpkeepAddress,
+      gameCreationAmount,
       houseEdge,
       authorizedAmounts,
     ],

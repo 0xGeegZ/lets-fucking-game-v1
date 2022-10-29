@@ -16,6 +16,8 @@ contract GameFactory is Pausable, Ownable {
     // TODO GUIGUI should be entered as percent
     uint256 public houseEdge;
 
+    uint256 public gameCreationAmount;
+
     uint256 public latestGameImplementationVersionId;
     GameImplementationVersion[] public gameImplementations;
 
@@ -27,6 +29,7 @@ contract GameFactory is Pausable, Ownable {
     ///
     ///STRUCTS
     ///
+
     /**
      * @notice Game structure that contain all usefull data for a game
      */
@@ -76,13 +79,17 @@ contract GameFactory is Pausable, Ownable {
     event Received(address sender, uint256 amount);
 
     /**
-     * @notice Constructor the is tagged ad base
-     * Base can only been initialised once
+     * @notice Constructor Tha initialised the factory configuration
+     * @param _gameImplementation the game implementation address
+     * @param _cronUpkeep the keeper address
+     * @param _gameCreationAmount the game creation amount
+     * @param _houseEdge the house edge in percent
+     * @param _authorizedAmounts the list of authorised amounts for game creation
      */
-    // TODO GUIGUI add game amount to pay when creating a new game
     constructor(
         address _gameImplementation,
         address _cronUpkeep,
+        uint256 _gameCreationAmount,
         uint256 _houseEdge,
         uint256[] memory _authorizedAmounts
     ) onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts) {
@@ -95,6 +102,8 @@ contract GameFactory is Pausable, Ownable {
         cronUpkeep = _cronUpkeep;
 
         houseEdge = _houseEdge;
+        gameCreationAmount = _gameCreationAmount;
+
         gameImplementations.push(
             GameImplementationVersion({ id: latestGameImplementationVersionId, deployedAddress: _gameImplementation })
         );
@@ -131,7 +140,9 @@ contract GameFactory is Pausable, Ownable {
         string memory _encodedCron
     )
         public
+        payable
         whenNotPaused
+        onlyGameCreationAmount
         onlyAllowedRegistrationAmount(_registrationAmount)
         onlyIfNotUsedRegistrationAmounts(_registrationAmount)
         returns (address game)
@@ -364,6 +375,14 @@ contract GameFactory is Pausable, Ownable {
      */
     modifier onlyAdmin() {
         require(msg.sender == owner(), "Caller is not the admin");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that amount sended is game creation amount
+     */
+    modifier onlyGameCreationAmount() {
+        require(msg.value == gameCreationAmount, "Only game creation amount is allowed");
         _;
     }
 

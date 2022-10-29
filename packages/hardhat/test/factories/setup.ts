@@ -15,6 +15,7 @@ const setupTest = deployments.createFixture(
       maxPlayers,
       playTimeRange,
       correctRegistrationAmount,
+      gameCreationAmount,
       creatorEdge,
       encodedCron,
     }
@@ -99,7 +100,8 @@ const setupTest = deployments.createFixture(
       playTimeRange,
       correctRegistrationAmount,
       creatorEdge,
-      encodedCron
+      encodedCron,
+      { value: gameCreationAmount }
     )
 
     const game = await gameFactory.deployedGames('0')
@@ -150,6 +152,7 @@ const initialiseTestData = async function () {
   this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
   this.zeroRegistrationAmount = ethers.utils.parseEther('0')
 
+  this.gameCreationAmount = ethers.utils.parseEther('0.1')
   this.houseEdge = ethers.utils.parseEther('0.00005')
   this.creatorEdge = ethers.utils.parseEther('0.00005')
   // prizeAmount equals total prize amount minus house edge
@@ -184,6 +187,7 @@ const initialiseTestData = async function () {
     maxPlayers: this.maxPlayers,
     playTimeRange: this.playTimeRange,
     correctRegistrationAmount: this.correctRegistrationAmount,
+    gameCreationAmount: this.gameCreationAmount,
     creatorEdge: this.creatorEdge,
     encodedCron: this.encodedCron,
   })

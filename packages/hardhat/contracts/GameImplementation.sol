@@ -161,9 +161,9 @@ contract GameImplementation {
     ///
     /// CONSTRUCTOR AND INITIALISATION
     ///
+
     /**
-     * @notice Constructor the is tagged ad base
-     * Base can only been initialised once
+     * @notice Constructor that define itself as base
      */
     constructor() {
         _isBase = true;

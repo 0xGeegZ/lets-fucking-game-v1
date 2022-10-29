@@ -35,7 +35,8 @@ describe('GameFactoryContract', function () {
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 1],
             this.creatorEdge,
-            this.encodedCron
+            this.encodedCron,
+            { value: this.gameCreationAmount }
           )
 
         const deployedGames = await this.gameFactory
@@ -101,8 +102,8 @@ describe('GameFactoryContract', function () {
         ).deploy(
           this.gameImplementation.address,
           this.cronUpkeep.address,
+          this.gameCreationAmount,
           this.houseEdge,
-          // this.creatorEdge,
           this.authorizedAmounts
         )
         await gameFactoryContract.deployed()
@@ -113,8 +114,8 @@ describe('GameFactoryContract', function () {
           this.GameFactoryContract.connect(this.owner).deploy(
             this.gameImplementation.address,
             this.cronUpkeep.address,
+            this.gameCreationAmount,
             this.houseEdge,
-            // this.creatorEdge,
             emptyauthorizedAmounts
           ),
           'authorizedAmounts should be greather or equal to 1'
@@ -129,7 +130,8 @@ describe('GameFactoryContract', function () {
             this.playTimeRange,
             sameRegistrationAmount,
             this.creatorEdge,
-            this.encodedCron
+            this.encodedCron,
+            { value: this.gameCreationAmount }
           )
 
         await expectRevert(
@@ -140,7 +142,8 @@ describe('GameFactoryContract', function () {
               this.playTimeRange,
               sameRegistrationAmount,
               this.creatorEdge,
-              this.encodedCron
+              this.encodedCron,
+              { value: this.gameCreationAmount }
             ),
           'registrationAmout is already used'
         )
