@@ -190,7 +190,7 @@ describe('GameImplementationContract - Mecanism', function () {
         const wrongCaller = this.players[0]
         await expectRevert(
           this.deployedGame.connect(wrongCaller).triggerDailyCheckpoint(),
-          'Caller is not the keeper'
+          'Caller is not the admin or keeper'
         )
       })
     })
@@ -854,7 +854,6 @@ describe('GameImplementationContract - Mecanism', function () {
           winnerIndex,
           contract: this.deployedGame,
           amount: this.correctRegistrationAmount,
-
           mockKeeper: this.mockKeeper,
         })
         const updatedPlayersAmount = await this.deployedGame.numPlayers()
@@ -907,7 +906,7 @@ describe('GameImplementationContract - Mecanism', function () {
           this.deployedGame
             .connect(this.players[winnerIndex])
             .claimPrize(inexistantGameId),
-          'This game does not exist'
+          'This round does not exist'
         )
       })
     })
@@ -1164,7 +1163,8 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should revert if remaining player are less than 50 % of total players', async function () {
-        // TODO
+        // TODO Implement Test
+        expect(true).to.be.false
       })
     })
   })

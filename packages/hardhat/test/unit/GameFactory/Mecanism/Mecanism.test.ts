@@ -16,10 +16,15 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               this.maxPlayers,
               this.playTimeRange,
               this.correctRegistrationAmount,
-              this.encodedCron
+              this.treasuryFee,
+              this.creatorFee,
+              this.encodedCron,
+              { value: this.gameCreationAmount }
             ),
           'Pausable: paused'
         )
@@ -28,29 +33,42 @@ describe('GameFactoryContract', function () {
 
     describe('when the given this.maxPlayers is not in authorized range', function () {
       it('should revert with correct message', async function () {
-        const outOfRangeMaxPlayers1 = 21
+        const registrationAmount =
+          this.authorizedAmounts[this.authorizedAmounts.length - 1]
+
+        const outOfRangeMaxPlayers1 = 101
         const outOfRangeMaxPlayers2 = 1
 
         await expectRevert(
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               outOfRangeMaxPlayers1,
               this.playTimeRange,
-              this.correctRegistrationAmount,
-              this.encodedCron
+              registrationAmount,
+              this.treasuryFee,
+              this.creatorFee,
+              this.encodedCron,
+              { value: this.gameCreationAmount }
             ),
-          'maxPlayers should not be bigger than 20'
+          'maxPlayers should not be bigger than 100'
         )
 
         await expectRevert(
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               outOfRangeMaxPlayers2,
               this.playTimeRange,
-              this.correctRegistrationAmount,
-              this.encodedCron
+              registrationAmount,
+              this.treasuryFee,
+              this.creatorFee,
+              this.encodedCron,
+              { value: this.gameCreationAmount }
             ),
           'maxPlayers should be bigger than or equal to 2'
         )
@@ -59,6 +77,9 @@ describe('GameFactoryContract', function () {
 
     describe('when the given this.playTimeRange is not in authorized range', function () {
       it('should revert with correct message', async function () {
+        const registrationAmount =
+          this.authorizedAmounts[this.authorizedAmounts.length - 1]
+
         const outOfRangePlayTimeRange1 = 9
         const outOfRangePlayTimeRange2 = 0
 
@@ -66,10 +87,15 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               this.maxPlayers,
               outOfRangePlayTimeRange1,
-              this.correctRegistrationAmount,
-              this.encodedCron
+              registrationAmount,
+              this.treasuryFee,
+              this.creatorFee,
+              this.encodedCron,
+              { value: this.gameCreationAmount }
             ),
           'playTimeRange should not be bigger than 8'
         )
@@ -78,10 +104,15 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               this.maxPlayers,
               outOfRangePlayTimeRange2,
-              this.correctRegistrationAmount,
-              this.encodedCron
+              registrationAmount,
+              this.treasuryFee,
+              this.creatorFee,
+              this.encodedCron,
+              { value: this.gameCreationAmount }
             ),
           'playTimeRange should be bigger than 0'
         )
@@ -95,10 +126,15 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
+            this.gameName,
+            this.gameImage,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
-            this.encodedCron
+            this.treasuryFee,
+            this.creatorFee,
+            this.encodedCron,
+            { value: this.gameCreationAmount }
           )
 
         const deployedGames = await this.gameFactory
@@ -110,7 +146,7 @@ describe('GameFactoryContract', function () {
           newGame.deployedAddress
         )
 
-        const responseGeneralAdmin = await clonedGameContract.generalAdmin()
+        const responseOwner = await clonedGameContract.owner()
         const responseCreator = await clonedGameContract.creator()
         const responseFactory = await clonedGameContract.factory()
         const responseGameId = await clonedGameContract.roundId()
@@ -120,10 +156,10 @@ describe('GameFactoryContract', function () {
         const responseMaxPlayers = await clonedGameContract.maxPlayers()
         const responseRegistrationAmount =
           await clonedGameContract.registrationAmount()
-        const responseHouseEdge = await clonedGameContract.houseEdge()
-        const responseCreatorEdge = await clonedGameContract.creatorEdge()
+        const responseTreasuryFee = await clonedGameContract.treasuryFee()
+        const responseCreatorFee = await clonedGameContract.creatorFee()
 
-        expect(responseGeneralAdmin).to.be.equal(this.owner.address)
+        expect(responseOwner).to.be.equal(this.owner.address)
         expect(responseCreator).to.be.equal(this.bob.address)
         expect(responseFactory).to.be.equal(this.gameFactory.address)
         expect(responseGameId).to.be.equal('0')
@@ -132,12 +168,14 @@ describe('GameFactoryContract', function () {
         expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
         expect(responseRegistrationAmount).to.be.equal(registrationAmount)
-        expect(responseHouseEdge).to.be.equal(this.houseEdge)
-        expect(responseCreatorEdge).to.be.equal(this.creatorEdge)
+        expect(responseTreasuryFee).to.be.equal(this.treasuryFee)
+        expect(responseCreatorFee).to.be.equal(this.creatorFee)
       })
 
       it('should add the new game in deployedGames', async function () {
-        const currentId = await this.gameFactory.connect(this.owner).gameId()
+        const currentId = await this.gameFactory
+          .connect(this.owner)
+          .nextGameId()
 
         const currentGameImplementationVersionId = await this.gameFactory
           .connect(this.owner)
@@ -146,18 +184,28 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
+            this.gameName,
+            this.gameImage,
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 1],
-            this.encodedCron
+            this.treasuryFee,
+            this.creatorFee,
+            this.encodedCron,
+            { value: this.gameCreationAmount }
           )
         await this.gameFactory
           .connect(this.alice)
           .createNewGame(
+            this.gameName,
+            this.gameImage,
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 2],
-            this.encodedCron
+            this.treasuryFee,
+            this.creatorFee,
+            this.encodedCron,
+            { value: this.gameCreationAmount }
           )
 
         const deployedGames = await this.gameFactory
@@ -180,16 +228,23 @@ describe('GameFactoryContract', function () {
       })
 
       it('should emit the GameCreated event with the correct data', async function () {
-        const currentId = await this.gameFactory.connect(this.owner).gameId()
+        const currentId = await this.gameFactory
+          .connect(this.owner)
+          .nextGameId()
 
         await expect(
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               this.maxPlayers,
               this.playTimeRange,
               this.authorizedAmounts[this.authorizedAmounts.length - 1],
-              this.encodedCron
+              this.treasuryFee,
+              this.creatorFee,
+              this.encodedCron,
+              { value: this.gameCreationAmount }
             )
         )
           .to.emit(this.gameFactory, 'GameCreated')
@@ -207,18 +262,28 @@ describe('GameFactoryContract', function () {
       await this.gameFactory
         .connect(this.bob)
         .createNewGame(
+          this.gameName,
+          this.gameImage,
           this.maxPlayers,
           this.playTimeRange,
           this.authorizedAmounts[1],
-          this.encodedCron
+          this.treasuryFee,
+          this.creatorFee,
+          this.encodedCron,
+          { value: this.gameCreationAmount }
         )
       await this.gameFactory
         .connect(this.alice)
         .createNewGame(
+          this.gameName,
+          this.gameImage,
           this.maxPlayers,
           this.playTimeRange,
           this.authorizedAmounts[2],
-          this.encodedCron
+          this.treasuryFee,
+          this.creatorFee,
+          this.encodedCron,
+          { value: this.gameCreationAmount }
         )
 
       const deployedGamesAfter = await this.gameFactory

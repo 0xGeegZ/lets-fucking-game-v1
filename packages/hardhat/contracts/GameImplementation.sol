@@ -12,34 +12,38 @@ contract GameImplementation {
     bool private _isBase;
     uint256 private randNonce;
 
-    address public generalAdmin;
+    address public owner;
     address public creator;
     address public factory;
 
     address public cronUpkeep;
     bytes public encodedCron;
+    uint256 private cronUpkeepJobId;
 
     uint256 public registrationAmount;
-    uint256 public houseEdge;
-    uint256 public creatorEdge;
 
-    // gameId is fix and represent the fixed id for the game
-    uint256 public gameId;
-    // roundId gets incremented every time the game restarts
-    uint256 public roundId;
+    uint256 public constant MAX_TREASURY_FEE = 1000; // 10%
+    uint256 public constant MAX_CREATOR_FEE = 500; // 5%
+
+    uint256 public treasuryFee; // treasury rate (e.g. 200 = 2%, 150 = 1.50%)
+    uint256 public treasuryAmount; // treasury amount that was not claimed
+
+    uint256 public creatorFee; // treasury rate (e.g. 200 = 2%, 150 = 1.50%)
+    uint256 public creatorAmount; // treasury amount that was not claimed
+
+    uint256 public gameId; // gameId is fix and represent the fixed id for the game
+    uint256 public roundId; // roundId gets incremented every time the game restarts
 
     string public gameName;
     string public gameImage;
 
     uint256 public gameImplementationVersion;
 
-    // Time length of a round in hours
-    uint256 public playTimeRange;
+    uint256 public playTimeRange; // Time length of a round in hours
     uint256 public maxPlayers;
     uint256 public numPlayers;
 
-    // Helps the keeper determine if a game has started or if we need to start it
-    bool public gameInProgress;
+    bool public gameInProgress; // Helps the keeper determine if a game has started or if we need to start it
     bool public contractPaused;
 
     address[] public playerAddresses;
@@ -47,6 +51,10 @@ contract GameImplementation {
     mapping(uint256 => Winner) winners;
 
     ///STRUCTS
+
+    /**
+     * @notice Player structure that contain all usefull data for a player
+     */
     struct Player {
         address playerAddress;
         uint256 roundRangeLowerLimit;
@@ -57,6 +65,9 @@ contract GameImplementation {
         bool isSplitOk;
     }
 
+    /**
+     * @notice WinnerPlayerData structure that contain all usefull data for a winner
+     */
     struct WinnerPlayerData {
         uint256 roundId;
         address playerAddress;
@@ -64,54 +75,155 @@ contract GameImplementation {
         bool prizeClaimed;
     }
 
+    /**
+     * @notice Winner structure that contain a list of winner for a current roundId
+     */
     struct Winner {
         address[] gameWinnerAddresses;
         mapping(address => WinnerPlayerData) gameWinners;
     }
 
+    /**
+     * @notice Initialization structure that contain all the data that are needed to create a new game
+     */
     struct Initialization {
-        address _initializer;
-        address _factoryOwner;
+        address _owner;
+        address _creator;
         address _cronUpkeep;
+        string _gameName;
+        string _gameImage;
         uint256 _gameImplementationVersion;
         uint256 _gameId;
         uint256 _playTimeRange;
         uint256 _maxPlayers;
         uint256 _registrationAmount;
-        uint256 _houseEdge;
-        uint256 _creatorEdge;
+        uint256 _treasuryFee;
+        uint256 _creatorFee;
         string _encodedCron;
     }
 
+    ///
     ///EVENTS
+    ///
+
+    /**
+     * @notice Called when a player has registered for a game
+     */
     event RegisteredForGame(address playerAddress, uint256 playersCount);
+    /**
+     * @notice Called when the keeper start the game
+     */
     event StartedGame(uint256 timelock, uint256 playersCount);
+    /**
+     * @notice Called when the keeper reset the game
+     */
     event ResetGame(uint256 timelock, uint256 resetGameId);
+    /**
+     * @notice Called when a player lost a game
+     */
     event GameLost(uint256 roundId, address playerAddress, uint256 roundCount);
+    /**
+     * @notice Called when a player play a round
+     */
     event PlayedRound(address playerAddress);
+    /**
+     * @notice Called when a player won the game
+     */
     event GameWon(uint256 roundId, address playerAddress, uint256 amountWon);
+    /**
+     * @notice Called when some player(s) split the game
+     */
     event GameSplitted(uint256 roundId, address playerAddress, uint256 amountWon);
+    /**
+     * @notice Called when a player vote to split pot
+     */
     event VoteToSplitPot(uint256 roundId, address playerAddress);
+    /**
+     * @notice Called when a transfert have failed
+     */
     event FailedTransfer(address receiver, uint256 amount);
+    /**
+     * @notice Called when the contract have receive funds via receive() or fallback() function
+     */
     event Received(address sender, uint256 amount);
+    /**
+     * @notice Called when a player have claimed his prize
+     */
     event GamePrizeClaimed(address claimer, uint256 roundId, uint256 amountClaimed);
+    /**
+     * @notice Called when the treasury fee are claimed
+     */
+    event TreasuryFeeClaimed(uint256 amount);
+    /**
+     * @notice Called when the treasury fee are claimed by factory
+     */
+    event TreasuryFeeClaimedByFactory(uint256 amount);
+
+    /**
+     * @notice Called when the creator fee are claimed
+     */
+    event CreatorFeeClaimed(uint256 amount);
+
+    /**
+     * @notice Called when the creator or admin update encodedCron
+     */
+    event EncodedCronUpdated(uint256 jobId, string encodedCron);
+    /**
+     * @notice Called when the factory or admin update cronUpkeep
+     */
+    event CronUpkeepUpdated(uint256 jobId, address cronUpkeep);
 
     ///
-    /// CONSTRUCTOR AND DEFAULT
+    /// CONSTRUCTOR AND INITIALISATION
     ///
+
+    /**
+     * @notice Constructor that define itself as base
+     */
     constructor() {
         _isBase = true;
     }
 
-    function initialize(Initialization calldata initialization) external onlyIfNotBase onlyIfNotAlreadyInitialized {
-        generalAdmin = initialization._factoryOwner;
-        creator = initialization._initializer;
+    /**
+     * @notice Create a new Game Implementation by cloning the base contract
+     * @param initialization the initialisation data with params as follow :
+     *  @param initialization._creator the game creator
+     *  @param initialization._owner the general admin address
+     *  @param initialization._cronUpkeep the cron upkeep address
+     *  @param initialization._gameName the game name
+     *  @param initialization._gameImage the game image path
+     *  @param initialization._gameImplementationVersion the version of the game implementation
+     *  @param initialization._gameId the unique game id (fix)
+     *  @param initialization._playTimeRange the time range during which a player can play in hour
+     *  @param initialization._maxPlayers the maximum number of players for a game
+     *  @param initialization._registrationAmount the amount that players will need to pay to enter in the game
+     *  @param initialization._treasuryFee the treasury fee in percent
+     *  @param initialization._creatorFee creator fee in percent
+     *  @param initialization._encodedCron the cron string
+     */
+    function initialize(Initialization calldata initialization)
+        external
+        onlyIfNotBase
+        onlyIfNotAlreadyInitialized
+        onlyAllowedNumberOfPlayers(initialization._maxPlayers)
+        onlyAllowedPlayTimeRange(initialization._playTimeRange)
+        onlyCreatorFee(initialization._creatorFee)
+    {
+        owner = initialization._owner;
+        creator = initialization._creator;
         factory = msg.sender;
+
+        gameName = initialization._gameName;
+        gameImage = initialization._gameImage;
+
         randNonce = 0;
 
         registrationAmount = initialization._registrationAmount;
-        houseEdge = initialization._houseEdge;
-        creatorEdge = initialization._creatorEdge;
+        treasuryFee = initialization._treasuryFee;
+        creatorFee = initialization._creatorFee;
+
+        treasuryAmount = 0;
+        creatorAmount = 0;
 
         gameId = initialization._gameId;
         gameImplementationVersion = initialization._gameImplementationVersion;
@@ -120,13 +232,11 @@ contract GameImplementation {
         playTimeRange = initialization._playTimeRange;
         maxPlayers = initialization._maxPlayers;
 
-        // TODO verify cron limitation : not less than every hour
-        // verify that should not contains "*/" in first value
-        // Pattern is : * * * * *
-        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
-
         encodedCron = CronExternal.toEncodedSpec(initialization._encodedCron);
         cronUpkeep = initialization._cronUpkeep;
+
+        uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
+        cronUpkeepJobId = nextCronJobIDs;
 
         CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
             address(this),
@@ -135,145 +245,28 @@ contract GameImplementation {
         );
     }
 
-    // TODO for development use remove in next smart contract version
-    function startGame() external onlyCreatorOrAdmin onlyNotPaused onlyIfFull {
+    /**
+     * @notice Function that is called by the keeper when game is ready to start
+     *  TODO IMPORTANT for development use remove in next smart contract version
+     */
+    function startGame() external onlyAdminOrCreator onlyNotPaused onlyIfFull {
         _startGame();
-    }
-
-    ///
-    /// MODIFIERS
-    ///
-
-    modifier onlyAdmin() {
-        require(msg.sender == generalAdmin, "Caller is not the creator");
-        _;
-    }
-
-    modifier onlyCreator() {
-        require(msg.sender == creator, "Caller is not the creator");
-        _;
-    }
-
-    modifier onlyNotCreator() {
-        require(msg.sender != creator, "Caller can't be the creator");
-        _;
-    }
-
-    modifier onlyCreatorOrAdmin() {
-        require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the creator or admin");
-        _;
-    }
-
-    modifier onlyKeeperOrAdmin() {
-        require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the keeper");
-        _;
-    }
-
-    modifier onlyKeeper() {
-        require(msg.sender == cronUpkeep, "Caller is not the keeper");
-        _;
-    }
-
-    modifier onlyIfKeeperDataInit() {
-        require(cronUpkeep != address(0), "Keeper need to be initialised");
-        require(bytes(encodedCron).length != 0, "Keeper cron need to be initialised");
-        _;
-    }
-
-    modifier onlyIfNotFull() {
-        require(numPlayers < maxPlayers, "This game is full");
-        _;
-    }
-
-    modifier onlyIfFull() {
-        require(numPlayers == maxPlayers, "This game is not full");
-        _;
-    }
-
-    modifier onlyIfNotAlreadyEntered() {
-        require(players[msg.sender].playerAddress == address(0), "Player already entered in this game");
-        _;
-    }
-
-    modifier onlyIfAlreadyEntered() {
-        require(players[msg.sender].playerAddress != address(0), "Player has not entered in this game");
-        _;
-    }
-
-    modifier onlyIfHasNotLost() {
-        require(!players[msg.sender].hasLost, "Player has already lost");
-        _;
-    }
-
-    modifier onlyIfHasNotPlayedThisRound() {
-        require(!players[msg.sender].hasPlayedRound, "Player has already played in this round");
-        _;
-    }
-
-    modifier onlyIfPlayersLowerHalfRemaining() {
-        uint256 remainingPlayersLength = _getRemainingPlayersCount();
-        require(
-            remainingPlayersLength <= maxPlayers / 2,
-            "Remaining players must be less or equal than half of started players"
-        );
-        _;
-    }
-
-    modifier onlyIfGameIsInProgress() {
-        require(gameInProgress, "Game is not in progress");
-        _;
-    }
-
-    modifier onlyHumans() {
-        uint256 size;
-        address addr = msg.sender;
-        assembly {
-            size := extcodesize(addr)
-        }
-        require(size == 0, "No contract allowed");
-        _;
-    }
-
-    modifier onlyRegistrationAmount() {
-        require(msg.value == registrationAmount, "Only game amount is allowed");
-        _;
-    }
-
-    modifier onlyIfRoundId(uint256 _roundId) {
-        require(_roundId <= roundId, "Wrong roundId");
-        _;
-    }
-
-    // This makes sure we can't initialize the implementation contract.
-    modifier onlyIfNotBase() {
-        require(_isBase == false, "The implementation contract can't be initialized");
-        _;
-    }
-
-    // This makes sure we can't initialize a cloned contract twice.
-    modifier onlyIfNotAlreadyInitialized() {
-        require(creator == address(0), "Contract already initialized");
-        _;
-    }
-
-    modifier onlyNotPaused() {
-        require(contractPaused != true, "Contract is paused");
-        _;
-    }
-
-    modifier onlyPaused() {
-        require(contractPaused != false, "Contract is not paused");
-        _;
     }
 
     ///
     /// MAIN FUNCTIONS
     ///
+
+    /**
+     * @notice Function that allow players to register for a game
+     * @dev Creator cannot register for his own game
+     */
     function registerForGame()
         external
         payable
         onlyHumans
         onlyNotPaused
+        onlyIfGameIsNotInProgress
         onlyIfNotFull
         onlyIfNotAlreadyEntered
         onlyRegistrationAmount
@@ -294,6 +287,11 @@ contract GameImplementation {
         emit RegisteredForGame(players[msg.sender].playerAddress, numPlayers);
     }
 
+    /**
+     * @notice Function that allow players to play for the current round
+     * @dev Creator cannot play for his own game
+     * @dev Callable by remaining players
+     */
     function playRound()
         external
         onlyHumans
@@ -303,6 +301,7 @@ contract GameImplementation {
         onlyIfHasNotLost
         onlyIfHasNotPlayedThisRound
         onlyNotCreator
+        onlyIfGameIsInProgress
     {
         Player storage player = players[msg.sender];
 
@@ -316,8 +315,11 @@ contract GameImplementation {
         }
     }
 
-    // TODO remove onlyKeeperOrAdmin and make test works
-    function triggerDailyCheckpoint() external onlyKeeperOrAdmin onlyNotPaused {
+    /**
+     * @notice Function that is called by the keeper based on the keeper cron
+     * @dev Callable by admin or keeper
+     */
+    function triggerDailyCheckpoint() external onlyAdminOrKeeper onlyNotPaused {
         // function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
         if (gameInProgress == true) {
             _refreshPlayerStatus();
@@ -329,11 +331,27 @@ contract GameImplementation {
         }
     }
 
-    function claimPrize(uint256 _roundId) external {
-        WinnerPlayerData storage winnerPlayerData = winners[_roundId].gameWinners[msg.sender];
+    /**
+     * @notice Function that allow player to vote to split pot
+     * Only callable if less than 50% of the players remain
+     * @dev Callable by remaining players
+     */
+    function voteToSplitPot()
+        external
+        onlyIfGameIsInProgress
+        onlyIfAlreadyEntered
+        onlyIfHasNotLost
+        onlyIfPlayersLowerHalfRemaining
+    {
+        players[msg.sender].isSplitOk = true;
+        emit VoteToSplitPot(roundId, players[msg.sender].playerAddress);
+    }
 
-        // TODO pass all require to modifier
-        require(_roundId <= roundId, "This game does not exist");
+    /**
+     * @notice Function that is called by a winner to claim his prize
+     */
+    function claimPrize(uint256 _roundId) external onlyIfRoundId(_roundId) {
+        WinnerPlayerData storage winnerPlayerData = winners[_roundId].gameWinners[msg.sender];
         require(winnerPlayerData.playerAddress == msg.sender, "Player did not win this game");
         require(winnerPlayerData.prizeClaimed == false, "Prize for this game already claimed");
         require(address(this).balance >= winnerPlayerData.amountWon, "Not enough funds in contract");
@@ -343,14 +361,13 @@ contract GameImplementation {
         emit GamePrizeClaimed(msg.sender, _roundId, winnerPlayerData.amountWon);
     }
 
-    function voteToSplitPot() external onlyIfAlreadyEntered onlyIfHasNotLost onlyIfPlayersLowerHalfRemaining {
-        players[msg.sender].isSplitOk = true;
-        emit VoteToSplitPot(roundId, players[msg.sender].playerAddress);
-    }
-
     ///
     /// INTERNAL FUNCTIONS
     ///
+
+    /**
+     * @notice Start the game(called when all conditions are ok)
+     */
     function _startGame() internal {
         for (uint256 i = 0; i < numPlayers; i++) {
             Player storage player = players[playerAddresses[i]];
@@ -361,6 +378,9 @@ contract GameImplementation {
         emit StartedGame(block.timestamp, numPlayers);
     }
 
+    /**
+     * @notice Reset the game (called at the end of the current game)
+     */
     function _resetGame() internal {
         gameInProgress = false;
         for (uint256 i = 0; i < numPlayers; i++) {
@@ -373,10 +393,12 @@ contract GameImplementation {
         roundId += 1;
     }
 
-    function _safeTransfert(address receiver, uint256 amount) internal {
-        uint256 balance = address(this).balance;
-        if (balance < amount) require(false, "Not enough in contract balance");
-
+    /**
+     * @notice Transfert funds
+     * @param receiver the receiver address
+     * @param amount the amount to transfert
+     */
+    function _safeTransfert(address receiver, uint256 amount) internal onlyIfEnoughtBalance(amount) {
         (bool success, ) = receiver.call{ value: amount }("");
 
         if (!success) {
@@ -385,12 +407,14 @@ contract GameImplementation {
         }
     }
 
+    /**
+     * @notice Check if game as ended
+     * If so, it will create winners and reset the game
+     */
     function _checkIfGameEnded() internal {
-        // TODO houseEdge + creatorEdge are cumultate.
-        uint256 prize = registrationAmount * numPlayers - houseEdge - creatorEdge;
         uint256 remainingPlayersCounter = 0;
-
         address lastNonLoosingPlayerAddress;
+
         for (uint256 i = 0; i < numPlayers; i++) {
             Player memory currentPlayer = players[playerAddresses[i]];
             if (!currentPlayer.hasLost) {
@@ -399,8 +423,19 @@ contract GameImplementation {
             }
         }
 
+        bool isPlitPot = _isAllPlayersSplitOk();
+
+        if (remainingPlayersCounter > 1 && !isPlitPot) return;
+
+        uint256 totalAmount = registrationAmount * numPlayers;
+        treasuryAmount = (totalAmount * treasuryFee) / 10000;
+        creatorAmount = (totalAmount * creatorFee) / 10000;
+        uint256 rewardAmount = totalAmount - treasuryAmount - creatorAmount;
+
         //Check if Game is over with one winner
         if (remainingPlayersCounter == 1) {
+            uint256 prize = rewardAmount;
+
             Winner storage winner = winners[roundId];
             winner.gameWinners[lastNonLoosingPlayerAddress] = WinnerPlayerData({
                 roundId: roundId,
@@ -411,13 +446,11 @@ contract GameImplementation {
             winner.gameWinnerAddresses.push(lastNonLoosingPlayerAddress);
 
             emit GameWon(roundId, lastNonLoosingPlayerAddress, prize);
-
-            _resetGame();
         }
 
         // Check if remaining players have vote to split pot
-        if (_isAllPlayersSplitOk()) {
-            uint256 splittedPrize = prize / remainingPlayersCounter;
+        if (isPlitPot) {
+            uint256 splittedPrize = rewardAmount / remainingPlayersCounter;
 
             Winner storage gameWinner = winners[roundId];
 
@@ -435,15 +468,20 @@ contract GameImplementation {
                     emit GameSplitted(roundId, currentPlayer.playerAddress, splittedPrize);
                 }
             }
-            _resetGame();
         }
 
-        // If no winner, the house keeps the prize and reset the game
+        // If no winner, the treasury and creator split the prize
         if (remainingPlayersCounter == 0) {
-            _resetGame();
+            treasuryAmount = rewardAmount / 2;
+            creatorAmount = rewardAmount / 2;
         }
+
+        _resetGame();
     }
 
+    /**
+     * @notice Refresh players status for remaining players
+     */
     function _refreshPlayerStatus() internal {
         // if everyone is ok to split, we wait
         if (_isAllPlayersSplitOk()) return;
@@ -461,7 +499,11 @@ contract GameImplementation {
         }
     }
 
-    // This function returns a number between 0 and 24 minus the current length of a round
+    /**
+     * @notice Returns a number between 0 and 24 minus the current length of a round
+     * @param playerAddress the player address
+     * @return the generated number
+     */
     function _randMod(address playerAddress) internal returns (uint256) {
         // increase nonce
         randNonce++;
@@ -471,12 +513,20 @@ contract GameImplementation {
         return randomNumber;
     }
 
+    /**
+     * @notice Reset the round range for a player
+     * @param player the player
+     */
     function _resetRoundRange(Player storage player) internal {
         uint256 newRoundLowerLimit = _randMod(player.playerAddress);
         player.roundRangeLowerLimit = block.timestamp + newRoundLowerLimit * 60 * 60;
         player.roundRangeUpperLimit = player.roundRangeLowerLimit + playTimeRange * 60 * 60;
     }
 
+    /**
+     * @notice Update looser player
+     * @param player the player
+     */
     function _setPlayerAsHavingLost(Player storage player) internal {
         player.hasLost = true;
         player.isSplitOk = false;
@@ -484,6 +534,10 @@ contract GameImplementation {
         emit GameLost(roundId, player.playerAddress, player.roundCount);
     }
 
+    /**
+     * @notice Check if all remaining players are ok to split pot
+     * @return true if all remaining players are ok to split pot, false otherwise
+     */
     function _isAllPlayersSplitOk() internal view returns (bool) {
         uint256 remainingPlayersSplitOkCounter = 0;
         uint256 remainingPlayersLength = _getRemainingPlayersCount();
@@ -497,6 +551,10 @@ contract GameImplementation {
         return remainingPlayersLength != 0 && remainingPlayersSplitOkCounter == remainingPlayersLength;
     }
 
+    /**
+     * @notice Get the number of remaining players for the current game
+     * @return the number of remaining players for the current game
+     */
     function _getRemainingPlayersCount() internal view returns (uint256) {
         uint256 remainingPlayers = 0;
         for (uint256 i = 0; i < numPlayers; i++) {
@@ -507,67 +565,13 @@ contract GameImplementation {
         return remainingPlayers;
     }
 
-    /// CREATOR FUNCTIONS
-
-    function setGameName(string calldata _gameName) external onlyCreator {
-        gameName = _gameName;
-    }
-
-    function setGameImage(string calldata _gameImage) external onlyCreator {
-        gameImage = _gameImage;
-    }
-
-    function withdrawCreatorEdge() external onlyCreator {
-        require(address(this).balance >= creatorEdge);
-        _safeTransfert(creator, creatorEdge);
-    }
-
-    /// ADMIN FUNCTIONS
-    function withdrawAdminEdge() external onlyAdmin {
-        require(address(this).balance >= houseEdge);
-        _safeTransfert(generalAdmin, houseEdge);
-    }
-
-    ///
-    /// EMERGENCY
-    ///
-
-    function withdrawFunds(address receiver) external onlyCreatorOrAdmin {
-        _safeTransfert(receiver, address(this).balance);
-    }
-
-    ///
-    /// SETTERS FUNCTIONS
-    ///
-
-    // TODO create a function to set keeper address & keeper cron
-    function setCronUpkeep(address _cronUpkeep) public onlyCreatorOrAdmin {
-        require(_cronUpkeep != address(0), "Keeper need to be initialised");
-        // cronUpkeep = CronUpkeepInterface(_cronUpkeep);
-        cronUpkeep = _cronUpkeep;
-        // TODO add parameter to know if it's needed to register encodedCron again
-    }
-
-    function setEncodedCron(bytes memory _encodedCron) external onlyCreatorOrAdmin {
-        encodedCron = _encodedCron;
-    }
-
-    function pause() external onlyCreatorOrAdmin onlyNotPaused {
-        // TODO pause Keeper JOB
-        contractPaused = true;
-    }
-
-    // TODO (Will need a big refactor for tests cases) reactivate to ensure that keeper is initialised
-    // function unpause() external onlyCreatorOrAdmin onlyPaused onlyIfKeeperDataInit {
-    function unpause() external onlyCreatorOrAdmin onlyPaused onlyIfKeeperDataInit {
-        // TODO unpause Keeper JOB
-        contractPaused = false;
-    }
-
     ///
     /// GETTERS FUNCTIONS
     ///
 
+    /**
+     * @notice Return game informations
+     */
     function getStatus()
         external
         view
@@ -586,8 +590,6 @@ contract GameImplementation {
             bool
         )
     {
-        // uint256 balance = address(this).balance;
-
         return (
             creator,
             roundId,
@@ -597,21 +599,35 @@ contract GameImplementation {
             maxPlayers,
             registrationAmount,
             playTimeRange,
-            houseEdge,
-            creatorEdge,
+            treasuryFee,
+            creatorFee,
             contractPaused,
             gameInProgress
         );
     }
 
+    /**
+     * @notice Return the players addresses for the current game
+     * @return list of players addresses
+     */
     function getPlayerAddresses() external view returns (address[] memory) {
         return playerAddresses;
     }
 
+    /**
+     * @notice Return a player for the current game
+     * @param player the player address
+     * @return player if finded
+     */
     function getPlayer(address player) external view returns (Player memory) {
         return players[player];
     }
 
+    /**
+     * @notice Return the winners for a round id
+     * @param _roundId the round id
+     * @return list of WinnerPlayerData
+     */
     function getWinners(uint256 _roundId) external view onlyIfRoundId(_roundId) returns (WinnerPlayerData[] memory) {
         uint256 gameWinnerAddressesLength = winners[_roundId].gameWinnerAddresses.length;
         WinnerPlayerData[] memory winnersPlayerData = new WinnerPlayerData[](gameWinnerAddressesLength);
@@ -623,25 +639,567 @@ contract GameImplementation {
         return winnersPlayerData;
     }
 
+    /**
+     * @notice Check if all remaining players are ok to split pot
+     * @return true if all remaining players are ok to split pot, false otherwise
+     */
     function isAllPlayersSplitOk() external view returns (bool) {
         return _isAllPlayersSplitOk();
     }
 
+    /**
+     * @notice Get the number of remaining players for the current game
+     * @return the number of remaining players for the current game
+     */
     function getRemainingPlayersCount() external view returns (uint256) {
         return _getRemainingPlayersCount();
+    }
+
+    ///
+    /// SETTERS FUNCTIONS
+    ///
+
+    /**
+     * @notice Set the name of the game
+     * @param _gameName the new game name
+     * @dev Callable by creator
+     */
+    function setGameName(string calldata _gameName) external onlyCreator {
+        gameName = _gameName;
+    }
+
+    /**
+     * @notice Set the image of the game
+     * @param _gameImage the new game image
+     * @dev Callable by creator
+     */
+    function setGameImage(string calldata _gameImage) external onlyCreator {
+        gameImage = _gameImage;
+    }
+
+    /**
+     * @notice Set the maximum allowed players for the game
+     * @param _maxPlayers the new max players limit
+     * @dev Callable by admin or creator
+     */
+    function setMaxPlayers(uint256 _maxPlayers)
+        external
+        onlyAdminOrCreator
+        onlyAllowedNumberOfPlayers(_maxPlayers)
+        onlyIfGameIsNotInProgress
+    {
+        maxPlayers = _maxPlayers;
+    }
+
+    /**
+     * @notice Set the creator fee for the game
+     * @param _creatorFee the new creator fee in %
+     * @dev Callable by admin or creator
+     * @dev Callable when game if not in progress
+     */
+    function setCreatorFee(uint256 _creatorFee)
+        external
+        onlyAdminOrCreator
+        onlyIfGameIsNotInProgress
+        onlyCreatorFee(_creatorFee)
+    {
+        creatorFee = _creatorFee;
+    }
+
+    /**
+     * @notice Allow creator to withdraw his fee
+     * @dev Callable by admin
+     */
+    function claimCreatorFee()
+        external
+        onlyCreator
+        onlyIfClaimableAmount(creatorAmount)
+        onlyIfEnoughtBalance(creatorAmount)
+    {
+        uint256 currentCreatorAmount = creatorAmount;
+        creatorAmount = 0;
+        _safeTransfert(creator, currentCreatorAmount);
+
+        emit CreatorFeeClaimed(currentCreatorAmount);
+    }
+
+    ///
+    /// ADMIN FUNCTIONS
+    ///
+
+    /**
+     * @notice Withdraw Treasury fee
+     * @dev Callable by admin
+     */
+    function claimTreasuryFee()
+        external
+        onlyAdmin
+        onlyIfClaimableAmount(treasuryAmount)
+        onlyIfEnoughtBalance(treasuryAmount)
+    {
+        uint256 currentTreasuryAmount = treasuryAmount;
+        treasuryAmount = 0;
+        _safeTransfert(owner, currentTreasuryAmount);
+
+        emit TreasuryFeeClaimed(currentTreasuryAmount);
+    }
+
+    /**
+     * @notice Withdraw Treasury fee and send it to factory
+     * @dev Callable by factory
+     */
+    function claimTreasuryFeeToFactory()
+        external
+        onlyFactory
+        onlyIfClaimableAmount(treasuryAmount)
+        onlyIfEnoughtBalance(treasuryAmount)
+    {
+        uint256 currentTreasuryAmount = treasuryAmount;
+        treasuryAmount = 0;
+        _safeTransfert(factory, currentTreasuryAmount);
+
+        emit TreasuryFeeClaimedByFactory(currentTreasuryAmount);
+    }
+
+    /**
+     * @notice Set the treasury fee for the game
+     * @param _treasuryFee the new treasury fee in %
+     * @dev Callable by admin
+     * @dev Callable when game if not in progress
+     */
+    function setTreasuryFee(uint256 _treasuryFee)
+        external
+        onlyAdmin
+        onlyIfGameIsNotInProgress
+        onlyTreasuryFee(_treasuryFee)
+    {
+        treasuryFee = _treasuryFee;
+    }
+
+    /**
+     * @notice Set the keeper address
+     * @param _cronUpkeep the new keeper address
+     * @dev Callable by admin or factory
+     */
+    function setCronUpkeep(address _cronUpkeep) external onlyAdminOrFactory onlyAddressInit(_cronUpkeep) {
+        // _splitCron(string memory _toSlice, bytes _delimiter) internal returns (string[] memory)
+        cronUpkeep = _cronUpkeep;
+
+        uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
+        cronUpkeepJobId = nextCronJobIDs;
+
+        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
+            address(this),
+            bytes("triggerDailyCheckpoint()"),
+            encodedCron
+        );
+
+        // CronUpkeepInterface(cronUpkeep).updateCronJob(
+        //     cronUpkeepJobId,
+        //     address(this),
+        //     bytes("triggerDailyCheckpoint()"),
+        //     encodedCron
+        // );
+        emit CronUpkeepUpdated(cronUpkeepJobId, cronUpkeep);
+    }
+
+    /**
+     * @notice Set the encoded cron
+     * @param _encodedCron the new encoded cron as * * * * *
+     * @dev Callable by admin or creator
+     */
+    function setEncodedCron(string memory _encodedCron) external onlyAdminOrCreator {
+        require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
+
+        // _splitCron(string memory _toSlice, bytes _delimiter) internal returns (string[] memory)
+
+        encodedCron = CronExternal.toEncodedSpec(_encodedCron);
+
+        CronUpkeepInterface(cronUpkeep).updateCronJob(
+            cronUpkeepJobId,
+            address(this),
+            bytes("triggerDailyCheckpoint()"),
+            encodedCron
+        );
+        emit EncodedCronUpdated(cronUpkeepJobId, _encodedCron);
+    }
+
+    /**
+     * @notice Pause the current game and associated keeper job
+     * @dev Callable by admin
+     */
+    function pause() external onlyAdmin onlyNotPaused {
+        // pause first to ensure no more interaction with contract
+        contractPaused = true;
+        CronUpkeepInterface(cronUpkeep).deleteCronJob(cronUpkeepJobId);
+    }
+
+    /**
+     * @notice Unpause the current game and associated keeper job
+     * @dev Callable by admin
+     */
+    function unpause() external onlyAdmin onlyPaused onlyIfKeeperDataInit {
+        uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
+        cronUpkeepJobId = nextCronJobIDs;
+
+        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
+            address(this),
+            bytes("triggerDailyCheckpoint()"),
+            encodedCron
+        );
+
+        // Reset round limits and round status for each remaining user
+        for (uint256 i = 0; i < numPlayers; i++) {
+            Player storage player = players[playerAddresses[i]];
+            if (player.hasLost == false) {
+                _resetRoundRange(player);
+                player.hasPlayedRound = false;
+            }
+        }
+
+        // unpause last to ensure that everything is ok
+        contractPaused = false;
+    }
+
+    ///
+    /// EMERGENCY
+    ///
+
+    /**
+     * @notice Transfert Admin Ownership
+     * @param _adminAddress the new admin address
+     * @dev Callable by admin
+     */
+    function transferAdminOwnership(address _adminAddress) public onlyAdmin onlyAddressInit(_adminAddress) {
+        owner = _adminAddress;
+    }
+
+    /**
+     * @notice Transfert Creator Ownership
+     * @param _creator the new creator address
+     * @dev Callable by creator
+     */
+    function transferCreatorOwnership(address _creator) public onlyCreator onlyAddressInit(_creator) {
+        creator = _creator;
+    }
+
+    /**
+     * @notice Transfert Factory Ownership
+     * @param _factory the new factory address
+     * @dev Callable by factory
+     */
+    function transferFactoryOwnership(address _factory) public onlyFactory onlyAddressInit(_factory) {
+        factory = _factory;
+    }
+
+    /**
+     * @notice Allow admin to withdraw all funds of smart contract
+     * @param receiver the receiver for the funds (admin or factory)
+     * @dev Callable by admin or factory
+     */
+    function withdrawFunds(address receiver) external onlyAdminOrFactory {
+        _safeTransfert(receiver, address(this).balance);
     }
 
     ///
     /// FALLBACK FUNCTIONS
     ///
 
-    // Called for empty calldata (and any value)
+    /**
+     * @notice  Called for empty calldata (and any value)
+     */
     receive() external payable {
         emit Received(msg.sender, msg.value);
     }
 
-    // Called when no other function matches (not even the receive function). Optionally payable
+    /**
+     * @notice Called when no other function matches (not even the receive function). Optionally payable
+     */
     fallback() external payable {
         emit Received(msg.sender, msg.value);
+    }
+
+    ///
+    /// MODIFIERS
+    ///
+
+    /**
+     * @notice Modifier that ensure only admin can access this function
+     */
+    modifier onlyAdmin() {
+        require(msg.sender == owner, "Caller is not the admin");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure only creator can access this function
+     */
+    modifier onlyCreator() {
+        require(msg.sender == creator, "Caller is not the creator");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure only factory can access this function
+     */
+    modifier onlyFactory() {
+        require(msg.sender == factory, "Caller is not the factory");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure only not creator can access this function
+     */
+    modifier onlyNotCreator() {
+        require(msg.sender != creator, "Caller can't be the creator");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure only admin or creator can access this function
+     */
+    modifier onlyAdminOrCreator() {
+        require(msg.sender == creator || msg.sender == owner, "Caller is not the admin or creator");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure only admin or keeper can access this function
+     */
+    modifier onlyAdminOrKeeper() {
+        require(msg.sender == creator || msg.sender == owner, "Caller is not the admin or keeper");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure only admin or factory can access this function
+     */
+    modifier onlyAdminOrFactory() {
+        require(msg.sender == factory || msg.sender == owner, "Caller is not the admin or factory");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure only keeper can access this function
+     */
+    modifier onlyKeeper() {
+        require(msg.sender == cronUpkeep, "Caller is not the keeper");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that address is initialised
+     */
+    modifier onlyAddressInit(address _toCheck) {
+        require(_toCheck != address(0), "address need to be initialised");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that keeper data are initialised
+     */
+    modifier onlyIfKeeperDataInit() {
+        require(cronUpkeep != address(0), "Keeper need to be initialised");
+        require(bytes(encodedCron).length != 0, "Keeper cron need to be initialised");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that game is not full
+     */
+    modifier onlyIfNotFull() {
+        require(numPlayers < maxPlayers, "This game is full");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that game is full
+     */
+    modifier onlyIfFull() {
+        require(numPlayers == maxPlayers, "This game is not full");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that player not already entered in the game
+     */
+    modifier onlyIfNotAlreadyEntered() {
+        require(players[msg.sender].playerAddress == address(0), "Player already entered in this game");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that player already entered in the game
+     */
+    modifier onlyIfAlreadyEntered() {
+        require(players[msg.sender].playerAddress != address(0), "Player has not entered in this game");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that player has not lost
+     */
+    modifier onlyIfHasNotLost() {
+        require(!players[msg.sender].hasLost, "Player has already lost");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that player has not already played this round
+     */
+    modifier onlyIfHasNotPlayedThisRound() {
+        require(!players[msg.sender].hasPlayedRound, "Player has already played in this round");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that there is less than 50% of remaining players
+     */
+    modifier onlyIfPlayersLowerHalfRemaining() {
+        uint256 remainingPlayersLength = _getRemainingPlayersCount();
+        require(
+            remainingPlayersLength <= maxPlayers / 2,
+            "Remaining players must be less or equal than half of started players"
+        );
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that the game is in progress
+     */
+    modifier onlyIfGameIsInProgress() {
+        require(gameInProgress, "Game is not in progress");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that the game is not in progress
+     */
+    modifier onlyIfGameIsNotInProgress() {
+        require(!gameInProgress, "Game is already in progress");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that caller is not a smart contract
+     */
+    modifier onlyHumans() {
+        uint256 size;
+        address addr = msg.sender;
+        assembly {
+            size := extcodesize(addr)
+        }
+        require(size == 0, "No contract allowed");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that amount sended is registration amount
+     */
+    modifier onlyRegistrationAmount() {
+        require(msg.value == registrationAmount, "Only game amount is allowed");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that roundId exist
+     */
+    modifier onlyIfRoundId(uint256 _roundId) {
+        require(_roundId <= roundId, "This round does not exist");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that there is less than 50% of remaining players
+     */
+    modifier onlyIfPlayerWon() {
+        uint256 remainingPlayersLength = _getRemainingPlayersCount();
+        require(
+            remainingPlayersLength <= maxPlayers / 2,
+            "Remaining players must be less or equal than half of started players"
+        );
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that we can't initialize the implementation contract
+     */
+    modifier onlyIfNotBase() {
+        require(_isBase == false, "The implementation contract can't be initialized");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that we can't initialize a cloned contract twice
+     */
+    modifier onlyIfNotAlreadyInitialized() {
+        require(creator == address(0), "Contract already initialized");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that max players is in allowed range
+     */
+    modifier onlyAllowedNumberOfPlayers(uint256 _maxPlayers) {
+        require(_maxPlayers > 1, "maxPlayers should be bigger than or equal to 2");
+        require(_maxPlayers <= 100, "maxPlayers should not be bigger than 100");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that play time range is in allowed range
+     */
+    modifier onlyAllowedPlayTimeRange(uint256 _playTimeRange) {
+        require(_playTimeRange > 0, "playTimeRange should be bigger than 0");
+        require(_playTimeRange < 9, "playTimeRange should not be bigger than 8");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that treasury fee are not too high
+     */
+    modifier onlyIfClaimableAmount(uint256 _amount) {
+        require(_amount > 0, "Nothing to claim");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that treasury fee are not too high
+     */
+    modifier onlyIfEnoughtBalance(uint256 _amount) {
+        require(address(this).balance >= _amount, "Not enough in contract balance");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that treasury fee are not too high
+     */
+    modifier onlyTreasuryFee(uint256 _treasuryFee) {
+        require(_treasuryFee <= MAX_TREASURY_FEE, "Treasury fee too high");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that creator fee are not too high
+     */
+    modifier onlyCreatorFee(uint256 _creatorFee) {
+        require(_creatorFee <= MAX_CREATOR_FEE, "Creator fee too high");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that game is not paused
+     */
+    modifier onlyNotPaused() {
+        require(!contractPaused, "Contract is paused");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that game is paused
+     */
+    modifier onlyPaused() {
+        require(contractPaused, "Contract is not paused");
+        _;
     }
 }

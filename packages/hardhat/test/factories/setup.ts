@@ -11,7 +11,17 @@ const AUTHORIZED_AMOUNTS = [
 const setupTest = deployments.createFixture(
   async (
     { deployments, getNamedAccounts, ethers }: HardhatRuntimeEnvironment,
-    { maxPlayers, playTimeRange, correctRegistrationAmount, encodedCron }
+    {
+      gameName,
+      gameImage,
+      maxPlayers,
+      playTimeRange,
+      correctRegistrationAmount,
+      gameCreationAmount,
+      treasuryFee,
+      creatorFee,
+      encodedCron,
+    }
   ) => {
     // await deployments.fixture(['lfg'])
     await deployments.fixture()
@@ -29,6 +39,20 @@ const setupTest = deployments.createFixture(
     const { address: cronExternalAddress } = await deployments.get(
       'CronExternal'
     )
+
+    // const cronExternalInterface = await ethers.getContractFactory(
+    //   'CronExternal',
+    //   {
+    //     contract:
+    //       '@chainlink/contracts/src/v0.8/libraries/external/Cron.sol:Cron',
+    //   }
+    // )
+
+    // const cronExternal = new ethers.Contract(
+    //   cronExternalAddress,
+    //   cronExternalInterface.interface,
+    //   deployer
+    // )
 
     const libraries = {
       libraries: {
@@ -89,10 +113,15 @@ const setupTest = deployments.createFixture(
     )
 
     await gameFactory.createNewGame(
+      gameName,
+      gameImage,
       maxPlayers,
       playTimeRange,
       correctRegistrationAmount,
-      encodedCron
+      treasuryFee,
+      creatorFee,
+      encodedCron,
+      { value: gameCreationAmount }
     )
 
     const game = await gameFactory.deployedGames('0')
@@ -114,6 +143,7 @@ const setupTest = deployments.createFixture(
       deployer,
       GameFactoryContract,
       GameImplementationContract,
+      // cronExternal,
       gameFactory,
       gameImplementation,
       cronUpkeep,
@@ -136,6 +166,9 @@ const initialiseTestData = async function () {
   this.bob = bob
   this.alice = alice
 
+  this.gameName = "Let's Fucking Game VMP"
+  this.gameImage = ''
+
   this.maxPlayers = 10
   this.playTimeRange = 2
 
@@ -143,9 +176,14 @@ const initialiseTestData = async function () {
   this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
   this.zeroRegistrationAmount = ethers.utils.parseEther('0')
 
-  this.houseEdge = ethers.utils.parseEther('0.00005')
-  this.creatorEdge = ethers.utils.parseEther('0.00005')
-  // prizeAmount equals total prize amount minus house edge
+  this.gameCreationAmount = ethers.utils.parseEther('0.1')
+  this.treasuryFee = 500 // 5%
+  this.creatorFee = 500 // 5%
+
+  // this.treasuryFee = ethers.utils.parseEther('0.00005')
+  // this.creatorFee = ethers.utils.parseEther('0.00005')
+
+  // prizeAmount equals total prize amount minus treasury fee
   this.prizeAmount = ethers.utils.parseEther('0.0009')
 
   this.launchDuration = 60 * 60 * 25
@@ -168,15 +206,21 @@ const initialiseTestData = async function () {
     deployer,
     GameFactoryContract,
     GameImplementationContract,
+    // cronExternal,
     gameFactory,
     gameImplementation,
     cronUpkeep,
     secondGameImplementation,
     deployedGame,
   } = await setupTest({
+    gameName: this.gameName,
+    gameImage: this.gameImage,
     maxPlayers: this.maxPlayers,
     playTimeRange: this.playTimeRange,
     correctRegistrationAmount: this.correctRegistrationAmount,
+    gameCreationAmount: this.gameCreationAmount,
+    treasuryFee: this.treasuryFee,
+    creatorFee: this.creatorFee,
     encodedCron: this.encodedCron,
   })
 
@@ -184,6 +228,7 @@ const initialiseTestData = async function () {
 
   this.GameImplementationContract = GameImplementationContract
   this.GameFactoryContract = GameFactoryContract
+  // this.cronExternal = cronExternal
 
   this.cronUpkeep = cronUpkeep
   this.gameFactory = gameFactory

@@ -11,7 +11,7 @@ const func: DeployFunction = async function ({
   const gameImplementation = await deployments.get('GameImplementation')
   const gameFactory = await deployments.get('GameImplementation')
 
-  // const multiCall = await deployments.get('Multicall')
+  const multiCall = await deployments.get('Multicall')
 
   const cronExternal = await deployments.get('CronExternal')
   const cronUpkeep = await deployments.get('CronUpkeep')
@@ -20,35 +20,45 @@ const func: DeployFunction = async function ({
   saveContractData({
     [chainId]: {
       GameFactory: {
-        // transactionHash: gameFactory.deployTransaction.hash,
         address: gameFactory.address,
+        libraries: gameFactory.libraries || {},
+        transactionHash: gameFactory.transactionHash,
       },
       GameImplementation: {
-        // transactionHash: gameImplementation.deployTransaction.hash,
         address: gameImplementation.address,
-        libraries: {
-          Cron: cronExternal.address,
-        },
+        libraries: gameImplementation.libraries || {},
+        transactionHash: gameImplementation.transactionHash,
       },
-      // MultiCall: {
-      //   address: multiCall.address,
-      // },
+      MultiCall: {
+        address: multiCall.address,
+        libraries: multiCall.libraries || {},
+        transactionHash: multiCall.transactionHash,
+      },
       CronExternal: {
         address: cronExternal.address,
+        libraries: cronExternal.libraries || {},
+        transactionHash: cronExternal.transactionHash,
       },
       CronUpkeep: {
         address: cronUpkeep.address,
-        libraries: {
-          Cron: cronExternal.address,
-        },
+        libraries: cronUpkeep.libraries || {},
+        transactionHash: cronUpkeep.transactionHash,
       },
       CronUpkeepDelegate: {
         address: cronUpkeepDelegate.address,
+        libraries: cronUpkeepDelegate.libraries || {},
+        transactionHash: cronUpkeepDelegate.transactionHash,
       },
     },
   })
 }
 
 func.tags = ['all']
+module.exports.dependencies = [
+  'game-factory',
+  'game-implementation',
+  'keeper',
+  'multicall',
+]
 
 export default func

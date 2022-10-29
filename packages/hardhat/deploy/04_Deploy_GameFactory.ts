@@ -29,27 +29,15 @@ const func: DeployFunction = async function ({
   )
 
   const { address: cronUpkeepAddress } = await deployments.get('CronUpkeep')
-  // TODO add interface for constructorArgs
-  // const constructorArgs: Array<string | number | Array<string | number>> = [
-  //   '100000000000000',
-  // ];
 
-  const houseEdge = ethers.utils.parseUnits('0.00005')
-  const creatorEdge = ethers.utils.parseUnits('0.00005')
+  const gameCreationAmount = ethers.utils.parseEther('0.1')
 
-  const authorizedAmounts = [
-    ethers.utils.parseEther('0.0001'),
-    ethers.utils.parseEther('0.05'),
-    ethers.utils.parseEther('0.1'),
-    ethers.utils.parseEther('0.25'),
-    ethers.utils.parseEther('0.50'),
-    ethers.utils.parseEther('0.75'),
-    ethers.utils.parseEther('1'),
-    ethers.utils.parseEther('1.5'),
-    ethers.utils.parseEther('2'),
-    ethers.utils.parseEther('5'),
-    ethers.utils.parseEther('10'),
+  const AUTHORIZED_AMOUNTS = [
+    0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
   ]
+  const authorizedAmounts = AUTHORIZED_AMOUNTS.map((amount) =>
+    ethers.utils.parseEther(`${amount}`)
+  )
 
   log('Deploying GameFactory contract')
   const {
@@ -61,8 +49,7 @@ const func: DeployFunction = async function ({
     args: [
       gameImplementationAddress,
       cronUpkeepAddress,
-      houseEdge,
-      creatorEdge,
+      gameCreationAmount,
       authorizedAmounts,
     ],
   })

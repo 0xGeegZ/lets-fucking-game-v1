@@ -1,6 +1,6 @@
+import { ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
-import { ethers } from 'hardhat'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -16,7 +16,10 @@ const func: DeployFunction = async function ({
   }
 
   log('Deploying CronUpkeepDelegate contract')
-  const cronUpkeepDelegate = await deploy('CronUpkeepDelegate', options)
+  const cronUpkeepDelegate = await deploy('CronUpkeepDelegate', {
+    ...options,
+    contract: '@chainlink/contracts/src/v0.8/libraries/external/Cron.sol:Cron',
+  })
 
   log('Deploying CronExternal contract')
   const {

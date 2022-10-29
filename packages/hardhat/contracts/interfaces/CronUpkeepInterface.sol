@@ -110,6 +110,12 @@ interface CronUpkeepInterface {
     function getActiveCronJobIDs() external view returns (uint256[] memory);
 
     /**
+     * @notice gets the next cron job IDs
+     * @return next cron job IDs
+     */
+    function getNextCronJobIDs() external view returns (uint256);
+
+    /**
    * @notice gets a cron job
    * @param id the cron job ID
    * @return target - the address a cron job forwards the eth tx to

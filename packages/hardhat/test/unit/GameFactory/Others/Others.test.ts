@@ -6,11 +6,13 @@ import { initialiseTestData } from '../../../factories/setup'
 
 describe('GameFactoryContract', function () {
   beforeEach(initialiseTestData)
-  context('GameFactory setAdmin', function () {
+  context('GameFactory transferOwnership', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
-          this.gameFactory.connect(this.alice).setAdmin(this.alice.address),
+          this.gameFactory
+            .connect(this.alice)
+            .transferAdminOwnership(this.alice.address),
           'Caller is not the admin'
         )
       })
@@ -18,7 +20,9 @@ describe('GameFactoryContract', function () {
 
     describe('when called by admin', function () {
       it('should transfer the administration to given address', async function () {
-        await this.gameFactory.connect(this.owner).setAdmin(this.alice.address)
+        await this.gameFactory
+          .connect(this.owner)
+          .transferAdminOwnership(this.alice.address)
         const newAdmin = await this.gameFactory.owner()
 
         expect(newAdmin).to.be.equal(this.alice.address)
@@ -30,9 +34,7 @@ describe('GameFactoryContract', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
-          this.gameFactory
-            .connect(this.alice)
-            .withdrawFunds(this.alice.address),
+          this.gameFactory.connect(this.alice).withdrawFunds(),
           'Caller is not the admin'
         )
       })
@@ -72,22 +74,23 @@ describe('GameFactoryContract', function () {
       })
     })
   })
+
   context('GameFactory addAuthorizedAmounts', function () {
-    describe('when admin update authorisedAmounts', function () {
+    describe('when admin update authorizedAmounts', function () {
       it('should be updated with correct amounts', async function () {
-        const toUpdateAuthorisedAmounts = [ethers.utils.parseEther('999')]
+        const toUpdateAuthorizedAmounts = [ethers.utils.parseEther('999')]
 
         const responseAuthorizedAmountsBefore = await this.gameFactory
           .connect(this.owner)
-          .getAuthorisedAmounts()
+          .getAuthorizedAmounts()
 
         await this.gameFactory
           .connect(this.owner)
-          .addAuthorizedAmounts(toUpdateAuthorisedAmounts)
+          .addAuthorizedAmounts(toUpdateAuthorizedAmounts)
 
         const responseAuthorizedAmountsAfter = await this.gameFactory
           .connect(this.owner)
-          .getAuthorisedAmounts()
+          .getAuthorizedAmounts()
 
         expect(responseAuthorizedAmountsBefore.length + 1).to.be.equal(
           responseAuthorizedAmountsAfter.length
@@ -95,7 +98,7 @@ describe('GameFactoryContract', function () {
       })
 
       it('should be updated with no duplicates amounts', async function () {
-        const toUpdateAuthorisedAmounts = [
+        const toUpdateAuthorizedAmounts = [
           ...this.authorizedAmounts,
           ethers.utils.parseEther('999'),
           ethers.utils.parseEther('999'),
@@ -103,15 +106,15 @@ describe('GameFactoryContract', function () {
 
         const responseAuthorizedAmountsBefore = await this.gameFactory
           .connect(this.owner)
-          .getAuthorisedAmounts()
+          .getAuthorizedAmounts()
 
         await this.gameFactory
           .connect(this.owner)
-          .addAuthorizedAmounts(toUpdateAuthorisedAmounts)
+          .addAuthorizedAmounts(toUpdateAuthorizedAmounts)
 
         const responseAuthorizedAmountsAfter = await this.gameFactory
           .connect(this.owner)
-          .getAuthorisedAmounts()
+          .getAuthorizedAmounts()
 
         expect(responseAuthorizedAmountsBefore.length + 1).to.be.equal(
           responseAuthorizedAmountsAfter.length
@@ -120,15 +123,84 @@ describe('GameFactoryContract', function () {
     })
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
-        const toUpdateAuthorisedAmounts = [ethers.utils.parseEther('999')]
+        const toUpdateAuthorizedAmounts = [ethers.utils.parseEther('999')]
 
         await expectRevert(
           this.gameFactory
             .connect(this.alice)
-            .addAuthorizedAmounts(toUpdateAuthorisedAmounts),
+            .addAuthorizedAmounts(toUpdateAuthorizedAmounts),
           'Caller is not the admin'
         )
       })
     })
   })
+
+  context('GameFactory updateCronUpkeep', function () {
+    describe('when called by non admin', function () {
+      it('should revert with correct message', async function () {
+        // TODO Implement Test
+        expect(true).to.be.false
+      })
+    })
+
+    describe('when called by admin', function () {
+      it('should update keeper address for the factory and all games and associated keeper job', async function () {
+        // TODO Implement Test
+        expect(true).to.be.false
+      })
+
+      it('should revert if keeper address is not init', async function () {
+        // TODO Implement Test
+        expect(true).to.be.false
+      })
+    })
+  })
+
+  context(
+    'GameFactory pauseAllGamesAndFactory & ResumeAllGamesAndFactory',
+    function () {
+      describe('when called by non admin', function () {
+        it('should revert with correct message', async function () {
+          // TODO Implement Test
+          expect(true).to.be.false
+        })
+      })
+
+      describe('when called by admin', function () {
+        it('should pause the factory and all games and associated keeper job', async function () {
+          // TODO Implement Test
+          expect(true).to.be.false
+        })
+
+        it('should resume the factory and all games and associated keeper job', async function () {
+          // TODO Implement Test
+          expect(true).to.be.false
+        })
+      })
+    }
+  )
+
+  context(
+    'GameFactory pauseAllGamesAndFactory & ResumeAllGamesAndFactory',
+    function () {
+      describe('when called by non admin', function () {
+        it('should revert with correct message', async function () {
+          // TODO Implement Test
+          expect(true).to.be.false
+        })
+      })
+
+      describe('when called by admin', function () {
+        it('should pause the factory and all games and associated keeper job', async function () {
+          // TODO Implement Test
+          expect(true).to.be.false
+        })
+
+        it('should resume the factory and all games and associated keeper job', async function () {
+          // TODO Implement Test
+          expect(true).to.be.false
+        })
+      })
+    }
+  )
 })
