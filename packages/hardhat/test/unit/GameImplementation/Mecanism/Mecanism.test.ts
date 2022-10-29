@@ -906,7 +906,7 @@ describe('GameImplementationContract - Mecanism', function () {
           this.deployedGame
             .connect(this.players[winnerIndex])
             .claimPrize(inexistantGameId),
-          'This game does not exist'
+          'This round does not exist'
         )
       })
     })

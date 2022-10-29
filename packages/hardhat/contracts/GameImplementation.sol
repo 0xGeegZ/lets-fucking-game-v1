@@ -211,11 +211,9 @@ contract GameImplementation {
         onlyIfNotAlreadyInitialized
         onlyAllowedNumberOfPlayers(initialization._maxPlayers)
         onlyAllowedPlayTimeRange(initialization._playTimeRange)
+        onlyCreatorFee(initialization._creatorFee)
     {
-        // TODO create modifier for this require
-        require(initialization._creatorFee <= MAX_CREATOR_FEE, "Creator fee too high");
-
-        // TODO verify cron limitation : not less than every hour
+        // TODO GUIGUI verify cron limitation : not less than every hour
         // verify that should not contains "*/" in first value
         // Pattern is : * * * * *
         // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
@@ -361,11 +359,8 @@ contract GameImplementation {
     /**
      * @notice Function that is called by a winner to claim his prize
      */
-    function claimPrize(uint256 _roundId) external {
+    function claimPrize(uint256 _roundId) external onlyIfRoundId(_roundId) {
         WinnerPlayerData storage winnerPlayerData = winners[_roundId].gameWinners[msg.sender];
-
-        // TODO pass all require to modifier
-        require(_roundId <= roundId, "This game does not exist");
         require(winnerPlayerData.playerAddress == msg.sender, "Player did not win this game");
         require(winnerPlayerData.prizeClaimed == false, "Prize for this game already claimed");
         require(address(this).balance >= winnerPlayerData.amountWon, "Not enough funds in contract");
@@ -412,10 +407,7 @@ contract GameImplementation {
      * @param receiver the receiver address
      * @param amount the amount to transfert
      */
-    function _safeTransfert(address receiver, uint256 amount) internal {
-        uint256 balance = address(this).balance;
-        if (balance < amount) require(false, "Not enough in contract balance");
-
+    function _safeTransfert(address receiver, uint256 amount) internal onlyIfEnoughtBalance(amount) {
         (bool success, ) = receiver.call{ value: amount }("");
 
         if (!success) {
@@ -714,10 +706,12 @@ contract GameImplementation {
      * @dev Callable by admin or creator
      * @dev Callable when game if not in progress
      */
-    function setCreatorFee(uint256 _creatorFee) external onlyAdminOrCreator onlyIfGameIsNotInProgress {
-        // TODO create modifier for this require
-        require(_creatorFee <= MAX_CREATOR_FEE, "Creator fee too high");
-
+    function setCreatorFee(uint256 _creatorFee)
+        external
+        onlyAdminOrCreator
+        onlyIfGameIsNotInProgress
+        onlyCreatorFee(_creatorFee)
+    {
         creatorFee = _creatorFee;
     }
 
@@ -725,10 +719,12 @@ contract GameImplementation {
      * @notice Allow creator to withdraw his fee
      * @dev Callable by admin
      */
-    function claimCreatorFee() external onlyCreator {
-        require(address(this).balance >= creatorAmount);
-        require(creatorAmount > 0, "No creator fee to claim");
-
+    function claimCreatorFee()
+        external
+        onlyCreator
+        onlyIfEnoughtBalance(creatorAmount)
+        onlyIfClaimableAmount(creatorAmount)
+    {
         uint256 currentCreatorAmount = creatorAmount;
         creatorAmount = 0;
         _safeTransfert(creator, currentCreatorAmount);
@@ -744,10 +740,12 @@ contract GameImplementation {
      * @notice Withdraw Treasury fee
      * @dev Callable by admin
      */
-    function claimTreasuryFee() external onlyAdmin {
-        require(address(this).balance >= treasuryAmount);
-        require(treasuryAmount > 0, "No treasury fee to claim");
-
+    function claimTreasuryFee()
+        external
+        onlyAdmin
+        onlyIfEnoughtBalance(treasuryAmount)
+        onlyIfClaimableAmount(treasuryAmount)
+    {
         uint256 currentTreasuryAmount = treasuryAmount;
         treasuryAmount = 0;
         _safeTransfert(owner, currentTreasuryAmount);
@@ -759,10 +757,12 @@ contract GameImplementation {
      * @notice Withdraw Treasury fee and send it to factory
      * @dev Callable by factory
      */
-    function claimTreasuryFeeToFactory() external onlyFactory {
-        require(address(this).balance >= treasuryAmount);
-        require(treasuryAmount > 0, "No treasury fee to claim");
-
+    function claimTreasuryFeeToFactory()
+        external
+        onlyFactory
+        onlyIfEnoughtBalance(treasuryAmount)
+        onlyIfClaimableAmount(treasuryAmount)
+    {
         uint256 currentTreasuryAmount = treasuryAmount;
         treasuryAmount = 0;
         _safeTransfert(factory, currentTreasuryAmount);
@@ -776,9 +776,12 @@ contract GameImplementation {
      * @dev Callable by admin
      * @dev Callable when game if not in progress
      */
-    function setTreasuryFee(uint256 _treasuryFee) external onlyAdmin onlyIfGameIsNotInProgress {
-        require(_treasuryFee <= MAX_TREASURY_FEE, "Treasury fee too high");
-
+    function setTreasuryFee(uint256 _treasuryFee)
+        external
+        onlyAdmin
+        onlyIfGameIsNotInProgress
+        onlyTreasuryFee(_treasuryFee)
+    {
         treasuryFee = _treasuryFee;
     }
 
@@ -1109,7 +1112,19 @@ contract GameImplementation {
      * @notice Modifier that ensure that roundId exist
      */
     modifier onlyIfRoundId(uint256 _roundId) {
-        require(_roundId <= roundId, "Wrong roundId");
+        require(_roundId <= roundId, "This round does not exist");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that there is less than 50% of remaining players
+     */
+    modifier onlyIfPlayerWon() {
+        uint256 remainingPlayersLength = _getRemainingPlayersCount();
+        require(
+            remainingPlayersLength <= maxPlayers / 2,
+            "Remaining players must be less or equal than half of started players"
+        );
         _;
     }
 
@@ -1144,6 +1159,38 @@ contract GameImplementation {
     modifier onlyAllowedPlayTimeRange(uint256 _playTimeRange) {
         require(_playTimeRange > 0, "playTimeRange should be bigger than 0");
         require(_playTimeRange < 9, "playTimeRange should not be bigger than 8");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that treasury fee are not too high
+     */
+    modifier onlyIfClaimableAmount(uint256 _amount) {
+        require(_amount > 0, "Nothing to claim");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that treasury fee are not too high
+     */
+    modifier onlyIfEnoughtBalance(uint256 _amount) {
+        require(address(this).balance >= _amount, "Not enough in contract balance");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that treasury fee are not too high
+     */
+    modifier onlyTreasuryFee(uint256 _treasuryFee) {
+        require(_treasuryFee <= MAX_TREASURY_FEE, "Treasury fee too high");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that creator fee are not too high
+     */
+    modifier onlyCreatorFee(uint256 _creatorFee) {
+        require(_creatorFee <= MAX_CREATOR_FEE, "Creator fee too high");
         _;
     }
 
