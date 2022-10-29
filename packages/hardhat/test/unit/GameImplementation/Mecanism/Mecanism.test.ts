@@ -854,7 +854,6 @@ describe('GameImplementationContract - Mecanism', function () {
           winnerIndex,
           contract: this.deployedGame,
           amount: this.correctRegistrationAmount,
-
           mockKeeper: this.mockKeeper,
         })
         const updatedPlayersAmount = await this.deployedGame.numPlayers()

@@ -16,6 +16,7 @@ const setupTest = deployments.createFixture(
       playTimeRange,
       correctRegistrationAmount,
       gameCreationAmount,
+      treasuryFee,
       creatorFee,
       encodedCron,
     }
@@ -99,6 +100,7 @@ const setupTest = deployments.createFixture(
       maxPlayers,
       playTimeRange,
       correctRegistrationAmount,
+      treasuryFee,
       creatorFee,
       encodedCron,
       { value: gameCreationAmount }
@@ -192,6 +194,7 @@ const initialiseTestData = async function () {
     playTimeRange: this.playTimeRange,
     correctRegistrationAmount: this.correctRegistrationAmount,
     gameCreationAmount: this.gameCreationAmount,
+    treasuryFee: this.treasuryFee,
     creatorFee: this.creatorFee,
     encodedCron: this.encodedCron,
   })

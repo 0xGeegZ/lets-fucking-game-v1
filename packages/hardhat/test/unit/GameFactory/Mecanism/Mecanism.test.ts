@@ -19,6 +19,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               this.playTimeRange,
               this.correctRegistrationAmount,
+              this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
@@ -43,6 +44,7 @@ describe('GameFactoryContract', function () {
               outOfRangeMaxPlayers1,
               this.playTimeRange,
               registrationAmount,
+              this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
@@ -57,6 +59,7 @@ describe('GameFactoryContract', function () {
               outOfRangeMaxPlayers2,
               this.playTimeRange,
               registrationAmount,
+              this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
@@ -81,6 +84,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               outOfRangePlayTimeRange1,
               registrationAmount,
+              this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
@@ -95,6 +99,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               outOfRangePlayTimeRange2,
               registrationAmount,
+              this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
@@ -114,6 +119,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
+            this.treasuryFee,
             this.creatorFee,
             this.encodedCron,
             { value: this.gameCreationAmount }
@@ -169,6 +175,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 1],
+            this.treasuryFee,
             this.creatorFee,
             this.encodedCron,
             { value: this.gameCreationAmount }
@@ -179,6 +186,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 2],
+            this.treasuryFee,
             this.creatorFee,
             this.encodedCron,
             { value: this.gameCreationAmount }
@@ -215,6 +223,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               this.playTimeRange,
               this.authorizedAmounts[this.authorizedAmounts.length - 1],
+              this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
@@ -238,6 +247,7 @@ describe('GameFactoryContract', function () {
           this.maxPlayers,
           this.playTimeRange,
           this.authorizedAmounts[1],
+          this.treasuryFee,
           this.creatorFee,
           this.encodedCron,
           { value: this.gameCreationAmount }
@@ -248,6 +258,7 @@ describe('GameFactoryContract', function () {
           this.maxPlayers,
           this.playTimeRange,
           this.authorizedAmounts[2],
+          this.treasuryFee,
           this.creatorFee,
           this.encodedCron,
           { value: this.gameCreationAmount }

@@ -36,23 +36,19 @@ contract GameImplementation {
     uint256 public creatorFee; // treasury rate (e.g. 200 = 2%, 150 = 1.50%)
     uint256 public creatorAmount; // treasury amount that was not claimed
 
-    // gameId is fix and represent the fixed id for the game
-    uint256 public gameId;
-    // roundId gets incremented every time the game restarts
-    uint256 public roundId;
+    uint256 public gameId; // gameId is fix and represent the fixed id for the game
+    uint256 public roundId; // roundId gets incremented every time the game restarts
 
     string public gameName;
     string public gameImage;
 
     uint256 public gameImplementationVersion;
 
-    // Time length of a round in hours
-    uint256 public playTimeRange;
+    uint256 public playTimeRange; // Time length of a round in hours
     uint256 public maxPlayers;
     uint256 public numPlayers;
 
-    // Helps the keeper determine if a game has started or if we need to start it
-    bool public gameInProgress;
+    bool public gameInProgress; // Helps the keeper determine if a game has started or if we need to start it
     bool public contractPaused;
 
     address[] public playerAddresses;

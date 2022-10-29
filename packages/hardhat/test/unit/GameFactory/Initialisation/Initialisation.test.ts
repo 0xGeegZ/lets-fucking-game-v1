@@ -34,6 +34,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 1],
+            this.treasuryFee,
             this.creatorFee,
             this.encodedCron,
             { value: this.gameCreationAmount }
@@ -76,8 +77,7 @@ describe('GameFactoryContract', function () {
             responseLatestGameImplementationVersionId
           )
         const responseOwner = await this.gameFactory.owner()
-        const responseTreasuryFee = await this.gameFactory.treasuryFee()
-        // const responseCreatorFee = await this.gameFactory.creatorFee()
+
         const responseAuthorizedAmounts =
           await this.gameFactory.getAuthorisedAmounts()
 
@@ -86,8 +86,6 @@ describe('GameFactoryContract', function () {
         expect(responseGameImplementation.deployedAddress).to.be.equal(
           this.gameImplementation.address
         )
-        expect(responseTreasuryFee).to.be.equal(this.treasuryFee)
-        // expect(responseCreatorFee).to.be.equal(this.creatorFee)
         expect(responseAuthorizedAmounts.toString()).to.be.equal(
           this.authorizedAmounts.toString()
         )
@@ -103,7 +101,6 @@ describe('GameFactoryContract', function () {
           this.gameImplementation.address,
           this.cronUpkeep.address,
           this.gameCreationAmount,
-          this.treasuryFee,
           this.authorizedAmounts
         )
         await gameFactoryContract.deployed()
@@ -115,7 +112,6 @@ describe('GameFactoryContract', function () {
             this.gameImplementation.address,
             this.cronUpkeep.address,
             this.gameCreationAmount,
-            this.treasuryFee,
             emptyauthorizedAmounts
           ),
           'authorizedAmounts should be greather or equal to 1'
@@ -129,6 +125,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             sameRegistrationAmount,
+            this.treasuryFee,
             this.creatorFee,
             this.encodedCron,
             { value: this.gameCreationAmount }
@@ -141,6 +138,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               this.playTimeRange,
               sameRegistrationAmount,
+              this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }

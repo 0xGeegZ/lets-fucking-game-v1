@@ -15,9 +15,6 @@ contract GameFactory is Pausable, Ownable {
 
     uint256 public nextGameId = 0;
 
-    // TODO GUIGUI remoove treasuryFee from factory
-    uint256 public treasuryFee; // treasury rate (e.g. 200 = 2%, 150 = 1.50%)
-
     uint256 public gameCreationAmount;
 
     uint256 public latestGameImplementationVersionId;
@@ -85,14 +82,12 @@ contract GameFactory is Pausable, Ownable {
      * @param _gameImplementation the game implementation address
      * @param _cronUpkeep the keeper address
      * @param _gameCreationAmount the game creation amount
-     * @param _treasuryFee the treasury fee in percent
      * @param _authorizedAmounts the list of authorised amounts for game creation
      */
     constructor(
         address _gameImplementation,
         address _cronUpkeep,
         uint256 _gameCreationAmount,
-        uint256 _treasuryFee,
         uint256[] memory _authorizedAmounts
     ) onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts) {
         // TODO transfor requires to modifiers (SEE: onlyAllowedNumberOfPlayers for _treasuryFee require)
@@ -100,7 +95,6 @@ contract GameFactory is Pausable, Ownable {
         require(_cronUpkeep != address(0), "Keeper need to be initialised");
 
         cronUpkeep = _cronUpkeep;
-        treasuryFee = _treasuryFee;
         gameCreationAmount = _gameCreationAmount;
 
         gameImplementations.push(
@@ -127,6 +121,7 @@ contract GameFactory is Pausable, Ownable {
      * @param _maxPlayers the max players for the game
      * @param _playTimeRange the player time range
      * @param _registrationAmount the registration amount
+     * @param _treasuryFee the treasury fee in percent
      * @param _creatorFee the creator fee in %
      * @param _encodedCron the encoded cron as * * * * *
      */
@@ -135,6 +130,7 @@ contract GameFactory is Pausable, Ownable {
         uint256 _maxPlayers,
         uint256 _playTimeRange,
         uint256 _registrationAmount,
+        uint256 _treasuryFee,
         uint256 _creatorFee,
         string memory _encodedCron
     )
@@ -162,7 +158,7 @@ contract GameFactory is Pausable, Ownable {
                 _playTimeRange: _playTimeRange,
                 _maxPlayers: _maxPlayers,
                 _registrationAmount: _registrationAmount,
-                _treasuryFee: treasuryFee,
+                _treasuryFee: _treasuryFee,
                 _creatorFee: _creatorFee,
                 _encodedCron: _encodedCron
             })
