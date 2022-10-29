@@ -713,8 +713,8 @@ contract GameImplementation {
     function claimCreatorFee()
         external
         onlyCreator
-        onlyIfEnoughtBalance(creatorAmount)
         onlyIfClaimableAmount(creatorAmount)
+        onlyIfEnoughtBalance(creatorAmount)
     {
         uint256 currentCreatorAmount = creatorAmount;
         creatorAmount = 0;
@@ -734,8 +734,8 @@ contract GameImplementation {
     function claimTreasuryFee()
         external
         onlyAdmin
-        onlyIfEnoughtBalance(treasuryAmount)
         onlyIfClaimableAmount(treasuryAmount)
+        onlyIfEnoughtBalance(treasuryAmount)
     {
         uint256 currentTreasuryAmount = treasuryAmount;
         treasuryAmount = 0;
@@ -751,8 +751,8 @@ contract GameImplementation {
     function claimTreasuryFeeToFactory()
         external
         onlyFactory
-        onlyIfEnoughtBalance(treasuryAmount)
         onlyIfClaimableAmount(treasuryAmount)
+        onlyIfEnoughtBalance(treasuryAmount)
     {
         uint256 currentTreasuryAmount = treasuryAmount;
         treasuryAmount = 0;
@@ -785,12 +785,21 @@ contract GameImplementation {
         // _splitCron(string memory _toSlice, bytes _delimiter) internal returns (string[] memory)
         cronUpkeep = _cronUpkeep;
 
-        CronUpkeepInterface(cronUpkeep).updateCronJob(
-            cronUpkeepJobId,
+        uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
+        cronUpkeepJobId = nextCronJobIDs;
+
+        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
             address(this),
             bytes("triggerDailyCheckpoint()"),
             encodedCron
         );
+
+        // CronUpkeepInterface(cronUpkeep).updateCronJob(
+        //     cronUpkeepJobId,
+        //     address(this),
+        //     bytes("triggerDailyCheckpoint()"),
+        //     encodedCron
+        // );
         emit CronUpkeepUpdated(cronUpkeepJobId, cronUpkeep);
     }
 
@@ -950,7 +959,7 @@ contract GameImplementation {
      * @notice Modifier that ensure only admin or creator can access this function
      */
     modifier onlyAdminOrCreator() {
-        require(msg.sender == creator || msg.sender == owner, "Caller is not the creator or admin");
+        require(msg.sender == creator || msg.sender == owner, "Caller is not the admin or creator");
         _;
     }
 
@@ -958,7 +967,7 @@ contract GameImplementation {
      * @notice Modifier that ensure only admin or keeper can access this function
      */
     modifier onlyAdminOrKeeper() {
-        require(msg.sender == creator || msg.sender == owner, "Caller is not the keeper");
+        require(msg.sender == creator || msg.sender == owner, "Caller is not the admin or keeper");
         _;
     }
 
@@ -966,7 +975,7 @@ contract GameImplementation {
      * @notice Modifier that ensure only admin or factory can access this function
      */
     modifier onlyAdminOrFactory() {
-        require(msg.sender == factory || msg.sender == owner, "Caller is not the factory or admin");
+        require(msg.sender == factory || msg.sender == owner, "Caller is not the admin or factory");
         _;
     }
 

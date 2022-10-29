@@ -190,7 +190,7 @@ describe('GameImplementationContract - Mecanism', function () {
         const wrongCaller = this.players[0]
         await expectRevert(
           this.deployedGame.connect(wrongCaller).triggerDailyCheckpoint(),
-          'Caller is not the keeper'
+          'Caller is not the admin or keeper'
         )
       })
     })

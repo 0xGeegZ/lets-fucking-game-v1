@@ -40,6 +40,20 @@ const setupTest = deployments.createFixture(
       'CronExternal'
     )
 
+    // const cronExternalInterface = await ethers.getContractFactory(
+    //   'CronExternal',
+    //   {
+    //     contract:
+    //       '@chainlink/contracts/src/v0.8/libraries/external/Cron.sol:Cron',
+    //   }
+    // )
+
+    // const cronExternal = new ethers.Contract(
+    //   cronExternalAddress,
+    //   cronExternalInterface.interface,
+    //   deployer
+    // )
+
     const libraries = {
       libraries: {
         Cron: cronExternalAddress,
@@ -129,6 +143,7 @@ const setupTest = deployments.createFixture(
       deployer,
       GameFactoryContract,
       GameImplementationContract,
+      // cronExternal,
       gameFactory,
       gameImplementation,
       cronUpkeep,
@@ -191,6 +206,7 @@ const initialiseTestData = async function () {
     deployer,
     GameFactoryContract,
     GameImplementationContract,
+    // cronExternal,
     gameFactory,
     gameImplementation,
     cronUpkeep,
@@ -212,6 +228,7 @@ const initialiseTestData = async function () {
 
   this.GameImplementationContract = GameImplementationContract
   this.GameFactoryContract = GameFactoryContract
+  // this.cronExternal = cronExternal
 
   this.cronUpkeep = cronUpkeep
   this.gameFactory = gameFactory
