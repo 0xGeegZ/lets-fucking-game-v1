@@ -8,13 +8,15 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import { GameImplementationInterface } from "./interfaces/GameImplementationInterface.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 
+// TODO GUIGUI add to documentation for modifiers : * @dev Callable by admin
+
 contract GameFactory is Pausable, Ownable {
     address public cronUpkeep;
 
     uint256 public nextGameId = 0;
 
-    // TODO GUIGUI should be entered as percent
-    uint256 public houseEdge;
+    // TODO GUIGUI remoove treasuryFee from factory
+    uint256 public treasuryFee; // treasury rate (e.g. 200 = 2%, 150 = 1.50%)
 
     uint256 public gameCreationAmount;
 
@@ -83,25 +85,22 @@ contract GameFactory is Pausable, Ownable {
      * @param _gameImplementation the game implementation address
      * @param _cronUpkeep the keeper address
      * @param _gameCreationAmount the game creation amount
-     * @param _houseEdge the house edge in percent
+     * @param _treasuryFee the treasury fee in percent
      * @param _authorizedAmounts the list of authorised amounts for game creation
      */
     constructor(
         address _gameImplementation,
         address _cronUpkeep,
         uint256 _gameCreationAmount,
-        uint256 _houseEdge,
+        uint256 _treasuryFee,
         uint256[] memory _authorizedAmounts
     ) onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts) {
-        // TODO transfor requires to modifiers (SEE: onlyAllowedNumberOfPlayers for _houseEdge require)
+        // TODO transfor requires to modifiers (SEE: onlyAllowedNumberOfPlayers for _treasuryFee require)
         require(_gameImplementation != address(0), "Game Implementation need to be initialised");
         require(_cronUpkeep != address(0), "Keeper need to be initialised");
-        // TODO create constant for max house edge
-        // require(_houseEdge <= 10, "House Edge need to be less or equal to 10");
 
         cronUpkeep = _cronUpkeep;
-
-        houseEdge = _houseEdge;
+        treasuryFee = _treasuryFee;
         gameCreationAmount = _gameCreationAmount;
 
         gameImplementations.push(
@@ -128,7 +127,7 @@ contract GameFactory is Pausable, Ownable {
      * @param _maxPlayers the max players for the game
      * @param _playTimeRange the player time range
      * @param _registrationAmount the registration amount
-     * @param _creatorEdge the creator edge in %
+     * @param _creatorFee the creator fee in %
      * @param _encodedCron the encoded cron as * * * * *
      */
     // TODO add Name and image url as argument to createNewGame & initialize functions
@@ -136,7 +135,7 @@ contract GameFactory is Pausable, Ownable {
         uint256 _maxPlayers,
         uint256 _playTimeRange,
         uint256 _registrationAmount,
-        uint256 _creatorEdge,
+        uint256 _creatorFee,
         string memory _encodedCron
     )
         public
@@ -163,8 +162,8 @@ contract GameFactory is Pausable, Ownable {
                 _playTimeRange: _playTimeRange,
                 _maxPlayers: _maxPlayers,
                 _registrationAmount: _registrationAmount,
-                _houseEdge: houseEdge,
-                _creatorEdge: _creatorEdge,
+                _treasuryFee: treasuryFee,
+                _creatorFee: _creatorFee,
                 _encodedCron: _encodedCron
             })
         );

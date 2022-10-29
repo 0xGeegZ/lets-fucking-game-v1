@@ -19,7 +19,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               this.playTimeRange,
               this.correctRegistrationAmount,
-              this.creatorEdge,
+              this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
             ),
@@ -43,7 +43,7 @@ describe('GameFactoryContract', function () {
               outOfRangeMaxPlayers1,
               this.playTimeRange,
               registrationAmount,
-              this.creatorEdge,
+              this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
             ),
@@ -57,7 +57,7 @@ describe('GameFactoryContract', function () {
               outOfRangeMaxPlayers2,
               this.playTimeRange,
               registrationAmount,
-              this.creatorEdge,
+              this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
             ),
@@ -81,7 +81,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               outOfRangePlayTimeRange1,
               registrationAmount,
-              this.creatorEdge,
+              this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
             ),
@@ -95,7 +95,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               outOfRangePlayTimeRange2,
               registrationAmount,
-              this.creatorEdge,
+              this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
             ),
@@ -114,7 +114,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
-            this.creatorEdge,
+            this.creatorFee,
             this.encodedCron,
             { value: this.gameCreationAmount }
           )
@@ -138,8 +138,8 @@ describe('GameFactoryContract', function () {
         const responseMaxPlayers = await clonedGameContract.maxPlayers()
         const responseRegistrationAmount =
           await clonedGameContract.registrationAmount()
-        const responseHouseEdge = await clonedGameContract.houseEdge()
-        const responseCreatorEdge = await clonedGameContract.creatorEdge()
+        const responseTreasuryFee = await clonedGameContract.treasuryFee()
+        const responseCreatorFee = await clonedGameContract.creatorFee()
 
         expect(responseOwner).to.be.equal(this.owner.address)
         expect(responseCreator).to.be.equal(this.bob.address)
@@ -150,8 +150,8 @@ describe('GameFactoryContract', function () {
         expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
         expect(responseRegistrationAmount).to.be.equal(registrationAmount)
-        expect(responseHouseEdge).to.be.equal(this.houseEdge)
-        expect(responseCreatorEdge).to.be.equal(this.creatorEdge)
+        expect(responseTreasuryFee).to.be.equal(this.treasuryFee)
+        expect(responseCreatorFee).to.be.equal(this.creatorFee)
       })
 
       it('should add the new game in deployedGames', async function () {
@@ -169,7 +169,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 1],
-            this.creatorEdge,
+            this.creatorFee,
             this.encodedCron,
             { value: this.gameCreationAmount }
           )
@@ -179,7 +179,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 2],
-            this.creatorEdge,
+            this.creatorFee,
             this.encodedCron,
             { value: this.gameCreationAmount }
           )
@@ -215,7 +215,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               this.playTimeRange,
               this.authorizedAmounts[this.authorizedAmounts.length - 1],
-              this.creatorEdge,
+              this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
             )
@@ -238,7 +238,7 @@ describe('GameFactoryContract', function () {
           this.maxPlayers,
           this.playTimeRange,
           this.authorizedAmounts[1],
-          this.creatorEdge,
+          this.creatorFee,
           this.encodedCron,
           { value: this.gameCreationAmount }
         )
@@ -248,7 +248,7 @@ describe('GameFactoryContract', function () {
           this.maxPlayers,
           this.playTimeRange,
           this.authorizedAmounts[2],
-          this.creatorEdge,
+          this.creatorFee,
           this.encodedCron,
           { value: this.gameCreationAmount }
         )

@@ -18,8 +18,8 @@ describe('GameFactoryContract', function () {
             _playTimeRange: this.playTimeRange,
             _maxPlayers: this.maxPlayers,
             _registrationAmount: this.correctRegistrationAmount,
-            _houseEdge: this.houseEdge,
-            _creatorEdge: this.creatorEdge,
+            _treasuryFee: this.treasuryFee,
+            _creatorFee: this.creatorFee,
             _encodedCron: this.encodedCron,
           }),
           "The implementation contract can't be initialized"
@@ -34,7 +34,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 1],
-            this.creatorEdge,
+            this.creatorFee,
             this.encodedCron,
             { value: this.gameCreationAmount }
           )
@@ -57,8 +57,8 @@ describe('GameFactoryContract', function () {
             _playTimeRange: this.playTimeRange,
             _maxPlayers: this.maxPlayers,
             _registrationAmount: this.correctRegistrationAmount,
-            _houseEdge: this.houseEdge,
-            _creatorEdge: this.creatorEdge,
+            _treasuryFee: this.treasuryFee,
+            _creatorFee: this.creatorFee,
             _encodedCron: this.encodedCron,
           }),
           'Contract already initialized'
@@ -76,8 +76,8 @@ describe('GameFactoryContract', function () {
             responseLatestGameImplementationVersionId
           )
         const responseOwner = await this.gameFactory.owner()
-        const responseHouseEdge = await this.gameFactory.houseEdge()
-        // const responseCreatorEdge = await this.gameFactory.creatorEdge()
+        const responseTreasuryFee = await this.gameFactory.treasuryFee()
+        // const responseCreatorFee = await this.gameFactory.creatorFee()
         const responseAuthorizedAmounts =
           await this.gameFactory.getAuthorisedAmounts()
 
@@ -86,8 +86,8 @@ describe('GameFactoryContract', function () {
         expect(responseGameImplementation.deployedAddress).to.be.equal(
           this.gameImplementation.address
         )
-        expect(responseHouseEdge).to.be.equal(this.houseEdge)
-        // expect(responseCreatorEdge).to.be.equal(this.creatorEdge)
+        expect(responseTreasuryFee).to.be.equal(this.treasuryFee)
+        // expect(responseCreatorFee).to.be.equal(this.creatorFee)
         expect(responseAuthorizedAmounts.toString()).to.be.equal(
           this.authorizedAmounts.toString()
         )
@@ -103,7 +103,7 @@ describe('GameFactoryContract', function () {
           this.gameImplementation.address,
           this.cronUpkeep.address,
           this.gameCreationAmount,
-          this.houseEdge,
+          this.treasuryFee,
           this.authorizedAmounts
         )
         await gameFactoryContract.deployed()
@@ -115,7 +115,7 @@ describe('GameFactoryContract', function () {
             this.gameImplementation.address,
             this.cronUpkeep.address,
             this.gameCreationAmount,
-            this.houseEdge,
+            this.treasuryFee,
             emptyauthorizedAmounts
           ),
           'authorizedAmounts should be greather or equal to 1'
@@ -129,7 +129,7 @@ describe('GameFactoryContract', function () {
             this.maxPlayers,
             this.playTimeRange,
             sameRegistrationAmount,
-            this.creatorEdge,
+            this.creatorFee,
             this.encodedCron,
             { value: this.gameCreationAmount }
           )
@@ -141,7 +141,7 @@ describe('GameFactoryContract', function () {
               this.maxPlayers,
               this.playTimeRange,
               sameRegistrationAmount,
-              this.creatorEdge,
+              this.creatorFee,
               this.encodedCron,
               { value: this.gameCreationAmount }
             ),

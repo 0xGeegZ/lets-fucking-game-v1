@@ -16,7 +16,7 @@ const setupTest = deployments.createFixture(
       playTimeRange,
       correctRegistrationAmount,
       gameCreationAmount,
-      creatorEdge,
+      creatorFee,
       encodedCron,
     }
   ) => {
@@ -99,7 +99,7 @@ const setupTest = deployments.createFixture(
       maxPlayers,
       playTimeRange,
       correctRegistrationAmount,
-      creatorEdge,
+      creatorFee,
       encodedCron,
       { value: gameCreationAmount }
     )
@@ -153,9 +153,13 @@ const initialiseTestData = async function () {
   this.zeroRegistrationAmount = ethers.utils.parseEther('0')
 
   this.gameCreationAmount = ethers.utils.parseEther('0.1')
-  this.houseEdge = ethers.utils.parseEther('0.00005')
-  this.creatorEdge = ethers.utils.parseEther('0.00005')
-  // prizeAmount equals total prize amount minus house edge
+  this.treasuryFee = 500 // 5%
+  this.creatorFee = 500 // 5%
+
+  // this.treasuryFee = ethers.utils.parseEther('0.00005')
+  // this.creatorFee = ethers.utils.parseEther('0.00005')
+
+  // prizeAmount equals total prize amount minus treasury fee
   this.prizeAmount = ethers.utils.parseEther('0.0009')
 
   this.launchDuration = 60 * 60 * 25
@@ -188,7 +192,7 @@ const initialiseTestData = async function () {
     playTimeRange: this.playTimeRange,
     correctRegistrationAmount: this.correctRegistrationAmount,
     gameCreationAmount: this.gameCreationAmount,
-    creatorEdge: this.creatorEdge,
+    creatorFee: this.creatorFee,
     encodedCron: this.encodedCron,
   })
 

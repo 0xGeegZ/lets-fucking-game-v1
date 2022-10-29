@@ -50,8 +50,8 @@ interface GameImplementationInterface {
         uint256 _playTimeRange;
         uint256 _maxPlayers;
         uint256 _registrationAmount;
-        uint256 _houseEdge;
-        uint256 _creatorEdge;
+        uint256 _treasuryFee;
+        uint256 _creatorFee;
         string _encodedCron;
     }
 
@@ -126,8 +126,8 @@ interface GameImplementationInterface {
      *  @param initialization._playTimeRange the time range during which a player can play in hour
      *  @param initialization._maxPlayers the maximum number of players for a game
      *  @param initialization._registrationAmount the amount that players will need to pay to enter in the game
-     *  @param initialization._houseEdge the house edge in percent
-     *  @param initialization._creatorEdge creator edge in percent
+     *  @param initialization._treasuryFee the treasury fee in percent
+     *  @param initialization._creatorFee creator fee in percent
      *  @param initialization._encodedCron the cron string
      */
     function initialize(Initialization calldata initialization) external;
@@ -170,14 +170,14 @@ interface GameImplementationInterface {
     /**
      * @notice Allow admin to withdraw his Edge
      */
-    function withdrawAdminEdge() external;
+    function claimTreasuryFee() external;
 
     /// ADMIN FUNCTIONS
     /**
-     * @notice set house edge for game
-     * @param _houseEdge the new house edge
+     * @notice set treasury fee for game
+     * @param _treasuryFee the new treasury fee
      */
-    function setHouseEdge(uint256 _houseEdge) external;
+    function setTreasuryFee(uint256 _treasuryFee) external;
 
     /**
      * @notice Allow admin or factory to update keeper address
@@ -216,7 +216,7 @@ interface GameImplementationInterface {
     /**
      * @notice Allow creator to withdraw his Edge
      */
-    function withdrawCreatorEdge() external;
+    function claimCreatorFee() external;
 
     /**
      * @notice Pause the current game and associated keeper job

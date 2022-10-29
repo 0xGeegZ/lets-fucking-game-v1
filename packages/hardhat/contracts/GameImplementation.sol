@@ -26,8 +26,15 @@ contract GameImplementation {
     uint256 private cronUpkeepJobId;
 
     uint256 public registrationAmount;
-    uint256 public houseEdge;
-    uint256 public creatorEdge;
+
+    uint256 public constant MAX_TREASURY_FEE = 1000; // 10%
+    uint256 public constant MAX_CREATOR_FEE = 500; // 5%
+
+    uint256 public treasuryFee; // treasury rate (e.g. 200 = 2%, 150 = 1.50%)
+    uint256 public treasuryAmount; // treasury amount that was not claimed
+
+    uint256 public creatorFee; // treasury rate (e.g. 200 = 2%, 150 = 1.50%)
+    uint256 public creatorAmount; // treasury amount that was not claimed
 
     // gameId is fix and represent the fixed id for the game
     uint256 public gameId;
@@ -96,8 +103,8 @@ contract GameImplementation {
         uint256 _playTimeRange;
         uint256 _maxPlayers;
         uint256 _registrationAmount;
-        uint256 _houseEdge;
-        uint256 _creatorEdge;
+        uint256 _treasuryFee;
+        uint256 _creatorFee;
         string _encodedCron;
     }
 
@@ -150,6 +157,20 @@ contract GameImplementation {
      */
     event GamePrizeClaimed(address claimer, uint256 roundId, uint256 amountClaimed);
     /**
+     * @notice Called when the treasury fee are claimed
+     */
+    event TreasuryFeeClaimed(uint256 amount);
+    /**
+     * @notice Called when the treasury fee are claimed by factory
+     */
+    event TreasuryFeeClaimedByFactory(uint256 amount);
+
+    /**
+     * @notice Called when the creator fee are claimed
+     */
+    event CreatorFeeClaimed(uint256 amount);
+
+    /**
      * @notice Called when the creator or admin update encodedCron
      */
     event EncodedCronUpdated(uint256 jobId, string encodedCron);
@@ -180,8 +201,8 @@ contract GameImplementation {
      *  @param initialization._playTimeRange the time range during which a player can play in hour
      *  @param initialization._maxPlayers the maximum number of players for a game
      *  @param initialization._registrationAmount the amount that players will need to pay to enter in the game
-     *  @param initialization._houseEdge the house edge in percent
-     *  @param initialization._creatorEdge creator edge in percent
+     *  @param initialization._treasuryFee the treasury fee in percent
+     *  @param initialization._creatorFee creator fee in percent
      *  @param initialization._encodedCron the cron string
      */
     function initialize(Initialization calldata initialization)
@@ -192,8 +213,7 @@ contract GameImplementation {
         onlyAllowedPlayTimeRange(initialization._playTimeRange)
     {
         // TODO create modifier for this require
-        // TODO create constant for max house edge
-        // require(initialization._creatorEdge <= 5, "Creator Edge need to be less or equal to 10");
+        require(initialization._creatorFee <= MAX_CREATOR_FEE, "Creator fee too high");
 
         // TODO verify cron limitation : not less than every hour
         // verify that should not contains "*/" in first value
@@ -207,8 +227,11 @@ contract GameImplementation {
         randNonce = 0;
 
         registrationAmount = initialization._registrationAmount;
-        houseEdge = initialization._houseEdge;
-        creatorEdge = initialization._creatorEdge;
+        treasuryFee = initialization._treasuryFee;
+        creatorFee = initialization._creatorFee;
+
+        treasuryAmount = 0;
+        creatorAmount = 0;
 
         gameId = initialization._gameId;
         gameImplementationVersion = initialization._gameImplementationVersion;
@@ -398,11 +421,9 @@ contract GameImplementation {
      * If so, it will create winners and reset the game
      */
     function _checkIfGameEnded() internal {
-        // TODO GUIGUI houseEdge + creatorEdge are cumultate.
-        uint256 prize = registrationAmount * numPlayers - houseEdge - creatorEdge;
         uint256 remainingPlayersCounter = 0;
-
         address lastNonLoosingPlayerAddress;
+
         for (uint256 i = 0; i < numPlayers; i++) {
             Player memory currentPlayer = players[playerAddresses[i]];
             if (!currentPlayer.hasLost) {
@@ -411,8 +432,19 @@ contract GameImplementation {
             }
         }
 
+        bool isPlitPot = _isAllPlayersSplitOk();
+
+        if (remainingPlayersCounter > 1 && !isPlitPot) return;
+
+        uint256 totalAmount = registrationAmount * numPlayers;
+        treasuryAmount = (totalAmount * treasuryFee) / 10000;
+        creatorAmount = (totalAmount * creatorFee) / 10000;
+        uint256 rewardAmount = totalAmount - treasuryAmount - creatorAmount;
+
         //Check if Game is over with one winner
         if (remainingPlayersCounter == 1) {
+            uint256 prize = rewardAmount;
+
             Winner storage winner = winners[roundId];
             winner.gameWinners[lastNonLoosingPlayerAddress] = WinnerPlayerData({
                 roundId: roundId,
@@ -423,13 +455,11 @@ contract GameImplementation {
             winner.gameWinnerAddresses.push(lastNonLoosingPlayerAddress);
 
             emit GameWon(roundId, lastNonLoosingPlayerAddress, prize);
-
-            _resetGame();
         }
 
         // Check if remaining players have vote to split pot
-        if (_isAllPlayersSplitOk()) {
-            uint256 splittedPrize = prize / remainingPlayersCounter;
+        if (isPlitPot) {
+            uint256 splittedPrize = rewardAmount / remainingPlayersCounter;
 
             Winner storage gameWinner = winners[roundId];
 
@@ -447,13 +477,15 @@ contract GameImplementation {
                     emit GameSplitted(roundId, currentPlayer.playerAddress, splittedPrize);
                 }
             }
-            _resetGame();
         }
 
-        // If no winner, the house keeps the prize and reset the game
+        // If no winner, the treasury and creator split the prize
         if (remainingPlayersCounter == 0) {
-            _resetGame();
+            treasuryAmount = rewardAmount / 2;
+            creatorAmount = rewardAmount / 2;
         }
+
+        _resetGame();
     }
 
     /**
@@ -567,8 +599,6 @@ contract GameImplementation {
             bool
         )
     {
-        // uint256 balance = address(this).balance;
-
         return (
             creator,
             roundId,
@@ -578,8 +608,8 @@ contract GameImplementation {
             maxPlayers,
             registrationAmount,
             playTimeRange,
-            houseEdge,
-            creatorEdge,
+            treasuryFee,
+            creatorFee,
             contractPaused,
             gameInProgress
         );
@@ -668,25 +698,28 @@ contract GameImplementation {
     }
 
     /**
-     * @notice Set the creator edge for the game
-     * @param _creatorEdge the new creator edge in %
+     * @notice Set the creator fee for the game
+     * @param _creatorFee the new creator fee in %
      */
-    function setCreatorEdge(uint256 _creatorEdge) external onlyAdminOrCreator onlyIfGameIsNotInProgress {
+    function setCreatorFee(uint256 _creatorFee) external onlyAdminOrCreator onlyIfGameIsNotInProgress {
         // TODO create modifier for this require
-        // TODO create constant for max house edge
-        // require(initialization._creatorEdge <= 5, "Creator Edge need to be less or equal to 10");
+        require(_creatorFee <= MAX_CREATOR_FEE, "Creator fee too high");
 
-        creatorEdge = _creatorEdge;
+        creatorFee = _creatorFee;
     }
 
     /**
-     * @notice Allow creator to withdraw his Edge
+     * @notice Allow creator to withdraw his fee
      */
-    function withdrawCreatorEdge() external onlyCreator {
-        // TODO Guigui handle better creatorEdge management to avoid multipl withdraw
-        // count each creator edge part balance at the start of each game. If the amount is withdrawn, the creator edge balance is set to zero
-        require(address(this).balance >= creatorEdge);
-        _safeTransfert(creator, creatorEdge);
+    function claimCreatorFee() external onlyCreator {
+        require(address(this).balance >= creatorAmount);
+        require(creatorAmount > 0, "No creator fee to claim");
+
+        uint256 currentCreatorAmount = creatorAmount;
+        creatorAmount = 0;
+        _safeTransfert(creator, currentCreatorAmount);
+
+        emit CreatorFeeClaimed(currentCreatorAmount);
     }
 
     ///
@@ -694,29 +727,41 @@ contract GameImplementation {
     ///
 
     /**
-     * @notice Withdraw Admin Edge
+     * @notice Withdraw Treasury fee
      */
-    function withdrawAdminEdge() external onlyAdmin {
-        // TODO Guigui handle better houseEdge management to avoid multipl withdraw
-        // count each house edge part balance at the start of each game. If the amount is withdrawn, the house edge balance is set to zero
-        require(address(this).balance >= houseEdge);
-        _safeTransfert(owner, houseEdge);
+    function claimTreasuryFee() external onlyAdmin {
+        require(address(this).balance >= treasuryAmount);
+        require(treasuryAmount > 0, "No treasury fee to claim");
+
+        uint256 currentTreasuryAmount = treasuryAmount;
+        treasuryAmount = 0;
+        _safeTransfert(owner, currentTreasuryAmount);
+
+        emit TreasuryFeeClaimed(currentTreasuryAmount);
     }
 
     /**
-     * @notice Withdraw Admin edge and send it to factory
+     * @notice Withdraw Treasury fee and send it to factory
      */
-    function withdrawAdminEdgToFactory() external onlyFactory {
-        require(address(this).balance >= houseEdge);
-        _safeTransfert(factory, houseEdge);
+    function claimTreasuryFeeToFactory() external onlyFactory {
+        require(address(this).balance >= treasuryAmount);
+        require(treasuryAmount > 0, "No treasury fee to claim");
+
+        uint256 currentTreasuryAmount = treasuryAmount;
+        treasuryAmount = 0;
+        _safeTransfert(factory, currentTreasuryAmount);
+
+        emit TreasuryFeeClaimedByFactory(currentTreasuryAmount);
     }
 
     /**
-     * @notice Set the house edge for the game
-     * @param _houseEdge the new house edge in %
+     * @notice Set the treasury fee for the game
+     * @param _treasuryFee the new treasury fee in %
      */
-    function setHouseEdge(uint256 _houseEdge) external onlyAdmin onlyIfGameIsNotInProgress {
-        houseEdge = _houseEdge;
+    function setTreasuryFee(uint256 _treasuryFee) external onlyAdmin onlyIfGameIsNotInProgress {
+        require(_treasuryFee <= MAX_TREASURY_FEE, "Treasury fee too high");
+
+        treasuryFee = _treasuryFee;
     }
 
     /**
