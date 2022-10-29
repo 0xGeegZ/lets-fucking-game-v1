@@ -42,7 +42,7 @@ interface GameImplementationInterface {
      * @notice Initialization structure that contain all the data that are needed to create a new game
      */
     struct Initialization {
-        address _generalAdmin;
+        address _owner;
         address _creator;
         address _cronUpkeep;
         uint256 _gameImplementationVersion;
@@ -104,13 +104,22 @@ interface GameImplementationInterface {
     /**
      * @notice Called when the creator or admin update Keeper
      */
-    event UpkeepUpdated(address cronUpkeep, string encodedCron, uint256 jobId);
+    // event UpkeepUpdated(address cronUpkeep, string encodedCron, uint256 jobId);
+
+    /**
+     * @notice Called when the creator or admin update encodedCron
+     */
+    event EncodedCronUpdated(uint256 jobId, string encodedCron);
+    /**
+     * @notice Called when the factory or admin update cronUpkeep
+     */
+    event CronUpkeepUpdated(uint256 jobId, address cronUpkeep);
 
     /**
      * @notice Create a new Game Implementation by cloning the base contract
      * @param initialization the initialisation data with params as follow :
      *  @param initialization._creator the game creator
-     *  @param initialization._generalAdmin the general admin address
+     *  @param initialization._owner the general admin address
      *  @param initialization._cronUpkeep the cron upkeep address
      *  @param initialization._gameImplementationVersion the version of the game implementation
      *  @param initialization._gameId the unique game id (fix)
@@ -165,17 +174,22 @@ interface GameImplementationInterface {
 
     /// ADMIN FUNCTIONS
     /**
-     * @notice Allow admin to update keeper
-     * @param _cronUpkeep the new cron keeper address
-     * @param _encodedCron the new cron
+     * @notice set house edge for game
+     * @param _houseEdge the new house edge
      */
-    function updateUpKeep(address _cronUpkeep, string memory _encodedCron) external;
+    function setHouseEdge(uint256 _houseEdge) external;
+
+    /**
+     * @notice Allow admin or factory to update keeper address
+     * @param _cronUpkeep the new keeper address
+     */
+    function setCronUpkeep(address _cronUpkeep) external;
 
     /**
      * @notice Allow admin or creator to update keeper cron
      * @param _encodedCron the new cron
      */
-    function updateUpKeepCron(string memory _encodedCron) external;
+    function setEncodedCron(string memory _encodedCron) external;
 
     ///
     /// SETTERS FUNCTIONS

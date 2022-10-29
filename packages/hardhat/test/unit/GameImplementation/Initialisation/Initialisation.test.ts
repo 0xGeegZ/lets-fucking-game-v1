@@ -6,9 +6,9 @@ describe('GameImplementationContract - Initialisation', function () {
   beforeEach(initialiseTestData)
 
   context('Contract Initialisation', function () {
-    describe('when generalAdmin has deployed the Factory Contract', async function () {
-      it('should be set as the generalAdmin of the created game', async function () {
-        const contractAdmin = await this.deployedGame.generalAdmin()
+    describe('when owner has deployed the Factory Contract', async function () {
+      it('should be set as the owner of the created game', async function () {
+        const contractAdmin = await this.deployedGame.owner()
         expect(this.owner.address).to.equal(contractAdmin)
       })
     })

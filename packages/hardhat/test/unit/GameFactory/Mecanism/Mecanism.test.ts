@@ -122,7 +122,7 @@ describe('GameFactoryContract', function () {
           newGame.deployedAddress
         )
 
-        const responseGeneralAdmin = await clonedGameContract.generalAdmin()
+        const responseOwner = await clonedGameContract.owner()
         const responseCreator = await clonedGameContract.creator()
         const responseFactory = await clonedGameContract.factory()
         const responseGameId = await clonedGameContract.roundId()
@@ -135,7 +135,7 @@ describe('GameFactoryContract', function () {
         const responseHouseEdge = await clonedGameContract.houseEdge()
         const responseCreatorEdge = await clonedGameContract.creatorEdge()
 
-        expect(responseGeneralAdmin).to.be.equal(this.owner.address)
+        expect(responseOwner).to.be.equal(this.owner.address)
         expect(responseCreator).to.be.equal(this.bob.address)
         expect(responseFactory).to.be.equal(this.gameFactory.address)
         expect(responseGameId).to.be.equal('0')

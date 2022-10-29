@@ -17,8 +17,7 @@ contract GameImplementation {
     bool private _isBase;
     uint256 private randNonce;
 
-    // TODO GUIGUI rename generalAdmin to factory?
-    address public generalAdmin;
+    address public owner;
     address public creator;
     address public factory;
 
@@ -77,7 +76,7 @@ contract GameImplementation {
     }
 
     struct Initialization {
-        address _generalAdmin;
+        address _owner;
         address _creator;
         address _cronUpkeep;
         uint256 _gameImplementationVersion;
@@ -102,7 +101,8 @@ contract GameImplementation {
     event FailedTransfer(address receiver, uint256 amount);
     event Received(address sender, uint256 amount);
     event GamePrizeClaimed(address claimer, uint256 roundId, uint256 amountClaimed);
-    event UpkeepUpdated(address cronUpkeep, string encodedCron, uint256 jobId);
+    event EncodedCronUpdated(uint256 jobId, string encodedCron);
+    event CronUpkeepUpdated(uint256 jobId, address cronUpkeep);
 
     ///
     /// CONSTRUCTOR AND DEFAULT
@@ -127,7 +127,7 @@ contract GameImplementation {
         // Pattern is : * * * * *
         // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
 
-        generalAdmin = initialization._generalAdmin;
+        owner = initialization._owner;
         creator = initialization._creator;
         factory = msg.sender;
 
@@ -158,7 +158,7 @@ contract GameImplementation {
     }
 
     // TODO IMPORTANT for development use remove in next smart contract version
-    function startGame() external onlyCreatorOrAdmin onlyNotPaused onlyIfFull {
+    function startGame() external onlyAdminOrCreator onlyNotPaused onlyIfFull {
         _startGame();
     }
 
@@ -214,7 +214,7 @@ contract GameImplementation {
         }
     }
 
-    function triggerDailyCheckpoint() external onlyKeeperOrAdmin onlyNotPaused onlyIfGameIsInProgress {
+    function triggerDailyCheckpoint() external onlyAdminOrKeeper onlyNotPaused onlyIfGameIsInProgress {
         // function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
         if (gameInProgress == true) {
             _refreshPlayerStatus();
@@ -289,7 +289,7 @@ contract GameImplementation {
     }
 
     function _checkIfGameEnded() internal {
-        // TODO houseEdge + creatorEdge are cumultate.
+        // TODO GUIGUI houseEdge + creatorEdge are cumultate.
         uint256 prize = registrationAmount * numPlayers - houseEdge - creatorEdge;
         uint256 remainingPlayersCounter = 0;
 
@@ -411,109 +411,6 @@ contract GameImplementation {
     }
 
     ///
-    /// SETTERS FUNCTIONS
-    ///
-
-    /// CREATOR FUNCTIONS
-
-    function setGameName(string calldata _gameName) external onlyCreator {
-        gameName = _gameName;
-    }
-
-    function setGameImage(string calldata _gameImage) external onlyCreator {
-        gameImage = _gameImage;
-    }
-
-    function setMaxPlayers(uint256 _maxPlayers)
-        external
-        onlyCreatorOrAdmin
-        onlyAllowedNumberOfPlayers(_maxPlayers)
-        onlyIfGameIsNotInProgress
-    {
-        maxPlayers = _maxPlayers;
-    }
-
-    function withdrawCreatorEdge() external onlyCreator {
-        require(address(this).balance >= creatorEdge);
-        _safeTransfert(creator, creatorEdge);
-    }
-
-    /// ADMIN FUNCTIONS
-    function withdrawAdminEdge() external onlyAdmin {
-        require(address(this).balance >= houseEdge);
-        _safeTransfert(generalAdmin, houseEdge);
-    }
-
-    function updateUpKeep(address _cronUpkeep, string memory _encodedCron) external onlyAdmin {
-        require(_cronUpkeep != address(0), "Keeper need to be initialised");
-        require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
-
-        // TODO verify cron limitation : not less than every hour
-        // verify that should not contains "*/" in first value
-        // Pattern is : * * * * *
-        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
-
-        encodedCron = CronExternal.toEncodedSpec(_encodedCron);
-        cronUpkeep = _cronUpkeep;
-
-        CronUpkeepInterface(cronUpkeep).updateCronJob(
-            cronUpkeepJobId,
-            address(this),
-            bytes("triggerDailyCheckpoint()"),
-            encodedCron
-        );
-        emit UpkeepUpdated(cronUpkeep, _encodedCron, 0);
-    }
-
-    function updateUpKeepCron(string memory _encodedCron) external onlyCreatorOrAdmin {
-        require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
-
-        // TODO verify cron limitation : not less than every hour
-        // verify that should not contains "*/" in first value
-        // Pattern is : * * * * *
-        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
-
-        encodedCron = CronExternal.toEncodedSpec(_encodedCron);
-
-        CronUpkeepInterface(cronUpkeep).updateCronJob(
-            cronUpkeepJobId,
-            address(this),
-            bytes("triggerDailyCheckpoint()"),
-            encodedCron
-        );
-        emit UpkeepUpdated(cronUpkeep, _encodedCron, 0);
-    }
-
-    function pause() external onlyAdmin onlyNotPaused {
-        // pause first to ensure no more interaction with contract
-        contractPaused = true;
-        CronUpkeepInterface(cronUpkeep).deleteCronJob(cronUpkeepJobId);
-    }
-
-    function unpause() external onlyAdmin onlyPaused onlyIfKeeperDataInit {
-        uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
-        cronUpkeepJobId = nextCronJobIDs;
-
-        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
-            address(this),
-            bytes("triggerDailyCheckpoint()"),
-            encodedCron
-        );
-
-        // Reset round limits and round status for each remaining user
-        for (uint256 i = 0; i < numPlayers; i++) {
-            Player storage player = players[playerAddresses[i]];
-            if (player.hasLost == false) {
-                _resetRoundRange(player);
-                player.hasPlayedRound = false;
-            }
-        }
-
-        // unpause last to ensure that everything is ok
-        contractPaused = false;
-    }
-
-    ///
     /// GETTERS FUNCTIONS
     ///
 
@@ -581,8 +478,145 @@ contract GameImplementation {
     }
 
     ///
+    /// SETTERS FUNCTIONS
+    ///
+
+    function setGameName(string calldata _gameName) external onlyCreator {
+        gameName = _gameName;
+    }
+
+    function setGameImage(string calldata _gameImage) external onlyCreator {
+        gameImage = _gameImage;
+    }
+
+    function setMaxPlayers(uint256 _maxPlayers)
+        external
+        onlyAdminOrCreator
+        onlyAllowedNumberOfPlayers(_maxPlayers)
+        onlyIfGameIsNotInProgress
+    {
+        maxPlayers = _maxPlayers;
+    }
+
+    function setCreatorEdge(uint256 _creatorEdge) external onlyAdminOrCreator onlyIfGameIsNotInProgress {
+        // TODO create modifier for this require
+        // TODO create constant for max house edge
+        // require(initialization._creatorEdge <= 5, "Creator Edge need to be less or equal to 10");
+
+        creatorEdge = _creatorEdge;
+    }
+
+    function withdrawCreatorEdge() external onlyCreator {
+        // TODO Guigui handle better creatorEdge management to avoid multipl withdraw
+        // count each creator edge part balance at the start of each game. If the amount is withdrawn, the creator edge balance is set to zero
+        require(address(this).balance >= creatorEdge);
+        _safeTransfert(creator, creatorEdge);
+    }
+
+    ///
+    /// ADMIN FUNCTIONS
+    ///
+
+    function withdrawAdminEdge() external onlyAdmin {
+        // TODO Guigui handle better houseEdge management to avoid multipl withdraw
+        // count each house edge part balance at the start of each game. If the amount is withdrawn, the house edge balance is set to zero
+        require(address(this).balance >= houseEdge);
+        _safeTransfert(owner, houseEdge);
+    }
+
+    function withdrawAdminEdgToFactory() external onlyFactory {
+        require(address(this).balance >= houseEdge);
+        _safeTransfert(factory, houseEdge);
+    }
+
+    function setHouseEdge(uint256 _houseEdge) external onlyAdmin onlyIfGameIsNotInProgress {
+        houseEdge = _houseEdge;
+    }
+
+    function setCronUpkeep(address _cronUpkeep) external onlyAdminOrFactory {
+        require(_cronUpkeep != address(0), "Keeper need to be initialised");
+
+        // TODO verify cron limitation : not less than every hour
+        // verify that should not contains "*/" in first value
+        // Pattern is : * * * * *
+        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
+
+        cronUpkeep = _cronUpkeep;
+
+        CronUpkeepInterface(cronUpkeep).updateCronJob(
+            cronUpkeepJobId,
+            address(this),
+            bytes("triggerDailyCheckpoint()"),
+            encodedCron
+        );
+        emit CronUpkeepUpdated(cronUpkeepJobId, cronUpkeep);
+    }
+
+    function setEncodedCron(string memory _encodedCron) external onlyAdminOrCreator {
+        require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
+
+        // TODO verify cron limitation : not less than every hour
+        // verify that should not contains "*/" in first value
+        // Pattern is : * * * * *
+        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
+
+        encodedCron = CronExternal.toEncodedSpec(_encodedCron);
+
+        CronUpkeepInterface(cronUpkeep).updateCronJob(
+            cronUpkeepJobId,
+            address(this),
+            bytes("triggerDailyCheckpoint()"),
+            encodedCron
+        );
+        emit EncodedCronUpdated(cronUpkeepJobId, _encodedCron);
+    }
+
+    function pause() external onlyAdmin onlyNotPaused {
+        // pause first to ensure no more interaction with contract
+        contractPaused = true;
+        CronUpkeepInterface(cronUpkeep).deleteCronJob(cronUpkeepJobId);
+    }
+
+    function unpause() external onlyAdmin onlyPaused onlyIfKeeperDataInit {
+        uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
+        cronUpkeepJobId = nextCronJobIDs;
+
+        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
+            address(this),
+            bytes("triggerDailyCheckpoint()"),
+            encodedCron
+        );
+
+        // Reset round limits and round status for each remaining user
+        for (uint256 i = 0; i < numPlayers; i++) {
+            Player storage player = players[playerAddresses[i]];
+            if (player.hasLost == false) {
+                _resetRoundRange(player);
+                player.hasPlayedRound = false;
+            }
+        }
+
+        // unpause last to ensure that everything is ok
+        contractPaused = false;
+    }
+
+    ///
     /// EMERGENCY
     ///
+    function transferAdminOwnership(address _adminAddress) public onlyAdmin {
+        require(_adminAddress != address(0), "adminAddress need to be initialised");
+        owner = _adminAddress;
+    }
+
+    function transferCreatorOwnership(address _creator) public onlyCreator {
+        require(_creator != address(0), "creator need to be initialised");
+        creator = _creator;
+    }
+
+    function transferFactoryOwnership(address _factory) public onlyCreator {
+        require(_factory != address(0), "factory need to be initialised");
+        factory = _factory;
+    }
 
     function withdrawFunds(address receiver) external onlyAdminOrFactory {
         _safeTransfert(receiver, address(this).balance);
@@ -607,7 +641,7 @@ contract GameImplementation {
     ///
 
     modifier onlyAdmin() {
-        require(msg.sender == generalAdmin, "Caller is not the admin");
+        require(msg.sender == owner, "Caller is not the admin");
         _;
     }
 
@@ -626,18 +660,18 @@ contract GameImplementation {
         _;
     }
 
-    modifier onlyCreatorOrAdmin() {
-        require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the creator or admin");
+    modifier onlyAdminOrCreator() {
+        require(msg.sender == creator || msg.sender == owner, "Caller is not the creator or admin");
         _;
     }
 
-    modifier onlyKeeperOrAdmin() {
-        require(msg.sender == creator || msg.sender == generalAdmin, "Caller is not the keeper");
+    modifier onlyAdminOrKeeper() {
+        require(msg.sender == creator || msg.sender == owner, "Caller is not the keeper");
         _;
     }
 
     modifier onlyAdminOrFactory() {
-        require(msg.sender == factory || msg.sender == generalAdmin, "Caller is not the factory or admin");
+        require(msg.sender == factory || msg.sender == owner, "Caller is not the factory or admin");
         _;
     }
 

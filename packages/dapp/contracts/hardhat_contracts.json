@@ -2323,7 +2323,7 @@
             },
             {
               "inputs": [],
-              "name": "generalAdmin",
+              "name": "owner",
               "outputs": [
                 {
                   "internalType": "address",
@@ -2508,7 +2508,7 @@
                     },
                     {
                       "internalType": "address",
-                      "name": "_generalAdmin",
+                      "name": "_owner",
                       "type": "address"
                     },
                     {

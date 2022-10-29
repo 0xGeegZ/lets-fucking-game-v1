@@ -12,10 +12,9 @@ import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 contract GameFactory is Pausable, Ownable {
     address public cronUpkeep;
 
-    // TODO should be entered as percent
+    // TODO GUIGUI should be entered as percent
     uint256 public houseEdge;
-    // TODO should be entered as percent
-    // uint256 public creatorEdge;
+    // TODO GUIGUI should be entered as percent
     uint256 public latestGameImplementationVersionId;
     GameImplementationVersion[] public gameImplementations;
     uint256 public nextGameId = 0;
@@ -27,35 +26,37 @@ contract GameFactory is Pausable, Ownable {
     ///
     ///STRUCTS
     ///
-    struct AuthorizedAmount {
-        uint256 amount;
-        bool isUsed;
-    }
-    struct GameImplementationVersion {
-        uint256 id;
-        address deployedAddress;
-    }
+
     struct Game {
         uint256 id;
         uint256 versionId;
         address creator;
         address deployedAddress;
     }
+
+    struct GameImplementationVersion {
+        uint256 id;
+        address deployedAddress;
+    }
+    struct AuthorizedAmount {
+        uint256 amount;
+        bool isUsed;
+    }
     ///
     ///EVENTS
     ///
     event GameCreated(uint256 nextGameId, address gameAddress, uint256 implementationVersion, address creatorAddress);
     event FailedTransfer(address receiver, uint256 amount);
+    event CronUpkeepUpdated(address cronUpkeep);
 
-    // TODO add game amount to pay when creating a new game
+    // TODO GUIGUI add game amount to pay when creating a new game
     constructor(
         address _gameImplementation,
         address _cronUpkeep,
         uint256 _houseEdge,
-        // uint256 _creatorEdge,
         uint256[] memory _authorizedAmounts
     ) onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts) {
-        // TODO transfor requires to modifiers (SEE: onlyAllowedNumberOfPlayers)
+        // TODO transfor requires to modifiers (SEE: onlyAllowedNumberOfPlayers for _houseEdge require)
         require(_gameImplementation != address(0), "Game Implementation need to be initialised");
         require(_cronUpkeep != address(0), "Keeper need to be initialised");
         // TODO create constant for max house edge
@@ -64,7 +65,6 @@ contract GameFactory is Pausable, Ownable {
         cronUpkeep = _cronUpkeep;
 
         houseEdge = _houseEdge;
-        // creatorEdge = _creatorEdge;
         gameImplementations.push(
             GameImplementationVersion({ id: latestGameImplementationVersionId, deployedAddress: _gameImplementation })
         );
@@ -81,9 +81,9 @@ contract GameFactory is Pausable, Ownable {
     }
 
     ///
-    ///BUSINESS LOGIC FUNCTIONS
+    /// MAIN FUNCTIONS
     ///
-    // TODO add Name and image url as argument to createNewGame & initialize functions
+    // TODO GUIGUI add Name and image url as argument to createNewGame & initialize functions
     function createNewGame(
         uint256 _maxPlayers,
         uint256 _playTimeRange,
@@ -106,7 +106,7 @@ contract GameFactory is Pausable, Ownable {
         GameImplementationInterface(newGameAddress).initialize(
             GameImplementationInterface.Initialization({
                 _creator: msg.sender,
-                _generalAdmin: owner(),
+                _owner: owner(),
                 _cronUpkeep: cronUpkeep,
                 _gameImplementationVersion: latestGameImplementationVersionId,
                 _gameId: nextGameId,
@@ -155,24 +155,23 @@ contract GameFactory is Pausable, Ownable {
     }
 
     ///
+    ///GETTER FUNCTIONS
+    ///
+    function getDeployedGames() external view returns (Game[] memory) {
+        return deployedGames;
+    }
+
+    function getAuthorisedAmounts() external view returns (uint256[] memory) {
+        return authorizedAmounts;
+    }
+
+    function getAuthorisedAmount(uint256 _authorizedAmount) external view returns (AuthorizedAmount memory) {
+        return usedAuthorisedAmounts[_authorizedAmount];
+    }
+
+    ///
     ///ADMIN FUNCTIONS
     ///
-    function setAdmin(address _adminAddress) public onlyAdmin {
-        transferOwnership(_adminAddress);
-    }
-
-    // TODO create a function to set house Edge to Factory and all smart contracts
-
-    function setCronUpkeep(address _cronUpkeep) public onlyAdmin {
-        require(_cronUpkeep != address(0), "Keeper need to be initialised");
-        cronUpkeep = _cronUpkeep;
-        // TODO set cronUpKeep for all Games
-        // TODO add parameter to know if it's needed to register encodedCron again
-    }
-
-    function withdrawFunds(address receiver) public onlyAdmin {
-        _safeTransfert(receiver, address(this).balance);
-    }
 
     function setNewGameImplementation(address _gameImplementation) public onlyAdmin {
         latestGameImplementationVersionId += 1;
@@ -193,7 +192,35 @@ contract GameFactory is Pausable, Ownable {
         }
     }
 
-    // TODO create a function to pause all games and the cronupKeep
+    function updateCronUpkeep(address _cronUpkeep) public onlyAdmin {
+        require(_cronUpkeep != address(0), "Keeper need to be initialised");
+
+        cronUpkeep = _cronUpkeep;
+
+        for (uint256 i = 0; i < deployedGames.length; i++) {
+            Game memory game = deployedGames[i];
+            GameImplementationInterface(payable(game.deployedAddress)).setCronUpkeep(cronUpkeep);
+        }
+        emit CronUpkeepUpdated(cronUpkeep);
+    }
+
+    function pauseAllGamesAndFactory() public onlyAdmin {
+        // pause first to ensure no more interaction with contract
+        pause();
+        for (uint256 i = 0; i < deployedGames.length; i++) {
+            Game memory game = deployedGames[i];
+            GameImplementationInterface(payable(game.deployedAddress)).pause();
+        }
+    }
+
+    function ResumeAllGamesAndFactory() public onlyAdmin {
+        for (uint256 i = 0; i < deployedGames.length; i++) {
+            Game memory game = deployedGames[i];
+            GameImplementationInterface(payable(game.deployedAddress)).unpause();
+        }
+        // unpause last to ensure that everything is ok
+        unpause();
+    }
 
     function pause() public onlyAdmin whenNotPaused {
         _pause();
@@ -204,18 +231,15 @@ contract GameFactory is Pausable, Ownable {
     }
 
     ///
-    ///GETTER FUNCTIONS
+    /// EMERGENCY
     ///
-    function getDeployedGames() external view returns (Game[] memory) {
-        return deployedGames;
+    function transferAdminOwnership(address _adminAddress) public onlyAdmin {
+        require(_adminAddress != address(0), "adminAddress need to be initialised");
+        transferOwnership(_adminAddress);
     }
 
-    function getAuthorisedAmounts() external view returns (uint256[] memory) {
-        return authorizedAmounts;
-    }
-
-    function getAuthorisedAmount(uint256 _authorizedAmount) external view returns (AuthorizedAmount memory) {
-        return usedAuthorisedAmounts[_authorizedAmount];
+    function withdrawFunds() public onlyAdmin {
+        _safeTransfert(owner(), address(this).balance);
     }
 
     ///

@@ -6,11 +6,13 @@ import { initialiseTestData } from '../../../factories/setup'
 
 describe('GameFactoryContract', function () {
   beforeEach(initialiseTestData)
-  context('GameFactory setAdmin', function () {
+  context('GameFactory transferOwnership', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
-          this.gameFactory.connect(this.alice).setAdmin(this.alice.address),
+          this.gameFactory
+            .connect(this.alice)
+            .transferAdminOwnership(this.alice.address),
           'Caller is not the admin'
         )
       })
@@ -18,7 +20,9 @@ describe('GameFactoryContract', function () {
 
     describe('when called by admin', function () {
       it('should transfer the administration to given address', async function () {
-        await this.gameFactory.connect(this.owner).setAdmin(this.alice.address)
+        await this.gameFactory
+          .connect(this.owner)
+          .transferAdminOwnership(this.alice.address)
         const newAdmin = await this.gameFactory.owner()
 
         expect(newAdmin).to.be.equal(this.alice.address)
@@ -30,9 +34,7 @@ describe('GameFactoryContract', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
-          this.gameFactory
-            .connect(this.alice)
-            .withdrawFunds(this.alice.address),
+          this.gameFactory.connect(this.alice).withdrawFunds(),
           'Caller is not the admin'
         )
       })

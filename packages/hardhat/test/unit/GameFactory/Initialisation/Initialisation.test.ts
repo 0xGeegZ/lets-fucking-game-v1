@@ -11,7 +11,7 @@ describe('GameFactoryContract', function () {
         await expectRevert(
           this.gameImplementation.initialize({
             _creator: this.bob.address,
-            _generalAdmin: this.owner.address,
+            _owner: this.owner.address,
             _cronUpkeep: this.cronUpkeep.address,
             _gameImplementationVersion: '0',
             _gameId: '0',
@@ -49,7 +49,7 @@ describe('GameFactoryContract', function () {
         await expectRevert(
           clonedGameContract.initialize({
             _creator: this.bob.address,
-            _generalAdmin: this.owner.address,
+            _owner: this.owner.address,
             _cronUpkeep: this.cronUpkeep.address,
             _gameImplementationVersion: '0',
             _gameId: '0',
