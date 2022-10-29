@@ -184,15 +184,15 @@ contract GameFactory is Pausable, Ownable {
     ///
     /**
      * @notice Transfert funds
-     * @param receiver the receiver address
-     * @param amount the amount to transfert
+     * @param _receiver the receiver address
+     * @param _amount the amount to transfert
      */
-    function _safeTransfert(address receiver, uint256 amount) internal {
+    function _safeTransfert(address _receiver, uint256 _amount) internal {
         uint256 balance = address(this).balance;
-        if (balance < amount) require(false, "Not enough in contract balance");
-        (bool success, ) = receiver.call{ value: amount }("");
+        if (balance < _amount) require(false, "Not enough in contract balance");
+        (bool success, ) = _receiver.call{ value: _amount }("");
         if (!success) {
-            emit FailedTransfer(receiver, amount);
+            emit FailedTransfer(_receiver, _amount);
             require(false, "Transfer failed.");
         }
     }
