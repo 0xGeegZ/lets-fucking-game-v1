@@ -744,7 +744,7 @@ contract GameImplementation {
 
     /**
      * @notice Set the encoded cron
-     * @param _encodedCron the new encoded cron
+     * @param _encodedCron the new encoded cron as * * * * *
      */
     function setEncodedCron(string memory _encodedCron) external onlyAdminOrCreator {
         require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
