@@ -34,8 +34,8 @@ interface GameImplementationInterface {
      * @notice Winner structure that contain a list of winner for a current roundId
      */
     struct Winner {
-        address[] gameWinnerAddresses;
-        mapping(address => WinnerPlayerData) gameWinners;
+        address[] winnerAddresses;
+        mapping(address => WinnerPlayerData) winnerDetails;
     }
 
     /**

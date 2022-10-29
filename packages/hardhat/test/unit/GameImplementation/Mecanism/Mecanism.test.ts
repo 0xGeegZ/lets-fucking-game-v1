@@ -801,7 +801,7 @@ describe('GameImplementationContract - Mecanism', function () {
 
   context('Winning a game', function () {
     describe('when there is only one user left', async function () {
-      it('should create a new Winner and add it to the gameWinners mapping', async function () {
+      it('should create a new Winner and add it to the winnerDetails mapping', async function () {
         const winnerIndex = 4
         const roundId = await this.deployedGame.roundId()
 

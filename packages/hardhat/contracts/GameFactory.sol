@@ -204,9 +204,7 @@ contract GameFactory is Pausable, Ownable {
      */
     function _isExistAuthorizedAmounts(uint256 _authorizedAmount) internal view returns (bool) {
         for (uint256 i = 0; i < authorizedAmounts.length; i++) {
-            if (authorizedAmounts[i] == _authorizedAmount) {
-                return true;
-            }
+            if (authorizedAmounts[i] == _authorizedAmount) return true;
         }
         return false;
     }
@@ -390,8 +388,9 @@ contract GameFactory is Pausable, Ownable {
     /**
      * @notice Modifier that ensure that amount sended is game creation amount
      */
+    // TODO cover in test
     modifier onlyGameCreationAmount() {
-        require(msg.value == gameCreationAmount, "Only game creation amount is allowed");
+        require(msg.sender == owner() || msg.value == gameCreationAmount, "Only game creation amount is allowed");
         _;
     }
 
