@@ -64,6 +64,7 @@ contract GameImplementation {
         uint256 roundRangeUpperLimit;
         bool hasPlayedRound;
         uint256 roundCount;
+        uint256 position;
         bool hasLost;
         bool isSplitOk;
     }
@@ -330,6 +331,7 @@ contract GameImplementation {
             hasPlayedRound: false,
             hasLost: false,
             isSplitOk: false,
+            position: maxPlayers,
             roundRangeUpperLimit: 0,
             roundRangeLowerLimit: 0
         });
@@ -489,32 +491,66 @@ contract GameImplementation {
      */
     function _checkIfGameEnded() internal {
         uint256 remainingPlayersCounter = 0;
-        address lastNonLoosingPlayerAddress;
+        // address lastNonLoosingPlayerAddress;
 
-        for (uint256 i = 0; i < numPlayers; i++) {
-            Player memory currentPlayer = players[playerAddresses[i]];
-            if (!currentPlayer.hasLost) {
-                remainingPlayersCounter += 1;
-                lastNonLoosingPlayerAddress = currentPlayer.playerAddress;
-            }
-        }
+        // for (uint256 i = 0; i < numPlayers; i++) {
+        //     Player memory currentPlayer = players[playerAddresses[i]];
+        //     if (!currentPlayer.hasLost) {
+        //         remainingPlayersCounter += 1;
+        //         lastNonLoosingPlayerAddress = currentPlayer.playerAddress;
+        //     }
+        // }
 
         bool isPlitPot = _isAllPlayersSplitOk();
 
-        if (remainingPlayersCounter > prizes[roundId].prizesCounter && !isPlitPot) return;
+        if (remainingPlayersCounter > 1 && !isPlitPot) return;
 
-        // TODO GUIGUI MAIN
-        if (remainingPlayersCounter <= prizes[roundId].prizesCounter) {
+        Prize storage prize = prizes[roundId];
+
+        if (remainingPlayersCounter == 1) {
             // Distribute prizes over winners
+            for (uint256 i = 0; i < numPlayers; i++) {
+                Player memory currentPlayer = players[playerAddresses[i]];
+
+                if (!currentPlayer.hasLost) {
+                    // player is winner
+                    PrizeDetail memory prizeDetail = prize.prizeDetails[0];
+
+                    _addWinner(1, currentPlayer.playerAddress, prizeDetail.amount);
+                } else if (currentPlayer.position <= prize.prizesCounter) {
+                    // player has won a prize
+                    PrizeDetail memory prizeDetail = prize.prizeDetails[currentPlayer.position - 1];
+                    _addWinner(currentPlayer.position, currentPlayer.playerAddress, prizeDetail.amount);
+                }
+            }
         }
 
         if (isPlitPot) {
             // Split with remaining player
-            // TODO iterate over prizes to Calculate TotalAmount
+            uint256 prizepool = 0;
+            for (uint256 i = 0; i < prize.prizesCounter; i++) {
+                PrizeDetail memory prizeDetail = prize.prizeDetails[i];
+                prizepool += prizeDetail.amount;
+            }
+
+            uint256 splittedPrize = prizepool / remainingPlayersCounter;
+
+            for (uint256 i = 0; i < numPlayers; i++) {
+                Player memory currentPlayer = players[playerAddresses[i]];
+                if (!currentPlayer.hasLost && currentPlayer.isSplitOk) {
+                    _addWinner(1, currentPlayer.playerAddress, splittedPrize);
+                }
+            }
         }
 
         if (remainingPlayersCounter == 0) {
-            // Creator will take everything
+            // Creator will take everything except the first prize
+            for (uint256 i = 0; i < prize.prizesCounter; i++) {
+                PrizeDetail memory prizeDetail = prize.prizeDetails[i];
+                address winnerAddress = i == 0 ? owner : creator;
+                // TODO FIXME avoid to erase map data by storing position as key for Map
+                _addWinner(prizeDetail.position, winnerAddress, prizeDetail.amount);
+            }
         }
 
         _resetGame();
@@ -592,6 +628,25 @@ contract GameImplementation {
         }
     }
 
+    function _addWinner(
+        uint256 position,
+        address playerAddress,
+        uint256 amount
+    ) internal {
+        Winner storage winner = winners[roundId];
+
+        winner.winnerDetails[playerAddress] = WinnerDetail({
+            roundId: roundId,
+            position: 1,
+            playerAddress: playerAddress,
+            amountWon: amount,
+            prizeClaimed: false
+        });
+        winner.winnerAddresses.push(playerAddress);
+
+        emit GameWon(roundId, playerAddress, amount);
+    }
+
     function _addPrizes(PrizeDetail[] memory prizeDetails) internal {
         uint256 prizepool = 0;
 
@@ -662,6 +717,7 @@ contract GameImplementation {
      * @param player the player
      */
     function _setPlayerAsHavingLost(Player storage player) internal {
+        player.position = _getRemainingPlayersCount();
         player.hasLost = true;
         player.isSplitOk = false;
 
