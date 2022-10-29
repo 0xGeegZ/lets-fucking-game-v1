@@ -156,15 +156,15 @@ interface GameImplementationInterface {
     function triggerDailyCheckpoint() external;
 
     /**
-     * @notice Function that is called by a winner to claim his prize
-     */
-    function claimPrize(uint256 _roundId) external;
-
-    /**
      * @notice Function that allow player to vote to split pot
      * Only callable if less than 50% of the players remain
      */
     function voteToSplitPot() external;
+
+    /**
+     * @notice Function that is called by a winner to claim his prize
+     */
+    function claimPrize(uint256 _roundId) external;
 
     /// ADMIN FUNCTIONS
     /**
