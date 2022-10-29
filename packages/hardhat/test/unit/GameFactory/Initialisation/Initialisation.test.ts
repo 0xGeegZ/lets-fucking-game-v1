@@ -13,6 +13,8 @@ describe('GameFactoryContract', function () {
             _creator: this.bob.address,
             _owner: this.owner.address,
             _cronUpkeep: this.cronUpkeep.address,
+            _gameName: this.gameName,
+            _gameImage: this.gameImage,
             _gameImplementationVersion: '0',
             _gameId: '0',
             _playTimeRange: this.playTimeRange,
@@ -31,6 +33,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
+            this.gameName,
+            this.gameImage,
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 1],
@@ -53,6 +57,8 @@ describe('GameFactoryContract', function () {
             _creator: this.bob.address,
             _owner: this.owner.address,
             _cronUpkeep: this.cronUpkeep.address,
+            _gameName: this.gameName,
+            _gameImage: this.gameImage,
             _gameImplementationVersion: '0',
             _gameId: '0',
             _playTimeRange: this.playTimeRange,
@@ -122,6 +128,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
+            this.gameName,
+            this.gameImage,
             this.maxPlayers,
             this.playTimeRange,
             sameRegistrationAmount,
@@ -135,6 +143,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.alice)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               this.maxPlayers,
               this.playTimeRange,
               sameRegistrationAmount,

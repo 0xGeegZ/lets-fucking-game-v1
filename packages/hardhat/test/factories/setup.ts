@@ -12,6 +12,8 @@ const setupTest = deployments.createFixture(
   async (
     { deployments, getNamedAccounts, ethers }: HardhatRuntimeEnvironment,
     {
+      gameName,
+      gameImage,
       maxPlayers,
       playTimeRange,
       correctRegistrationAmount,
@@ -97,6 +99,8 @@ const setupTest = deployments.createFixture(
     )
 
     await gameFactory.createNewGame(
+      gameName,
+      gameImage,
       maxPlayers,
       playTimeRange,
       correctRegistrationAmount,
@@ -147,6 +151,9 @@ const initialiseTestData = async function () {
   this.bob = bob
   this.alice = alice
 
+  this.gameName = "Let's Fucking Game VMP"
+  this.gameImage = ''
+
   this.maxPlayers = 10
   this.playTimeRange = 2
 
@@ -190,6 +197,8 @@ const initialiseTestData = async function () {
     secondGameImplementation,
     deployedGame,
   } = await setupTest({
+    gameName: this.gameName,
+    gameImage: this.gameImage,
     maxPlayers: this.maxPlayers,
     playTimeRange: this.playTimeRange,
     correctRegistrationAmount: this.correctRegistrationAmount,

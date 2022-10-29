@@ -89,11 +89,11 @@ contract GameFactory is Pausable, Ownable {
         address _cronUpkeep,
         uint256 _gameCreationAmount,
         uint256[] memory _authorizedAmounts
-    ) onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts) {
-        // TODO transfor requires to modifiers (SEE: onlyAllowedNumberOfPlayers for _treasuryFee require)
-        require(_gameImplementation != address(0), "Game Implementation need to be initialised");
-        require(_cronUpkeep != address(0), "Keeper need to be initialised");
-
+    )
+        onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts)
+        onlyAddressInit(_gameImplementation)
+        onlyAddressInit(_cronUpkeep)
+    {
         cronUpkeep = _cronUpkeep;
         gameCreationAmount = _gameCreationAmount;
 
@@ -118,6 +118,8 @@ contract GameFactory is Pausable, Ownable {
 
     /**
      * @notice Create a new game
+     * @param _gameName the game name
+     * @param _gameImage the game image path
      * @param _maxPlayers the max players for the game
      * @param _playTimeRange the player time range
      * @param _registrationAmount the registration amount
@@ -125,8 +127,10 @@ contract GameFactory is Pausable, Ownable {
      * @param _creatorFee the creator fee in %
      * @param _encodedCron the encoded cron as * * * * *
      */
-    // TODO add Name and image url as argument to createNewGame & initialize functions
+    // TODO GUIGUI add Name and image url as argument to createNewGame & initialize functions
     function createNewGame(
+        string memory _gameName,
+        string memory _gameImage,
         uint256 _maxPlayers,
         uint256 _playTimeRange,
         uint256 _registrationAmount,
@@ -148,21 +152,23 @@ contract GameFactory is Pausable, Ownable {
 
         CronUpkeepInterface(cronUpkeep).addDelegator(newGameAddress);
 
-        GameImplementationInterface(newGameAddress).initialize(
-            GameImplementationInterface.Initialization({
-                _creator: msg.sender,
-                _owner: owner(),
-                _cronUpkeep: cronUpkeep,
-                _gameImplementationVersion: latestGameImplementationVersionId,
-                _gameId: nextGameId,
-                _playTimeRange: _playTimeRange,
-                _maxPlayers: _maxPlayers,
-                _registrationAmount: _registrationAmount,
-                _treasuryFee: _treasuryFee,
-                _creatorFee: _creatorFee,
-                _encodedCron: _encodedCron
-            })
-        );
+        GameImplementationInterface.Initialization memory initialization;
+        initialization._creator = msg.sender;
+        initialization._owner = owner();
+        initialization._cronUpkeep = cronUpkeep;
+        initialization._gameName = _gameName;
+        initialization._gameImage = _gameImage;
+        initialization._gameImplementationVersion = latestGameImplementationVersionId;
+        initialization._gameId = nextGameId;
+        initialization._playTimeRange = _playTimeRange;
+        initialization._maxPlayers = _maxPlayers;
+        initialization._registrationAmount = _registrationAmount;
+        initialization._treasuryFee = _treasuryFee;
+        initialization._creatorFee = _creatorFee;
+        initialization._encodedCron = _encodedCron;
+
+        GameImplementationInterface(newGameAddress).initialize(initialization);
+
         deployedGames.push(
             Game({
                 id: nextGameId,
@@ -273,9 +279,7 @@ contract GameFactory is Pausable, Ownable {
      * @notice Update the keeper address for the factory and all games and associated keeper job
      * @param _cronUpkeep the new keeper address
      */
-    function updateCronUpkeep(address _cronUpkeep) public onlyAdmin {
-        require(_cronUpkeep != address(0), "Keeper need to be initialised");
-
+    function updateCronUpkeep(address _cronUpkeep) public onlyAdmin onlyAddressInit(_cronUpkeep) {
         cronUpkeep = _cronUpkeep;
 
         for (uint256 i = 0; i < deployedGames.length; i++) {
@@ -331,8 +335,7 @@ contract GameFactory is Pausable, Ownable {
      * @notice Transfert Admin Ownership
      * @param _adminAddress the new admin address
      */
-    function transferAdminOwnership(address _adminAddress) public onlyAdmin {
-        require(_adminAddress != address(0), "adminAddress need to be initialised");
+    function transferAdminOwnership(address _adminAddress) public onlyAdmin onlyAddressInit(_adminAddress) {
         transferOwnership(_adminAddress);
     }
 
@@ -370,6 +373,14 @@ contract GameFactory is Pausable, Ownable {
      */
     modifier onlyAdmin() {
         require(msg.sender == owner(), "Caller is not the admin");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that address is initialised
+     */
+    modifier onlyAddressInit(address _toCheck) {
+        require(_toCheck != address(0), "address need to be initialised");
         _;
     }
 

@@ -45,6 +45,8 @@ interface GameImplementationInterface {
         address _owner;
         address _creator;
         address _cronUpkeep;
+        string _gameName;
+        string _gameImage;
         uint256 _gameImplementationVersion;
         uint256 _gameId;
         uint256 _playTimeRange;

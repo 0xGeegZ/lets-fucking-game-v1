@@ -16,6 +16,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               this.maxPlayers,
               this.playTimeRange,
               this.correctRegistrationAmount,
@@ -41,6 +43,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               outOfRangeMaxPlayers1,
               this.playTimeRange,
               registrationAmount,
@@ -56,6 +60,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               outOfRangeMaxPlayers2,
               this.playTimeRange,
               registrationAmount,
@@ -81,6 +87,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               this.maxPlayers,
               outOfRangePlayTimeRange1,
               registrationAmount,
@@ -96,6 +104,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               this.maxPlayers,
               outOfRangePlayTimeRange2,
               registrationAmount,
@@ -116,6 +126,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
+            this.gameName,
+            this.gameImage,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
@@ -172,6 +184,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
+            this.gameName,
+            this.gameImage,
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 1],
@@ -183,6 +197,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.alice)
           .createNewGame(
+            this.gameName,
+            this.gameImage,
             this.maxPlayers,
             this.playTimeRange,
             this.authorizedAmounts[this.authorizedAmounts.length - 2],
@@ -220,6 +236,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
+              this.gameName,
+              this.gameImage,
               this.maxPlayers,
               this.playTimeRange,
               this.authorizedAmounts[this.authorizedAmounts.length - 1],
@@ -244,6 +262,8 @@ describe('GameFactoryContract', function () {
       await this.gameFactory
         .connect(this.bob)
         .createNewGame(
+          this.gameName,
+          this.gameImage,
           this.maxPlayers,
           this.playTimeRange,
           this.authorizedAmounts[1],
@@ -255,6 +275,8 @@ describe('GameFactoryContract', function () {
       await this.gameFactory
         .connect(this.alice)
         .createNewGame(
+          this.gameName,
+          this.gameImage,
           this.maxPlayers,
           this.playTimeRange,
           this.authorizedAmounts[2],

@@ -94,6 +94,8 @@ contract GameImplementation {
         address _owner;
         address _creator;
         address _cronUpkeep;
+        string _gameName;
+        string _gameImage;
         uint256 _gameImplementationVersion;
         uint256 _gameId;
         uint256 _playTimeRange;
@@ -192,6 +194,8 @@ contract GameImplementation {
      *  @param initialization._creator the game creator
      *  @param initialization._owner the general admin address
      *  @param initialization._cronUpkeep the cron upkeep address
+     *  @param initialization._gameName the game name
+     *  @param initialization._gameImage the game image path
      *  @param initialization._gameImplementationVersion the version of the game implementation
      *  @param initialization._gameId the unique game id (fix)
      *  @param initialization._playTimeRange the time range during which a player can play in hour
@@ -219,6 +223,9 @@ contract GameImplementation {
         owner = initialization._owner;
         creator = initialization._creator;
         factory = msg.sender;
+
+        gameName = initialization._gameName;
+        gameImage = initialization._gameImage;
 
         randNonce = 0;
 
@@ -764,10 +771,8 @@ contract GameImplementation {
      * @notice Set the keeper address
      * @param _cronUpkeep the new keeper address
      */
-    function setCronUpkeep(address _cronUpkeep) external onlyAdminOrFactory {
-        require(_cronUpkeep != address(0), "Keeper need to be initialised");
-
-        // TODO verify cron limitation : not less than every hour
+    function setCronUpkeep(address _cronUpkeep) external onlyAdminOrFactory onlyAddressInit(_cronUpkeep) {
+        // TODO GUIGUI verify cron limitation : not less than every hour
         // verify that should not contains "*/" in first value
         // Pattern is : * * * * *
         // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
@@ -849,8 +854,7 @@ contract GameImplementation {
      * @notice Transfert Admin Ownership
      * @param _adminAddress the new admin address
      */
-    function transferAdminOwnership(address _adminAddress) public onlyAdmin {
-        require(_adminAddress != address(0), "adminAddress need to be initialised");
+    function transferAdminOwnership(address _adminAddress) public onlyAdmin onlyAddressInit(_adminAddress) {
         owner = _adminAddress;
     }
 
@@ -858,8 +862,7 @@ contract GameImplementation {
      * @notice Transfert Creator Ownership
      * @param _creator the new creator address
      */
-    function transferCreatorOwnership(address _creator) public onlyCreator {
-        require(_creator != address(0), "creator need to be initialised");
+    function transferCreatorOwnership(address _creator) public onlyCreator onlyAddressInit(_creator) {
         creator = _creator;
     }
 
@@ -867,8 +870,7 @@ contract GameImplementation {
      * @notice Transfert Factory Ownership
      * @param _factory the new factory address
      */
-    function transferFactoryOwnership(address _factory) public onlyCreator {
-        require(_factory != address(0), "factory need to be initialised");
+    function transferFactoryOwnership(address _factory) public onlyCreator onlyAddressInit(_factory) {
         factory = _factory;
     }
 
@@ -963,6 +965,14 @@ contract GameImplementation {
      */
     modifier onlyKeeper() {
         require(msg.sender == cronUpkeep, "Caller is not the keeper");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure that address is initialised
+     */
+    modifier onlyAddressInit(address _toCheck) {
+        require(_toCheck != address(0), "address need to be initialised");
         _;
     }
 
