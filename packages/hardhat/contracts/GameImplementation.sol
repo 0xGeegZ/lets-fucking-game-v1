@@ -6,11 +6,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
-// TODO REMOVE AFTER TEST
-import "hardhat/console.sol";
-
-// console.log("jobIdLength creating job %s", nextCronJobIDs);
-
 contract GameImplementation {
     using Address for address;
 
@@ -56,6 +51,7 @@ contract GameImplementation {
     mapping(uint256 => Winner) winners;
 
     ///STRUCTS
+
     /**
      * @notice Player structure that contain all usefull data for a player
      */
@@ -213,11 +209,6 @@ contract GameImplementation {
         onlyAllowedPlayTimeRange(initialization._playTimeRange)
         onlyCreatorFee(initialization._creatorFee)
     {
-        // TODO GUIGUI verify cron limitation : not less than every hour
-        // verify that should not contains "*/" in first value
-        // Pattern is : * * * * *
-        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
-
         owner = initialization._owner;
         creator = initialization._creator;
         factory = msg.sender;
@@ -791,11 +782,7 @@ contract GameImplementation {
      * @dev Callable by admin or factory
      */
     function setCronUpkeep(address _cronUpkeep) external onlyAdminOrFactory onlyAddressInit(_cronUpkeep) {
-        // TODO GUIGUI verify cron limitation : not less than every hour
-        // verify that should not contains "*/" in first value
-        // Pattern is : * * * * *
-        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
-
+        // _splitCron(string memory _toSlice, bytes _delimiter) internal returns (string[] memory)
         cronUpkeep = _cronUpkeep;
 
         CronUpkeepInterface(cronUpkeep).updateCronJob(
@@ -815,10 +802,7 @@ contract GameImplementation {
     function setEncodedCron(string memory _encodedCron) external onlyAdminOrCreator {
         require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
 
-        // TODO verify cron limitation : not less than every hour
-        // verify that should not contains "*/" in first value
-        // Pattern is : * * * * *
-        // https://stackoverflow.com/questions/44179638/string-conversion-to-array-in-solidity
+        // _splitCron(string memory _toSlice, bytes _delimiter) internal returns (string[] memory)
 
         encodedCron = CronExternal.toEncodedSpec(_encodedCron);
 

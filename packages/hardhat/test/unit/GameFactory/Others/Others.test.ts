@@ -75,21 +75,21 @@ describe('GameFactoryContract', function () {
     })
   })
   context('GameFactory addAuthorizedAmounts', function () {
-    describe('when admin update authorisedAmounts', function () {
+    describe('when admin update authorizedAmounts', function () {
       it('should be updated with correct amounts', async function () {
-        const toUpdateAuthorisedAmounts = [ethers.utils.parseEther('999')]
+        const toUpdateAuthorizedAmounts = [ethers.utils.parseEther('999')]
 
         const responseAuthorizedAmountsBefore = await this.gameFactory
           .connect(this.owner)
-          .getAuthorisedAmounts()
+          .getAuthorizedAmounts()
 
         await this.gameFactory
           .connect(this.owner)
-          .addAuthorizedAmounts(toUpdateAuthorisedAmounts)
+          .addAuthorizedAmounts(toUpdateAuthorizedAmounts)
 
         const responseAuthorizedAmountsAfter = await this.gameFactory
           .connect(this.owner)
-          .getAuthorisedAmounts()
+          .getAuthorizedAmounts()
 
         expect(responseAuthorizedAmountsBefore.length + 1).to.be.equal(
           responseAuthorizedAmountsAfter.length
@@ -97,7 +97,7 @@ describe('GameFactoryContract', function () {
       })
 
       it('should be updated with no duplicates amounts', async function () {
-        const toUpdateAuthorisedAmounts = [
+        const toUpdateAuthorizedAmounts = [
           ...this.authorizedAmounts,
           ethers.utils.parseEther('999'),
           ethers.utils.parseEther('999'),
@@ -105,15 +105,15 @@ describe('GameFactoryContract', function () {
 
         const responseAuthorizedAmountsBefore = await this.gameFactory
           .connect(this.owner)
-          .getAuthorisedAmounts()
+          .getAuthorizedAmounts()
 
         await this.gameFactory
           .connect(this.owner)
-          .addAuthorizedAmounts(toUpdateAuthorisedAmounts)
+          .addAuthorizedAmounts(toUpdateAuthorizedAmounts)
 
         const responseAuthorizedAmountsAfter = await this.gameFactory
           .connect(this.owner)
-          .getAuthorisedAmounts()
+          .getAuthorizedAmounts()
 
         expect(responseAuthorizedAmountsBefore.length + 1).to.be.equal(
           responseAuthorizedAmountsAfter.length
@@ -122,12 +122,12 @@ describe('GameFactoryContract', function () {
     })
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
-        const toUpdateAuthorisedAmounts = [ethers.utils.parseEther('999')]
+        const toUpdateAuthorizedAmounts = [ethers.utils.parseEther('999')]
 
         await expectRevert(
           this.gameFactory
             .connect(this.alice)
-            .addAuthorizedAmounts(toUpdateAuthorisedAmounts),
+            .addAuthorizedAmounts(toUpdateAuthorizedAmounts),
           'Caller is not the admin'
         )
       })

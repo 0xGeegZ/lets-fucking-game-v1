@@ -20,8 +20,8 @@ contract GameFactory is Pausable, Ownable {
 
     Game[] public deployedGames;
 
-    uint256[] authorizedAmounts;
-    mapping(uint256 => AuthorizedAmount) public usedAuthorisedAmounts;
+    uint256[] public authorizedAmounts;
+    mapping(uint256 => AuthorizedAmount) public usedAuthorizedAmounts;
 
     ///
     ///STRUCTS
@@ -46,7 +46,7 @@ contract GameFactory is Pausable, Ownable {
     }
 
     /**
-     * @notice AuthorizedAmount structure that contain all usefull data bout an authorised amount
+     * @notice AuthorizedAmount structure that contain all usefull data bout an authorized amount
      */
     struct AuthorizedAmount {
         uint256 amount;
@@ -80,7 +80,7 @@ contract GameFactory is Pausable, Ownable {
      * @param _gameImplementation the game implementation address
      * @param _cronUpkeep the keeper address
      * @param _gameCreationAmount the game creation amount
-     * @param _authorizedAmounts the list of authorised amounts for game creation
+     * @param _authorizedAmounts the list of authorized amounts for game creation
      */
     constructor(
         address _gameImplementation,
@@ -102,7 +102,7 @@ contract GameFactory is Pausable, Ownable {
         for (uint256 i = 0; i < _authorizedAmounts.length; i++) {
             if (!_isExistAuthorizedAmounts(_authorizedAmounts[i])) {
                 authorizedAmounts.push(_authorizedAmounts[i]);
-                usedAuthorisedAmounts[_authorizedAmounts[i]] = AuthorizedAmount({
+                usedAuthorizedAmounts[_authorizedAmounts[i]] = AuthorizedAmount({
                     isUsed: false,
                     amount: _authorizedAmounts[i]
                 });
@@ -176,7 +176,7 @@ contract GameFactory is Pausable, Ownable {
         );
         emit GameCreated(nextGameId, newGameAddress, latestGameImplementationVersionId, msg.sender);
         nextGameId += 1;
-        usedAuthorisedAmounts[_registrationAmount].isUsed = true;
+        usedAuthorizedAmounts[_registrationAmount].isUsed = true;
         return newGameAddress;
     }
 
@@ -199,7 +199,7 @@ contract GameFactory is Pausable, Ownable {
     }
 
     /**
-     * @notice Check if authorised amount exist
+     * @notice Check if authorized amount exist
      * @param _authorizedAmount the authorized amount to check
      * @return true if exist false if not
      */
@@ -225,20 +225,20 @@ contract GameFactory is Pausable, Ownable {
     }
 
     /**
-     * @notice Get the list of authorised amounts
-     * @return the list of authorised amounts
+     * @notice Get the list of authorized amounts
+     * @return the list of authorized amounts
      */
-    function getAuthorisedAmounts() external view returns (uint256[] memory) {
+    function getAuthorizedAmounts() external view returns (uint256[] memory) {
         return authorizedAmounts;
     }
 
     /**
-     * @notice Get authorised amount
+     * @notice Get authorized amount
      * @param _authorizedAmount the authorized amount to get
-     * @return the authorised amount
+     * @return the authorized amount
      */
-    function getAuthorisedAmount(uint256 _authorizedAmount) external view returns (AuthorizedAmount memory) {
-        return usedAuthorisedAmounts[_authorizedAmount];
+    function getAuthorizedAmount(uint256 _authorizedAmount) external view returns (AuthorizedAmount memory) {
+        return usedAuthorizedAmounts[_authorizedAmount];
     }
 
     ///
@@ -258,15 +258,15 @@ contract GameFactory is Pausable, Ownable {
     }
 
     /**
-     * @notice Add some authorised amounts
-     * @param _authorizedAmounts the list of authorised amounts to add
+     * @notice Add some authorized amounts
+     * @param _authorizedAmounts the list of authorized amounts to add
      * @dev Callable by admin
      */
     function addAuthorizedAmounts(uint256[] memory _authorizedAmounts) public onlyAdmin {
         for (uint256 i = 0; i < _authorizedAmounts.length; i++) {
             if (!_isExistAuthorizedAmounts(_authorizedAmounts[i])) {
                 authorizedAmounts.push(_authorizedAmounts[i]);
-                usedAuthorisedAmounts[_authorizedAmounts[i]] = AuthorizedAmount({
+                usedAuthorizedAmounts[_authorizedAmounts[i]] = AuthorizedAmount({
                     isUsed: false,
                     amount: _authorizedAmounts[i]
                 });
@@ -402,7 +402,7 @@ contract GameFactory is Pausable, Ownable {
      */
     modifier onlyAllowedRegistrationAmount(uint256 _registrationAmount) {
         require(
-            usedAuthorisedAmounts[_registrationAmount].amount == _registrationAmount,
+            usedAuthorizedAmounts[_registrationAmount].amount == _registrationAmount,
             "registrationAmout is not allowed"
         );
         _;
@@ -413,7 +413,7 @@ contract GameFactory is Pausable, Ownable {
      * @param _registrationAmount authorized amount
      */
     modifier onlyIfNotUsedRegistrationAmounts(uint256 _registrationAmount) {
-        require(usedAuthorisedAmounts[_registrationAmount].isUsed == false, "registrationAmout is already used");
+        require(usedAuthorizedAmounts[_registrationAmount].isUsed == false, "registrationAmout is already used");
         _;
     }
 

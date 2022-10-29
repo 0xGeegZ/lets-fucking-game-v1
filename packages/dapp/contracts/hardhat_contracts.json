@@ -3108,7 +3108,7 @@
                   "type": "uint256"
                 }
               ],
-              "name": "getAuthorisedAmount",
+              "name": "getAuthorizedAmount",
               "outputs": [
                 {
                   "components": [
@@ -3133,7 +3133,7 @@
             },
             {
               "inputs": [],
-              "name": "getAuthorisedAmounts",
+              "name": "getAuthorizedAmounts",
               "outputs": [
                 {
                   "internalType": "uint256[]",
@@ -3312,7 +3312,7 @@
                   "type": "uint256"
                 }
               ],
-              "name": "usedAuthorisedAmounts",
+              "name": "usedAuthorizedAmounts",
               "outputs": [
                 {
                   "internalType": "uint256",

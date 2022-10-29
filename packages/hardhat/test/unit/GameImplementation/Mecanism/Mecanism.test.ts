@@ -1163,7 +1163,8 @@ describe('GameImplementationContract - Mecanism', function () {
       })
 
       it('should revert if remaining player are less than 50 % of total players', async function () {
-        // TODO
+        // TODO Implement Test
+        expect(true).to.be.false
       })
     })
   })

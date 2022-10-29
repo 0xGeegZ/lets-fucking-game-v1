@@ -85,7 +85,7 @@ describe('GameFactoryContract', function () {
         const responseOwner = await this.gameFactory.owner()
 
         const responseAuthorizedAmounts =
-          await this.gameFactory.getAuthorisedAmounts()
+          await this.gameFactory.getAuthorizedAmounts()
 
         expect(responseOwner).to.be.equal(this.owner.address)
         expect(responseLatestGameImplementationVersionId).to.be.equal('0')
