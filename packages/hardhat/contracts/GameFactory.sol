@@ -8,8 +8,6 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import { GameImplementationInterface } from "./interfaces/GameImplementationInterface.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 
-// TODO GUIGUI add to documentation for modifiers : * @dev Callable by admin
-
 contract GameFactory is Pausable, Ownable {
     address public cronUpkeep;
 
@@ -127,7 +125,6 @@ contract GameFactory is Pausable, Ownable {
      * @param _creatorFee the creator fee in %
      * @param _encodedCron the encoded cron as * * * * *
      */
-    // TODO GUIGUI add Name and image url as argument to createNewGame & initialize functions
     function createNewGame(
         string memory _gameName,
         string memory _gameImage,
@@ -251,6 +248,7 @@ contract GameFactory is Pausable, Ownable {
     /**
      * @notice Set the game implementation address
      * @param _gameImplementation the new game implementation address
+     * @dev Callable by admin
      */
     function setNewGameImplementation(address _gameImplementation) public onlyAdmin {
         latestGameImplementationVersionId += 1;
@@ -262,6 +260,7 @@ contract GameFactory is Pausable, Ownable {
     /**
      * @notice Add some authorised amounts
      * @param _authorizedAmounts the list of authorised amounts to add
+     * @dev Callable by admin
      */
     function addAuthorizedAmounts(uint256[] memory _authorizedAmounts) public onlyAdmin {
         for (uint256 i = 0; i < _authorizedAmounts.length; i++) {
@@ -278,6 +277,7 @@ contract GameFactory is Pausable, Ownable {
     /**
      * @notice Update the keeper address for the factory and all games and associated keeper job
      * @param _cronUpkeep the new keeper address
+     * @dev Callable by admin
      */
     function updateCronUpkeep(address _cronUpkeep) public onlyAdmin onlyAddressInit(_cronUpkeep) {
         cronUpkeep = _cronUpkeep;
@@ -291,6 +291,7 @@ contract GameFactory is Pausable, Ownable {
 
     /**
      * @notice Pause the factory and all games and associated keeper job
+     * @dev Callable by admin
      */
     function pauseAllGamesAndFactory() public onlyAdmin {
         // pause first to ensure no more interaction with contract
@@ -303,6 +304,7 @@ contract GameFactory is Pausable, Ownable {
 
     /**
      * @notice Resume the factory and all games and associated keeper job
+     * @dev Callable by admin
      */
     function ResumeAllGamesAndFactory() public onlyAdmin {
         for (uint256 i = 0; i < deployedGames.length; i++) {
@@ -334,6 +336,7 @@ contract GameFactory is Pausable, Ownable {
     /**
      * @notice Transfert Admin Ownership
      * @param _adminAddress the new admin address
+     * @dev Callable by admin
      */
     function transferAdminOwnership(address _adminAddress) public onlyAdmin onlyAddressInit(_adminAddress) {
         transferOwnership(_adminAddress);
@@ -341,6 +344,7 @@ contract GameFactory is Pausable, Ownable {
 
     /**
      * @notice Allow admin to withdraw all funds of smart contract
+     * @dev Callable by admin
      */
     function withdrawFunds() public onlyAdmin {
         _safeTransfert(owner(), address(this).balance);

@@ -270,6 +270,7 @@ contract GameImplementation {
 
     /**
      * @notice Function that allow players to register for a game
+     * @dev Creator cannot register for his own game
      */
     function registerForGame()
         external
@@ -299,6 +300,8 @@ contract GameImplementation {
 
     /**
      * @notice Function that allow players to play for the current round
+     * @dev Creator cannot play for his own game
+     * @dev Callable by remaining players
      */
     function playRound()
         external
@@ -325,6 +328,7 @@ contract GameImplementation {
 
     /**
      * @notice Function that is called by the keeper based on the keeper cron
+     * @dev Callable by admin or keeper
      */
     function triggerDailyCheckpoint() external onlyAdminOrKeeper onlyNotPaused {
         // function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
@@ -341,6 +345,7 @@ contract GameImplementation {
     /**
      * @notice Function that allow player to vote to split pot
      * Only callable if less than 50% of the players remain
+     * @dev Callable by remaining players
      */
     function voteToSplitPot()
         external
@@ -674,6 +679,7 @@ contract GameImplementation {
     /**
      * @notice Set the name of the game
      * @param _gameName the new game name
+     * @dev Callable by creator
      */
     function setGameName(string calldata _gameName) external onlyCreator {
         gameName = _gameName;
@@ -682,6 +688,7 @@ contract GameImplementation {
     /**
      * @notice Set the image of the game
      * @param _gameImage the new game image
+     * @dev Callable by creator
      */
     function setGameImage(string calldata _gameImage) external onlyCreator {
         gameImage = _gameImage;
@@ -690,6 +697,7 @@ contract GameImplementation {
     /**
      * @notice Set the maximum allowed players for the game
      * @param _maxPlayers the new max players limit
+     * @dev Callable by admin or creator
      */
     function setMaxPlayers(uint256 _maxPlayers)
         external
@@ -703,6 +711,8 @@ contract GameImplementation {
     /**
      * @notice Set the creator fee for the game
      * @param _creatorFee the new creator fee in %
+     * @dev Callable by admin or creator
+     * @dev Callable when game if not in progress
      */
     function setCreatorFee(uint256 _creatorFee) external onlyAdminOrCreator onlyIfGameIsNotInProgress {
         // TODO create modifier for this require
@@ -713,6 +723,7 @@ contract GameImplementation {
 
     /**
      * @notice Allow creator to withdraw his fee
+     * @dev Callable by admin
      */
     function claimCreatorFee() external onlyCreator {
         require(address(this).balance >= creatorAmount);
@@ -731,6 +742,7 @@ contract GameImplementation {
 
     /**
      * @notice Withdraw Treasury fee
+     * @dev Callable by admin
      */
     function claimTreasuryFee() external onlyAdmin {
         require(address(this).balance >= treasuryAmount);
@@ -745,6 +757,7 @@ contract GameImplementation {
 
     /**
      * @notice Withdraw Treasury fee and send it to factory
+     * @dev Callable by factory
      */
     function claimTreasuryFeeToFactory() external onlyFactory {
         require(address(this).balance >= treasuryAmount);
@@ -760,6 +773,8 @@ contract GameImplementation {
     /**
      * @notice Set the treasury fee for the game
      * @param _treasuryFee the new treasury fee in %
+     * @dev Callable by admin
+     * @dev Callable when game if not in progress
      */
     function setTreasuryFee(uint256 _treasuryFee) external onlyAdmin onlyIfGameIsNotInProgress {
         require(_treasuryFee <= MAX_TREASURY_FEE, "Treasury fee too high");
@@ -770,6 +785,7 @@ contract GameImplementation {
     /**
      * @notice Set the keeper address
      * @param _cronUpkeep the new keeper address
+     * @dev Callable by admin or factory
      */
     function setCronUpkeep(address _cronUpkeep) external onlyAdminOrFactory onlyAddressInit(_cronUpkeep) {
         // TODO GUIGUI verify cron limitation : not less than every hour
@@ -791,6 +807,7 @@ contract GameImplementation {
     /**
      * @notice Set the encoded cron
      * @param _encodedCron the new encoded cron as * * * * *
+     * @dev Callable by admin or creator
      */
     function setEncodedCron(string memory _encodedCron) external onlyAdminOrCreator {
         require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
@@ -813,6 +830,7 @@ contract GameImplementation {
 
     /**
      * @notice Pause the current game and associated keeper job
+     * @dev Callable by admin
      */
     function pause() external onlyAdmin onlyNotPaused {
         // pause first to ensure no more interaction with contract
@@ -822,6 +840,7 @@ contract GameImplementation {
 
     /**
      * @notice Unpause the current game and associated keeper job
+     * @dev Callable by admin
      */
     function unpause() external onlyAdmin onlyPaused onlyIfKeeperDataInit {
         uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
@@ -853,6 +872,7 @@ contract GameImplementation {
     /**
      * @notice Transfert Admin Ownership
      * @param _adminAddress the new admin address
+     * @dev Callable by admin
      */
     function transferAdminOwnership(address _adminAddress) public onlyAdmin onlyAddressInit(_adminAddress) {
         owner = _adminAddress;
@@ -861,6 +881,7 @@ contract GameImplementation {
     /**
      * @notice Transfert Creator Ownership
      * @param _creator the new creator address
+     * @dev Callable by creator
      */
     function transferCreatorOwnership(address _creator) public onlyCreator onlyAddressInit(_creator) {
         creator = _creator;
@@ -869,14 +890,16 @@ contract GameImplementation {
     /**
      * @notice Transfert Factory Ownership
      * @param _factory the new factory address
+     * @dev Callable by factory
      */
-    function transferFactoryOwnership(address _factory) public onlyCreator onlyAddressInit(_factory) {
+    function transferFactoryOwnership(address _factory) public onlyFactory onlyAddressInit(_factory) {
         factory = _factory;
     }
 
     /**
      * @notice Allow admin to withdraw all funds of smart contract
      * @param receiver the receiver for the funds (admin or factory)
+     * @dev Callable by admin or factory
      */
     function withdrawFunds(address receiver) external onlyAdminOrFactory {
         _safeTransfert(receiver, address(this).balance);
