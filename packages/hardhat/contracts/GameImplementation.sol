@@ -158,12 +158,10 @@ contract GameImplementation {
      * @notice Called when the treasury fee are claimed by factory
      */
     event TreasuryFeeClaimedByFactory(uint256 amount);
-
     /**
      * @notice Called when the creator fee are claimed
      */
     event CreatorFeeClaimed(uint256 amount);
-
     /**
      * @notice Called when the creator or admin update encodedCron
      */
@@ -333,7 +331,7 @@ contract GameImplementation {
 
     /**
      * @notice Function that allow player to vote to split pot
-     * Only callable if less than 50% of the players remain
+     * @dev Only callable if less than 50% of the players remain
      * @dev Callable by remaining players
      */
     function voteToSplitPot()
@@ -782,7 +780,6 @@ contract GameImplementation {
      * @dev Callable by admin or factory
      */
     function setCronUpkeep(address _cronUpkeep) external onlyAdminOrFactory onlyAddressInit(_cronUpkeep) {
-        // _splitCron(string memory _toSlice, bytes _delimiter) internal returns (string[] memory)
         cronUpkeep = _cronUpkeep;
 
         uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
@@ -794,12 +791,6 @@ contract GameImplementation {
             encodedCron
         );
 
-        // CronUpkeepInterface(cronUpkeep).updateCronJob(
-        //     cronUpkeepJobId,
-        //     address(this),
-        //     bytes("triggerDailyCheckpoint()"),
-        //     encodedCron
-        // );
         emit CronUpkeepUpdated(cronUpkeepJobId, cronUpkeep);
     }
 
@@ -810,8 +801,6 @@ contract GameImplementation {
      */
     function setEncodedCron(string memory _encodedCron) external onlyAdminOrCreator {
         require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
-
-        // _splitCron(string memory _toSlice, bytes _delimiter) internal returns (string[] memory)
 
         encodedCron = CronExternal.toEncodedSpec(_encodedCron);
 

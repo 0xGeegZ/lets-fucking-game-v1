@@ -61,7 +61,6 @@ contract GameFactory is Pausable, Ownable {
      * @notice Called when a game is created
      */
     event GameCreated(uint256 nextGameId, address gameAddress, uint256 implementationVersion, address creatorAddress);
-
     /**
      * @notice Called when a transfert have failed
      */
