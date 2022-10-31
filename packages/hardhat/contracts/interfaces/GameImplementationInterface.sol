@@ -7,6 +7,8 @@ import { CronUpkeepInterface } from "./CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
 interface GameImplementationInterface {
+    ///STRUCTS
+
     /**
      * @notice Player structure that contain all usefull data for a player
      */
@@ -42,8 +44,7 @@ interface GameImplementationInterface {
         ERC1155
     }
     /**
-     * @notice Prize structure that contain the prize information
-     * @dev TODO NEXT VERSION use enum PrizeStandard for standard (cause errors for front end requests)
+     * @notice Prize structure that contain a list of prizes for the current roundId
      */
     struct Prize {
         uint256 position;
@@ -81,7 +82,10 @@ interface GameImplementationInterface {
         Prize[] prizes;
     }
 
+    ///
     ///EVENTS
+    ///
+
     /**
      * @notice Called when a player has registered for a game
      */
@@ -105,15 +109,26 @@ interface GameImplementationInterface {
     /**
      * @notice Called when a player won the game
      */
-    event GameWon(uint256 roundId, address playerAddress, uint256 amountWon);
+    event GameWon(uint256 roundId, uint256 winnersCounter, address playerAddress, uint256 amountWon);
     /**
      * @notice Called when some player(s) split the game
      */
-    event GameSplitted(uint256 roundId, address playerAddress, uint256 amountWon);
+    event GameSplitted(uint256 roundId, uint256 remainingPlayersCount, uint256 amountWon);
     /**
      * @notice Called when a player vote to split pot
      */
     event VoteToSplitPot(uint256 roundId, address playerAddress);
+    /**
+     * @notice Called when a prize is added
+     */
+    event PrizeAdded(
+        uint256 roundId,
+        uint256 position,
+        uint256 amount,
+        uint256 standard,
+        address contractAddress,
+        uint256 tokenId
+    );
     /**
      * @notice Called when a transfert have failed
      */
@@ -126,12 +141,18 @@ interface GameImplementationInterface {
      * @notice Called when a player have claimed his prize
      */
     event GamePrizeClaimed(address claimer, uint256 roundId, uint256 amountClaimed);
-
     /**
-     * @notice Called when the creator or admin update Keeper
+     * @notice Called when the treasury fee are claimed
      */
-    // event UpkeepUpdated(address cronUpkeep, string encodedCron, uint256 jobId);
-
+    event TreasuryFeeClaimed(uint256 amount);
+    /**
+     * @notice Called when the treasury fee are claimed by factory
+     */
+    event TreasuryFeeClaimedByFactory(uint256 amount);
+    /**
+     * @notice Called when the creator fee are claimed
+     */
+    event CreatorFeeClaimed(uint256 amount);
     /**
      * @notice Called when the creator or admin update encodedCron
      */
@@ -141,119 +162,82 @@ interface GameImplementationInterface {
      */
     event CronUpkeepUpdated(uint256 jobId, address cronUpkeep);
 
+    ///
+    /// INITIALISATION
+    ///
+
     /**
      * @notice Create a new Game Implementation by cloning the base contract
-     * @param initialization the initialisation data with params as follow :
-     *  @param initialization.creator the game creator
-     *  @param initialization.owner the general admin address
-     *  @param initialization.cronUpkeep the cron upkeep address
-     *  @param initialization.gameImplementationVersion the version of the game implementation
-     *  @param initialization.gameId the unique game id (fix)
-     *  @param initialization.playTimeRange the time range during which a player can play in hour
-     *  @param initialization.maxPlayers the maximum number of players for a game
-     *  @param initialization.registrationAmount the amount that players will need to pay to enter in the game
-     *  @param initialization.treasuryFee the treasury fee in percent
-     *  @param initialization.creatorFee creator fee in percent
-     *  @param initialization.encodedCron the cron string
-     *  @param initialization.prizes the prize list
+     * @param _initialization the initialisation data with params as follow :
+     *  @param _initialization.creator the game creator
+     *  @param _initialization.owner the general admin address
+     *  @param _initialization.cronUpkeep the cron upkeep address
+     *  @param _initialization.gameName the game name
+     *  @param _initialization.gameImage the game image path
+     *  @param _initialization.gameImplementationVersion the version of the game implementation
+     *  @param _initialization.gameId the unique game id (fix)
+     *  @param _initialization.playTimeRange the time range during which a player can play in hour
+     *  @param _initialization.maxPlayers the maximum number of players for a game
+     *  @param _initialization.registrationAmount the amount that players will need to pay to enter in the game
+     *  @param _initialization.treasuryFee the treasury fee in percent
+     *  @param _initialization.creatorFee creator fee in percent
+     *  @param _initialization.encodedCron the cron string
+     *  @param _initialization.prizes the cron string
+     * @dev TODO NEXT VERSION Remove _isGameAllPrizesStandard limitation to include other prize typ
      */
-    function initialize(Initialization calldata initialization) external;
+    function initialize(Initialization calldata _initialization) external payable;
 
     /**
      * @notice Function that is called by the keeper when game is ready to start
+     * @dev TODO NEXT VERSION remove this function in next smart contract version
      */
     function startGame() external;
 
     ///
     /// MAIN FUNCTIONS
     ///
+
     /**
      * @notice Function that allow players to register for a game
+     * @dev Creator cannot register for his own game
      */
     function registerForGame() external payable;
 
     /**
      * @notice Function that allow players to play for the current round
+     * @dev Creator cannot play for his own game
+     * @dev Callable by remaining players
      */
     function playRound() external;
 
     /**
      * @notice Function that is called by the keeper based on the keeper cron
+     * @dev Callable by admin or keeper
+     * @dev TODO NEXT VERSION Update triggerDailyCheckpoint to mae it only callable by keeper
      */
     function triggerDailyCheckpoint() external;
 
     /**
      * @notice Function that allow player to vote to split pot
-     * Only callable if less than 50% of the players remain
+     * @dev Only callable if less than 50% of the players remain
+     * @dev Callable by remaining players
      */
     function voteToSplitPot() external;
 
     /**
      * @notice Function that is called by a winner to claim his prize
+     * @dev TODO NEXT VERSION Update claim process according to prize type
      */
     function claimPrize(uint256 _roundId) external;
 
-    /// ADMIN FUNCTIONS
     /**
-     * @notice Allow admin to withdraw his Edge
+     * @notice Prizes adding management
+     * @dev Callable by admin or creator
+     * @dev TODO NEXT VERSION add a taxe for creator in case of not payable games
+     *      Need to store the factory gameCreationAmount in this contract on initialisation
+     * @dev TODO NEXT VERSION Remove _isGameAllPrizesStandard limitation to include other prize typ
      */
-    function claimTreasuryFee() external;
-
-    /// ADMIN FUNCTIONS
-    /**
-     * @notice set treasury fee for game
-     * @param _treasuryFee the new treasury fee
-     */
-    function setTreasuryFee(uint256 _treasuryFee) external;
-
-    /**
-     * @notice Allow admin or factory to update keeper address
-     * @param _cronUpkeep the new keeper address
-     */
-    function setCronUpkeep(address _cronUpkeep) external;
-
-    /**
-     * @notice Allow admin or creator to update keeper cron
-     * @param _encodedCron the new cron
-     */
-    function setEncodedCron(string memory _encodedCron) external;
-
-    ///
-    /// SETTERS FUNCTIONS
-    ///
-
-    /**
-     * @notice Set the name of the game
-     * @param _gameName the new game name
-     */
-    function setGameName(string calldata _gameName) external;
-
-    /**
-     * @notice Set the image of the game
-     * @param _gameImage the new game image
-     */
-    function setGameImage(string calldata _gameImage) external;
-
-    /**
-     * @notice Set the maximum allowed players for the game
-     * @param _maxPlayers the new max players limit
-     */
-    function setMaxPlayers(uint256 _maxPlayers) external;
-
-    /**
-     * @notice Allow creator to withdraw his Edge
-     */
-    function claimCreatorFee() external;
-
-    /**
-     * @notice Pause the current game and associated keeper job
-     */
-    function pause() external;
-
-    /**
-     * @notice Unpause the current game and associated keeper job
-     */
-    function unpause() external;
+    function addPrizes(Prize[] memory _prizes) external payable;
 
     ///
     /// GETTERS FUNCTIONS
@@ -288,10 +272,10 @@ interface GameImplementationInterface {
 
     /**
      * @notice Return a player for the current game
-     * @param player the player address
+     * @param _player the player address
      * @return player if finded
      */
-    function getPlayer(address player) external view returns (Player memory);
+    function getPlayer(address _player) external view returns (Player memory);
 
     /**
      * @notice Return the winners for a round id
@@ -301,10 +285,29 @@ interface GameImplementationInterface {
     function getWinners(uint256 _roundId) external view returns (Winner[] memory);
 
     /**
+     * @notice Return the winners for a round id
+     * @param _roundId the round id
+     * @return list of Prize
+     */
+    function getPrizes(uint256 _roundId) external view returns (Prize[] memory);
+
+    /**
      * @notice Check if all remaining players are ok to split pot
      * @return true if all remaining players are ok to split pot, false otherwise
      */
     function isAllPlayersSplitOk() external view returns (bool);
+
+    /**
+     * @notice Check if Game is payable
+     * @return true if game is payable, false otherwise
+     */
+    function isGamePayable() external view returns (bool);
+
+    /**
+     * @notice Check if Game prizes are standard
+     * @return true if game prizes are standard, false otherwise
+     */
+    function isGameAllPrizesStandard() external view returns (bool);
 
     /**
      * @notice Get the number of remaining players for the current game
@@ -313,20 +316,132 @@ interface GameImplementationInterface {
     function getRemainingPlayersCount() external view returns (uint256);
 
     ///
+    /// SETTERS FUNCTIONS
+    ///
+
+    /**
+     * @notice Set the name of the game
+     * @param _gameName the new game name
+     * @dev Callable by creator
+     */
+    function setGameName(string calldata _gameName) external;
+
+    /**
+     * @notice Set the image of the game
+     * @param _gameImage the new game image
+     * @dev Callable by creator
+     */
+    function setGameImage(string calldata _gameImage) external;
+
+    /**
+     * @notice Set the maximum allowed players for the game
+     * @param _maxPlayers the new max players limit
+     * @dev Callable by admin or creator
+     */
+    function setMaxPlayers(uint256 _maxPlayers) external;
+
+    /**
+     * @notice Set the creator fee for the game
+     * @param _creatorFee the new creator fee in %
+     * @dev Callable by admin or creator
+     * @dev Callable when game if not in progress
+     */
+    function setCreatorFee(uint256 _creatorFee) external;
+
+    /**
+     * @notice Allow creator to withdraw his fee
+     * @dev Callable by admin
+     */
+    function claimCreatorFee() external;
+
+    ///
+    /// ADMIN FUNCTIONS
+    ///
+
+    /**
+     * @notice Withdraw Treasury fee
+     * @dev Callable by admin
+     */
+    function claimTreasuryFee() external;
+
+    /**
+     * @notice Withdraw Treasury fee and send it to factory
+     * @dev Callable by factory
+     */
+    function claimTreasuryFeeToFactory() external;
+
+    /**
+     * @notice Set the treasury fee for the game
+     * @param _treasuryFee the new treasury fee in %
+     * @dev Callable by admin
+     * @dev Callable when game if not in progress
+     */
+    function setTreasuryFee(uint256 _treasuryFee) external;
+
+    /**
+     * @notice Set the keeper address
+     * @param _cronUpkeep the new keeper address
+     * @dev Callable by admin or factory
+     */
+    function setCronUpkeep(address _cronUpkeep) external;
+
+    /**
+     * @notice Set the encoded cron
+     * @param _encodedCron the new encoded cron as * * * * *
+     * @dev Callable by admin or creator
+     */
+    function setEncodedCron(string memory _encodedCron) external;
+
+    /**
+     * @notice Pause the current game and associated keeper job
+     * @dev Callable by admin or creator
+     */
+    function pause() external;
+
+    /**
+     * @notice Unpause the current game and associated keeper job
+     * @dev Callable by admin or creator
+     */
+    function unpause() external;
+
+    ///
     /// EMERGENCY
     ///
+
     /**
-     * @notice Allow admin to withdraw all funds for smart contract
-     * @param receiver the receiver for the funds
+     * @notice Transfert Admin Ownership
+     * @param _adminAddress the new admin address
+     * @dev Callable by admin
      */
-    function withdrawFunds(address receiver) external;
+    function transferAdminOwnership(address _adminAddress) external;
+
+    /**
+     * @notice Transfert Creator Ownership
+     * @param _creator the new creator address
+     * @dev Callable by creator
+     */
+    function transferCreatorOwnership(address _creator) external;
+
+    /**
+     * @notice Transfert Factory Ownership
+     * @param _factory the new factory address
+     * @dev Callable by factory
+     */
+    function transferFactoryOwnership(address _factory) external;
+
+    /**
+     * @notice Allow admin to withdraw all funds of smart contract
+     * @param _receiver the receiver for the funds (admin or factory)
+     * @dev Callable by admin or factory
+     */
+    function withdrawFunds(address _receiver) external;
 
     ///
     /// FALLBACK FUNCTIONS
     ///
 
     /**
-     * @notice  Called for empty calldata (and any value)
+     * @notice Called for empty calldata (and any value)
      */
     receive() external payable;
 

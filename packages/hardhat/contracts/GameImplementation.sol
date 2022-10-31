@@ -1024,7 +1024,7 @@ contract GameImplementation {
      * @param _adminAddress the new admin address
      * @dev Callable by admin
      */
-    function transferAdminOwnership(address _adminAddress) public onlyAdmin onlyAddressInit(_adminAddress) {
+    function transferAdminOwnership(address _adminAddress) external onlyAdmin onlyAddressInit(_adminAddress) {
         owner = _adminAddress;
     }
 
@@ -1033,7 +1033,7 @@ contract GameImplementation {
      * @param _creator the new creator address
      * @dev Callable by creator
      */
-    function transferCreatorOwnership(address _creator) public onlyCreator onlyAddressInit(_creator) {
+    function transferCreatorOwnership(address _creator) external onlyCreator onlyAddressInit(_creator) {
         creator = _creator;
     }
 
@@ -1042,7 +1042,7 @@ contract GameImplementation {
      * @param _factory the new factory address
      * @dev Callable by factory
      */
-    function transferFactoryOwnership(address _factory) public onlyFactory onlyAddressInit(_factory) {
+    function transferFactoryOwnership(address _factory) external onlyFactory onlyAddressInit(_factory) {
         factory = _factory;
     }
 
