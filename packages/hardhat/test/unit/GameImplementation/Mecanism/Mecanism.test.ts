@@ -816,7 +816,6 @@ describe('GameImplementationContract - Mecanism', function () {
         })
 
         const winners = await this.deployedGame.getWinners(roundId)
-        console.log('🚀 ~ file: Mecanism.test.ts ~ line 819 ~ winners', winners)
         const [newWinner] = winners
 
         expect(newWinner.playerAddress).to.equal(
@@ -825,8 +824,7 @@ describe('GameImplementationContract - Mecanism', function () {
         expect(newWinner.amountWon.eq(this.prizeAmount)).to.be.true
         expect(newWinner.prizeClaimed).to.be.false
         expect(newWinner.roundId).to.equal(roundId)
-
-        // TODO expect winners lengh to be one
+        expect(winners.length).to.equal(1)
       })
 
       it('should emit the GameWon event with the correct data', async function () {
@@ -838,13 +836,13 @@ describe('GameImplementationContract - Mecanism', function () {
             winnerIndex,
             contract: this.deployedGame,
             amount: this.correctRegistrationAmount,
-
             mockKeeper: this.mockKeeper,
           })
         )
           .to.emit(this.deployedGame, 'GameWon')
           .withArgs(
             '0',
+            '1',
             this.players[winnerIndex].address,
             this.prizeAmount.toString()
           )
@@ -1034,7 +1032,7 @@ describe('GameImplementationContract - Mecanism', function () {
 
   context('Splitting the prize', function () {
     describe('when users decide to split the prize', function () {
-      it.only('should allow players to split the pot', async function () {
+      it('should allow players to split the pot', async function () {
         const finalistIndex = 2
         const secondFinalistIndex = 3
         const roundId = await this.deployedGame.roundId()
@@ -1077,10 +1075,6 @@ describe('GameImplementationContract - Mecanism', function () {
           .to.emit(this.deployedGame, 'ResetGame')
 
         const winners = await this.deployedGame.getWinners(roundId)
-        console.log(
-          '🚀 ~ file: Mecanism.test.ts ~ line 1079 ~ winners',
-          winners
-        )
         const [firstWinner, secondWinner] = winners
 
         expect(firstWinner.playerAddress).to.equal(
@@ -1097,7 +1091,7 @@ describe('GameImplementationContract - Mecanism', function () {
         expect(secondWinner.prizeClaimed).to.be.false
         expect(secondWinner.roundId).to.equal(roundId)
 
-        // TODO expect winners lengh to be one
+        expect(winners.length).to.equal(2)
       })
 
       it('should claim prize', async function () {

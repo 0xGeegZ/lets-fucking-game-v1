@@ -23,7 +23,7 @@ describe('GameFactoryContract', function () {
             treasuryFee: this.treasuryFee,
             creatorFee: this.creatorFee,
             encodedCron: this.encodedCron,
-            prizeDetails: this.prizeDetails,
+            prizes: this.prizes,
           }),
           "The implementation contract can't be initialized"
         )
@@ -34,8 +34,8 @@ describe('GameFactoryContract', function () {
         const registrationAmount =
           this.authorizedAmounts[this.authorizedAmounts.length - 1]
 
-        const updatedPrizeDetails = this.prizeDetails
-        updatedPrizeDetails[0].amount = registrationAmount.mul(this.maxPlayers)
+        const updatedPrizes = this.prizes
+        updatedPrizes[0].amount = registrationAmount.mul(this.maxPlayers)
 
         await this.gameFactory
           .connect(this.bob)
@@ -48,7 +48,7 @@ describe('GameFactoryContract', function () {
             this.treasuryFee,
             this.creatorFee,
             this.encodedCron,
-            updatedPrizeDetails,
+            updatedPrizes,
             { value: this.gameCreationAmount }
           )
 
@@ -75,7 +75,7 @@ describe('GameFactoryContract', function () {
             treasuryFee: this.treasuryFee,
             creatorFee: this.creatorFee,
             encodedCron: this.encodedCron,
-            prizeDetails: this.prizeDetails,
+            prizes: this.prizes,
           }),
           'Contract already initialized'
         )
@@ -135,10 +135,8 @@ describe('GameFactoryContract', function () {
       it('should revert create game with already used amount', async function () {
         const sameRegistrationAmount = this.authorizedAmounts[1]
 
-        const updatedPrizeDetails = this.prizeDetails
-        updatedPrizeDetails[0].amount = sameRegistrationAmount.mul(
-          this.maxPlayers
-        )
+        const updatedPrizes = this.prizes
+        updatedPrizes[0].amount = sameRegistrationAmount.mul(this.maxPlayers)
 
         await this.gameFactory
           .connect(this.bob)
@@ -151,7 +149,7 @@ describe('GameFactoryContract', function () {
             this.treasuryFee,
             this.creatorFee,
             this.encodedCron,
-            updatedPrizeDetails,
+            updatedPrizes,
             { value: this.gameCreationAmount }
           )
 
@@ -167,7 +165,7 @@ describe('GameFactoryContract', function () {
               this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
-              updatedPrizeDetails,
+              updatedPrizes,
               { value: this.gameCreationAmount }
             ),
           'registrationAmout is already used'

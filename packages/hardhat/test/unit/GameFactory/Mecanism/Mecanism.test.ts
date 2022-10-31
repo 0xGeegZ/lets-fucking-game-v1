@@ -24,7 +24,7 @@ describe('GameFactoryContract', function () {
               this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
-              this.prizeDetails,
+              this.prizes,
               { value: this.gameCreationAmount }
             ),
           'Pausable: paused'
@@ -52,7 +52,7 @@ describe('GameFactoryContract', function () {
               this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
-              this.prizeDetails,
+              this.prizes,
               { value: this.gameCreationAmount }
             ),
           'maxPlayers should not be bigger than 100'
@@ -70,7 +70,7 @@ describe('GameFactoryContract', function () {
               this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
-              this.prizeDetails,
+              this.prizes,
               { value: this.gameCreationAmount }
             ),
           'maxPlayers should be bigger than or equal to 2'
@@ -98,7 +98,7 @@ describe('GameFactoryContract', function () {
               this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
-              this.prizeDetails,
+              this.prizes,
               { value: this.gameCreationAmount }
             ),
           'playTimeRange should not be bigger than 8'
@@ -116,7 +116,7 @@ describe('GameFactoryContract', function () {
               this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
-              this.prizeDetails,
+              this.prizes,
               { value: this.gameCreationAmount }
             ),
           'playTimeRange should be bigger than 0'
@@ -129,8 +129,8 @@ describe('GameFactoryContract', function () {
         const registrationAmount =
           this.authorizedAmounts[this.authorizedAmounts.length - 1]
 
-        const updatedPrizeDetails = this.prizeDetails
-        updatedPrizeDetails[0].amount = registrationAmount.mul(this.maxPlayers)
+        const updatedPrizes = this.prizes
+        updatedPrizes[0].amount = registrationAmount.mul(this.maxPlayers)
 
         await this.gameFactory
           .connect(this.bob)
@@ -143,7 +143,7 @@ describe('GameFactoryContract', function () {
             this.treasuryFee,
             this.creatorFee,
             this.encodedCron,
-            updatedPrizeDetails,
+            updatedPrizes,
             { value: this.gameCreationAmount }
           )
 
@@ -194,8 +194,8 @@ describe('GameFactoryContract', function () {
         const registrationAmountFirst =
           this.authorizedAmounts[this.authorizedAmounts.length - 1]
 
-        const updatedPrizeDetailsFirst = this.prizeDetails
-        updatedPrizeDetailsFirst[0].amount = registrationAmountFirst.mul(
+        const updatedPrizesFirst = this.prizes
+        updatedPrizesFirst[0].amount = registrationAmountFirst.mul(
           this.maxPlayers
         )
 
@@ -210,15 +210,15 @@ describe('GameFactoryContract', function () {
             this.treasuryFee,
             this.creatorFee,
             this.encodedCron,
-            updatedPrizeDetailsFirst,
+            updatedPrizesFirst,
             { value: this.gameCreationAmount }
           )
 
         const registrationAmountSecond =
           this.authorizedAmounts[this.authorizedAmounts.length - 2]
 
-        const updatedPrizeDetailsSecond = this.prizeDetails
-        updatedPrizeDetailsSecond[0].amount = registrationAmountSecond.mul(
+        const updatedPrizesSecond = this.prizes
+        updatedPrizesSecond[0].amount = registrationAmountSecond.mul(
           this.maxPlayers
         )
 
@@ -233,7 +233,7 @@ describe('GameFactoryContract', function () {
             this.treasuryFee,
             this.creatorFee,
             this.encodedCron,
-            updatedPrizeDetailsSecond,
+            updatedPrizesSecond,
             { value: this.gameCreationAmount }
           )
 
@@ -265,8 +265,8 @@ describe('GameFactoryContract', function () {
         const registrationAmount =
           this.authorizedAmounts[this.authorizedAmounts.length - 1]
 
-        const updatedPrizeDetails = this.prizeDetails
-        updatedPrizeDetails[0].amount = registrationAmount.mul(this.maxPlayers)
+        const updatedPrizes = this.prizes
+        updatedPrizes[0].amount = registrationAmount.mul(this.maxPlayers)
 
         await expect(
           this.gameFactory
@@ -280,7 +280,7 @@ describe('GameFactoryContract', function () {
               this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
-              updatedPrizeDetails,
+              updatedPrizes,
               { value: this.gameCreationAmount }
             )
         )
@@ -298,8 +298,8 @@ describe('GameFactoryContract', function () {
 
       const registrationAmountFirst = this.authorizedAmounts[1]
 
-      const updatedPrizeDetailsFirst = this.prizeDetails
-      updatedPrizeDetailsFirst[0].amount = registrationAmountFirst.mul(
+      const updatedPrizesFirst = this.prizes
+      updatedPrizesFirst[0].amount = registrationAmountFirst.mul(
         this.maxPlayers
       )
 
@@ -314,14 +314,14 @@ describe('GameFactoryContract', function () {
           this.treasuryFee,
           this.creatorFee,
           this.encodedCron,
-          updatedPrizeDetailsFirst,
+          updatedPrizesFirst,
           { value: this.gameCreationAmount }
         )
 
       const registrationAmountSecond = this.authorizedAmounts[2]
 
-      const updatedPrizeDetailsSecond = this.prizeDetails
-      updatedPrizeDetailsSecond[0].amount = registrationAmountSecond.mul(
+      const updatedPrizesSecond = this.prizes
+      updatedPrizesSecond[0].amount = registrationAmountSecond.mul(
         this.maxPlayers
       )
 
@@ -336,7 +336,7 @@ describe('GameFactoryContract', function () {
           this.treasuryFee,
           this.creatorFee,
           this.encodedCron,
-          updatedPrizeDetailsSecond,
+          updatedPrizesSecond,
           { value: this.gameCreationAmount }
         )
 

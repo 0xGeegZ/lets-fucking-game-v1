@@ -133,7 +133,7 @@ contract GameFactory is Pausable, Ownable {
         uint256 _treasuryFee,
         uint256 _creatorFee,
         string memory _encodedCron,
-        GameImplementationInterface.PrizeDetail[] memory _prizeDetails
+        GameImplementationInterface.Prize[] memory _prizes
     )
         public
         payable
@@ -163,7 +163,7 @@ contract GameFactory is Pausable, Ownable {
         initialization.treasuryFee = _treasuryFee;
         initialization.creatorFee = _creatorFee;
         initialization.encodedCron = _encodedCron;
-        initialization.prizeDetails = _prizeDetails;
+        initialization.prizes = _prizes;
 
         // TODO add value to initialize function if receive
         // https://ethereum.stackexchange.com/questions/6665/call-contract-and-send-value-from-solidity

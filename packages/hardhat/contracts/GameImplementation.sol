@@ -6,8 +6,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
-import "hardhat/console.sol";
-
 contract GameImplementation {
     using Address for address;
 
@@ -41,19 +39,19 @@ contract GameImplementation {
 
     uint256 public gameImplementationVersion;
 
-    uint256 public playTimeRange; // Time length of a round in hours
+    uint256 public playTimeRange; // time length of a round in hours
 
     uint256 public maxPlayers;
     // TODO GUIGUI LAST remove numPlayers to replace it by players.length ??
     uint256 public numPlayers;
 
-    bool public gameInProgress; // Helps the keeper determine if a game has started or if we need to start it
+    bool public gameInProgress; // helps the keeper determine if a game has started or if we need to start it
     bool public contractPaused;
 
     address[] public playerAddresses;
     mapping(address => Player) public players;
-    mapping(uint256 => Winner) winners;
-    mapping(uint256 => Prize) prizes;
+    mapping(uint256 => Winner[]) winners;
+    mapping(uint256 => Prize[]) prizes;
 
     ///STRUCTS
 
@@ -72,22 +70,14 @@ contract GameImplementation {
     }
 
     /**
-     * @notice WinnerDetail structure that contain all usefull data for a winner
+     * @notice Winner structure that contain all usefull data for a winner
      */
-    struct WinnerDetail {
+    struct Winner {
         uint256 roundId;
         address playerAddress;
         uint256 amountWon;
         uint256 position;
         bool prizeClaimed;
-    }
-
-    /**
-     * @notice Winner structure that contain a list of winners for the current roundId
-     */
-    struct Winner {
-        uint256 winnersCounter;
-        mapping(uint256 => WinnerDetail) winnerDetails;
     }
 
     /**
@@ -100,9 +90,9 @@ contract GameImplementation {
         ERC1155
     }
     /**
-     * @notice PrizeDetail structure that contain the prize information
+     * @notice Prize structure that contain a list of prizes for the current roundId
      */
-    struct PrizeDetail {
+    struct Prize {
         uint256 position;
         uint256 amount;
         /*
@@ -114,18 +104,8 @@ contract GameImplementation {
          * 3 - ERC1155
          */
         uint256 standard;
-        // TODO NEXT VERSION USE ENUM
-        // PrizeStandard standard;
         address contractAddress;
         uint256 tokenId;
-    }
-
-    /**
-     * @notice Prize structure that contain a list of prizes for the current roundId
-     */
-    struct Prize {
-        uint256 prizesCounter;
-        mapping(uint256 => PrizeDetail) prizeDetails;
     }
 
     /**
@@ -145,7 +125,7 @@ contract GameImplementation {
         uint256 treasuryFee;
         uint256 creatorFee;
         string encodedCron;
-        PrizeDetail[] prizeDetails;
+        Prize[] prizes;
     }
 
     ///
@@ -255,11 +235,12 @@ contract GameImplementation {
      *  @param _initialization.treasuryFee the treasury fee in percent
      *  @param _initialization.creatorFee creator fee in percent
      *  @param _initialization.encodedCron the cron string
-     *  @param _initialization.prizeDetails the cron string
+     *  @param _initialization.prizes the cron string
      * @dev TODO NEXT VERSION Remove _isGameAllPrizesStandard limitation to include other prize typ
      */
     function initialize(Initialization calldata _initialization)
         external
+        payable
         onlyIfNotBase
         // TODO Only Factory ?
         onlyIfNotAlreadyInitialized
@@ -267,8 +248,7 @@ contract GameImplementation {
         onlyAllowedPlayTimeRange(_initialization.playTimeRange)
         onlyTreasuryFee(_initialization.treasuryFee)
         onlyCreatorFee(_initialization.creatorFee)
-        onlyIfPrizeDetailsParam(_initialization.prizeDetails)
-    // todo only if smg.value right amount if game is not payable and standard prize
+        onlyIfPrizesParam(_initialization.prizes)
     {
         owner = _initialization.owner;
         creator = _initialization.creator;
@@ -297,7 +277,8 @@ contract GameImplementation {
         cronUpkeep = _initialization.cronUpkeep;
 
         // Setup prizes structure
-        _addPrizes(_initialization.prizeDetails);
+        _checkIfPrizeAmountIfNeeded(_initialization.prizes);
+        _addPrizes(_initialization.prizes);
 
         // Verify Game Configuration :
         // Game can only be payable only if also standard
@@ -392,9 +373,9 @@ contract GameImplementation {
     /**
      * @notice Function that is called by the keeper based on the keeper cron
      * @dev Callable by admin or keeper
+     * @dev TODO NEXT VERSION Update triggerDailyCheckpoint to mae it only callable by keeper
      */
     function triggerDailyCheckpoint() external onlyAdminOrKeeper onlyNotPaused {
-        // function triggerDailyCheckpoint() external onlyKeeper onlyNotPaused {
         if (gameInProgress == true) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
@@ -423,31 +404,17 @@ contract GameImplementation {
      * @dev TODO NEXT VERSION Update claim process according to prize type
      */
     function claimPrize(uint256 _roundId) external onlyIfRoundId(_roundId) {
-        // TODO GUIGUI WWY this works and not the other version ??
-        // for (uint256 i = 0; i < winners[_roundId].winnersCounter; i++)
-        //     if (winners[_roundId].winnerDetails[i].playerAddress == msg.sender) {
-        //         require(
-        //             winners[_roundId].winnerDetails[i].prizeClaimed == false,
-        //             "Prize for this game already claimed"
-        //         );
-        //         require(
-        //             address(this).balance >= winners[_roundId].winnerDetails[i].amountWon,
-        //             "Not enough funds in contract"
-        //         );
+        for (uint256 i = 0; i < winners[_roundId].length; i++)
+            if (winners[_roundId][i].playerAddress == msg.sender) {
+                require(winners[_roundId][i].prizeClaimed == false, "Prize for this game already claimed");
+                require(address(this).balance >= winners[_roundId][i].amountWon, "Not enough funds in contract");
 
-        //         winners[_roundId].winnerDetails[i].prizeClaimed = true;
-        //         _safeTransfert(msg.sender, winners[_roundId].winnerDetails[i].amountWon);
-        //         emit GamePrizeClaimed(msg.sender, _roundId, winners[_roundId].winnerDetails[i].amountWon);
-        //     }
-
-        (bool exists, WinnerDetail memory winnerPlayerData) = _findWinnerPlayerData(_roundId, msg.sender);
-        require(exists, "Player did not win this game");
-        require(winnerPlayerData.prizeClaimed == false, "Prize for this game already claimed");
-        require(address(this).balance >= winnerPlayerData.amountWon, "Not enough funds in contract");
-
-        winnerPlayerData.prizeClaimed = true;
-        _safeTransfert(msg.sender, winnerPlayerData.amountWon);
-        emit GamePrizeClaimed(msg.sender, _roundId, winnerPlayerData.amountWon);
+                winners[_roundId][i].prizeClaimed = true;
+                _safeTransfert(msg.sender, winners[_roundId][i].amountWon);
+                emit GamePrizeClaimed(msg.sender, _roundId, winners[_roundId][i].amountWon);
+                return;
+            }
+        require(false, "Player did not win this game");
     }
 
     /**
@@ -457,16 +424,15 @@ contract GameImplementation {
      *      Need to store the factory gameCreationAmount in this contract on initialisation
      * @dev TODO NEXT VERSION Remove _isGameAllPrizesStandard limitation to include other prize typ
      */
-    function addPrizes(PrizeDetail[] memory _prizeDetails)
+    function addPrizes(Prize[] memory _prizes)
         external
         payable
         onlyAdminOrCreator
         onlyIfGameIsNotInProgress
-        onlyIfPrizeDetailsParam(_prizeDetails)
-    // todo only if smg.value right amount if game is not payable and standard prize
+        onlyIfPrizesParam(_prizes)
+        onlyIfPrizeAmountIfNeeded(_prizes)
     {
-        _addPrizes(_prizeDetails);
-
+        _addPrizes(_prizes);
         // Limitation for current version as standard for NFT is not implemented
         require(_isGameAllPrizesStandard(), "This version only allow standard prize");
     }
@@ -479,14 +445,8 @@ contract GameImplementation {
      * @notice Start the game(called when all conditions are ok)
      */
     function _startGame() internal {
-        for (uint256 i = 0; i < numPlayers; i++) {
-            Player storage player = players[playerAddresses[i]];
-            _resetRoundRange(player);
-        }
-
+        for (uint256 i = 0; i < numPlayers; i++) _resetRoundRange(players[playerAddresses[i]]);
         gameInProgress = true;
-        winners[roundId].winnersCounter = 0;
-
         emit StartedGame(block.timestamp, numPlayers);
     }
 
@@ -504,17 +464,12 @@ contract GameImplementation {
         emit ResetGame(block.timestamp, roundId);
         roundId += 1;
 
-        // stop game if not payable to allow creator to add prizes
+        // Stop game if not payable to allow creator to add prizes
         if (!_isGamePayable()) return _pause();
 
-        Prize storage oldPrize = prizes[roundId - 1];
-        Prize storage newPrize = prizes[roundId];
+        Prize[] storage oldPrize = prizes[roundId - 1];
 
-        newPrize.prizesCounter = oldPrize.prizesCounter;
-
-        for (uint256 i = 0; i < oldPrize.prizesCounter; i++) {
-            _addPrizeDetail(newPrize, oldPrize.prizeDetails[i]);
-        }
+        for (uint256 i = 0; i < oldPrize.length; i++) _addPrize(oldPrize[i]);
     }
 
     /**
@@ -537,102 +492,66 @@ contract GameImplementation {
      */
     function _checkIfGameEnded() internal {
         uint256 remainingPlayersCount = _getRemainingPlayersCount();
-
         bool isPlitPot = _isAllPlayersSplitOk();
 
         if (remainingPlayersCount > 1 && !isPlitPot) return;
 
-        Prize storage prize = prizes[roundId];
         uint256 treasuryRoundAmount = 0;
         uint256 creatorRoundAmount = 0;
 
-        if (remainingPlayersCount == 1) {
+        Prize[] memory _prizes = prizes[roundId];
+
+        if (remainingPlayersCount == 1)
             // Distribute prizes over winners
             for (uint256 i = 0; i < numPlayers; i++) {
                 Player memory currentPlayer = players[playerAddresses[i]];
 
                 if (!currentPlayer.hasLost) {
-                    // player is winner
-                    console.log(" player is winner");
+                    // Player is winner
+                    treasuryRoundAmount = (_prizes[0].amount * treasuryFee) / 10000;
+                    creatorRoundAmount = (_prizes[0].amount * creatorFee) / 10000;
+                    uint256 rewardAmount = _prizes[0].amount - treasuryRoundAmount - creatorRoundAmount;
 
-                    PrizeDetail memory prizeDetail = prize.prizeDetails[1];
-
-                    treasuryRoundAmount = (prizeDetail.amount * treasuryFee) / 10000;
-                    creatorRoundAmount = (prizeDetail.amount * creatorFee) / 10000;
-                    uint256 rewardAmount = prizeDetail.amount - treasuryRoundAmount - creatorRoundAmount;
-
-                    _addWinner(1, currentPlayer.playerAddress, rewardAmount);
-                } else if (currentPlayer.position <= prize.prizesCounter) {
-                    // player has won a prize
-                    console.log(
-                        "player has won a prize currentPlayer.position %s prize.prizesCounter %s",
-                        currentPlayer.position,
-                        prize.prizesCounter
-                    );
-
-                    PrizeDetail memory prizeDetail = prize.prizeDetails[currentPlayer.position - 1];
-
-                    treasuryRoundAmount = (prizeDetail.amount * treasuryFee) / 10000;
-                    creatorRoundAmount = (prizeDetail.amount * creatorFee) / 10000;
-                    uint256 rewardAmount = prizeDetail.amount - treasuryRoundAmount - creatorRoundAmount;
+                    _addWinner(0, currentPlayer.playerAddress, rewardAmount);
+                } else if (i < _prizes.length && currentPlayer.position <= _prizes[i].position) {
+                    // Player has won a prize
+                    treasuryRoundAmount = (_prizes[0].amount * treasuryFee) / 10000;
+                    creatorRoundAmount = (_prizes[0].amount * creatorFee) / 10000;
+                    uint256 rewardAmount = _prizes[0].amount - treasuryRoundAmount - creatorRoundAmount;
 
                     _addWinner(currentPlayer.position, currentPlayer.playerAddress, rewardAmount);
                 }
             }
-        }
 
         if (isPlitPot) {
             // Split with remaining player
-            console.log("Split with remaining player");
-
             uint256 prizepool = 0;
-            for (uint256 i = 1; i <= prize.prizesCounter; i++) {
-                PrizeDetail memory prizeDetail = prize.prizeDetails[i];
-
-                // console.log("PrizeDetail amount %s ", prizeDetail.amount);
-                prizepool += prizeDetail.amount;
-            }
+            for (uint256 i = 0; i < _prizes.length; i++) prizepool += _prizes[i].amount;
 
             treasuryRoundAmount = (prizepool * treasuryFee) / 10000;
             creatorRoundAmount = (prizepool * creatorFee) / 10000;
             uint256 rewardAmount = prizepool - treasuryRoundAmount - creatorRoundAmount;
             uint256 splittedPrize = rewardAmount / remainingPlayersCount;
 
-            // console.log(
-            //     "prizepool %s splittedPrize %s prize.prizesCounter %s",
-            //     prizepool,
-            //     splittedPrize,
-            //     prize.prizesCounter
-            // );
-
             for (uint256 i = 0; i < numPlayers; i++) {
                 Player memory currentPlayer = players[playerAddresses[i]];
-                if (!currentPlayer.hasLost && currentPlayer.isSplitOk) {
-                    console.log(
-                        "_addWinner currentPlayer.playerAddress %s splittedPrize %s",
-                        currentPlayer.playerAddress,
-                        splittedPrize
-                    );
+                if (!currentPlayer.hasLost && currentPlayer.isSplitOk)
                     _addWinner(1, currentPlayer.playerAddress, splittedPrize);
-                }
             }
             emit GameSplitted(roundId, remainingPlayersCount, splittedPrize);
         }
 
-        if (remainingPlayersCount == 0) {
+        if (remainingPlayersCount == 0)
             // Creator will take everything except the first prize
-            console.log("Creator will take everything except the first prizer");
-            for (uint256 i = 1; i <= prize.prizesCounter; i++) {
-                PrizeDetail memory prizeDetail = prize.prizeDetails[i];
-                treasuryRoundAmount = (prizeDetail.amount * treasuryFee) / 10000;
-                creatorRoundAmount = (prizeDetail.amount * creatorFee) / 10000;
+            for (uint256 i = 0; i < _prizes.length; i++) {
+                treasuryRoundAmount = (_prizes[i].amount * treasuryFee) / 10000;
+                creatorRoundAmount = (_prizes[i].amount * creatorFee) / 10000;
 
-                uint256 rewardAmount = prizeDetail.amount - treasuryRoundAmount - creatorRoundAmount;
+                uint256 rewardAmount = _prizes[i].amount - treasuryRoundAmount - creatorRoundAmount;
 
-                address winnerAddress = i == 0 ? owner : creator;
-                _addWinner(prizeDetail.position, winnerAddress, rewardAmount);
+                address winnerAddress = i == 1 ? owner : creator;
+                _addWinner(_prizes[i].position, winnerAddress, rewardAmount);
             }
-        }
 
         treasuryAmount += treasuryRoundAmount;
         creatorAmount += creatorRoundAmount;
@@ -643,7 +562,7 @@ contract GameImplementation {
      * @notice Refresh players status for remaining players
      */
     function _refreshPlayerStatus() internal {
-        // if everyone is ok to split, we wait
+        // If everyone is ok to split, we wait
         if (_isAllPlayersSplitOk()) return;
 
         for (uint256 i = 0; i < numPlayers; i++) {
@@ -663,35 +582,36 @@ contract GameImplementation {
         address _playerAddress,
         uint256 _amount
     ) internal {
-        // Winner storage winner = winners[roundId];
-
-        // console.log("_addWinner winner.winnersCounter %s", winner.winnersCounter);
-        // console.log("_addWinner winner.winnersCounter %s", winner.winnersCounter);
-        winners[roundId].winnersCounter += 1;
-
-        winners[roundId].winnerDetails[winners[roundId].winnersCounter] = WinnerDetail({
-            roundId: roundId,
-            position: _position,
-            playerAddress: _playerAddress,
-            amountWon: _amount,
-            prizeClaimed: false
-        });
-        // winner.winnersCounter += 1;
-        console.log("_addWinner winner.winnersCounter %s", winners[roundId].winnersCounter);
-
-        emit GameWon(roundId, winners[roundId].winnersCounter, _playerAddress, _amount);
+        winners[roundId].push(
+            Winner({
+                roundId: roundId,
+                position: _position,
+                playerAddress: _playerAddress,
+                amountWon: _amount,
+                prizeClaimed: false
+            })
+        );
+        emit GameWon(roundId, winners[roundId].length, _playerAddress, _amount);
     }
 
-    function _addPrizes(PrizeDetail[] memory prizeDetails) internal {
+    /**
+     * @notice Check if msg.value have the right amount if needed
+     * @param _prizes list of prize details
+     */
+    function _checkIfPrizeAmountIfNeeded(Prize[] memory _prizes) internal view {
+        if (_isGamePayable()) return;
+
         uint256 prizepool = 0;
+        for (uint256 i = 0; i < _prizes.length; i++) prizepool += _prizes[i].amount;
 
-        Prize storage prize = prizes[roundId];
-        // prize.prizesCounter = prizeDetails.length;
+        require(msg.value == prizepool, "Need to send prizepool amount");
+    }
 
-        console.log("_addPrizes prizeDetails.length %s", prizeDetails.length);
-        for (uint256 i = 0; i < prizeDetails.length; i++) {
-            _addPrizeDetail(prize, prizeDetails[i]);
-            prizepool += prizeDetails[i].amount;
+    function _addPrizes(Prize[] memory _prizes) internal {
+        uint256 prizepool = 0;
+        for (uint256 i = 0; i < _prizes.length; i++) {
+            _addPrize(_prizes[i]);
+            prizepool += _prizes[i].amount;
         }
 
         if (_isGamePayable()) {
@@ -700,17 +620,16 @@ contract GameImplementation {
         }
     }
 
-    function _addPrizeDetail(Prize storage prize, PrizeDetail memory prizeDetail) internal {
-        prize.prizeDetails[prizeDetail.position] = prizeDetail;
+    function _addPrize(Prize memory _prize) internal {
+        prizes[roundId].push(_prize);
         emit PrizeAdded(
             roundId,
-            prizeDetail.position,
-            prizeDetail.amount,
-            prizeDetail.standard,
-            prizeDetail.contractAddress,
-            prizeDetail.tokenId
+            _prize.position,
+            _prize.amount,
+            _prize.standard,
+            _prize.contractAddress,
+            _prize.tokenId
         );
-        prize.prizesCounter += 1;
     }
 
     function _isGamePayable() internal view returns (bool) {
@@ -718,12 +637,7 @@ contract GameImplementation {
     }
 
     function _isGameAllPrizesStandard() internal view returns (bool) {
-        Prize storage prize = prizes[roundId];
-        for (uint256 i = 0; i < prize.prizesCounter; i++) {
-            PrizeDetail storage prizeDetail = prize.prizeDetails[i];
-            // if (prizeDetail.standard != PrizeStandard.STANDARD) return false;
-            if (prizeDetail.standard != 0) return false;
-        }
+        for (uint256 i = 0; i < prizes[roundId].length; i++) if (prizes[roundId][i].standard != 0) return false;
         return true;
     }
 
@@ -733,7 +647,7 @@ contract GameImplementation {
      * @return the generated number
      */
     function _randMod(address _playerAddress) internal returns (uint256) {
-        // increase nonce
+        // Increase nonce
         randNonce++;
         uint256 maxUpperRange = 25 - playTimeRange; // We use 25 because modulo excludes the higher limit
         uint256 randomNumber = uint256(keccak256(abi.encodePacked(block.timestamp, _playerAddress, randNonce))) %
@@ -788,29 +702,12 @@ contract GameImplementation {
     }
 
     /**
-     * @notice find if the given address have associated winner player data
-     * @return winnerPlayerData if finded
-     */
-    function _findWinnerPlayerData(uint256 _roundId, address _address)
-        internal
-        view
-        returns (bool, WinnerDetail memory)
-    {
-        for (uint256 i = 0; i < winners[_roundId].winnersCounter; i++)
-            if (winners[_roundId].winnerDetails[i].playerAddress == _address)
-                return (true, winners[_roundId].winnerDetails[i]);
-
-        WinnerDetail memory winnerDetail;
-        return (false, winnerDetail);
-    }
-
-    /**
      * @notice Pause the current game and associated keeper job
      * @dev Callable by admin or creator
      */
 
     function _pause() internal onlyNotPaused {
-        // pause first to ensure no more interaction with contract
+        // Pause first to ensure no more interaction with contract
         contractPaused = true;
         CronUpkeepInterface(cronUpkeep).deleteCronJob(cronUpkeepJobId);
     }
@@ -876,19 +773,20 @@ contract GameImplementation {
     /**
      * @notice Return the winners for a round id
      * @param _roundId the round id
-     * @return list of WinnerDetail
+     * @return list of Winner
      */
-    function getWinners(uint256 _roundId) external view onlyIfRoundId(_roundId) returns (WinnerDetail[] memory) {
-        uint256 winnersCounter = winners[_roundId].winnersCounter;
-        WinnerDetail[] memory winnersPlayerData = new WinnerDetail[](winnersCounter);
-
-        for (uint256 i = 1; i <= winnersCounter; i++) {
-            winnersPlayerData[i - 1] = winners[_roundId].winnerDetails[winnersCounter];
-        }
-        return winnersPlayerData;
+    function getWinners(uint256 _roundId) external view onlyIfRoundId(_roundId) returns (Winner[] memory) {
+        return winners[_roundId];
     }
 
-    // TODO create getPrizes
+    /**
+     * @notice Return the winners for a round id
+     * @param _roundId the round id
+     * @return list of Prize
+     */
+    function getPrizes(uint256 _roundId) external view onlyIfRoundId(_roundId) returns (Prize[] memory) {
+        return prizes[_roundId];
+    }
 
     /**
      * @notice Check if all remaining players are ok to split pot
@@ -1094,7 +992,7 @@ contract GameImplementation {
      * @notice Unpause the current game and associated keeper job
      * @dev Callable by admin or creator
      */
-    function unpause() external onlyAdminOrCreator onlyPaused onlyIfKeeperDataInit onlyIfPrizeDetailsIsNotEmpty {
+    function unpause() external onlyAdminOrCreator onlyPaused onlyIfKeeperDataInit onlyIfPrizesIsNotEmpty {
         uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
         cronUpkeepJobId = nextCronJobIDs;
 
@@ -1113,7 +1011,7 @@ contract GameImplementation {
             }
         }
 
-        // unpause last to ensure that everything is ok
+        // Unpause last to ensure that everything is ok
         contractPaused = false;
     }
 
@@ -1162,7 +1060,7 @@ contract GameImplementation {
     ///
 
     /**
-     * @notice  Called for empty calldata (and any value)
+     * @notice Called for empty calldata (and any value)
      */
     receive() external payable {
         emit Received(msg.sender, msg.value);
@@ -1469,23 +1367,28 @@ contract GameImplementation {
 
     /**
      * @notice Modifier that ensure that prize details param is not empty
-     * @param _prizeDetails list of prize details
+     * @param _prizes list of prize details
      */
-    modifier onlyIfPrizeDetailsParam(PrizeDetail[] memory _prizeDetails) {
-        require(_prizeDetails.length > 0, "prizeDetails should be greather or equal to 1");
-        bool isListOrdered = true;
-        for (uint256 i = 0; i < _prizeDetails.length; i++) {
-            PrizeDetail memory prizeDetail = _prizeDetails[i];
-            require(prizeDetail.position == i + 1, "Prize list is not ordered");
-        }
+    modifier onlyIfPrizesParam(Prize[] memory _prizes) {
+        require(_prizes.length > 0, "Prizes should be greather or equal to 1");
+        for (uint256 i = 0; i < _prizes.length; i++) require(_prizes[i].position == i + 1, "Prize list is not ordered");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure thatmsg.value have the right amount if needed
+     * @param _prizes list of prize details
+     */
+    modifier onlyIfPrizeAmountIfNeeded(Prize[] memory _prizes) {
+        _checkIfPrizeAmountIfNeeded(_prizes);
         _;
     }
 
     /**
      * @notice Modifier that ensure that prize details is not empty
      */
-    modifier onlyIfPrizeDetailsIsNotEmpty() {
-        require(prizes[roundId].prizesCounter > 0, "prizeDetails should be greather or equal to 1");
+    modifier onlyIfPrizesIsNotEmpty() {
+        require(prizes[roundId].length > 0, "Prizes should be greather or equal to 1");
         _;
     }
 

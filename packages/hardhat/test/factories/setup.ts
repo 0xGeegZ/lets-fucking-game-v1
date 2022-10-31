@@ -22,7 +22,7 @@ const setupTest = deployments.createFixture(
       treasuryFee,
       creatorFee,
       encodedCron,
-      prizeDetails,
+      prizes,
     }
   ) => {
     // await deployments.fixture(['lfg'])
@@ -123,7 +123,7 @@ const setupTest = deployments.createFixture(
       treasuryFee,
       creatorFee,
       encodedCron,
-      prizeDetails,
+      prizes,
       { value: gameCreationAmount }
     )
 
@@ -205,7 +205,7 @@ const initialiseTestData = async function () {
     ethers.utils.parseEther(`${amount}`)
   )
 
-  this.prizeDetails = [
+  this.prizes = [
     {
       position: '1',
       // amount: ethers.utils.parseEther(`${0.0001 * 10}`),
@@ -237,7 +237,7 @@ const initialiseTestData = async function () {
     treasuryFee: this.treasuryFee,
     creatorFee: this.creatorFee,
     encodedCron: this.encodedCron,
-    prizeDetails: this.prizeDetails,
+    prizes: this.prizes,
   })
 
   this.owner = deployer

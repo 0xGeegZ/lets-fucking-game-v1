@@ -22,22 +22,14 @@ interface GameImplementationInterface {
     }
 
     /**
-     * @notice WinnerDetail structure that contain all usefull data for a winner
+     * @notice Winner structure that contain all usefull data for a winner
      */
-    struct WinnerDetail {
+    struct Winner {
         uint256 roundId;
         address playerAddress;
         uint256 amountWon;
         uint256 position;
         bool prizeClaimed;
-    }
-
-    /**
-     * @notice Winner structure that contain a list of winners for the current roundId
-     */
-    struct Winner {
-        uint256 winnersCounter;
-        mapping(uint256 => WinnerDetail) winnerDetails;
     }
 
     /**
@@ -50,9 +42,10 @@ interface GameImplementationInterface {
         ERC1155
     }
     /**
-     * @notice PrizeDetail structure that contain the prize information
+     * @notice Prize structure that contain the prize information
+     * @dev TODO NEXT VERSION use enum PrizeStandard for standard (cause errors for front end requests)
      */
-    struct PrizeDetail {
+    struct Prize {
         uint256 position;
         uint256 amount;
         /*
@@ -64,18 +57,8 @@ interface GameImplementationInterface {
          * 3 - ERC1155
          */
         uint256 standard;
-        // TODO NEXT VERSION USE ENUM
-        // PrizeStandard standard;
         address contractAddress;
         uint256 tokenId;
-    }
-
-    /**
-     * @notice Prize structure that contain a list of prizes for the current roundId
-     */
-    struct Prize {
-        uint256 prizesCounter;
-        mapping(uint256 => PrizeDetail) prizeDetails;
     }
 
     /**
@@ -95,7 +78,7 @@ interface GameImplementationInterface {
         uint256 treasuryFee;
         uint256 creatorFee;
         string encodedCron;
-        PrizeDetail[] prizeDetails;
+        Prize[] prizes;
     }
 
     ///EVENTS
@@ -161,17 +144,18 @@ interface GameImplementationInterface {
     /**
      * @notice Create a new Game Implementation by cloning the base contract
      * @param initialization the initialisation data with params as follow :
-     *  @param initialization._creator the game creator
-     *  @param initialization._owner the general admin address
-     *  @param initialization._cronUpkeep the cron upkeep address
-     *  @param initialization._gameImplementationVersion the version of the game implementation
-     *  @param initialization._gameId the unique game id (fix)
-     *  @param initialization._playTimeRange the time range during which a player can play in hour
-     *  @param initialization._maxPlayers the maximum number of players for a game
-     *  @param initialization._registrationAmount the amount that players will need to pay to enter in the game
-     *  @param initialization._treasuryFee the treasury fee in percent
-     *  @param initialization._creatorFee creator fee in percent
-     *  @param initialization._encodedCron the cron string
+     *  @param initialization.creator the game creator
+     *  @param initialization.owner the general admin address
+     *  @param initialization.cronUpkeep the cron upkeep address
+     *  @param initialization.gameImplementationVersion the version of the game implementation
+     *  @param initialization.gameId the unique game id (fix)
+     *  @param initialization.playTimeRange the time range during which a player can play in hour
+     *  @param initialization.maxPlayers the maximum number of players for a game
+     *  @param initialization.registrationAmount the amount that players will need to pay to enter in the game
+     *  @param initialization.treasuryFee the treasury fee in percent
+     *  @param initialization.creatorFee creator fee in percent
+     *  @param initialization.encodedCron the cron string
+     *  @param initialization.prizes the prize list
      */
     function initialize(Initialization calldata initialization) external;
 
@@ -312,9 +296,9 @@ interface GameImplementationInterface {
     /**
      * @notice Return the winners for a round id
      * @param _roundId the round id
-     * @return list of WinnerDetail
+     * @return list of Winner
      */
-    function getWinners(uint256 _roundId) external view returns (WinnerDetail[] memory);
+    function getWinners(uint256 _roundId) external view returns (Winner[] memory);
 
     /**
      * @notice Check if all remaining players are ok to split pot
