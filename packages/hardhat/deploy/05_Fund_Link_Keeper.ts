@@ -14,7 +14,7 @@ const func: DeployFunction = async function ({
   const chainId = await getChainId()
   let linkTokenAddress: string
 
-  if (chainId == '31337') {
+  if (chainId === '31337' || chainId === '1337') {
     const linkToken = await get('LinkToken')
     linkTokenAddress = linkToken.address
   } else {

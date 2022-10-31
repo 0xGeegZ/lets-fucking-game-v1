@@ -163,6 +163,9 @@ const initialiseTestData = async function () {
   // first signer is deployer, associating to mockKeeeper
   ;[mockKeeper, bob, alice, ...players] = await ethers.getSigners()
 
+  if (players.length < 10)
+    throw new Error('Not enough players to launch test suit')
+
   this.players = players
   this.bob = bob
   this.alice = alice

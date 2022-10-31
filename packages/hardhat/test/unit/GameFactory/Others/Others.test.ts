@@ -138,20 +138,35 @@ describe('GameFactoryContract', function () {
   context('GameFactory updateCronUpkeep', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
-        // TODO Implement Test
-        expect(true).to.be.false
+        await expectRevert(
+          this.gameFactory
+            .connect(this.alice)
+            .updateCronUpkeep(this.owner.address),
+          'Caller is not the admin'
+        )
       })
     })
 
     describe('when called by admin', function () {
       it('should update keeper address for the factory and all games and associated keeper job', async function () {
-        // TODO Implement Test
+        // TODO deploy a new keeper to update keeper data
+        // this.gameFactory.connect(this.owner).updateCronUpkeep(this.owner.address)
         expect(true).to.be.false
       })
 
-      it('should revert if keeper address is not init', async function () {
-        // TODO Implement Test
-        expect(true).to.be.false
+      it('should revert if keeper address is not a contract address', async function () {
+        await expectRevert(
+          this.gameFactory
+            .connect(this.owner)
+            .updateCronUpkeep(this.bob.address),
+          'Transaction reverted: function call to a non-contract account'
+        )
+      })
+      it('should revert if keeper address is not initialized', async function () {
+        await expectRevert(
+          this.gameFactory.connect(this.owner).updateCronUpkeep(''),
+          'resolver or addr is not configured for ENS name'
+        )
       })
     })
   })
@@ -161,43 +176,19 @@ describe('GameFactoryContract', function () {
     function () {
       describe('when called by non admin', function () {
         it('should revert with correct message', async function () {
-          // TODO Implement Test
+          // TODO GUIGUI Implement Test
           expect(true).to.be.false
         })
       })
 
       describe('when called by admin', function () {
         it('should pause the factory and all games and associated keeper job', async function () {
-          // TODO Implement Test
+          // TODO GUIGUI Implement Test
           expect(true).to.be.false
         })
 
         it('should resume the factory and all games and associated keeper job', async function () {
-          // TODO Implement Test
-          expect(true).to.be.false
-        })
-      })
-    }
-  )
-
-  context(
-    'GameFactory pauseAllGamesAndFactory & ResumeAllGamesAndFactory',
-    function () {
-      describe('when called by non admin', function () {
-        it('should revert with correct message', async function () {
-          // TODO Implement Test
-          expect(true).to.be.false
-        })
-      })
-
-      describe('when called by admin', function () {
-        it('should pause the factory and all games and associated keeper job', async function () {
-          // TODO Implement Test
-          expect(true).to.be.false
-        })
-
-        it('should resume the factory and all games and associated keeper job', async function () {
-          // TODO Implement Test
+          // TODO GUIGUI Implement Test
           expect(true).to.be.false
         })
       })

@@ -6,8 +6,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
-import "hardhat/console.sol";
-
 contract GameImplementation {
     using Address for address;
 
@@ -454,10 +452,9 @@ contract GameImplementation {
      */
     function _resetGame() internal {
         gameInProgress = false;
-        for (uint256 i = 0; i < playerAddresses.length; i++) {
-            delete players[playerAddresses[i]];
-            delete playerAddresses[i];
-        }
+        for (uint256 i = 0; i < playerAddresses.length; i++) delete players[playerAddresses[i]];
+
+        delete playerAddresses;
 
         emit ResetGame(block.timestamp, roundId);
         roundId += 1;
@@ -601,8 +598,6 @@ contract GameImplementation {
 
         uint256 prizepool = 0;
         for (uint256 i = 0; i < _prizes.length; i++) prizepool += _prizes[i].amount;
-
-        console.log("_checkIfPrizeAmountIfNeeded prizepool %s msg.value %s", prizepool, msg.value);
 
         require(msg.value == prizepool, "Need to send prizepool amount");
     }

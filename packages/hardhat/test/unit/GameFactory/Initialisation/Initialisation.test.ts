@@ -133,7 +133,8 @@ describe('GameFactoryContract', function () {
         )
       })
       it('should revert create game with already used amount', async function () {
-        const sameRegistrationAmount = this.authorizedAmounts[1]
+        const sameRegistrationAmount =
+          this.authorizedAmounts[this.authorizedAmounts.length - 1]
 
         const updatedPrizes = this.prizes
         updatedPrizes[0].amount = sameRegistrationAmount.mul(this.maxPlayers)

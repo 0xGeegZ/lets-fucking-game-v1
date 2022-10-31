@@ -447,7 +447,8 @@ describe('GameFactoryContract', function () {
         .connect(this.owner)
         .getDeployedGames()
 
-      const registrationAmountFirst = this.authorizedAmounts[1]
+      const registrationAmountFirst =
+        this.authorizedAmounts[this.authorizedAmounts.length - 1]
 
       const updatedPrizesFirst = this.prizes
       updatedPrizesFirst[0].amount = registrationAmountFirst.mul(

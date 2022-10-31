@@ -10,7 +10,7 @@ const func: DeployFunction = async function ({
   const { deployer } = await getNamedAccounts()
   const chainId = await getChainId()
 
-  if (chainId === '31337') {
+  if (chainId === '31337' || chainId === '1337') {
     await deploy('LinkToken', { from: deployer, log: true })
   }
 }

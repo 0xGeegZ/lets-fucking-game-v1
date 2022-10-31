@@ -8,8 +8,6 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import { GameImplementationInterface } from "./interfaces/GameImplementationInterface.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 
-import "hardhat/console.sol";
-
 contract GameFactory is Pausable, Ownable {
     address public cronUpkeep;
 
@@ -167,12 +165,7 @@ contract GameFactory is Pausable, Ownable {
         initialization.encodedCron = _encodedCron;
         initialization.prizes = _prizes;
 
-        // TODO GUIGUI add value to initialize function if receive (minus gameCreationAmount)
-        // https://ethereum.stackexchange.com/questions/6665/call-contract-and-send-value-from-solidity
         uint256 prizepool = msg.value - gameCreationAmount;
-
-        console.log("Initialize Game with prizepool %s", prizepool);
-
         GameImplementationInterface(newGameAddress).initialize{ value: prizepool }(initialization);
 
         deployedGames.push(

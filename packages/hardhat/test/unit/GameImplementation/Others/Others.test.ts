@@ -396,7 +396,7 @@ describe('GameImplementationContract - Others', function () {
           await expectRevert(
             this.deployedGame
               .connect(this.bob)
-              .setCronUpkeep('0x0000000000000000000000000000000000000001'),
+              .setCronUpkeep(this.owner.address),
             'Caller is not the admin or factory'
           )
         })
@@ -404,7 +404,8 @@ describe('GameImplementationContract - Others', function () {
 
       describe('when called by admin', function () {
         it('should update keeper address for the game and associated keeper job', async function () {
-          // TODO deploy a new cronUpkeep to get his adress and update the keeper
+          // TODO deploy a new keeper to update keeper data
+          // this.gameFactory.connect(this.owner).updateCronUpkeep(this.owner.address)
           expect(true).to.be.false
           // const newCronUpkeep = '0x0000000000000000000000000000000000000001'
           // await this.deployedGame
@@ -414,12 +415,18 @@ describe('GameImplementationContract - Others', function () {
           // expect(updatedCronUpkeep).to.be.equal(newCronUpkeep)
         })
 
-        it('should revert if keeper address is not init', async function () {
+        it('should revert if keeper address is not a contract address', async function () {
           await expectRevert(
             this.deployedGame
               .connect(this.owner)
-              .setCronUpkeep('0x0000000000000000000000000000000000000000'),
-            'address need to be initialised'
+              .setCronUpkeep(this.bob.address),
+            'Transaction reverted: function call to a non-contract account'
+          )
+        })
+        it('should revert if keeper address is not initialized', async function () {
+          await expectRevert(
+            this.deployedGame.connect(this.owner).setCronUpkeep(''),
+            'resolver or addr is not configured for ENS name'
           )
         })
       })
@@ -438,6 +445,7 @@ describe('GameImplementationContract - Others', function () {
       describe('when called by admin', function () {
         it('should update keeper cron for the game and associated keeper job', async function () {
           // TODO FIXME call toEncodedSpec from externalCron
+          // TODO GUIGUI ??
           expect(true).to.be.false
 
           // const newEncodedCron = '* * * * *'
@@ -453,11 +461,14 @@ describe('GameImplementationContract - Others', function () {
         })
 
         it('should revert if keeper cron is not init', async function () {
+          // TODO GUIGUI
           // TODO FIXME (operation="getResolver", network="unknown", code=UNSUPPORTED_OPERATION, version=providers/5.7.1)
           expect(true).to.be.false
 
           // await expectRevert.unspecified(
-          //   this.deployedGame.connect(this.owner).setCronUpkeep('ERROR')
+          //   this.deployedGame
+          //     .connect(this.owner)
+          //     .setCronUpkeep(this.owner.address)
           // )
         })
       })
