@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
+import "hardhat/console.sol";
+
 contract GameImplementation {
     using Address for address;
 
@@ -84,8 +86,6 @@ contract GameImplementation {
      * @notice Winner structure that contain a list of winners for the current roundId
      */
     struct Winner {
-        // address[] winnerAddresses;
-        // mapping(address => WinnerDetail) winnerDetails;
         uint256 winnersCounter;
         mapping(uint256 => WinnerDetail) winnerDetails;
     }
@@ -94,6 +94,7 @@ contract GameImplementation {
      * @notice PrizeStandard ENUM
      */
     enum PrizeStandard {
+        STANDARD,
         ERC20,
         ERC721,
         ERC1155
@@ -104,8 +105,19 @@ contract GameImplementation {
     struct PrizeDetail {
         uint256 position;
         uint256 amount;
-        PrizeStandard standard;
-        address token;
+        /*
+         * This will return a single integer between 0 and 5.
+         * The numbers represent different ‘states’ a name is currently in.
+         * 0 - STANDARD
+         * 1 - ERC20
+         * 2 - ERC721
+         * 3 - ERC1155
+         */
+        uint256 standard;
+        // TODO NEXT VERSION USE ENUM
+        // PrizeStandard standard;
+        address contractAddress;
+        uint256 tokenId;
     }
 
     /**
@@ -163,21 +175,26 @@ contract GameImplementation {
     /**
      * @notice Called when a player won the game
      */
-    event GameWon(uint256 roundId, address playerAddress, uint256 amountWon);
+    event GameWon(uint256 roundId, uint256 winnersCounter, address playerAddress, uint256 amountWon);
     /**
      * @notice Called when some player(s) split the game
      */
-    event GameSplitted(uint256 roundId, address playerAddress, uint256 amountWon);
+    event GameSplitted(uint256 roundId, uint256 remainingPlayersCount, uint256 amountWon);
     /**
      * @notice Called when a player vote to split pot
      */
     event VoteToSplitPot(uint256 roundId, address playerAddress);
-
     /**
      * @notice Called when a prize is added
      */
-    event PrizeAdded(uint256 roundId, uint256 position, uint256 amount, PrizeStandard standard, address token);
-
+    event PrizeAdded(
+        uint256 roundId,
+        uint256 position,
+        uint256 amount,
+        uint256 standard,
+        address contractAddress,
+        uint256 tokenId
+    );
     /**
      * @notice Called when a transfert have failed
      */
@@ -239,17 +256,19 @@ contract GameImplementation {
      *  @param _initialization.creatorFee creator fee in percent
      *  @param _initialization.encodedCron the cron string
      *  @param _initialization.prizeDetails the cron string
-     * @dev TODO NEXT VERSION Remove _isGameAllPrizesErc20 limitation to include other prize typ
+     * @dev TODO NEXT VERSION Remove _isGameAllPrizesStandard limitation to include other prize typ
      */
     function initialize(Initialization calldata _initialization)
         external
         onlyIfNotBase
+        // TODO Only Factory ?
         onlyIfNotAlreadyInitialized
         onlyAllowedNumberOfPlayers(_initialization.maxPlayers)
         onlyAllowedPlayTimeRange(_initialization.playTimeRange)
         onlyTreasuryFee(_initialization.treasuryFee)
         onlyCreatorFee(_initialization.creatorFee)
         onlyIfPrizeDetailsParam(_initialization.prizeDetails)
+    // todo only if smg.value right amount if game is not payable and standard prize
     {
         owner = _initialization.owner;
         creator = _initialization.creator;
@@ -281,12 +300,12 @@ contract GameImplementation {
         _addPrizes(_initialization.prizeDetails);
 
         // Verify Game Configuration :
-        // Game can only be payable only if also ERC20
+        // Game can only be payable only if also standard
         // OR Game can be not payable and everything else
-        require((_isGamePayable() && _isGameAllPrizesErc20()) || !_isGamePayable(), "Configuration missmatch");
+        require((_isGamePayable() && _isGameAllPrizesStandard()) || !_isGamePayable(), "Configuration missmatch");
 
         // Limitation for current version as standard for NFT is not implemented
-        require(_isGameAllPrizesErc20(), "This version only allow erc20 prize");
+        require(_isGameAllPrizesStandard(), "This version only allow standard prize");
 
         // Register the keeper job
         uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
@@ -402,16 +421,27 @@ contract GameImplementation {
     /**
      * @notice Function that is called by a winner to claim his prize
      * @dev TODO NEXT VERSION Update claim process according to prize type
-     * @dev TODO NEXT VERSION Remove _isGameAllPrizesErc20 limitation to include other prize type
      */
     function claimPrize(uint256 _roundId) external onlyIfRoundId(_roundId) {
-        //  Limitation for current version as standard for NFT is not implemented
-        require(_isGameAllPrizesErc20(), "This version only allow erc20 prize");
+        // TODO GUIGUI WWY this works and not the other version ??
+        // for (uint256 i = 0; i < winners[_roundId].winnersCounter; i++)
+        //     if (winners[_roundId].winnerDetails[i].playerAddress == msg.sender) {
+        //         require(
+        //             winners[_roundId].winnerDetails[i].prizeClaimed == false,
+        //             "Prize for this game already claimed"
+        //         );
+        //         require(
+        //             address(this).balance >= winners[_roundId].winnerDetails[i].amountWon,
+        //             "Not enough funds in contract"
+        //         );
+
+        //         winners[_roundId].winnerDetails[i].prizeClaimed = true;
+        //         _safeTransfert(msg.sender, winners[_roundId].winnerDetails[i].amountWon);
+        //         emit GamePrizeClaimed(msg.sender, _roundId, winners[_roundId].winnerDetails[i].amountWon);
+        //     }
 
         (bool exists, WinnerDetail memory winnerPlayerData) = _findWinnerPlayerData(_roundId, msg.sender);
-
-        require(exists, "No data found for given address");
-        require(winnerPlayerData.playerAddress == msg.sender, "Player did not win this game");
+        require(exists, "Player did not win this game");
         require(winnerPlayerData.prizeClaimed == false, "Prize for this game already claimed");
         require(address(this).balance >= winnerPlayerData.amountWon, "Not enough funds in contract");
 
@@ -423,20 +453,22 @@ contract GameImplementation {
     /**
      * @notice Prizes adding management
      * @dev Callable by admin or creator
-     * @dev TODO NEXT VERSION make this function payable for creator in case of not payable games
+     * @dev TODO NEXT VERSION add a taxe for creator in case of not payable games
      *      Need to store the factory gameCreationAmount in this contract on initialisation
-     * @dev TODO NEXT VERSION Remove _isGameAllPrizesErc20 limitation to include other prize typ
+     * @dev TODO NEXT VERSION Remove _isGameAllPrizesStandard limitation to include other prize typ
      */
     function addPrizes(PrizeDetail[] memory _prizeDetails)
         external
+        payable
         onlyAdminOrCreator
         onlyIfGameIsNotInProgress
         onlyIfPrizeDetailsParam(_prizeDetails)
+    // todo only if smg.value right amount if game is not payable and standard prize
     {
         _addPrizes(_prizeDetails);
 
         // Limitation for current version as standard for NFT is not implemented
-        require(_isGameAllPrizesErc20(), "This version only allow erc20 prize");
+        require(_isGameAllPrizesStandard(), "This version only allow standard prize");
     }
 
     ///
@@ -511,6 +543,8 @@ contract GameImplementation {
         if (remainingPlayersCount > 1 && !isPlitPot) return;
 
         Prize storage prize = prizes[roundId];
+        uint256 treasuryRoundAmount = 0;
+        uint256 creatorRoundAmount = 0;
 
         if (remainingPlayersCount == 1) {
             // Distribute prizes over winners
@@ -519,20 +553,28 @@ contract GameImplementation {
 
                 if (!currentPlayer.hasLost) {
                     // player is winner
-                    PrizeDetail memory prizeDetail = prize.prizeDetails[0];
+                    console.log(" player is winner");
 
-                    treasuryAmount += (prizeDetail.amount * treasuryFee) / 10000;
-                    creatorAmount += (prizeDetail.amount * creatorFee) / 10000;
-                    uint256 rewardAmount = prizeDetail.amount - treasuryAmount - creatorAmount;
+                    PrizeDetail memory prizeDetail = prize.prizeDetails[1];
+
+                    treasuryRoundAmount = (prizeDetail.amount * treasuryFee) / 10000;
+                    creatorRoundAmount = (prizeDetail.amount * creatorFee) / 10000;
+                    uint256 rewardAmount = prizeDetail.amount - treasuryRoundAmount - creatorRoundAmount;
 
                     _addWinner(1, currentPlayer.playerAddress, rewardAmount);
                 } else if (currentPlayer.position <= prize.prizesCounter) {
                     // player has won a prize
+                    console.log(
+                        "player has won a prize currentPlayer.position %s prize.prizesCounter %s",
+                        currentPlayer.position,
+                        prize.prizesCounter
+                    );
+
                     PrizeDetail memory prizeDetail = prize.prizeDetails[currentPlayer.position - 1];
 
-                    treasuryAmount += (prizeDetail.amount * treasuryFee) / 10000;
-                    creatorAmount += (prizeDetail.amount * creatorFee) / 10000;
-                    uint256 rewardAmount = prizeDetail.amount - treasuryAmount - creatorAmount;
+                    treasuryRoundAmount = (prizeDetail.amount * treasuryFee) / 10000;
+                    creatorRoundAmount = (prizeDetail.amount * creatorFee) / 10000;
+                    uint256 rewardAmount = prizeDetail.amount - treasuryRoundAmount - creatorRoundAmount;
 
                     _addWinner(currentPlayer.position, currentPlayer.playerAddress, rewardAmount);
                 }
@@ -541,38 +583,59 @@ contract GameImplementation {
 
         if (isPlitPot) {
             // Split with remaining player
+            console.log("Split with remaining player");
+
             uint256 prizepool = 0;
-            for (uint256 i = 0; i < prize.prizesCounter; i++) {
+            for (uint256 i = 1; i <= prize.prizesCounter; i++) {
                 PrizeDetail memory prizeDetail = prize.prizeDetails[i];
+
+                // console.log("PrizeDetail amount %s ", prizeDetail.amount);
                 prizepool += prizeDetail.amount;
             }
 
-            uint256 splittedPrize = prizepool / remainingPlayersCount;
+            treasuryRoundAmount = (prizepool * treasuryFee) / 10000;
+            creatorRoundAmount = (prizepool * creatorFee) / 10000;
+            uint256 rewardAmount = prizepool - treasuryRoundAmount - creatorRoundAmount;
+            uint256 splittedPrize = rewardAmount / remainingPlayersCount;
+
+            // console.log(
+            //     "prizepool %s splittedPrize %s prize.prizesCounter %s",
+            //     prizepool,
+            //     splittedPrize,
+            //     prize.prizesCounter
+            // );
 
             for (uint256 i = 0; i < numPlayers; i++) {
                 Player memory currentPlayer = players[playerAddresses[i]];
                 if (!currentPlayer.hasLost && currentPlayer.isSplitOk) {
-                    treasuryAmount += (splittedPrize * treasuryFee) / 10000;
-                    creatorAmount += (splittedPrize * creatorFee) / 10000;
-                    uint256 rewardAmount = splittedPrize - treasuryAmount - creatorAmount;
-                    _addWinner(1, currentPlayer.playerAddress, rewardAmount);
+                    console.log(
+                        "_addWinner currentPlayer.playerAddress %s splittedPrize %s",
+                        currentPlayer.playerAddress,
+                        splittedPrize
+                    );
+                    _addWinner(1, currentPlayer.playerAddress, splittedPrize);
                 }
             }
+            emit GameSplitted(roundId, remainingPlayersCount, splittedPrize);
         }
 
         if (remainingPlayersCount == 0) {
             // Creator will take everything except the first prize
-            for (uint256 i = 0; i < prize.prizesCounter; i++) {
+            console.log("Creator will take everything except the first prizer");
+            for (uint256 i = 1; i <= prize.prizesCounter; i++) {
                 PrizeDetail memory prizeDetail = prize.prizeDetails[i];
-                treasuryAmount += (prizeDetail.amount * treasuryFee) / 10000;
-                creatorAmount += (prizeDetail.amount * creatorFee) / 10000;
-                uint256 rewardAmount = prizeDetail.amount - treasuryAmount - creatorAmount;
+                treasuryRoundAmount = (prizeDetail.amount * treasuryFee) / 10000;
+                creatorRoundAmount = (prizeDetail.amount * creatorFee) / 10000;
+
+                uint256 rewardAmount = prizeDetail.amount - treasuryRoundAmount - creatorRoundAmount;
 
                 address winnerAddress = i == 0 ? owner : creator;
                 _addWinner(prizeDetail.position, winnerAddress, rewardAmount);
             }
         }
 
+        treasuryAmount += treasuryRoundAmount;
+        creatorAmount += creatorRoundAmount;
         _resetGame();
     }
 
@@ -600,40 +663,53 @@ contract GameImplementation {
         address _playerAddress,
         uint256 _amount
     ) internal {
-        Winner storage winner = winners[roundId];
+        // Winner storage winner = winners[roundId];
 
-        winner.winnerDetails[winner.winnersCounter] = WinnerDetail({
+        // console.log("_addWinner winner.winnersCounter %s", winner.winnersCounter);
+        // console.log("_addWinner winner.winnersCounter %s", winner.winnersCounter);
+        winners[roundId].winnersCounter += 1;
+
+        winners[roundId].winnerDetails[winners[roundId].winnersCounter] = WinnerDetail({
             roundId: roundId,
             position: _position,
             playerAddress: _playerAddress,
             amountWon: _amount,
             prizeClaimed: false
         });
-        winner.winnersCounter += 1;
+        // winner.winnersCounter += 1;
+        console.log("_addWinner winner.winnersCounter %s", winners[roundId].winnersCounter);
 
-        emit GameWon(roundId, _playerAddress, _amount);
+        emit GameWon(roundId, winners[roundId].winnersCounter, _playerAddress, _amount);
     }
 
     function _addPrizes(PrizeDetail[] memory prizeDetails) internal {
         uint256 prizepool = 0;
 
         Prize storage prize = prizes[roundId];
-        prize.prizesCounter = prizeDetails.length;
+        // prize.prizesCounter = prizeDetails.length;
 
+        console.log("_addPrizes prizeDetails.length %s", prizeDetails.length);
         for (uint256 i = 0; i < prizeDetails.length; i++) {
             _addPrizeDetail(prize, prizeDetails[i]);
-            if (prizeDetails[i].standard == PrizeStandard.ERC20) prizepool += prizeDetails[i].amount;
+            prizepool += prizeDetails[i].amount;
         }
 
         if (_isGamePayable()) {
-            uint256 prizepoolVerify = registrationAmount * numPlayers;
+            uint256 prizepoolVerify = registrationAmount * maxPlayers;
             require(prizepool == prizepoolVerify, "Wrong total amount to won");
         }
     }
 
     function _addPrizeDetail(Prize storage prize, PrizeDetail memory prizeDetail) internal {
         prize.prizeDetails[prizeDetail.position] = prizeDetail;
-        emit PrizeAdded(roundId, prizeDetail.position, prizeDetail.amount, prizeDetail.standard, prizeDetail.token);
+        emit PrizeAdded(
+            roundId,
+            prizeDetail.position,
+            prizeDetail.amount,
+            prizeDetail.standard,
+            prizeDetail.contractAddress,
+            prizeDetail.tokenId
+        );
         prize.prizesCounter += 1;
     }
 
@@ -641,11 +717,12 @@ contract GameImplementation {
         return registrationAmount > 0;
     }
 
-    function _isGameAllPrizesErc20() internal view returns (bool) {
+    function _isGameAllPrizesStandard() internal view returns (bool) {
         Prize storage prize = prizes[roundId];
         for (uint256 i = 0; i < prize.prizesCounter; i++) {
             PrizeDetail storage prizeDetail = prize.prizeDetails[i];
-            if (prizeDetail.standard != PrizeStandard.ERC20) return false;
+            // if (prizeDetail.standard != PrizeStandard.STANDARD) return false;
+            if (prizeDetail.standard != 0) return false;
         }
         return true;
     }
@@ -693,10 +770,8 @@ contract GameImplementation {
     function _isAllPlayersSplitOk() internal view returns (bool) {
         uint256 remainingPlayersSplitOkCounter = 0;
         uint256 remainingPlayersLength = _getRemainingPlayersCount();
-        for (uint256 i = 0; i < numPlayers; i++) {
-            Player memory currentPlayer = players[playerAddresses[i]];
-            if (currentPlayer.isSplitOk) remainingPlayersSplitOkCounter++;
-        }
+        for (uint256 i = 0; i < numPlayers; i++)
+            if (players[playerAddresses[i]].isSplitOk) remainingPlayersSplitOkCounter++;
 
         return remainingPlayersLength != 0 && remainingPlayersSplitOkCounter == remainingPlayersLength;
     }
@@ -707,9 +782,8 @@ contract GameImplementation {
      */
     function _getRemainingPlayersCount() internal view returns (uint256) {
         uint256 remainingPlayers = 0;
-        for (uint256 i = 0; i < numPlayers; i++) {
-            if (!players[playerAddresses[i]].hasLost) remainingPlayers++;
-        }
+        for (uint256 i = 0; i < numPlayers; i++) if (!players[playerAddresses[i]].hasLost) remainingPlayers++;
+
         return remainingPlayers;
     }
 
@@ -722,10 +796,10 @@ contract GameImplementation {
         view
         returns (bool, WinnerDetail memory)
     {
-        for (uint256 i = 0; i < winners[_roundId].winnersCounter; i++) {
+        for (uint256 i = 0; i < winners[_roundId].winnersCounter; i++)
             if (winners[_roundId].winnerDetails[i].playerAddress == _address)
                 return (true, winners[_roundId].winnerDetails[i]);
-        }
+
         WinnerDetail memory winnerDetail;
         return (false, winnerDetail);
     }
@@ -808,11 +882,13 @@ contract GameImplementation {
         uint256 winnersCounter = winners[_roundId].winnersCounter;
         WinnerDetail[] memory winnersPlayerData = new WinnerDetail[](winnersCounter);
 
-        for (uint256 i = 0; i < winnersCounter; i++) {
-            winnersPlayerData[i] = winners[_roundId].winnerDetails[winnersCounter];
+        for (uint256 i = 1; i <= winnersCounter; i++) {
+            winnersPlayerData[i - 1] = winners[_roundId].winnerDetails[winnersCounter];
         }
         return winnersPlayerData;
     }
+
+    // TODO create getPrizes
 
     /**
      * @notice Check if all remaining players are ok to split pot
@@ -831,11 +907,11 @@ contract GameImplementation {
     }
 
     /**
-     * @notice Check if Game prizes are full ERC20
-     * @return true if game prizes are full ERC20, false otherwise
+     * @notice Check if Game prizes are standard
+     * @return true if game prizes are standard, false otherwise
      */
-    function isGameAllPrizesErc20() external view returns (bool) {
-        return _isGameAllPrizesErc20();
+    function isGameAllPrizesStandard() external view returns (bool) {
+        return _isGameAllPrizesStandard();
     }
 
     /**
@@ -1277,7 +1353,7 @@ contract GameImplementation {
      * @notice Modifier that ensure that amount sended is registration amount
      */
     modifier onlyRegistrationAmount() {
-        require(msg.value == registrationAmount, "Only game amount is allowed");
+        require(msg.value == registrationAmount, "Only registration amount is allowed");
         _;
     }
 
@@ -1387,7 +1463,7 @@ contract GameImplementation {
      * @notice Modifier that ensure that game is splittable
      */
     modifier onlyIfGameIsSplittable() {
-        require(!_isGameAllPrizesErc20(), "Game is not splittable");
+        require(_isGameAllPrizesStandard(), "Game is not splittable");
         _;
     }
 

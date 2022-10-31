@@ -132,7 +132,8 @@ contract GameFactory is Pausable, Ownable {
         uint256 _registrationAmount,
         uint256 _treasuryFee,
         uint256 _creatorFee,
-        string memory _encodedCron
+        string memory _encodedCron,
+        GameImplementationInterface.PrizeDetail[] memory _prizeDetails
     )
         public
         payable
@@ -149,20 +150,23 @@ contract GameFactory is Pausable, Ownable {
         CronUpkeepInterface(cronUpkeep).addDelegator(newGameAddress);
 
         GameImplementationInterface.Initialization memory initialization;
-        initialization._creator = msg.sender;
-        initialization._owner = owner();
-        initialization._cronUpkeep = cronUpkeep;
-        initialization._gameName = _gameName;
-        initialization._gameImage = _gameImage;
-        initialization._gameImplementationVersion = latestGameImplementationVersionId;
-        initialization._gameId = nextGameId;
-        initialization._playTimeRange = _playTimeRange;
-        initialization._maxPlayers = _maxPlayers;
-        initialization._registrationAmount = _registrationAmount;
-        initialization._treasuryFee = _treasuryFee;
-        initialization._creatorFee = _creatorFee;
-        initialization._encodedCron = _encodedCron;
+        initialization.creator = msg.sender;
+        initialization.owner = owner();
+        initialization.cronUpkeep = cronUpkeep;
+        initialization.gameName = _gameName;
+        initialization.gameImage = _gameImage;
+        initialization.gameImplementationVersion = latestGameImplementationVersionId;
+        initialization.gameId = nextGameId;
+        initialization.playTimeRange = _playTimeRange;
+        initialization.maxPlayers = _maxPlayers;
+        initialization.registrationAmount = _registrationAmount;
+        initialization.treasuryFee = _treasuryFee;
+        initialization.creatorFee = _creatorFee;
+        initialization.encodedCron = _encodedCron;
+        initialization.prizeDetails = _prizeDetails;
 
+        // TODO add value to initialize function if receive
+        // https://ethereum.stackexchange.com/questions/6665/call-contract-and-send-value-from-solidity
         GameImplementationInterface(newGameAddress).initialize(initialization);
 
         deployedGames.push(

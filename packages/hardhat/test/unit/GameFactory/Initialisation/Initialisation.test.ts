@@ -10,19 +10,20 @@ describe('GameFactoryContract', function () {
       it('should revert with the correct reason', async function () {
         await expectRevert(
           this.gameImplementation.initialize({
-            _creator: this.bob.address,
-            _owner: this.owner.address,
-            _cronUpkeep: this.cronUpkeep.address,
-            _gameName: this.gameName,
-            _gameImage: this.gameImage,
-            _gameImplementationVersion: '0',
-            _gameId: '0',
-            _playTimeRange: this.playTimeRange,
-            _maxPlayers: this.maxPlayers,
-            _registrationAmount: this.correctRegistrationAmount,
-            _treasuryFee: this.treasuryFee,
-            _creatorFee: this.creatorFee,
-            _encodedCron: this.encodedCron,
+            creator: this.bob.address,
+            owner: this.owner.address,
+            cronUpkeep: this.cronUpkeep.address,
+            gameName: this.gameName,
+            gameImage: this.gameImage,
+            gameImplementationVersion: '0',
+            gameId: '0',
+            playTimeRange: this.playTimeRange,
+            maxPlayers: this.maxPlayers,
+            registrationAmount: this.correctRegistrationAmount,
+            treasuryFee: this.treasuryFee,
+            creatorFee: this.creatorFee,
+            encodedCron: this.encodedCron,
+            prizeDetails: this.prizeDetails,
           }),
           "The implementation contract can't be initialized"
         )
@@ -30,6 +31,12 @@ describe('GameFactoryContract', function () {
     })
     describe('when the creator tries to initialize a game already initialized', function () {
       it('should revert with the correct message', async function () {
+        const registrationAmount =
+          this.authorizedAmounts[this.authorizedAmounts.length - 1]
+
+        const updatedPrizeDetails = this.prizeDetails
+        updatedPrizeDetails[0].amount = registrationAmount.mul(this.maxPlayers)
+
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
@@ -37,10 +44,11 @@ describe('GameFactoryContract', function () {
             this.gameImage,
             this.maxPlayers,
             this.playTimeRange,
-            this.authorizedAmounts[this.authorizedAmounts.length - 1],
+            registrationAmount,
             this.treasuryFee,
             this.creatorFee,
             this.encodedCron,
+            updatedPrizeDetails,
             { value: this.gameCreationAmount }
           )
 
@@ -54,19 +62,20 @@ describe('GameFactoryContract', function () {
         )
         await expectRevert(
           clonedGameContract.initialize({
-            _creator: this.bob.address,
-            _owner: this.owner.address,
-            _cronUpkeep: this.cronUpkeep.address,
-            _gameName: this.gameName,
-            _gameImage: this.gameImage,
-            _gameImplementationVersion: '0',
-            _gameId: '0',
-            _playTimeRange: this.playTimeRange,
-            _maxPlayers: this.maxPlayers,
-            _registrationAmount: this.correctRegistrationAmount,
-            _treasuryFee: this.treasuryFee,
-            _creatorFee: this.creatorFee,
-            _encodedCron: this.encodedCron,
+            creator: this.bob.address,
+            owner: this.owner.address,
+            cronUpkeep: this.cronUpkeep.address,
+            gameName: this.gameName,
+            gameImage: this.gameImage,
+            gameImplementationVersion: '0',
+            gameId: '0',
+            playTimeRange: this.playTimeRange,
+            maxPlayers: this.maxPlayers,
+            registrationAmount: this.correctRegistrationAmount,
+            treasuryFee: this.treasuryFee,
+            creatorFee: this.creatorFee,
+            encodedCron: this.encodedCron,
+            prizeDetails: this.prizeDetails,
           }),
           'Contract already initialized'
         )
@@ -125,6 +134,12 @@ describe('GameFactoryContract', function () {
       })
       it('should revert create game with already used amount', async function () {
         const sameRegistrationAmount = this.authorizedAmounts[1]
+
+        const updatedPrizeDetails = this.prizeDetails
+        updatedPrizeDetails[0].amount = sameRegistrationAmount.mul(
+          this.maxPlayers
+        )
+
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
@@ -136,6 +151,7 @@ describe('GameFactoryContract', function () {
             this.treasuryFee,
             this.creatorFee,
             this.encodedCron,
+            updatedPrizeDetails,
             { value: this.gameCreationAmount }
           )
 
@@ -151,6 +167,7 @@ describe('GameFactoryContract', function () {
               this.treasuryFee,
               this.creatorFee,
               this.encodedCron,
+              updatedPrizeDetails,
               { value: this.gameCreationAmount }
             ),
           'registrationAmout is already used'

@@ -16,45 +16,86 @@ interface GameImplementationInterface {
         uint256 roundRangeUpperLimit;
         bool hasPlayedRound;
         uint256 roundCount;
+        uint256 position;
         bool hasLost;
         bool isSplitOk;
     }
 
     /**
-     * @notice WinnerPlayerData structure that contain all usefull data for a winner
+     * @notice WinnerDetail structure that contain all usefull data for a winner
      */
-    struct WinnerPlayerData {
+    struct WinnerDetail {
         uint256 roundId;
         address playerAddress;
         uint256 amountWon;
+        uint256 position;
         bool prizeClaimed;
     }
 
     /**
-     * @notice Winner structure that contain a list of winner for a current roundId
+     * @notice Winner structure that contain a list of winners for the current roundId
      */
     struct Winner {
-        address[] winnerAddresses;
-        mapping(address => WinnerPlayerData) winnerDetails;
+        uint256 winnersCounter;
+        mapping(uint256 => WinnerDetail) winnerDetails;
+    }
+
+    /**
+     * @notice PrizeStandard ENUM
+     */
+    enum PrizeStandard {
+        STANDARD,
+        ERC20,
+        ERC721,
+        ERC1155
+    }
+    /**
+     * @notice PrizeDetail structure that contain the prize information
+     */
+    struct PrizeDetail {
+        uint256 position;
+        uint256 amount;
+        /*
+         * This will return a single integer between 0 and 5.
+         * The numbers represent different ‘states’ a name is currently in.
+         * 0 - STANDARD
+         * 1 - ERC20
+         * 2 - ERC721
+         * 3 - ERC1155
+         */
+        uint256 standard;
+        // TODO NEXT VERSION USE ENUM
+        // PrizeStandard standard;
+        address contractAddress;
+        uint256 tokenId;
+    }
+
+    /**
+     * @notice Prize structure that contain a list of prizes for the current roundId
+     */
+    struct Prize {
+        uint256 prizesCounter;
+        mapping(uint256 => PrizeDetail) prizeDetails;
     }
 
     /**
      * @notice Initialization structure that contain all the data that are needed to create a new game
      */
     struct Initialization {
-        address _owner;
-        address _creator;
-        address _cronUpkeep;
-        string _gameName;
-        string _gameImage;
-        uint256 _gameImplementationVersion;
-        uint256 _gameId;
-        uint256 _playTimeRange;
-        uint256 _maxPlayers;
-        uint256 _registrationAmount;
-        uint256 _treasuryFee;
-        uint256 _creatorFee;
-        string _encodedCron;
+        address owner;
+        address creator;
+        address cronUpkeep;
+        string gameName;
+        string gameImage;
+        uint256 gameImplementationVersion;
+        uint256 gameId;
+        uint256 playTimeRange;
+        uint256 maxPlayers;
+        uint256 registrationAmount;
+        uint256 treasuryFee;
+        uint256 creatorFee;
+        string encodedCron;
+        PrizeDetail[] prizeDetails;
     }
 
     ///EVENTS
@@ -271,9 +312,9 @@ interface GameImplementationInterface {
     /**
      * @notice Return the winners for a round id
      * @param _roundId the round id
-     * @return list of WinnerPlayerData
+     * @return list of WinnerDetail
      */
-    function getWinners(uint256 _roundId) external view returns (WinnerPlayerData[] memory);
+    function getWinners(uint256 _roundId) external view returns (WinnerDetail[] memory);
 
     /**
      * @notice Check if all remaining players are ok to split pot
