@@ -1,12 +1,11 @@
 import { deployments, ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
-// import { ONE_DAY_IN_SECONDS } from '@/test/helpers'
 import { ONE_DAY_IN_SECONDS } from '../helpers'
 
 const AUTHORIZED_AMOUNTS = [
-  // 0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
-  0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
+  0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
+  // 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
 ]
 
 const setupTest = deployments.createFixture(
@@ -25,7 +24,6 @@ const setupTest = deployments.createFixture(
       prizes,
     }
   ) => {
-    // await deployments.fixture(['lfg'])
     await deployments.fixture()
 
     const { deploy, log } = deployments

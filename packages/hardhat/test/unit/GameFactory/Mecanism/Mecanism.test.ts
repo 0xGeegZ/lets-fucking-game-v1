@@ -1,6 +1,7 @@
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 import { expectRevert } from '@openzeppelin/test-helpers'
 import { expect } from 'chai'
+import { ethers } from 'hardhat'
 
 import { initialiseTestData } from '../../../factories/setup'
 
@@ -125,7 +126,7 @@ describe('GameFactoryContract', function () {
     })
 
     describe('when new game gets created', function () {
-      it('should create a new game with the correct data', async function () {
+      it('should create a new payable game with simple winner', async function () {
         const registrationAmount =
           this.authorizedAmounts[this.authorizedAmounts.length - 1]
 
@@ -180,6 +181,156 @@ describe('GameFactoryContract', function () {
         expect(responseRegistrationAmount).to.be.equal(registrationAmount)
         expect(responseTreasuryFee).to.be.equal(this.treasuryFee)
         expect(responseCreatorFee).to.be.equal(this.creatorFee)
+      })
+
+      it('should create a new payable game with multiple winners', async function () {
+        const registrationAmount =
+          this.authorizedAmounts[this.authorizedAmounts.length - 1]
+
+        const updatedPrizes = this.prizes
+        updatedPrizes.push(Object.assign({}, updatedPrizes[0]))
+
+        updatedPrizes[0].amount = registrationAmount.mul(this.maxPlayers * 0.8)
+        updatedPrizes[0].position = 1
+
+        updatedPrizes[1].amount = registrationAmount.mul(this.maxPlayers * 0.2)
+        updatedPrizes[1].position = 2
+
+        await this.gameFactory
+          .connect(this.bob)
+          .createNewGame(
+            this.gameName,
+            this.gameImage,
+            this.maxPlayers,
+            this.playTimeRange,
+            registrationAmount,
+            this.treasuryFee,
+            this.creatorFee,
+            this.encodedCron,
+            updatedPrizes,
+            { value: this.gameCreationAmount }
+          )
+
+        const deployedGames = await this.gameFactory
+          .connect(this.owner)
+          .getDeployedGames()
+
+        const newGame = deployedGames[deployedGames.length - 1]
+        const clonedGameContract = await this.GameImplementationContract.attach(
+          newGame.deployedAddress
+        )
+
+        const responseOwner = await clonedGameContract.owner()
+        const responseCreator = await clonedGameContract.creator()
+        const responseFactory = await clonedGameContract.factory()
+        const responseGameId = await clonedGameContract.roundId()
+        const responseGameImplementationVersion =
+          await clonedGameContract.gameImplementationVersion()
+        const responsePlayTimeRange = await clonedGameContract.playTimeRange()
+        const responseMaxPlayers = await clonedGameContract.maxPlayers()
+        const responseRegistrationAmount =
+          await clonedGameContract.registrationAmount()
+        const responseTreasuryFee = await clonedGameContract.treasuryFee()
+        const responseCreatorFee = await clonedGameContract.creatorFee()
+        const responsePrizes = await clonedGameContract.getPrizes(
+          responseGameId
+        )
+        expect(responseOwner).to.be.equal(this.owner.address)
+        expect(responseCreator).to.be.equal(this.bob.address)
+        expect(responseFactory).to.be.equal(this.gameFactory.address)
+        expect(responseGameId).to.be.equal('0')
+        expect(responseGameImplementationVersion).to.be.equal('0')
+        expect(responseGameId).to.be.equal('0')
+        expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
+        expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
+        expect(responseRegistrationAmount).to.be.equal(registrationAmount)
+        expect(responseTreasuryFee).to.be.equal(this.treasuryFee)
+        expect(responseCreatorFee).to.be.equal(this.creatorFee)
+        expect(responsePrizes.length).to.be.equal(updatedPrizes.length)
+        expect(responsePrizes[0].amount).to.be.equal(
+          registrationAmount.mul(this.maxPlayers * 0.8)
+        )
+        expect(responsePrizes[0].position).to.be.equal(1)
+        expect(responsePrizes[1].amount).to.be.equal(
+          registrationAmount.mul(this.maxPlayers * 0.2)
+        )
+        expect(responsePrizes[1].position).to.be.equal(2)
+      })
+
+      it('should create a new game with multiple winners and not payable game', async function () {
+        const registrationAmount = 0
+        const prizepool = 1
+
+        const updatedPrizes = this.prizes
+        updatedPrizes.push(Object.assign({}, updatedPrizes[0]))
+
+        updatedPrizes[0].amount = ethers.utils.parseEther(`${prizepool * 0.8}`)
+        updatedPrizes[1].amount = ethers.utils.parseEther(`${prizepool * 0.2}`)
+        updatedPrizes[1].position = 2
+
+        await this.gameFactory
+          .connect(this.bob)
+          .createNewGame(
+            this.gameName,
+            this.gameImage,
+            this.maxPlayers,
+            this.playTimeRange,
+            registrationAmount,
+            this.treasuryFee,
+            this.creatorFee,
+            this.encodedCron,
+            updatedPrizes,
+            {
+              value: this.gameCreationAmount.add(
+                ethers.utils.parseEther(`${prizepool}`)
+              ),
+            }
+          )
+
+        const deployedGames = await this.gameFactory
+          .connect(this.owner)
+          .getDeployedGames()
+
+        const newGame = deployedGames[deployedGames.length - 1]
+        const clonedGameContract = await this.GameImplementationContract.attach(
+          newGame.deployedAddress
+        )
+
+        const responseOwner = await clonedGameContract.owner()
+        const responseCreator = await clonedGameContract.creator()
+        const responseFactory = await clonedGameContract.factory()
+        const responseGameId = await clonedGameContract.roundId()
+        const responseGameImplementationVersion =
+          await clonedGameContract.gameImplementationVersion()
+        const responsePlayTimeRange = await clonedGameContract.playTimeRange()
+        const responseMaxPlayers = await clonedGameContract.maxPlayers()
+        const responseRegistrationAmount =
+          await clonedGameContract.registrationAmount()
+        const responseTreasuryFee = await clonedGameContract.treasuryFee()
+        const responseCreatorFee = await clonedGameContract.creatorFee()
+        const responsePrizes = await clonedGameContract.getPrizes(
+          responseGameId
+        )
+        expect(responseOwner).to.be.equal(this.owner.address)
+        expect(responseCreator).to.be.equal(this.bob.address)
+        expect(responseFactory).to.be.equal(this.gameFactory.address)
+        expect(responseGameId).to.be.equal('0')
+        expect(responseGameImplementationVersion).to.be.equal('0')
+        expect(responseGameId).to.be.equal('0')
+        expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
+        expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
+        expect(responseRegistrationAmount).to.be.equal(registrationAmount)
+        expect(responseTreasuryFee).to.be.equal(this.treasuryFee)
+        expect(responseCreatorFee).to.be.equal(this.creatorFee)
+        expect(responsePrizes.length).to.be.equal(updatedPrizes.length)
+        expect(responsePrizes[0].amount).to.be.equal(
+          ethers.utils.parseEther(`${prizepool * 0.8}`)
+        )
+        expect(responsePrizes[0].position).to.be.equal(1)
+        expect(responsePrizes[1].amount).to.be.equal(
+          ethers.utils.parseEther(`${prizepool * 0.2}`)
+        )
+        expect(responsePrizes[1].position).to.be.equal(2)
       })
 
       it('should add the new game in deployedGames', async function () {

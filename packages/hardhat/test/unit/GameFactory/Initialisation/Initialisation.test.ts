@@ -171,6 +171,117 @@ describe('GameFactoryContract', function () {
           'registrationAmout is already used'
         )
       })
+
+      it('should revert create payable game with not ordered prizes list', async function () {
+        const registrationAmount =
+          this.authorizedAmounts[this.authorizedAmounts.length - 1]
+
+        const updatedPrizes = this.prizes
+        updatedPrizes.push(Object.assign({}, updatedPrizes[0]))
+
+        updatedPrizes[0].amount = registrationAmount.mul(this.maxPlayers * 0.8)
+        updatedPrizes[0].position = 2
+
+        updatedPrizes[1].amount = registrationAmount.mul(this.maxPlayers * 0.2)
+        updatedPrizes[1].position = 1
+
+        await expectRevert(
+          this.gameFactory
+            .connect(this.alice)
+            .createNewGame(
+              this.gameName,
+              this.gameImage,
+              this.maxPlayers,
+              this.playTimeRange,
+              registrationAmount,
+              this.treasuryFee,
+              this.creatorFee,
+              this.encodedCron,
+              updatedPrizes,
+              { value: this.gameCreationAmount }
+            ),
+          'Prize list is not ordered'
+        )
+      })
+
+      it('should revert create payable game with prizepool amount too low', async function () {
+        const registrationAmount =
+          this.authorizedAmounts[this.authorizedAmounts.length - 1]
+
+        const updatedPrizes = this.prizes
+        updatedPrizes[0].amount = registrationAmount.mul(this.maxPlayers * 0.8)
+
+        await expectRevert(
+          this.gameFactory
+            .connect(this.alice)
+            .createNewGame(
+              this.gameName,
+              this.gameImage,
+              this.maxPlayers,
+              this.playTimeRange,
+              registrationAmount,
+              this.treasuryFee,
+              this.creatorFee,
+              this.encodedCron,
+              updatedPrizes,
+              { value: this.gameCreationAmount }
+            ),
+          'Wrong total amount to won'
+        )
+      })
+
+      it('should revert create payable game with prizepool amount too high', async function () {
+        const registrationAmount =
+          this.authorizedAmounts[this.authorizedAmounts.length - 1]
+
+        const updatedPrizes = this.prizes
+        updatedPrizes[0].amount = registrationAmount.mul(this.maxPlayers * 2)
+
+        await expectRevert(
+          this.gameFactory
+            .connect(this.alice)
+            .createNewGame(
+              this.gameName,
+              this.gameImage,
+              this.maxPlayers,
+              this.playTimeRange,
+              registrationAmount,
+              this.treasuryFee,
+              this.creatorFee,
+              this.encodedCron,
+              updatedPrizes,
+              { value: this.gameCreationAmount }
+            ),
+          'Wrong total amount to won'
+        )
+      })
+
+      it('should revert create a not payable game without initial prizepool amount sent', async function () {
+        const registrationAmount = 0
+        const prizepool = ethers.utils.parseEther('1')
+
+        const updatedPrizes = this.prizes
+        updatedPrizes[0].amount = prizepool
+        updatedPrizes[0].position = 1
+
+        await expectRevert(
+          this.gameFactory
+            .connect(this.alice)
+            .createNewGame(
+              this.gameName,
+              this.gameImage,
+              this.maxPlayers,
+              this.playTimeRange,
+              registrationAmount,
+              this.treasuryFee,
+              this.creatorFee,
+              this.encodedCron,
+              updatedPrizes,
+              { value: this.gameCreationAmount }
+            ),
+          'Need to send prizepool amount'
+        )
+      })
     })
   })
 })

@@ -113,13 +113,19 @@ describe('GameImplementationContract - Mecanism', function () {
     describe('User can register to the game', function () {
       context('when one user registers to the game', async function () {
         it('should increase the number of registered players', async function () {
-          const initialNumberOfPlayers = await this.deployedGame.numPlayers()
+          const initialNumberOfPlayers = (
+            await this.deployedGame.getPlayerAddresses()
+          ).length
+
           await registerPlayer({
             player: this.players[0],
             contract: this.deployedGame,
             value: this.correctRegistrationAmount,
           })
-          const updatedNumberOfPlayers = await this.deployedGame.numPlayers()
+          const updatedNumberOfPlayers = (
+            await this.deployedGame.getPlayerAddresses()
+          ).length
+
           expect(updatedNumberOfPlayers).to.equal(initialNumberOfPlayers + 1)
         })
 
@@ -175,9 +181,10 @@ describe('GameImplementationContract - Mecanism', function () {
                 value: this.correctRegistrationAmount,
               })
             }
-            const numPlayers = await this.deployedGame.numPlayers()
+            const numPlayers = (await this.deployedGame.getPlayerAddresses())
+              .length
             const playerAddresses = await this.deployedGame.getPlayerAddresses()
-            expect(numPlayers.toNumber()).to.equal(10) // No risk of using toNumber() here
+            expect(numPlayers).to.equal(10) // No risk of using toNumber() here
             expect(playerAddresses.length).to.equal(10)
           })
         }
@@ -686,9 +693,9 @@ describe('GameImplementationContract - Mecanism', function () {
 
         await expect(
           this.deployedGame.connect(this.players[playerIndex]).playRound()
-        ).to.emit(this.deployedGame, 'GameLost')
-        // Add params  event GameLost(uint256 roundId, address playerAddress, uint256 roundCount);
-        // .withArgs('0', this.players[playerIndex].address)
+        )
+          .to.emit(this.deployedGame, 'GameLost')
+          .withArgs('0', this.players[playerIndex].address, anyValue)
       })
     })
 
@@ -858,13 +865,12 @@ describe('GameImplementationContract - Mecanism', function () {
           amount: this.correctRegistrationAmount,
           mockKeeper: this.mockKeeper,
         })
-        const updatedPlayersAmount = await this.deployedGame.numPlayers()
         const updatedPlayerAddressesList =
           await this.deployedGame.getPlayerAddresses()
 
         const updatedGameId = await this.deployedGame.roundId()
 
-        expect(updatedPlayersAmount).to.equal(0)
+        expect(updatedPlayerAddressesList.length).to.equal(0)
         for (let i = 0; i < updatedPlayerAddressesList.length; i++) {
           expect(updatedPlayerAddressesList[i]).to.equal(
             '0x0000000000000000000000000000000000000000'

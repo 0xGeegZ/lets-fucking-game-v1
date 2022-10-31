@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
+import "hardhat/console.sol";
+
 contract GameImplementation {
     using Address for address;
 
@@ -42,8 +44,6 @@ contract GameImplementation {
     uint256 public playTimeRange; // time length of a round in hours
 
     uint256 public maxPlayers;
-    // TODO GUIGUI LAST remove numPlayers to replace it by players.length ??
-    uint256 public numPlayers;
 
     bool public gameInProgress; // helps the keeper determine if a game has started or if we need to start it
     bool public contractPaused;
@@ -242,7 +242,7 @@ contract GameImplementation {
         external
         payable
         onlyIfNotBase
-        // TODO Only Factory ?
+        // TODO GUIGUI Only Factory ?
         onlyIfNotAlreadyInitialized
         onlyAllowedNumberOfPlayers(_initialization.maxPlayers)
         onlyAllowedPlayTimeRange(_initialization.playTimeRange)
@@ -326,7 +326,6 @@ contract GameImplementation {
         onlyRegistrationAmount
         onlyNotCreator
     {
-        numPlayers++;
         players[msg.sender] = Player({
             playerAddress: msg.sender,
             roundCount: 0,
@@ -339,7 +338,7 @@ contract GameImplementation {
         });
         playerAddresses.push(msg.sender);
 
-        emit RegisteredForGame(players[msg.sender].playerAddress, numPlayers);
+        emit RegisteredForGame(players[msg.sender].playerAddress, playerAddresses.length);
     }
 
     /**
@@ -379,7 +378,7 @@ contract GameImplementation {
         if (gameInProgress == true) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
-        } else if (numPlayers == maxPlayers) _startGame();
+        } else if (playerAddresses.length == maxPlayers) _startGame();
     }
 
     /**
@@ -445,9 +444,9 @@ contract GameImplementation {
      * @notice Start the game(called when all conditions are ok)
      */
     function _startGame() internal {
-        for (uint256 i = 0; i < numPlayers; i++) _resetRoundRange(players[playerAddresses[i]]);
+        for (uint256 i = 0; i < playerAddresses.length; i++) _resetRoundRange(players[playerAddresses[i]]);
         gameInProgress = true;
-        emit StartedGame(block.timestamp, numPlayers);
+        emit StartedGame(block.timestamp, playerAddresses.length);
     }
 
     /**
@@ -455,11 +454,10 @@ contract GameImplementation {
      */
     function _resetGame() internal {
         gameInProgress = false;
-        for (uint256 i = 0; i < numPlayers; i++) {
+        for (uint256 i = 0; i < playerAddresses.length; i++) {
             delete players[playerAddresses[i]];
             delete playerAddresses[i];
         }
-        numPlayers = 0;
 
         emit ResetGame(block.timestamp, roundId);
         roundId += 1;
@@ -503,7 +501,7 @@ contract GameImplementation {
 
         if (remainingPlayersCount == 1)
             // Distribute prizes over winners
-            for (uint256 i = 0; i < numPlayers; i++) {
+            for (uint256 i = 0; i < playerAddresses.length; i++) {
                 Player memory currentPlayer = players[playerAddresses[i]];
 
                 if (!currentPlayer.hasLost) {
@@ -533,7 +531,7 @@ contract GameImplementation {
             uint256 rewardAmount = prizepool - treasuryRoundAmount - creatorRoundAmount;
             uint256 splittedPrize = rewardAmount / remainingPlayersCount;
 
-            for (uint256 i = 0; i < numPlayers; i++) {
+            for (uint256 i = 0; i < playerAddresses.length; i++) {
                 Player memory currentPlayer = players[playerAddresses[i]];
                 if (!currentPlayer.hasLost && currentPlayer.isSplitOk)
                     _addWinner(1, currentPlayer.playerAddress, splittedPrize);
@@ -565,7 +563,7 @@ contract GameImplementation {
         // If everyone is ok to split, we wait
         if (_isAllPlayersSplitOk()) return;
 
-        for (uint256 i = 0; i < numPlayers; i++) {
+        for (uint256 i = 0; i < playerAddresses.length; i++) {
             Player storage player = players[playerAddresses[i]];
             // Refresh player status to having lost if player has not played
             if (player.hasPlayedRound == false && player.hasLost == false) _setPlayerAsHavingLost(player);
@@ -603,6 +601,8 @@ contract GameImplementation {
 
         uint256 prizepool = 0;
         for (uint256 i = 0; i < _prizes.length; i++) prizepool += _prizes[i].amount;
+
+        console.log("_checkIfPrizeAmountIfNeeded prizepool %s msg.value %s", prizepool, msg.value);
 
         require(msg.value == prizepool, "Need to send prizepool amount");
     }
@@ -684,7 +684,7 @@ contract GameImplementation {
     function _isAllPlayersSplitOk() internal view returns (bool) {
         uint256 remainingPlayersSplitOkCounter = 0;
         uint256 remainingPlayersLength = _getRemainingPlayersCount();
-        for (uint256 i = 0; i < numPlayers; i++)
+        for (uint256 i = 0; i < playerAddresses.length; i++)
             if (players[playerAddresses[i]].isSplitOk) remainingPlayersSplitOkCounter++;
 
         return remainingPlayersLength != 0 && remainingPlayersSplitOkCounter == remainingPlayersLength;
@@ -696,7 +696,8 @@ contract GameImplementation {
      */
     function _getRemainingPlayersCount() internal view returns (uint256) {
         uint256 remainingPlayers = 0;
-        for (uint256 i = 0; i < numPlayers; i++) if (!players[playerAddresses[i]].hasLost) remainingPlayers++;
+        for (uint256 i = 0; i < playerAddresses.length; i++)
+            if (!players[playerAddresses[i]].hasLost) remainingPlayers++;
 
         return remainingPlayers;
     }
@@ -742,7 +743,7 @@ contract GameImplementation {
             roundId,
             gameName,
             gameImage,
-            numPlayers,
+            playerAddresses.length,
             maxPlayers,
             registrationAmount,
             playTimeRange,
@@ -1003,7 +1004,7 @@ contract GameImplementation {
         );
 
         // Reset round limits and round status for each remaining user
-        for (uint256 i = 0; i < numPlayers; i++) {
+        for (uint256 i = 0; i < playerAddresses.length; i++) {
             Player storage player = players[playerAddresses[i]];
             if (player.hasLost == false) {
                 _resetRoundRange(player);
@@ -1162,7 +1163,7 @@ contract GameImplementation {
      * @notice Modifier that ensure that game is not full
      */
     modifier onlyIfNotFull() {
-        require(numPlayers < maxPlayers, "This game is full");
+        require(playerAddresses.length < maxPlayers, "This game is full");
         _;
     }
 
@@ -1170,7 +1171,7 @@ contract GameImplementation {
      * @notice Modifier that ensure that game is full
      */
     modifier onlyIfFull() {
-        require(numPlayers == maxPlayers, "This game is not full");
+        require(playerAddresses.length == maxPlayers, "This game is not full");
         _;
     }
 
