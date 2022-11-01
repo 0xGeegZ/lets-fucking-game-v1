@@ -25,7 +25,7 @@
     "test:coverage": "yarn chain:stop && (ganache-cli &) && hardhat coverage",
     "build": "bin/build.sh",
     "analyze:static": "docker run -v \"$(pwd):/labs\" analyze:latest slither",
-    "analyze:security": "docker run -v \"$(pwd):/labs\" analyze:latest myth analyze --solc-json mythril.config.json",
+    "analyze:security": "docker run -v \"$(pwd):/labs\" analyze:latest myth analyze --solv 0.8.6 --solc-json mythril.config.json",
     "analyze:all": "bin/analyze.sh",
     "generate:flatten": "docker run -v \"$(pwd):/labs\" analyze:latest slither-flat --solc-args '--base-path node_modules' --dir soldata/flatten/",
     "generate:abi": "docker run -v $(pwd):/labs analyze:latest solc --abi --base-path /labs/node_modules --allow-paths . ./=../ -o soldata/abi/ --overwrite",

@@ -35,19 +35,12 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: process.env.SOLC_VERSION || '0.8.9',
-      },
-      {
-        version: '0.8.7',
-      },
-      {
-        version: '0.8.6',
+        version: process.env.SOLC_VERSION || '0.8.6',
       },
       {
         version: '0.4.24',
       },
     ],
-    // version: process.env.SOLC_VERSION || '0.8.6',
     settings: {
       optimizer: {
         enabled:
