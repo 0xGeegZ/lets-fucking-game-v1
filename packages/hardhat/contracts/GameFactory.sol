@@ -391,7 +391,6 @@ contract GameFactory is Pausable, Ownable {
     /**
      * @notice Modifier that ensure that amount sended is game creation amount
      */
-    // TODO cover in test
     modifier onlyGameCreationAmount() {
         require(msg.sender == owner() || msg.value >= gameCreationAmount, "Only game creation amount is allowed");
         _;
