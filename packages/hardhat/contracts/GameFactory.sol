@@ -135,7 +135,7 @@ contract GameFactory is Pausable, Ownable {
         string memory _encodedCron,
         GameImplementationInterface.Prize[] memory _prizes
     )
-        public
+        external
         payable
         whenNotPaused
         onlyGameCreationAmount
@@ -250,7 +250,7 @@ contract GameFactory is Pausable, Ownable {
      * @param _gameImplementation the new game implementation address
      * @dev Callable by admin
      */
-    function setNewGameImplementation(address _gameImplementation) public onlyAdmin {
+    function setNewGameImplementation(address _gameImplementation) external onlyAdmin {
         latestGameImplementationVersionId += 1;
         gameImplementations.push(
             GameImplementationVersion({ id: latestGameImplementationVersionId, deployedAddress: _gameImplementation })
@@ -262,7 +262,7 @@ contract GameFactory is Pausable, Ownable {
      * @param _authorizedAmounts the list of authorized amounts to add
      * @dev Callable by admin
      */
-    function addAuthorizedAmounts(uint256[] memory _authorizedAmounts) public onlyAdmin {
+    function addAuthorizedAmounts(uint256[] memory _authorizedAmounts) external onlyAdmin {
         for (uint256 i = 0; i < _authorizedAmounts.length; i++) {
             if (!_isExistAuthorizedAmounts(_authorizedAmounts[i])) {
                 authorizedAmounts.push(_authorizedAmounts[i]);
@@ -279,7 +279,7 @@ contract GameFactory is Pausable, Ownable {
      * @param _cronUpkeep the new keeper address
      * @dev Callable by admin
      */
-    function updateCronUpkeep(address _cronUpkeep) public onlyAdmin onlyAddressInit(_cronUpkeep) {
+    function updateCronUpkeep(address _cronUpkeep) external onlyAdmin onlyAddressInit(_cronUpkeep) {
         cronUpkeep = _cronUpkeep;
 
         for (uint256 i = 0; i < deployedGames.length; i++) {
@@ -293,9 +293,9 @@ contract GameFactory is Pausable, Ownable {
      * @notice Pause the factory and all games and associated keeper job
      * @dev Callable by admin
      */
-    function pauseAllGamesAndFactory() public onlyAdmin {
+    function pauseAllGamesAndFactory() external onlyAdmin whenNotPaused {
         // pause first to ensure no more interaction with contract
-        pause();
+        _pause();
         for (uint256 i = 0; i < deployedGames.length; i++) {
             Game memory game = deployedGames[i];
             GameImplementationInterface(payable(game.deployedAddress)).pause();
@@ -306,26 +306,26 @@ contract GameFactory is Pausable, Ownable {
      * @notice Resume the factory and all games and associated keeper job
      * @dev Callable by admin
      */
-    function ResumeAllGamesAndFactory() public onlyAdmin {
+    function resumeAllGamesAndFactory() external onlyAdmin whenPaused {
         for (uint256 i = 0; i < deployedGames.length; i++) {
             Game memory game = deployedGames[i];
             GameImplementationInterface(payable(game.deployedAddress)).unpause();
         }
         // unpause last to ensure that everything is ok
-        unpause();
+        _unpause();
     }
 
     /**
      * @notice Pause the factory
      */
-    function pause() public onlyAdmin whenNotPaused {
+    function pause() external onlyAdmin whenNotPaused {
         _pause();
     }
 
     /**
      * @notice Unpause the factory
      */
-    function unpause() public onlyAdmin whenPaused {
+    function unpause() external onlyAdmin whenPaused {
         _unpause();
     }
 
@@ -338,7 +338,7 @@ contract GameFactory is Pausable, Ownable {
      * @param _adminAddress the new admin address
      * @dev Callable by admin
      */
-    function transferAdminOwnership(address _adminAddress) public onlyAdmin onlyAddressInit(_adminAddress) {
+    function transferAdminOwnership(address _adminAddress) external onlyAdmin onlyAddressInit(_adminAddress) {
         transferOwnership(_adminAddress);
     }
 
@@ -346,7 +346,7 @@ contract GameFactory is Pausable, Ownable {
      * @notice Allow admin to withdraw all funds of smart contract
      * @dev Callable by admin
      */
-    function withdrawFunds() public onlyAdmin {
+    function withdrawFunds() external onlyAdmin {
         _safeTransfert(owner(), address(this).balance);
     }
 
@@ -414,7 +414,10 @@ contract GameFactory is Pausable, Ownable {
      * @param _registrationAmount authorized amount
      */
     modifier onlyIfNotUsedRegistrationAmounts(uint256 _registrationAmount) {
-        require(usedAuthorizedAmounts[_registrationAmount].isUsed == false, "registrationAmout is already used");
+        require(
+            _registrationAmount == 0 || usedAuthorizedAmounts[_registrationAmount].isUsed == false,
+            "registrationAmout is already used"
+        );
         _;
     }
 

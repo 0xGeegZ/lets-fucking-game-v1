@@ -22,6 +22,10 @@ const setupTest = deployments.createFixture(
       creatorFee,
       encodedCron,
       prizes,
+      freeGameCreationAmount,
+      freeGameRegistrationAmount,
+      freeGamePrizepoolAmount,
+      freeGamePrizes,
     }
   ) => {
     await deployments.fixture()
@@ -112,6 +116,7 @@ const setupTest = deployments.createFixture(
       deployer
     )
 
+    // Create a payable game
     await gameFactory.createNewGame(
       gameName,
       gameImage,
@@ -124,11 +129,34 @@ const setupTest = deployments.createFixture(
       prizes,
       { value: gameCreationAmount }
     )
+    const payableGame = await gameFactory.deployedGames('0')
 
-    const game = await gameFactory.deployedGames('0')
+    const deployedPayableGame = new ethers.Contract(
+      payableGame.deployedAddress,
+      gameImplementationInterface.interface,
+      deployer
+    )
 
-    const deployedGame = new ethers.Contract(
-      game.deployedAddress,
+    // Create a free game
+    await gameFactory.createNewGame(
+      gameName,
+      gameImage,
+      maxPlayers,
+      playTimeRange,
+      freeGameRegistrationAmount,
+      treasuryFee,
+      creatorFee,
+      encodedCron,
+      freeGamePrizes,
+      {
+        value: freeGameCreationAmount.add(freeGamePrizepoolAmount),
+      }
+    )
+
+    const freeGame = await gameFactory.deployedGames('1')
+
+    const deployedFreeGame = new ethers.Contract(
+      freeGame.deployedAddress,
       gameImplementationInterface.interface,
       deployer
     )
@@ -149,7 +177,8 @@ const setupTest = deployments.createFixture(
       gameImplementation,
       cronUpkeep,
       secondGameImplementation,
-      deployedGame,
+      deployedPayableGame,
+      deployedFreeGame,
     }
   }
 )
@@ -180,6 +209,9 @@ const initialiseTestData = async function () {
   this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
   this.zeroRegistrationAmount = ethers.utils.parseEther('0')
 
+  this.freeGamePrizepool = 1
+  this.freeGamePrizepoolAmount = ethers.utils.parseEther('1')
+
   this.gameCreationAmount = ethers.utils.parseEther('0.1')
   this.treasuryFee = 500 // 5%
   this.creatorFee = 500 // 5%
@@ -209,14 +241,26 @@ const initialiseTestData = async function () {
   this.prizes = [
     {
       position: '1',
-      // amount: ethers.utils.parseEther(`${0.0001 * 10}`),
       amount: this.correctRegistrationAmount.mul(this.maxPlayers),
-      // standard: 'STANDARD', //PrizeStandard
       standard: '0',
       contractAddress: '0x0000000000000000000000000000000000000000',
       tokenId: '1',
     },
   ]
+
+  const updatedPrizes = []
+  updatedPrizes.push({ ...this.prizes[0] })
+  updatedPrizes.push({ ...this.prizes[0] })
+
+  updatedPrizes[0].amount = ethers.utils.parseEther(
+    `${this.freeGamePrizepool * 0.8}`
+  )
+  updatedPrizes[1].amount = ethers.utils.parseEther(
+    `${this.freeGamePrizepool * 0.2}`
+  )
+  updatedPrizes[1].position = 2
+
+  this.freeGamePrizes = updatedPrizes
 
   const {
     deployer,
@@ -227,7 +271,8 @@ const initialiseTestData = async function () {
     gameImplementation,
     cronUpkeep,
     secondGameImplementation,
-    deployedGame,
+    deployedPayableGame,
+    deployedFreeGame,
   } = await setupTest({
     gameName: this.gameName,
     gameImage: this.gameImage,
@@ -239,6 +284,10 @@ const initialiseTestData = async function () {
     creatorFee: this.creatorFee,
     encodedCron: this.encodedCron,
     prizes: this.prizes,
+    freeGameCreationAmount: this.gameCreationAmount,
+    freeGameRegistrationAmount: this.zeroRegistrationAmount,
+    freeGamePrizepoolAmount: this.freeGamePrizepoolAmount,
+    freeGamePrizes: this.freeGamePrizes,
   })
 
   this.owner = deployer
@@ -251,7 +300,8 @@ const initialiseTestData = async function () {
   this.gameFactory = gameFactory
   this.gameImplementation = gameImplementation
   this.secondGameImplementation = secondGameImplementation
-  this.deployedGame = deployedGame
+  this.deployedPayableGame = deployedPayableGame
+  this.deployedFreeGame = deployedFreeGame
 }
 
 module.exports = {

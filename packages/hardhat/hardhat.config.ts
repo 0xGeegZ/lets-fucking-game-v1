@@ -6,7 +6,6 @@ import '@nomicfoundation/hardhat-toolbox'
 // import '@typechain/hardhat'
 // TODO add hardhat upgrades https://docs.openzeppelin.com/upgrades-plugins/1.x/hardhat-upgrades
 import 'hardhat-contract-sizer'
-// import '@nomiclabs/hardhat-ganache'
 import 'hardhat-deploy'
 import 'hardhat-docgen'
 import 'hardhat-tracer'

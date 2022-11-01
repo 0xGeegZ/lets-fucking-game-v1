@@ -235,12 +235,12 @@ contract GameImplementation {
      *  @param _initialization.encodedCron the cron string
      *  @param _initialization.prizes the cron string
      * @dev TODO NEXT VERSION Remove _isGameAllPrizesStandard limitation to include other prize typ
+     * @dev TODO NEXT VERSION Make it only accessible to factory
      */
     function initialize(Initialization calldata _initialization)
         external
         payable
         onlyIfNotBase
-        // TODO GUIGUI Only Factory ?
         onlyIfNotAlreadyInitialized
         onlyAllowedNumberOfPlayers(_initialization.maxPlayers)
         onlyAllowedPlayTimeRange(_initialization.playTimeRange)
@@ -417,7 +417,7 @@ contract GameImplementation {
     /**
      * @notice Prizes adding management
      * @dev Callable by admin or creator
-     * @dev TODO NEXT VERSION add a taxe for creator in case of not payable games
+     * @dev TODO NEXT VERSION add a taxe for creator in case of free games
      *      Need to store the factory gameCreationAmount in this contract on initialisation
      * @dev TODO NEXT VERSION Remove _isGameAllPrizesStandard limitation to include other prize typ
      */
@@ -708,6 +708,33 @@ contract GameImplementation {
         CronUpkeepInterface(cronUpkeep).deleteCronJob(cronUpkeepJobId);
     }
 
+    /**
+     * @notice Unpause the current game and associated keeper job
+     * @dev Callable by admin or creator
+     */
+    function _unpause() internal onlyPaused {
+        uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
+        cronUpkeepJobId = nextCronJobIDs;
+
+        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
+            address(this),
+            bytes("triggerDailyCheckpoint()"),
+            encodedCron
+        );
+
+        // Reset round limits and round status for each remaining user
+        for (uint256 i = 0; i < playerAddresses.length; i++) {
+            Player storage player = players[playerAddresses[i]];
+            if (player.hasLost == false) {
+                _resetRoundRange(player);
+                player.hasPlayedRound = false;
+            }
+        }
+
+        // Unpause last to ensure that everything is ok
+        contractPaused = false;
+    }
+
     ///
     /// GETTERS FUNCTIONS
     ///
@@ -911,7 +938,7 @@ contract GameImplementation {
      */
     function claimTreasuryFeeToFactory()
         external
-        onlyFactory
+        onlyAdminOrFactory
         onlyIfClaimableAmount(treasuryAmount)
         onlyIfEnoughtBalance(treasuryAmount)
     {
@@ -980,7 +1007,7 @@ contract GameImplementation {
      * @notice Pause the current game and associated keeper job
      * @dev Callable by admin or creator
      */
-    function pause() external onlyAdminOrCreator onlyNotPaused {
+    function pause() external onlyAdminOrCreatorOrFactory onlyNotPaused {
         _pause();
     }
 
@@ -988,27 +1015,8 @@ contract GameImplementation {
      * @notice Unpause the current game and associated keeper job
      * @dev Callable by admin or creator
      */
-    function unpause() external onlyAdminOrCreator onlyPaused onlyIfKeeperDataInit onlyIfPrizesIsNotEmpty {
-        uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
-        cronUpkeepJobId = nextCronJobIDs;
-
-        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
-            address(this),
-            bytes("triggerDailyCheckpoint()"),
-            encodedCron
-        );
-
-        // Reset round limits and round status for each remaining user
-        for (uint256 i = 0; i < playerAddresses.length; i++) {
-            Player storage player = players[playerAddresses[i]];
-            if (player.hasLost == false) {
-                _resetRoundRange(player);
-                player.hasPlayedRound = false;
-            }
-        }
-
-        // Unpause last to ensure that everything is ok
-        contractPaused = false;
+    function unpause() external onlyAdminOrCreatorOrFactory onlyPaused onlyIfKeeperDataInit onlyIfPrizesIsNotEmpty {
+        _unpause();
     }
 
     ///
@@ -1038,7 +1046,7 @@ contract GameImplementation {
      * @param _factory the new factory address
      * @dev Callable by factory
      */
-    function transferFactoryOwnership(address _factory) external onlyFactory onlyAddressInit(_factory) {
+    function transferFactoryOwnership(address _factory) external onlyAdminOrFactory onlyAddressInit(_factory) {
         factory = _factory;
     }
 
@@ -1110,6 +1118,17 @@ contract GameImplementation {
      */
     modifier onlyAdminOrCreator() {
         require(msg.sender == creator || msg.sender == owner, "Caller is not the admin or creator");
+        _;
+    }
+
+    /**
+     * @notice Modifier that ensure only admin or creator or factory can access this function
+     */
+    modifier onlyAdminOrCreatorOrFactory() {
+        require(
+            msg.sender == creator || msg.sender == owner || msg.sender == factory,
+            "Caller is not the admin or creator or factory"
+        );
         _;
     }
 
