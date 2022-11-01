@@ -1,5 +1,5 @@
-import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction } from 'hardhat-deploy/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -23,7 +23,7 @@ const func: DeployFunction = async function ({
 
     if (multicallAddress) {
       log(
-        `Contract Multicall deployed at ${multicallNewlyDeployed} using ${multicallGasUsed} gas`
+        `✅ Contract Multicall deployed at ${multicallNewlyDeployed} using ${multicallGasUsed} gas`
       )
     }
   }

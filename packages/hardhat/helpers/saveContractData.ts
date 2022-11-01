@@ -1,10 +1,9 @@
 import fs from 'fs'
 
 const contractsDir = __dirname + '/../build'
-const filePath = contractsDir + '/deployedContracts.json'
+const filePath = contractsDir + '/internal.json'
 
 const saveContract = ({ contractName, chainId, contractData }) => {
-  // const contractName = Object.keys(contractData[chainId])[0];
   const rawdata = fs.readFileSync(filePath)
   const deployedContracts = JSON.parse(rawdata)
 
@@ -58,7 +57,7 @@ const saveContractData = (contractData) => {
       fs.writeFileSync(filePath, JSON.stringify({}))
     }
   } catch (error) {
-    console.lerrorog('Error during file creation : ', error)
+    console.error('Error during file creation : ', error)
     return
   }
 

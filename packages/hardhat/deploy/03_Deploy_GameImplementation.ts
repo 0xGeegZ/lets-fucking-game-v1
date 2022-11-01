@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -32,7 +32,7 @@ const func: DeployFunction = async function ({
 
   if (gameImplementationNewlyDeployed) {
     log(
-      `Contract GameImplementation deployed at ${gameImplementationAddress} using ${gameImplementationGasUsed} gas`
+      `✅ Contract GameImplementation deployed at ${gameImplementationAddress} using ${gameImplementationGasUsed} gas`
     )
   }
 

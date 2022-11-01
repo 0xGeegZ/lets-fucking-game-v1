@@ -17,7 +17,7 @@
     "size": "hardhat size-contracts",
     "prepend-spdx": "hardhat prepend-spdx-license",
     "deploy": "bin/deploy.sh",
-    "deploy:all": "npx hardhat deploy --network hardhat --tags all --export-all ../dapp/contracts/hardhat_contracts.json",
+    "deploy:all": "npx hardhat deploy --network hardhat --tags all",
     "verify": "hardhat verify --network",
     "test": "hardhat test",
     "test:trace": "hardhat test --trace",
