@@ -9,7 +9,7 @@
     "export": "yarn workspace lets-fucking-game-dapp export",
     "start": "yarn workspace lets-fucking-game-dapp start",
     "chain": "yarn workspace lets-fucking-game-hardhat chain",
-    "deploy": "yarn workspace lets-fucking-game-hardhat deploy",
+    "deploy": "yarn workspace lets-fucking-game-hardhat deploy:all",
     "compile": "yarn workspace lets-fucking-game-hardhat compile",
     "test:contracts": "yarn workspace lets-fucking-game-hardhat test",
     "test:dapp": "yarn workspace lets-fucking-game-dapp test",
