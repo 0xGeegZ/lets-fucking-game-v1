@@ -1,5 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# TODO Reactivate after test
-# yarn run hook:pre-push
+yarn run hook:pre-push
