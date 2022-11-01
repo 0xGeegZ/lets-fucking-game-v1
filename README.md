@@ -144,12 +144,11 @@ To make setting environment variables easier there are `.env.example` files in t
 
 #### Hardhat
 
-| Name                | Description                                                                                                                                                                                                                 |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NETWORK_RPC_URL`   | Required to deploy to public networks. Obtain from [Infura's site](https://infura.io).                                                                                                                                      |
-| `MNEMONIC`          | Used to derive accounts from wallet seed phrase, ie Metamask. The first account must have enough ETH to deploy the contracts, as well as LINK which can be obtained from [Chainlink's faucets](https://faucets.chain.link). |
-| `PRIVATE_KEY`       | Alternative to using mnemonic. Some changes are required in `hardhat.config.js`                                                                                                                                             |
-| `ETHERSCAN_API_KEY` | Verify contract code on Etherscan.                                                                                                                                                                                          |
+| Name                          | Description                                                                                                                                                                                                                        |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NETWORK_RPC_URL`             | One key by RCP network (see env.example). Required to deploy to public networks. Obtain from [Infura's site](https://infura.io).                                                                                                   |
+| `DEPLOYER_WALLET_PRIVATE_KEY` | The private key of the account which will send the deployment transaction. The account must have enough ETH to deploy the contracts, as well as LINK which can be obtained from [Chainlink's faucets](https://faucets.chain.link). |
+| `ETHERSCAN_API_KEY`           | Your Etherscan API key to verify contract code on Etherscan.                                                                                                                                                                       |
 
 #### Front-end
 
