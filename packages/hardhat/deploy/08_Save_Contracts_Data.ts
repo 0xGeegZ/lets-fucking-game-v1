@@ -69,7 +69,7 @@ const func: DeployFunction = async function ({
   log('✅ Contracts data was copied to the dapp')
 }
 
-func.tags = ['all', 'lfg']
+func.tags = ['all', 'dev', 'lfg']
 module.exports.dependencies = [
   'game-factory',
   'game-implementation',

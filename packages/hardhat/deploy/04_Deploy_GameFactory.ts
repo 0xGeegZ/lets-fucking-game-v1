@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -34,7 +34,6 @@ const func: DeployFunction = async function ({
 
   const AUTHORIZED_AMOUNTS = [
     0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
-    // 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
   ]
   const authorizedAmounts = AUTHORIZED_AMOUNTS.map((amount) =>
     ethers.utils.parseEther(`${amount}`)
@@ -75,7 +74,7 @@ const func: DeployFunction = async function ({
   cronUpkeep.addDelegator(gameFactoryAddress)
 }
 
-func.tags = ['all', 'lfg', 'main', 'game-factory']
+func.tags = ['all', 'lfg', 'main', 'game-factory', 'test']
 module.exports.dependencies = ['game-implementation', 'keeper']
 
 export default func

@@ -5,30 +5,15 @@ import { ONE_DAY_IN_SECONDS } from '../helpers'
 
 const AUTHORIZED_AMOUNTS = [
   0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
-  // 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
 ]
 
 const setupTest = deployments.createFixture(
-  async (
-    { deployments, getNamedAccounts, ethers }: HardhatRuntimeEnvironment,
-    {
-      gameName,
-      gameImage,
-      maxPlayers,
-      playTimeRange,
-      correctRegistrationAmount,
-      gameCreationAmount,
-      treasuryFee,
-      creatorFee,
-      encodedCron,
-      prizes,
-      freeGameCreationAmount,
-      freeGameRegistrationAmount,
-      freeGamePrizepoolAmount,
-      freeGamePrizes,
-    }
-  ) => {
-    await deployments.fixture()
+  async ({
+    deployments,
+    getNamedAccounts,
+    ethers,
+  }: HardhatRuntimeEnvironment) => {
+    await deployments.fixture('test')
 
     const { deploy, log } = deployments
     const { deployer: deployerAddress } = await getNamedAccounts()
@@ -70,9 +55,7 @@ const setupTest = deployments.createFixture(
       'GameImplementation',
       libraries
     )
-    const cronUpkeepDelegateContract = await deployments.get(
-      'CronUpkeepDelegate'
-    )
+
     const cronUpkeepContract = await deployments.get('CronUpkeep', libraries)
 
     const secondGameImplementationContract = await deploy(
@@ -116,41 +99,12 @@ const setupTest = deployments.createFixture(
       deployer
     )
 
-    // Create a payable game
-    await gameFactory.createNewGame(
-      gameName,
-      gameImage,
-      maxPlayers,
-      playTimeRange,
-      correctRegistrationAmount,
-      treasuryFee,
-      creatorFee,
-      encodedCron,
-      prizes,
-      { value: gameCreationAmount }
-    )
     const payableGame = await gameFactory.deployedGames('0')
 
     const deployedPayableGame = new ethers.Contract(
       payableGame.deployedAddress,
       gameImplementationInterface.interface,
       deployer
-    )
-
-    // Create a free game
-    await gameFactory.createNewGame(
-      gameName,
-      gameImage,
-      maxPlayers,
-      playTimeRange,
-      freeGameRegistrationAmount,
-      treasuryFee,
-      creatorFee,
-      encodedCron,
-      freeGamePrizes,
-      {
-        value: freeGameCreationAmount.add(freeGamePrizepoolAmount),
-      }
     )
 
     const freeGame = await gameFactory.deployedGames('1')
@@ -216,9 +170,6 @@ const initialiseTestData = async function () {
   this.treasuryFee = 500 // 5%
   this.creatorFee = 500 // 5%
 
-  // this.treasuryFee = ethers.utils.parseEther('0.00005')
-  // this.creatorFee = ethers.utils.parseEther('0.00005')
-
   // prizeAmount equals total prize amount minus treasury fee
   this.prizeAmount = ethers.utils.parseEther('0.0009')
 
@@ -273,22 +224,7 @@ const initialiseTestData = async function () {
     secondGameImplementation,
     deployedPayableGame,
     deployedFreeGame,
-  } = await setupTest({
-    gameName: this.gameName,
-    gameImage: this.gameImage,
-    maxPlayers: this.maxPlayers,
-    playTimeRange: this.playTimeRange,
-    correctRegistrationAmount: this.correctRegistrationAmount,
-    gameCreationAmount: this.gameCreationAmount,
-    treasuryFee: this.treasuryFee,
-    creatorFee: this.creatorFee,
-    encodedCron: this.encodedCron,
-    prizes: this.prizes,
-    freeGameCreationAmount: this.gameCreationAmount,
-    freeGameRegistrationAmount: this.zeroRegistrationAmount,
-    freeGamePrizepoolAmount: this.freeGamePrizepoolAmount,
-    freeGamePrizes: this.freeGamePrizes,
-  })
+  } = await setupTest()
 
   this.owner = deployer
 

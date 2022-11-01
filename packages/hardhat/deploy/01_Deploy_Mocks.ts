@@ -1,5 +1,5 @@
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -15,6 +15,6 @@ const func: DeployFunction = async function ({
   }
 }
 
-func.tags = ['all', 'mocks', 'main']
+func.tags = ['all', 'mocks', 'main', 'test']
 
 export default func

@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction } from 'hardhat-deploy/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -53,7 +53,7 @@ const func: DeployFunction = async function ({
   cronUpkeep.addDelegator(gameImplementationAddress)
 }
 
-func.tags = ['all', 'lfg', 'main', 'game-implementation']
+func.tags = ['all', 'lfg', 'main', 'game-implementation', 'test']
 module.exports.dependencies = ['keeper']
 
 export default func
