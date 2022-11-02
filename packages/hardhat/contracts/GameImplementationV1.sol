@@ -5,9 +5,11 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
+// import { GameImplementationV1Interface } from "./interfaces/GameImplementationV1Interface.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
+// contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard {
 contract GameImplementationV1 is ReentrancyGuard {
     using Address for address;
 
@@ -190,6 +192,18 @@ contract GameImplementationV1 is ReentrancyGuard {
         address contractAddress,
         uint256 tokenId
     );
+    /**
+     * @notice Called when a methode transferCreatorOwnership is called
+     */
+    event CreatorOwnershipTransferred(address oldCreator, address newCreator);
+    /**
+     * @notice Called when a methode transferAdminOwnership is called
+     */
+    event AdminOwnershipTransferred(address oldAdmin, address newAdmin);
+    /**
+     * @notice Called when a methode transferFactoryOwnership is called
+     */
+    event FactoryOwnershipTransferred(address oldFactory, address newFactory);
     /**
      * @notice Called when a transfert have failed
      */
@@ -1054,6 +1068,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @dev Callable by admin
      */
     function transferAdminOwnership(address _adminAddress) external onlyAdmin onlyAddressInit(_adminAddress) {
+        emit AdminOwnershipTransferred(owner, _adminAddress);
         owner = _adminAddress;
     }
 
@@ -1063,6 +1078,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @dev Callable by creator
      */
     function transferCreatorOwnership(address _creator) external onlyCreator onlyAddressInit(_creator) {
+        emit CreatorOwnershipTransferred(creator, _creator);
         creator = _creator;
     }
 
@@ -1072,6 +1088,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @dev Callable by factory
      */
     function transferFactoryOwnership(address _factory) external onlyAdminOrFactory onlyAddressInit(_factory) {
+        emit FactoryOwnershipTransferred(factory, _factory);
         factory = _factory;
     }
 

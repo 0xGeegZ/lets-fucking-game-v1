@@ -145,6 +145,18 @@ interface GameImplementationV1Interface {
         uint256 tokenId
     );
     /**
+     * @notice Called when a methode transferCreatorOwnership is called
+     */
+    event CreatorOwnershipTransferred(address oldCreator, address newCreator);
+    /**
+     * @notice Called when a methode transferAdminOwnership is called
+     */
+    event AdminOwnershipTransferred(address oldAdmin, address newAdmin);
+    /**
+     * @notice Called when a methode transferFactoryOwnership is called
+     */
+    event FactoryOwnershipTransferred(address oldFactory, address newFactory);
+    /**
      * @notice Called when a transfert have failed
      */
     event FailedTransfer(address receiver, uint256 amount);
