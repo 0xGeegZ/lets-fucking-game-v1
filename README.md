@@ -85,6 +85,8 @@ Lfg would thus become a real social engagement tool for its web3 community, espe
 
 It will also be necessary to improve the architecture of the smart contracts, in particular to optimize them and optimize the gas costs.
 
+Last, we would like to use Ethereum Push Notification to improve user experience and why not add Chainlink VRF to randomize in a better way the daily time range generation.
+
 ## Built with
 
 Primary :
