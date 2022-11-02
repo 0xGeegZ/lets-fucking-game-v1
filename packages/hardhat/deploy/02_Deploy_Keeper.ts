@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -33,7 +33,7 @@ const func: DeployFunction = async function ({
 
   if (cronExternalNewlyDeployed) {
     log(
-      `Contract CronExternal deployed at ${cronExternalAddress} using ${cronExternalGasUsed} gas`
+      `✅ Contract CronExternal deployed at ${cronExternalAddress} using ${cronExternalGasUsed} gas`
     )
   }
 
@@ -61,11 +61,11 @@ const func: DeployFunction = async function ({
 
   if (cronUpkeepNewlyDeployed) {
     log(
-      `Contract CronUpkeep deployed at ${cronUpkeepAddress} using ${cronUpkeepGasUsed} gas`
+      `✅ Contract CronUpkeep deployed at ${cronUpkeepAddress} using ${cronUpkeepGasUsed} gas`
     )
   }
 }
 
-func.tags = ['all', 'lfg', 'main', 'keeper']
+func.tags = ['all', 'lfg', 'main', 'keeper', 'test']
 
 export default func

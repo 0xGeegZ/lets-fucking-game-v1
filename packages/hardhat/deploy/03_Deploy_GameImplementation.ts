@@ -32,7 +32,7 @@ const func: DeployFunction = async function ({
 
   if (gameImplementationNewlyDeployed) {
     log(
-      `Contract GameImplementation deployed at ${gameImplementationAddress} using ${gameImplementationGasUsed} gas`
+      `✅ Contract GameImplementation deployed at ${gameImplementationAddress} using ${gameImplementationGasUsed} gas`
     )
   }
 
@@ -53,7 +53,7 @@ const func: DeployFunction = async function ({
   cronUpkeep.addDelegator(gameImplementationAddress)
 }
 
-func.tags = ['all', 'lfg', 'main', 'game-implementation']
+func.tags = ['all', 'lfg', 'main', 'game-implementation', 'test']
 module.exports.dependencies = ['keeper']
 
 export default func

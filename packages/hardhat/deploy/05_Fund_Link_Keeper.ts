@@ -1,6 +1,6 @@
 import { ethers, run } from 'hardhat'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction, DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 import { networkConfig } from '../config/networkConfig'
 import { autoFundCheck } from '../helpers/autoFundCheck'
@@ -14,7 +14,7 @@ const func: DeployFunction = async function ({
   const chainId = await getChainId()
   let linkTokenAddress: string
 
-  if (chainId == '31337') {
+  if (chainId === '31337' || chainId === '1337') {
     const linkToken = await get('LinkToken')
     linkTokenAddress = linkToken.address
   } else {
@@ -34,7 +34,7 @@ const func: DeployFunction = async function ({
   }
 }
 
-func.tags = ['all', 'lfg', 'main', 'fund-link']
+func.tags = ['all', 'lfg', 'main', 'fund-link', 'test']
 module.exports.dependencies = ['keeper']
 
 export default func

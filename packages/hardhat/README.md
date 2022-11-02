@@ -1,16 +1,10 @@
 # Coverage Report
 
-| Statements                                                                               | Functions                                                                              | Lines                                                                          |
-| ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| ![Statements](https://img.shields.io/badge/statements-100%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-100%25-brightgreen.svg?style=flat) |
+| Statements                                                                              | Functions                                                                             | Lines                                                                         |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| ![Statements](https://img.shields.io/badge/statements-80%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-80%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-80%25-brightgreen.svg?style=flat) |
 
 # Prerequisites
-
-- Docker
-
-```shell
-PATH+=":./bin"    # use your sh files (which are located in bin/) directly from the root of the project
-```
 
 ```shell
 yarn install      # install deps
@@ -22,21 +16,21 @@ Don't forget to copy the .env.example file to a file named .env, and then edit i
 # Running all the tests
 
 ```shell
-yarn run test
+yarn run test             # run tests on hardhat network
 yarn run test:trace       # shows logs + calls
 yarn run test:fresh       # force compile and then run tests
-yarn run test:coverage    # run tests with coverage reports
+yarn run test:coverage    # run tests on ganache with coverage reports
 ```
 
 # Formatters & Linters
 
 You can use the below packages,
 
-- Solhint
-- ESLint
-- Prettier
-- CSpell
-- ShellCheck
+- [Solhint](https://github.com/protofire/solhint)
+- [ESLint](https://eslint.org)
+- [Prettier](https://prettier.io/)
+- [CSpell](https://cspell.org/)
+- [ShellCheck](https://www.shellcheck.net/)
 
 ```shell
 yarn run format
@@ -47,8 +41,8 @@ yarn run lint
 
 You can use the below tools,
 
-- Slither
-- Mythril
+- [Slither](https://github.com/crytic/slither)
+- [Mythril](https://github.com/ConsenSys/mythril)
 
 ```shell
 yarn run analyze:static path/to/contract
@@ -62,15 +56,24 @@ To try out Etherscan verification, you first need to deploy a contract to an Eth
 
 In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details.
 
-- Enter your Etherscan API key
-- Ropsten node URL (eg from Alchemy)
-- The private key of the account which will send the deployment transaction.
+| Name                          | Description                                                                                                                                                                                                                        |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NETWORK_RPC_URL`             | One key by RCP network (see env.example). Required to deploy to public networks. Obtain from [Infura's site](https://infura.io).                                                                                                   |
+| `DEPLOYER_WALLET_PRIVATE_KEY` | The private key of the account which will send the deployment transaction. The account must have enough ETH to deploy the contracts, as well as LINK which can be obtained from [Chainlink's faucets](https://faucets.chain.link). |
+| `ETHERSCAN_API_KEY`           | Your Etherscan API key to verify contract code on Etherscan.                                                                                                                                                                       |
 
 With a valid .env file in place, first deploy your contract:
 
+To deploy all contracts :
+
 ```shell
-yarn run deploy ropsten <CONTRACT_FILE_NAME>    # related to scripts/deploy/<CONTRACT_FILE_NAME>.ts
-yarn run deploy:all ropsten                     # related to scripts/deploy.ts
+yarn run deploy:all
+```
+
+To deploy one contract :
+
+```shell
+yarn run deploy ropsten <CONTRACT_FILE_NAME>
 ```
 
 Also, you can add contract(s) manually to your tenderly projects from the output.
@@ -101,9 +104,3 @@ yarn run generate:all-metadata
 ```shell
 yarn run share    # share project folder with remix ide
 ```
-
-# TODO
-
-- Increase diversity in the Workshop Contract
-- Add Workshop Contract tests
-- Add TSLint as a TypeScript linter

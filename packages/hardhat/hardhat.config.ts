@@ -4,6 +4,7 @@ import '@nomicfoundation/hardhat-toolbox'
 // import 'hardhat-gas-reporter'
 // import 'solidity-coverage'
 // import '@typechain/hardhat'
+// TODO add hardhat upgrades https://docs.openzeppelin.com/upgrades-plugins/1.x/hardhat-upgrades
 import 'hardhat-contract-sizer'
 import 'hardhat-deploy'
 import 'hardhat-docgen'
@@ -12,7 +13,6 @@ import 'hardhat-spdx-license-identifier'
 import '@tenderly/hardhat-tenderly'
 import '@nomicfoundation/hardhat-chai-matchers'
 import 'hardhat-storage-layout'
-import 'hardhat-interface-generator'
 import '@appliedblockchain/chainlink-plugins-fund-link'
 import './tasks/accounts'
 import './tasks/storage-layout'
@@ -35,19 +35,12 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: process.env.SOLC_VERSION || '0.8.9',
-      },
-      {
-        version: '0.8.7',
-      },
-      {
-        version: '0.8.6',
+        version: process.env.SOLC_VERSION || '0.8.6',
       },
       {
         version: '0.4.24',
       },
     ],
-    // version: process.env.SOLC_VERSION || '0.8.6',
     settings: {
       optimizer: {
         enabled:

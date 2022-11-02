@@ -1,5 +1,5 @@
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -10,11 +10,11 @@ const func: DeployFunction = async function ({
   const { deployer } = await getNamedAccounts()
   const chainId = await getChainId()
 
-  if (chainId === '31337') {
+  if (chainId === '31337' || chainId === '1337') {
     await deploy('LinkToken', { from: deployer, log: true })
   }
 }
 
-func.tags = ['all', 'mocks', 'main']
+func.tags = ['all', 'mocks', 'main', 'test']
 
 export default func

@@ -11,7 +11,7 @@ const func: DeployFunction = async function ({
 
   const chainId = await getChainId()
 
-  if (chainId === '31337') {
+  if (chainId === '31337' || chainId === '1337') {
     log('Local Network Detected, Deploying external contracts')
 
     log('Deploying Multicall contract')
@@ -23,12 +23,12 @@ const func: DeployFunction = async function ({
 
     if (multicallAddress) {
       log(
-        `Contract Multicall deployed at ${multicallNewlyDeployed} using ${multicallGasUsed} gas`
+        `✅ Contract Multicall deployed at ${multicallNewlyDeployed} using ${multicallGasUsed} gas`
       )
     }
   }
 }
 
-func.tags = ['all', 'main', 'multicall']
+func.tags = ['all', 'main', 'multicall', 'test']
 
 export default func
