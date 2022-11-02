@@ -5,12 +5,11 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
-// import { GameImplementationV1Interface } from "./interfaces/GameImplementationV1Interface.sol";
+import { GameImplementationV1Interface } from "./interfaces/GameImplementationV1Interface.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
-// contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard {
-contract GameImplementationV1 is ReentrancyGuard {
+contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard {
     using Address for address;
 
     bool private _isBase;
@@ -55,188 +54,6 @@ contract GameImplementationV1 is ReentrancyGuard {
     mapping(uint256 => Winner[]) winners;
     mapping(uint256 => Prize[]) prizes;
 
-    ///STRUCTS
-
-    /**
-     * @notice Player structure that contain all usefull data for a player
-     */
-    struct Player {
-        address playerAddress;
-        uint256 roundRangeLowerLimit;
-        uint256 roundRangeUpperLimit;
-        bool hasPlayedRound;
-        uint256 roundCount;
-        uint256 position;
-        bool hasLost;
-        bool isSplitOk;
-    }
-
-    /**
-     * @notice Winner structure that contain all usefull data for a winner
-     */
-    struct Winner {
-        uint256 roundId;
-        address playerAddress;
-        uint256 amountWon;
-        uint256 position;
-        bool prizeClaimed;
-    }
-
-    /**
-     * @notice PrizeStandard ENUM
-     */
-    enum PrizeStandard {
-        STANDARD,
-        ERC20,
-        ERC721,
-        ERC1155
-    }
-    /**
-     * @notice Prize structure that contain a list of prizes for the current roundId
-     */
-    struct Prize {
-        uint256 position;
-        uint256 amount;
-        /*
-         * This will return a single integer between 0 and 5.
-         * The numbers represent different ‘states’ a name is currently in.
-         * 0 - STANDARD
-         * 1 - ERC20
-         * 2 - ERC721
-         * 3 - ERC1155
-         */
-        uint256 standard;
-        address contractAddress;
-        uint256 tokenId;
-    }
-
-    /**
-     * @notice Initialization structure that contain all the data that are needed to create a new game
-     */
-    struct Initialization {
-        address owner;
-        address creator;
-        address cronUpkeep;
-        string gameName;
-        string gameImage;
-        uint256 gameImplementationVersion;
-        uint256 gameId;
-        uint256 playTimeRange;
-        uint256 maxPlayers;
-        uint256 registrationAmount;
-        uint256 treasuryFee;
-        uint256 creatorFee;
-        string encodedCron;
-        Prize[] prizes;
-    }
-
-    struct GameStatus {
-        address creator;
-        uint256 roundId;
-        string gameName;
-        string gameImage;
-        uint256 playerAddressesCount;
-        uint256 maxPlayers;
-        uint256 registrationAmount;
-        uint256 playTimeRange;
-        uint256 treasuryFee;
-        uint256 creatorFee;
-        bool contractPaused;
-        bool gameInProgress;
-    }
-
-    ///
-    ///EVENTS
-    ///
-
-    /**
-     * @notice Called when a player has registered for a game
-     */
-    event RegisteredForGame(address playerAddress, uint256 playersCount);
-    /**
-     * @notice Called when the keeper start the game
-     */
-    event StartedGame(uint256 timelock, uint256 playersCount);
-    /**
-     * @notice Called when the keeper reset the game
-     */
-    event ResetGame(uint256 timelock, uint256 resetGameId);
-    /**
-     * @notice Called when a player lost a game
-     */
-    event GameLost(uint256 roundId, address playerAddress, uint256 roundCount);
-    /**
-     * @notice Called when a player play a round
-     */
-    event PlayedRound(address playerAddress);
-    /**
-     * @notice Called when a player won the game
-     */
-    event GameWon(uint256 roundId, uint256 winnersCounter, address playerAddress, uint256 amountWon);
-    /**
-     * @notice Called when some player(s) split the game
-     */
-    event GameSplitted(uint256 roundId, uint256 remainingPlayersCount, uint256 amountWon);
-    /**
-     * @notice Called when a player vote to split pot
-     */
-    event VoteToSplitPot(uint256 roundId, address playerAddress);
-    /**
-     * @notice Called when a prize is added
-     */
-    event PrizeAdded(
-        uint256 roundId,
-        uint256 position,
-        uint256 amount,
-        uint256 standard,
-        address contractAddress,
-        uint256 tokenId
-    );
-    /**
-     * @notice Called when a methode transferCreatorOwnership is called
-     */
-    event CreatorOwnershipTransferred(address oldCreator, address newCreator);
-    /**
-     * @notice Called when a methode transferAdminOwnership is called
-     */
-    event AdminOwnershipTransferred(address oldAdmin, address newAdmin);
-    /**
-     * @notice Called when a methode transferFactoryOwnership is called
-     */
-    event FactoryOwnershipTransferred(address oldFactory, address newFactory);
-    /**
-     * @notice Called when a transfert have failed
-     */
-    event FailedTransfer(address receiver, uint256 amount);
-    /**
-     * @notice Called when the contract have receive funds via receive() or fallback() function
-     */
-    event Received(address sender, uint256 amount);
-    /**
-     * @notice Called when a player have claimed his prize
-     */
-    event GamePrizeClaimed(address claimer, uint256 roundId, uint256 amountClaimed);
-    /**
-     * @notice Called when the treasury fee are claimed
-     */
-    event TreasuryFeeClaimed(uint256 amount);
-    /**
-     * @notice Called when the treasury fee are claimed by factory
-     */
-    event TreasuryFeeClaimedByFactory(uint256 amount);
-    /**
-     * @notice Called when the creator fee are claimed
-     */
-    event CreatorFeeClaimed(uint256 amount);
-    /**
-     * @notice Called when the creator or admin update encodedCron
-     */
-    event EncodedCronUpdated(uint256 jobId, string encodedCron);
-    /**
-     * @notice Called when the factory or admin update cronUpkeep
-     */
-    event CronUpkeepUpdated(uint256 jobId, address cronUpkeep);
-
     ///
     /// CONSTRUCTOR AND INITIALISATION
     ///
@@ -271,6 +88,7 @@ contract GameImplementationV1 is ReentrancyGuard {
     function initialize(Initialization calldata _initialization)
         external
         payable
+        override
         onlyIfNotBase
         onlyIfNotAlreadyInitialized
         onlyAllowedNumberOfPlayers(_initialization.maxPlayers)
@@ -332,7 +150,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @notice Function that is called by the keeper when game is ready to start
      * @dev TODO NEXT VERSION remove this function in next smart contract version
      */
-    function startGame() external onlyAdminOrCreator onlyNotPaused onlyIfFull {
+    function startGame() external override onlyAdminOrCreator onlyNotPaused onlyIfFull {
         _startGame();
     }
 
@@ -347,6 +165,7 @@ contract GameImplementationV1 is ReentrancyGuard {
     function registerForGame()
         external
         payable
+        override
         onlyHumans
         onlyNotPaused
         onlyIfGameIsNotInProgress
@@ -377,6 +196,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      */
     function playRound()
         external
+        override
         onlyHumans
         onlyNotPaused
         onlyIfFull
@@ -403,7 +223,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @dev Callable by admin or keeper
      * @dev TODO NEXT VERSION Update triggerDailyCheckpoint to mae it only callable by keeper
      */
-    function triggerDailyCheckpoint() external onlyAdminOrKeeper onlyNotPaused {
+    function triggerDailyCheckpoint() external override onlyAdminOrKeeper onlyNotPaused {
         if (gameInProgress) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
@@ -417,6 +237,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      */
     function voteToSplitPot()
         external
+        override
         onlyIfGameIsInProgress
         onlyIfAlreadyEntered
         onlyIfHasNotLost
@@ -431,7 +252,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @notice Function that is called by a winner to claim his prize
      * @dev TODO NEXT VERSION Update claim process according to prize type
      */
-    function claimPrize(uint256 _roundId) external onlyIfRoundId(_roundId) {
+    function claimPrize(uint256 _roundId) external override onlyIfRoundId(_roundId) {
         for (uint256 i = 0; i < winners[_roundId].length; i++)
             if (winners[_roundId][i].playerAddress == msg.sender) {
                 require(!winners[_roundId][i].prizeClaimed, "Prize for this game already claimed");
@@ -455,6 +276,7 @@ contract GameImplementationV1 is ReentrancyGuard {
     function addPrizes(Prize[] memory _prizes)
         external
         payable
+        override
         onlyAdminOrCreator
         onlyIfGameIsNotInProgress
         onlyIfPrizesParam(_prizes)
@@ -800,7 +622,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      *  gameStatus.contractPaused a boolean set to true if game is paused
      *  gameStatus.gameInProgress a boolean set to true if game is in progress
      */
-    function getStatus() external view returns (GameStatus memory gameStatus) {
+    function getStatus() external view override returns (GameStatus memory gameStatus) {
         return
             GameStatus({
                 creator: creator,
@@ -822,7 +644,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @notice Return the players addresses for the current game
      * @return gamePlayerAddresses list of players addresses
      */
-    function getPlayerAddresses() external view returns (address[] memory gamePlayerAddresses) {
+    function getPlayerAddresses() external view override returns (address[] memory gamePlayerAddresses) {
         return playerAddresses;
     }
 
@@ -831,7 +653,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @param _player the player address
      * @return gamePlayer if finded
      */
-    function getPlayer(address _player) external view returns (Player memory gamePlayer) {
+    function getPlayer(address _player) external view override returns (Player memory gamePlayer) {
         return players[_player];
     }
 
@@ -840,7 +662,13 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @param _roundId the round id
      * @return gameWinners list of Winner
      */
-    function getWinners(uint256 _roundId) external view onlyIfRoundId(_roundId) returns (Winner[] memory gameWinners) {
+    function getWinners(uint256 _roundId)
+        external
+        view
+        override
+        onlyIfRoundId(_roundId)
+        returns (Winner[] memory gameWinners)
+    {
         return winners[_roundId];
     }
 
@@ -849,7 +677,13 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @param _roundId the round id
      * @return gamePrizes list of Prize
      */
-    function getPrizes(uint256 _roundId) external view onlyIfRoundId(_roundId) returns (Prize[] memory gamePrizes) {
+    function getPrizes(uint256 _roundId)
+        external
+        view
+        override
+        onlyIfRoundId(_roundId)
+        returns (Prize[] memory gamePrizes)
+    {
         return prizes[_roundId];
     }
 
@@ -857,7 +691,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @notice Check if all remaining players are ok to split pot
      * @return isSplitOk set to true if all remaining players are ok to split pot, false otherwise
      */
-    function isAllPlayersSplitOk() external view returns (bool isSplitOk) {
+    function isAllPlayersSplitOk() external view override returns (bool isSplitOk) {
         return _isAllPlayersSplitOk();
     }
 
@@ -865,7 +699,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @notice Check if Game is payable
      * @return isPayable set to true if game is payable, false otherwise
      */
-    function isGamePayable() external view returns (bool isPayable) {
+    function isGamePayable() external view override returns (bool isPayable) {
         return _isGamePayable();
     }
 
@@ -873,7 +707,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @notice Check if Game prizes are standard
      * @return isStandard true if game prizes are standard, false otherwise
      */
-    function isGameAllPrizesStandard() external view returns (bool isStandard) {
+    function isGameAllPrizesStandard() external view override returns (bool isStandard) {
         return _isGameAllPrizesStandard();
     }
 
@@ -881,7 +715,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @notice Get the number of remaining players for the current game
      * @return remainingPlayersCount the number of remaining players for the current game
      */
-    function getRemainingPlayersCount() external view returns (uint256 remainingPlayersCount) {
+    function getRemainingPlayersCount() external view override returns (uint256 remainingPlayersCount) {
         return _getRemainingPlayersCount();
     }
 
@@ -894,7 +728,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @param _gameName the new game name
      * @dev Callable by creator
      */
-    function setGameName(string calldata _gameName) external onlyCreator {
+    function setGameName(string calldata _gameName) external override onlyCreator {
         gameName = _gameName;
     }
 
@@ -903,7 +737,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @param _gameImage the new game image
      * @dev Callable by creator
      */
-    function setGameImage(string calldata _gameImage) external onlyCreator {
+    function setGameImage(string calldata _gameImage) external override onlyCreator {
         gameImage = _gameImage;
     }
 
@@ -914,6 +748,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      */
     function setMaxPlayers(uint256 _maxPlayers)
         external
+        override
         onlyAdminOrCreator
         onlyAllowedNumberOfPlayers(_maxPlayers)
         onlyIfGameIsNotInProgress
@@ -929,6 +764,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      */
     function setCreatorFee(uint256 _creatorFee)
         external
+        override
         onlyAdminOrCreator
         onlyIfGameIsNotInProgress
         onlyCreatorFee(_creatorFee)
@@ -942,6 +778,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      */
     function claimCreatorFee()
         external
+        override
         onlyCreator
         onlyIfClaimableAmount(creatorAmount)
         onlyIfEnoughtBalance(creatorAmount)
@@ -962,6 +799,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      */
     function claimTreasuryFee()
         external
+        override
         onlyAdmin
         onlyIfClaimableAmount(treasuryAmount)
         onlyIfEnoughtBalance(treasuryAmount)
@@ -978,6 +816,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      */
     function claimTreasuryFeeToFactory()
         external
+        override
         onlyAdminOrFactory
         onlyIfClaimableAmount(treasuryAmount)
         onlyIfEnoughtBalance(treasuryAmount)
@@ -996,6 +835,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      */
     function setTreasuryFee(uint256 _treasuryFee)
         external
+        override
         onlyAdmin
         onlyIfGameIsNotInProgress
         onlyTreasuryFee(_treasuryFee)
@@ -1008,7 +848,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @param _cronUpkeep the new keeper address
      * @dev Callable by admin or factory
      */
-    function setCronUpkeep(address _cronUpkeep) external onlyAdminOrFactory onlyAddressInit(_cronUpkeep) {
+    function setCronUpkeep(address _cronUpkeep) external override onlyAdminOrFactory onlyAddressInit(_cronUpkeep) {
         cronUpkeep = _cronUpkeep;
         emit CronUpkeepUpdated(cronUpkeepJobId, cronUpkeep);
 
@@ -1027,7 +867,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @param _encodedCron the new encoded cron as * * * * *
      * @dev Callable by admin or creator
      */
-    function setEncodedCron(string memory _encodedCron) external onlyAdminOrCreator {
+    function setEncodedCron(string memory _encodedCron) external override onlyAdminOrCreator {
         require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
 
         encodedCron = CronExternal.toEncodedSpec(_encodedCron);
@@ -1046,7 +886,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @notice Pause the current game and associated keeper job
      * @dev Callable by admin or creator
      */
-    function pause() external onlyAdminOrCreatorOrFactory onlyNotPaused {
+    function pause() external override onlyAdminOrCreatorOrFactory onlyNotPaused {
         _pause();
     }
 
@@ -1054,7 +894,14 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @notice Unpause the current game and associated keeper job
      * @dev Callable by admin or creator
      */
-    function unpause() external onlyAdminOrCreatorOrFactory onlyPaused onlyIfKeeperDataInit onlyIfPrizesIsNotEmpty {
+    function unpause()
+        external
+        override
+        onlyAdminOrCreatorOrFactory
+        onlyPaused
+        onlyIfKeeperDataInit
+        onlyIfPrizesIsNotEmpty
+    {
         _unpause();
     }
 
@@ -1067,7 +914,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @param _adminAddress the new admin address
      * @dev Callable by admin
      */
-    function transferAdminOwnership(address _adminAddress) external onlyAdmin onlyAddressInit(_adminAddress) {
+    function transferAdminOwnership(address _adminAddress) external override onlyAdmin onlyAddressInit(_adminAddress) {
         emit AdminOwnershipTransferred(owner, _adminAddress);
         owner = _adminAddress;
     }
@@ -1077,7 +924,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @param _creator the new creator address
      * @dev Callable by creator
      */
-    function transferCreatorOwnership(address _creator) external onlyCreator onlyAddressInit(_creator) {
+    function transferCreatorOwnership(address _creator) external override onlyCreator onlyAddressInit(_creator) {
         emit CreatorOwnershipTransferred(creator, _creator);
         creator = _creator;
     }
@@ -1087,7 +934,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @param _factory the new factory address
      * @dev Callable by factory
      */
-    function transferFactoryOwnership(address _factory) external onlyAdminOrFactory onlyAddressInit(_factory) {
+    function transferFactoryOwnership(address _factory) external override onlyAdminOrFactory onlyAddressInit(_factory) {
         emit FactoryOwnershipTransferred(factory, _factory);
         factory = _factory;
     }
@@ -1097,7 +944,7 @@ contract GameImplementationV1 is ReentrancyGuard {
      * @param _receiver the receiver for the funds (admin or factory)
      * @dev Callable by admin or factory
      */
-    function withdrawFunds(address _receiver) external onlyAdminOrFactory {
+    function withdrawFunds(address _receiver) external override onlyAdminOrFactory {
         _safeTransfert(_receiver, address(this).balance);
     }
 
@@ -1108,14 +955,14 @@ contract GameImplementationV1 is ReentrancyGuard {
     /**
      * @notice Called for empty calldata (and any value)
      */
-    receive() external payable {
+    receive() external payable override {
         emit Received(msg.sender, msg.value);
     }
 
     /**
      * @notice Called when no other function matches (not even the receive function). Optionally payable
      */
-    fallback() external payable {
+    fallback() external payable override {
         emit Received(msg.sender, msg.value);
     }
 
