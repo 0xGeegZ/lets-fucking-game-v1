@@ -38,6 +38,9 @@ const config: HardhatUserConfig = {
         version: process.env.SOLC_VERSION || '0.8.6',
       },
       {
+        version: '0.8.6',
+      },
+      {
         version: '0.4.24',
       },
     ],

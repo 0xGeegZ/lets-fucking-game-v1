@@ -52,24 +52,24 @@ const setupTest = deployments.createFixture(
     const gameFactoryContract = await deployments.get('GameFactory')
 
     const gameImplementationContract = await deployments.get(
-      'GameImplementation',
+      'GameImplementationV1',
       libraries
     )
 
     const cronUpkeepContract = await deployments.get('CronUpkeep', libraries)
 
-    const secondGameImplementationContract = await deploy(
-      'GameImplementation',
+    const secondGameImplementationV1Contract = await deploy(
+      'GameImplementationV1',
       { ...options, ...libraries }
     )
 
     const gameImplementationInterface = await ethers.getContractFactory(
-      'GameImplementation',
+      'GameImplementationV1',
       libraries
     )
 
-    const secondGameImplementation = new ethers.Contract(
-      secondGameImplementationContract.address,
+    const secondGameImplementationV1 = new ethers.Contract(
+      secondGameImplementationV1Contract.address,
       gameImplementationInterface.interface,
       deployer
     )
@@ -117,20 +117,20 @@ const setupTest = deployments.createFixture(
 
     const GameFactoryContract = await ethers.getContractFactory('GameFactory')
 
-    const GameImplementationContract = await ethers.getContractFactory(
-      'GameImplementation',
+    const GameImplementationV1Contract = await ethers.getContractFactory(
+      'GameImplementationV1',
       libraries
     )
 
     return {
       deployer,
       GameFactoryContract,
-      GameImplementationContract,
+      GameImplementationV1Contract,
       // cronExternal,
       gameFactory,
       gameImplementation,
       cronUpkeep,
-      secondGameImplementation,
+      secondGameImplementationV1,
       deployedPayableGame,
       deployedFreeGame,
     }
@@ -216,26 +216,26 @@ const initialiseTestData = async function () {
   const {
     deployer,
     GameFactoryContract,
-    GameImplementationContract,
+    GameImplementationV1Contract,
     // cronExternal,
     gameFactory,
     gameImplementation,
     cronUpkeep,
-    secondGameImplementation,
+    secondGameImplementationV1,
     deployedPayableGame,
     deployedFreeGame,
   } = await setupTest()
 
   this.owner = deployer
 
-  this.GameImplementationContract = GameImplementationContract
+  this.GameImplementationV1Contract = GameImplementationV1Contract
   this.GameFactoryContract = GameFactoryContract
   // this.cronExternal = cronExternal
 
   this.cronUpkeep = cronUpkeep
   this.gameFactory = gameFactory
   this.gameImplementation = gameImplementation
-  this.secondGameImplementation = secondGameImplementation
+  this.secondGameImplementationV1 = secondGameImplementationV1
   this.deployedPayableGame = deployedPayableGame
   this.deployedFreeGame = deployedFreeGame
 }

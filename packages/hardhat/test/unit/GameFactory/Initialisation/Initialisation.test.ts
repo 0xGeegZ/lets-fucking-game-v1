@@ -5,7 +5,7 @@ import { initialiseTestData } from '../../../factories/setup'
 
 describe('GameFactoryContract', function () {
   beforeEach(initialiseTestData)
-  context('GameImplementation deployed', function () {
+  context('GameImplementationV1 deployed', function () {
     // TODO should only allow factoy to call initialize function ?
 
     describe('when an account tries to initialize the base contract', function () {
@@ -59,9 +59,10 @@ describe('GameFactoryContract', function () {
           .getDeployedGames()
 
         const clonedContract = deployedGames[deployedGames.length - 1]
-        const clonedGameContract = await this.GameImplementationContract.attach(
-          clonedContract.deployedAddress
-        )
+        const clonedGameContract =
+          await this.GameImplementationV1Contract.attach(
+            clonedContract.deployedAddress
+          )
         await expectRevert(
           clonedGameContract.initialize({
             creator: this.bob.address,
@@ -87,11 +88,11 @@ describe('GameFactoryContract', function () {
   context('GameFactory constructor', function () {
     describe('when GameFactory gets deployed', function () {
       it('should set the correct values to state variables', async function () {
-        const responseLatestGameImplementationVersionId =
+        const responseLatestGameImplementationV1VersionId =
           await this.gameFactory.latestGameImplementationVersionId()
-        const responseGameImplementation =
+        const responseGameImplementationV1 =
           await this.gameFactory.gameImplementations(
-            responseLatestGameImplementationVersionId
+            responseLatestGameImplementationV1VersionId
           )
         const responseOwner = await this.gameFactory.owner()
 
@@ -99,8 +100,8 @@ describe('GameFactoryContract', function () {
           await this.gameFactory.getAuthorizedAmounts()
 
         expect(responseOwner).to.be.equal(this.owner.address)
-        expect(responseLatestGameImplementationVersionId).to.be.equal('0')
-        expect(responseGameImplementation.deployedAddress).to.be.equal(
+        expect(responseLatestGameImplementationV1VersionId).to.be.equal('0')
+        expect(responseGameImplementationV1.deployedAddress).to.be.equal(
           this.gameImplementation.address
         )
         expect(responseAuthorizedAmounts.toString()).to.be.equal(

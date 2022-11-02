@@ -14,7 +14,7 @@ import {
   setUpGameWithAWinner,
 } from '../../../helpers'
 
-describe('GameImplementationContract - Mecanism', function () {
+describe('GameImplementationV1Contract - Mecanism', function () {
   beforeEach(initialiseTestData)
 
   context('Registering to game', function () {
@@ -26,7 +26,7 @@ describe('GameImplementationContract - Mecanism', function () {
             this.deployedPayableGame.connect(this.players[0]).registerForGame({
               value: this.correctRegistrationAmount,
             }),
-            'Contract is paused'
+            'Pausable: paused'
           )
         })
       })
@@ -208,7 +208,7 @@ describe('GameImplementationContract - Mecanism', function () {
           this.deployedPayableGame
             .connect(this.mockKeeper)
             .triggerDailyCheckpoint(),
-          'Contract is paused'
+          'Pausable: paused'
         )
       })
     })
@@ -389,7 +389,7 @@ describe('GameImplementationContract - Mecanism', function () {
           await this.deployedPayableGame.pause()
           await expectRevert(
             this.deployedPayableGame.connect(this.players[0]).playRound(),
-            'Contract is paused'
+            'Pausable: paused'
           )
         })
       })

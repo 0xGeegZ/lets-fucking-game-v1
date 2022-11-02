@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.6;
+pragma solidity >=0.8.6;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 
 import { CronUpkeepInterface } from "./CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
-interface GameImplementationInterface {
+interface GameImplementationV1Interface {
     ///STRUCTS
 
     /**
@@ -82,6 +82,21 @@ interface GameImplementationInterface {
         Prize[] prizes;
     }
 
+    struct GameStatus {
+        address creator;
+        uint256 roundId;
+        string gameName;
+        string gameImage;
+        uint256 playerAddressesCount;
+        uint256 maxPlayers;
+        uint256 registrationAmount;
+        uint256 playTimeRange;
+        uint256 treasuryFee;
+        uint256 creatorFee;
+        bool contractPaused;
+        bool gameInProgress;
+    }
+
     ///
     ///EVENTS
     ///
@@ -129,6 +144,18 @@ interface GameImplementationInterface {
         address contractAddress,
         uint256 tokenId
     );
+    /**
+     * @notice Called when a methode transferCreatorOwnership is called
+     */
+    event CreatorOwnershipTransferred(address oldCreator, address newCreator);
+    /**
+     * @notice Called when a methode transferAdminOwnership is called
+     */
+    event AdminOwnershipTransferred(address oldAdmin, address newAdmin);
+    /**
+     * @notice Called when a methode transferFactoryOwnership is called
+     */
+    event FactoryOwnershipTransferred(address oldFactory, address newFactory);
     /**
      * @notice Called when a transfert have failed
      */
@@ -184,6 +211,7 @@ interface GameImplementationInterface {
      *  @param _initialization.encodedCron the cron string
      *  @param _initialization.prizes the cron string
      * @dev TODO NEXT VERSION Remove _isGameAllPrizesStandard limitation to include other prize typ
+     * @dev TODO NEXT VERSION Make it only accessible to factory
      */
     function initialize(Initialization calldata _initialization) external payable;
 
@@ -245,75 +273,72 @@ interface GameImplementationInterface {
 
     /**
      * @notice Return game informations
+     * @return gameStatus the game status data with params as follow :
+     *  gameStatus.creator the creator address of the game
+     *  gameStatus.roundId the roundId of the game
+     *  gameStatus.gameName the name of the game
+     *  gameStatus.gameImage the image of the game
+     *  gameStatus.playerAddressesCount the number of registered players
+     *  gameStatus.maxPlayers the maximum players of the game
+     *  gameStatus.registrationAmount the registration amount of the game
+     *  gameStatus.playTimeRange the player time range of the game
+     *  gameStatus.treasuryFee the treasury fee of the game
+     *  gameStatus.creatorFee the creator fee of the game
+     *  gameStatus.contractPaused a boolean set to true if game is paused
+     *  gameStatus.gameInProgress a boolean set to true if game is in progress
      */
-    function getStatus()
-        external
-        view
-        returns (
-            address,
-            uint256,
-            string memory,
-            string memory,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            bool,
-            bool
-        );
+    function getStatus() external view returns (GameStatus memory gameStatus);
 
     /**
      * @notice Return the players addresses for the current game
-     * @return list of players addresses
+     * @return gamePlayerAddresses list of players addresses
      */
-    function getPlayerAddresses() external view returns (address[] memory);
+    function getPlayerAddresses() external view returns (address[] memory gamePlayerAddresses);
 
     /**
      * @notice Return a player for the current game
      * @param _player the player address
-     * @return player if finded
+     * @return gamePlayer if finded
      */
-    function getPlayer(address _player) external view returns (Player memory);
+    function getPlayer(address _player) external view returns (Player memory gamePlayer);
 
     /**
      * @notice Return the winners for a round id
      * @param _roundId the round id
-     * @return list of Winner
+     * @return gameWinners list of Winner
      */
-    function getWinners(uint256 _roundId) external view returns (Winner[] memory);
+    function getWinners(uint256 _roundId) external view returns (Winner[] memory gameWinners);
 
     /**
      * @notice Return the winners for a round id
      * @param _roundId the round id
-     * @return list of Prize
+     * @return gamePrizes list of Prize
      */
-    function getPrizes(uint256 _roundId) external view returns (Prize[] memory);
+    function getPrizes(uint256 _roundId) external view returns (Prize[] memory gamePrizes);
 
     /**
      * @notice Check if all remaining players are ok to split pot
-     * @return true if all remaining players are ok to split pot, false otherwise
+     * @return isSplitOk set to true if all remaining players are ok to split pot, false otherwise
      */
-    function isAllPlayersSplitOk() external view returns (bool);
+    function isAllPlayersSplitOk() external view returns (bool isSplitOk);
 
     /**
      * @notice Check if Game is payable
-     * @return true if game is payable, false otherwise
+     * @return isPayable set to true if game is payable, false otherwise
      */
-    function isGamePayable() external view returns (bool);
+    function isGamePayable() external view returns (bool isPayable);
 
     /**
      * @notice Check if Game prizes are standard
-     * @return true if game prizes are standard, false otherwise
+     * @return isStandard true if game prizes are standard, false otherwise
      */
-    function isGameAllPrizesStandard() external view returns (bool);
+    function isGameAllPrizesStandard() external view returns (bool isStandard);
 
     /**
      * @notice Get the number of remaining players for the current game
-     * @return the number of remaining players for the current game
+     * @return remainingPlayersCount the number of remaining players for the current game
      */
-    function getRemainingPlayersCount() external view returns (uint256);
+    function getRemainingPlayersCount() external view returns (uint256 remainingPlayersCount);
 
     ///
     /// SETTERS FUNCTIONS

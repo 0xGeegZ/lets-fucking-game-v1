@@ -16,7 +16,7 @@
     3) Cron job is running :)
 */
 
-pragma solidity ^0.8.6;
+pragma solidity >=0.8.6;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/proxy/Proxy.sol";

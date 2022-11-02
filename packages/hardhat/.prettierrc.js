@@ -22,7 +22,7 @@ module.exports = {
         printWidth: 120,
         useTabs: false,
         explicitTypes: 'always',
-        compiler: '^0.8.6',
+        compiler: '^0.8.16',
       },
     },
   ],

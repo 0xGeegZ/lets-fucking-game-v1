@@ -36,15 +36,16 @@ describe('GameFactoryContract', function () {
           .getDeployedGames()
 
         const newGame = deployedGames[deployedGames.length - 1]
-        const clonedGameContract = await this.GameImplementationContract.attach(
-          newGame.deployedAddress
-        )
+        const clonedGameContract =
+          await this.GameImplementationV1Contract.attach(
+            newGame.deployedAddress
+          )
 
         const responseOwner = await clonedGameContract.owner()
         const responseCreator = await clonedGameContract.creator()
         const responseFactory = await clonedGameContract.factory()
         const responseGameId = await clonedGameContract.roundId()
-        const responseGameImplementationVersion =
+        const responseGameImplementationV1Version =
           await clonedGameContract.gameImplementationVersion()
         const responsePlayTimeRange = await clonedGameContract.playTimeRange()
         const responseMaxPlayers = await clonedGameContract.maxPlayers()
@@ -57,7 +58,7 @@ describe('GameFactoryContract', function () {
         expect(responseCreator).to.be.equal(this.bob.address)
         expect(responseFactory).to.be.equal(this.gameFactory.address)
         expect(responseGameId).to.be.equal('0')
-        expect(responseGameImplementationVersion).to.be.equal('0')
+        expect(responseGameImplementationV1Version).to.be.equal('0')
         expect(responseGameId).to.be.equal('0')
         expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
@@ -100,15 +101,16 @@ describe('GameFactoryContract', function () {
           .getDeployedGames()
 
         const newGame = deployedGames[deployedGames.length - 1]
-        const clonedGameContract = await this.GameImplementationContract.attach(
-          newGame.deployedAddress
-        )
+        const clonedGameContract =
+          await this.GameImplementationV1Contract.attach(
+            newGame.deployedAddress
+          )
 
         const responseOwner = await clonedGameContract.owner()
         const responseCreator = await clonedGameContract.creator()
         const responseFactory = await clonedGameContract.factory()
         const responseGameId = await clonedGameContract.roundId()
-        const responseGameImplementationVersion =
+        const responseGameImplementationV1Version =
           await clonedGameContract.gameImplementationVersion()
         const responsePlayTimeRange = await clonedGameContract.playTimeRange()
         const responseMaxPlayers = await clonedGameContract.maxPlayers()
@@ -123,7 +125,7 @@ describe('GameFactoryContract', function () {
         expect(responseCreator).to.be.equal(this.bob.address)
         expect(responseFactory).to.be.equal(this.gameFactory.address)
         expect(responseGameId).to.be.equal('0')
-        expect(responseGameImplementationVersion).to.be.equal('0')
+        expect(responseGameImplementationV1Version).to.be.equal('0')
         expect(responseGameId).to.be.equal('0')
         expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
@@ -314,15 +316,16 @@ describe('GameFactoryContract', function () {
           .getDeployedGames()
 
         const newGame = deployedGames[deployedGames.length - 1]
-        const clonedGameContract = await this.GameImplementationContract.attach(
-          newGame.deployedAddress
-        )
+        const clonedGameContract =
+          await this.GameImplementationV1Contract.attach(
+            newGame.deployedAddress
+          )
 
         const responseOwner = await clonedGameContract.owner()
         const responseCreator = await clonedGameContract.creator()
         const responseFactory = await clonedGameContract.factory()
         const responseGameId = await clonedGameContract.roundId()
-        const responseGameImplementationVersion =
+        const responseGameImplementationV1Version =
           await clonedGameContract.gameImplementationVersion()
         const responsePlayTimeRange = await clonedGameContract.playTimeRange()
         const responseMaxPlayers = await clonedGameContract.maxPlayers()
@@ -337,7 +340,7 @@ describe('GameFactoryContract', function () {
         expect(responseCreator).to.be.equal(this.bob.address)
         expect(responseFactory).to.be.equal(this.gameFactory.address)
         expect(responseGameId).to.be.equal('0')
-        expect(responseGameImplementationVersion).to.be.equal('0')
+        expect(responseGameImplementationV1Version).to.be.equal('0')
         expect(responseGameId).to.be.equal('0')
         expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
@@ -387,15 +390,16 @@ describe('GameFactoryContract', function () {
           .getDeployedGames()
 
         const newGame = deployedGames[deployedGames.length - 1]
-        const clonedGameContract = await this.GameImplementationContract.attach(
-          newGame.deployedAddress
-        )
+        const clonedGameContract =
+          await this.GameImplementationV1Contract.attach(
+            newGame.deployedAddress
+          )
 
         const responseOwner = await clonedGameContract.owner()
         const responseCreator = await clonedGameContract.creator()
         const responseFactory = await clonedGameContract.factory()
         const responseGameId = await clonedGameContract.roundId()
-        const responseGameImplementationVersion =
+        const responseGameImplementationV1Version =
           await clonedGameContract.gameImplementationVersion()
         const responsePlayTimeRange = await clonedGameContract.playTimeRange()
         const responseMaxPlayers = await clonedGameContract.maxPlayers()
@@ -410,7 +414,7 @@ describe('GameFactoryContract', function () {
         expect(responseCreator).to.be.equal(this.bob.address)
         expect(responseFactory).to.be.equal(this.gameFactory.address)
         expect(responseGameId).to.be.equal('0')
-        expect(responseGameImplementationVersion).to.be.equal('0')
+        expect(responseGameImplementationV1Version).to.be.equal('0')
         expect(responseGameId).to.be.equal('0')
         expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
@@ -512,7 +516,7 @@ describe('GameFactoryContract', function () {
           .connect(this.owner)
           .nextGameId()
 
-        const currentGameImplementationVersionId = await this.gameFactory
+        const currentGameImplementationV1VersionId = await this.gameFactory
           .connect(this.owner)
           .latestGameImplementationVersionId()
 
@@ -571,13 +575,13 @@ describe('GameFactoryContract', function () {
 
         expect(firstGame.id).to.be.equal(currentId)
         expect(firstGame.versionId).to.be.equal(
-          currentGameImplementationVersionId
+          currentGameImplementationV1VersionId
         )
         expect(firstGame.creator).to.be.equal(this.bob.address)
 
         expect(secondGame.id).to.be.equal(+currentId + 1)
         expect(secondGame.versionId).to.be.equal(
-          currentGameImplementationVersionId
+          currentGameImplementationV1VersionId
         )
         expect(secondGame.creator).to.be.equal(this.alice.address)
       })
