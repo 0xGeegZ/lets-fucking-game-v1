@@ -7,9 +7,10 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 
 import { GameImplementationV1Interface } from "./interfaces/GameImplementationV1Interface.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
+
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
-contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard {
+contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard, Pausable {
     using Address for address;
 
     bool private _isBase;
@@ -47,7 +48,6 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard 
     uint256 public maxPlayers;
 
     bool public gameInProgress; // helps the keeper determine if a game has started or if we need to start it
-    bool public contractPaused;
 
     address[] public playerAddresses;
     mapping(address => Player) public players;
@@ -150,7 +150,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard 
      * @notice Function that is called by the keeper when game is ready to start
      * @dev TODO NEXT VERSION remove this function in next smart contract version
      */
-    function startGame() external override onlyAdminOrCreator onlyNotPaused onlyIfFull {
+    function startGame() external override onlyAdminOrCreator whenNotPaused onlyIfFull {
         _startGame();
     }
 
@@ -167,7 +167,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard 
         payable
         override
         onlyHumans
-        onlyNotPaused
+        whenNotPaused
         onlyIfGameIsNotInProgress
         onlyIfNotFull
         onlyIfNotAlreadyEntered
@@ -198,7 +198,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard 
         external
         override
         onlyHumans
-        onlyNotPaused
+        whenNotPaused
         onlyIfFull
         onlyIfAlreadyEntered
         onlyIfHasNotLost
@@ -223,7 +223,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard 
      * @dev Callable by admin or keeper
      * @dev TODO NEXT VERSION Update triggerDailyCheckpoint to mae it only callable by keeper
      */
-    function triggerDailyCheckpoint() external override onlyAdminOrKeeper onlyNotPaused {
+    function triggerDailyCheckpoint() external override onlyAdminOrKeeper whenNotPaused {
         if (gameInProgress) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
@@ -313,7 +313,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard 
         roundId += 1;
 
         // Stop game if not payable to allow creator to add prizes
-        if (!_isGamePayable()) return _pause();
+        if (!_isGamePayable()) return _pauseGame();
 
         Prize[] storage oldPrize = prizes[roundId - 1];
 
@@ -572,8 +572,8 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard 
      * @dev Callable by admin or creator
      */
 
-    function _pause() internal onlyNotPaused {
-        contractPaused = true;
+    function _pauseGame() internal whenNotPaused {
+        _pause();
         CronUpkeepInterface(cronUpkeep).deleteCronJob(cronUpkeepJobId);
     }
 
@@ -581,8 +581,8 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard 
      * @notice Unpause the current game and associated keeper job
      * @dev Callable by admin or creator
      */
-    function _unpause() internal onlyPaused {
-        contractPaused = false;
+    function _unpauseGame() internal whenPaused {
+        _unpause();
 
         // Reset round limits and round status for each remaining user
         for (uint256 i = 0; i < playerAddresses.length; i++) {
@@ -635,7 +635,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard 
                 playTimeRange: playTimeRange,
                 treasuryFee: treasuryFee,
                 creatorFee: creatorFee,
-                contractPaused: contractPaused,
+                contractPaused: paused(),
                 gameInProgress: gameInProgress
             });
     }
@@ -886,8 +886,8 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard 
      * @notice Pause the current game and associated keeper job
      * @dev Callable by admin or creator
      */
-    function pause() external override onlyAdminOrCreatorOrFactory onlyNotPaused {
-        _pause();
+    function pause() external override onlyAdminOrCreatorOrFactory whenNotPaused {
+        _pauseGame();
     }
 
     /**
@@ -898,11 +898,11 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard 
         external
         override
         onlyAdminOrCreatorOrFactory
-        onlyPaused
+        whenPaused
         onlyIfKeeperDataInit
         onlyIfPrizesIsNotEmpty
     {
-        _unpause();
+        _unpauseGame();
     }
 
     ///
@@ -1293,22 +1293,6 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard 
      */
     modifier onlyIfPrizesIsNotEmpty() {
         require(prizes[roundId].length > 0, "Prizes should be greather or equal to 1");
-        _;
-    }
-
-    /**
-     * @notice Modifier that ensure that game is not paused
-     */
-    modifier onlyNotPaused() {
-        require(!contractPaused, "Contract is paused");
-        _;
-    }
-
-    /**
-     * @notice Modifier that ensure that game is paused
-     */
-    modifier onlyPaused() {
-        require(contractPaused, "Contract is not paused");
         _;
     }
 }
