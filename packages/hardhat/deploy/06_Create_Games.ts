@@ -101,6 +101,6 @@ const func: DeployFunction = async function ({
 }
 
 func.tags = ['all', 'dev', 'create-game', 'test']
-module.exports.dependencies = ['game-factory']
+func.dependencies = ['game-factory']
 
 export default func

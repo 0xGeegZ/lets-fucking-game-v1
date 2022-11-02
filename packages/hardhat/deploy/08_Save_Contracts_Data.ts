@@ -1,6 +1,6 @@
 import fs from 'fs'
-import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction } from 'hardhat-deploy/types'
 
 import saveContractData from '../helpers/saveContractData'
 
@@ -12,9 +12,10 @@ const func: DeployFunction = async function ({
 
   const chainId = await getChainId()
   const gameImplementation = await deployments.get('GameImplementationV1')
-  const gameFactory = await deployments.get('GameImplementationV1')
+  const gameFactory = await deployments.get('GameFactory')
 
   const multiCall = await deployments.get('Multicall')
+  const multiCall3 = await deployments.get('Multicall3')
 
   const cronExternal = await deployments.get('CronExternal')
   const cronUpkeep = await deployments.get('CronUpkeep')
@@ -34,12 +35,6 @@ const func: DeployFunction = async function ({
         transactionHash: gameImplementation.transactionHash,
         abi: gameImplementation.abi,
       },
-      MultiCall: {
-        address: multiCall.address,
-        libraries: multiCall.libraries || {},
-        transactionHash: multiCall.transactionHash,
-        abi: multiCall.abi,
-      },
       CronExternal: {
         address: cronExternal.address,
         libraries: cronExternal.libraries || {},
@@ -58,6 +53,18 @@ const func: DeployFunction = async function ({
         transactionHash: cronUpkeepDelegate.transactionHash,
         abi: cronUpkeepDelegate.abi,
       },
+      MultiCall: {
+        address: multiCall.address,
+        libraries: multiCall.libraries || {},
+        transactionHash: multiCall.transactionHash,
+        abi: multiCall.abi,
+      },
+      MultiCall3: {
+        address: multiCall3.address,
+        libraries: multiCall3.libraries || {},
+        transactionHash: multiCall3.transactionHash,
+        abi: multiCall3.abi,
+      },
     },
   })
 
@@ -70,7 +77,7 @@ const func: DeployFunction = async function ({
 }
 
 func.tags = ['all', 'dev', 'lfg']
-module.exports.dependencies = [
+func.dependencies = [
   'game-factory',
   'game-implementation',
   'keeper',

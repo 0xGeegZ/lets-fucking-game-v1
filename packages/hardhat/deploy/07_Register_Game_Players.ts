@@ -80,6 +80,6 @@ const func: DeployFunction = async function ({
 }
 
 func.tags = ['all', 'dev', 'register-game-players']
-module.exports.dependencies = ['create-game']
+func.dependencies = ['create-game']
 
 export default func

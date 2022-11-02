@@ -69,13 +69,13 @@ With a valid .env file in place, first deploy your contract:
 To deploy all contracts :
 
 ```shell
-yarn run deploy:all
+yarn run deploy:all <NETWORK>
 ```
 
-To deploy one contract :
+To deploy contracts for a specific tag :
 
 ```shell
-yarn run deploy ropsten <CONTRACT_FILE_NAME>
+yarn run deploy <NETWORK> <TAG>
 ```
 
 Also, you can add contract(s) manually to your tenderly projects from the output.
@@ -84,8 +84,10 @@ Also, you can add contract(s) manually to your tenderly projects from the output
 And then verify it:
 
 ```shell
-yarn run verify ropsten <DEPLOYED_CONTRACT_ADDRESS> "<CONSTRUCTOR_ARGUMENT(S)>"    # hardhat.config.ts to see all networks
+yarn run verify <NETWORK> <DEPLOYED_CONTRACT_ADDRESS> "<CONSTRUCTOR_ARGUMENT(S)>"
 ```
+
+SEE [hardhat.config.ts](./hardhat.config.ts) to see all networks
 
 # Miscellaneous
 

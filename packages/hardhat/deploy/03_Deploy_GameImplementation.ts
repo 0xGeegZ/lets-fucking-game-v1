@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction } from 'hardhat-deploy/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -54,6 +54,6 @@ const func: DeployFunction = async function ({
 }
 
 func.tags = ['all', 'lfg', 'main', 'game-implementation', 'test']
-module.exports.dependencies = ['keeper']
+func.dependencies = ['keeper']
 
 export default func

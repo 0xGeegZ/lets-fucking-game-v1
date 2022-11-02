@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "author": "@GuiDieudo",
   "scripts": {
-    "chain": "hardhat node --show-stack-traces --max-memory 8192",
+    "chain": "hardhat node --show-stack-traces",
     "chain:stop": "lsof -ti tcp:8545 | xargs kill ",
     "chain:force": "yarn chain:stop && yarn chain",
     "start": "hardhat node",
@@ -17,7 +17,7 @@
     "size": "hardhat size-contracts",
     "prepend-spdx": "hardhat prepend-spdx-license",
     "deploy": "bin/deploy.sh",
-    "deploy:all": "npx hardhat deploy --network hardhat --tags all",
+    "deploy:all": "npx hardhat deploy --tags all --network",
     "verify": "hardhat verify --network",
     "test": "hardhat test",
     "test:trace": "hardhat test --trace",
