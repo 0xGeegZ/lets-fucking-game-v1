@@ -9,7 +9,7 @@ TODO UPDATE DEMO LINK
 
 We could run into a storytelling exercise and tell you that this was thought of as an innovative new way to engage your web3 community on twitter while providing a simple and fun experience.
 
-And in retrospect, it can be. But the fact is the original goal was just to find a fun way to learn Web3 because in fact... It's just a fucking game :)
+And in retrospect, it can be. But the fact is the original goal was just to find a fun way to learn Web3 because in reality... It's just a fucking game :)
 
 ## What it does
 
@@ -21,9 +21,11 @@ Once the total number of players is reached, the game starts.
 
 ## How it works
 
-Each day, as a player you have a random time slot during which you have to log in and validate your presence. If you forget, you lose. The last remaining players share the prize pool.
+Each day, as a player you have a random time slot during which you have to log in and validate your presence. If you forget, you lose.
 
-when there is less than 50% players, a player can vote to split pot between remaining players. If all remaining players are ok to split pot then the pot is fairly distributed between remaining players .
+The last remaining players share the prizes according to the prizepool repartition.
+
+When there is less than 50% players, a player can vote to split pot between remaining players. If all remaining players are ok to split pot then the pot is fairly distributed between remaining players .
 
 The creator can manage the size of the slots and the frequency of the games to make the game last more or less time.
 
@@ -31,7 +33,8 @@ The game creator can also manage the winners structure to allow more or less pla
 
 ## How we built it
 
-- Mono Repo started from multiple boileplates to help us bootstraping this project :
+Mono Repo boilerplate crafted from multiple other boileplates. This help us to bootstrap this project in the best conditions :
+
 - https://github.com/hackbg/chainlink-fullstack/ : For the monorepo configuration
 - [https://github.com/emretepedev/solidity-hardhat-typescript-boilerplate](https://github.com/emretepedev/solidity-hardhat-typescript-boilerplate) : For the Smart Contract Project configuration
 - https://github.com/pancakeswap/pancake-frontend : For the front end project configuration
@@ -54,11 +57,11 @@ The smart contracts are more than 80% covered in tests and this is probably our 
 
 We have also created an interface for the games and a genericity system that will allow us to easily evolve the game contract to offer games with ERC20 tokens or NFTS.
 
-Finally, the boilerplate we used offers a very quick analysis of our smart contracts with Slither and Mythril which allowed us to respect the design pattern and the main security standards.
+Finally, the boilerplate we used offers a very quick analysis of our smart contracts with Slither and Mythril which allowed us to respect the best design pattern and the main security standards.
 
 ## What we learned
 
-First of all, it is important to know that 4 of the 5 team members had never been initiated to web3. It was therefore an opportunity for them to discover all these technologies.
+First of all, it is important to know that 4 of the 5 team members had never been initiated to web3 before this project. It was therefore an opportunity for them to discover all these technologies.
 
 We learned a lot about web3, both in terms of smart contracts and interfacing with etherJs.
 

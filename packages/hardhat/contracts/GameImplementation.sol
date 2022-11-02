@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
+// TODO GUIGUI RENAME TO GAME IMPLEMENTATION V1
 contract GameImplementation {
     using Address for address;
 
