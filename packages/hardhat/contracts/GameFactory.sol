@@ -47,6 +47,7 @@ contract GameFactory is Pausable, Ownable {
 
     /**
      * @notice AuthorizedAmount structure that contain all usefull data bout an authorized amount
+     * @dev TODO NEXT VERSION add default Name and Image to AuthorizedAmount
      */
     struct AuthorizedAmount {
         uint256 amount;

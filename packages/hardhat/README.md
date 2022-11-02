@@ -1,3 +1,5 @@
+# Let's Fucking Game - Smart Contract
+
 # Coverage Report
 
 | Statements                                                                              | Functions                                                                             | Lines                                                                         |
