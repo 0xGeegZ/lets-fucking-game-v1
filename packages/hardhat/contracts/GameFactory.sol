@@ -20,7 +20,7 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
 
     uint256 public gameCreationAmount;
 
-    uint256 public latestGameImplementationV1VersionId;
+    uint256 public latestGameImplementationVersionId;
     GameImplementationV1Version[] public gameImplementations;
 
     Game[] public deployedGames;
@@ -101,10 +101,7 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
         gameCreationAmount = _gameCreationAmount;
 
         gameImplementations.push(
-            GameImplementationV1Version({
-                id: latestGameImplementationV1VersionId,
-                deployedAddress: _gameImplementation
-            })
+            GameImplementationV1Version({ id: latestGameImplementationVersionId, deployedAddress: _gameImplementation })
         );
 
         for (uint256 i = 0; i < _authorizedAmounts.length; i++) {
@@ -152,7 +149,7 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
         onlyIfNotUsedRegistrationAmounts(_registrationAmount)
         returns (address game)
     {
-        address latestGameImplementationV1Address = gameImplementations[latestGameImplementationV1VersionId]
+        address latestGameImplementationV1Address = gameImplementations[latestGameImplementationVersionId]
             .deployedAddress;
         address payable newGameAddress = payable(Clones.clone(latestGameImplementationV1Address));
 
@@ -160,12 +157,12 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
         deployedGames.push(
             Game({
                 id: nextGameId,
-                versionId: latestGameImplementationV1VersionId,
+                versionId: latestGameImplementationVersionId,
                 creator: msg.sender,
                 deployedAddress: newGameAddress
             })
         );
-        emit GameCreated(nextGameId, newGameAddress, latestGameImplementationV1VersionId, msg.sender);
+        emit GameCreated(nextGameId, newGameAddress, latestGameImplementationVersionId, msg.sender);
         nextGameId += 1;
 
         CronUpkeepInterface(cronUpkeep).addDelegator(newGameAddress);
@@ -177,7 +174,7 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
         initialization.cronUpkeep = cronUpkeep;
         initialization.gameName = _gameName;
         initialization.gameImage = _gameImage;
-        initialization.gameImplementationVersion = latestGameImplementationV1VersionId;
+        initialization.gameImplementationVersion = latestGameImplementationVersionId;
         initialization.gameId = nextGameId;
         initialization.playTimeRange = _playTimeRange;
         initialization.maxPlayers = _maxPlayers;
@@ -267,12 +264,9 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
      * @dev Callable by admin
      */
     function setNewGameImplementationV1(address _gameImplementation) external onlyAdmin {
-        latestGameImplementationV1VersionId += 1;
+        latestGameImplementationVersionId += 1;
         gameImplementations.push(
-            GameImplementationV1Version({
-                id: latestGameImplementationV1VersionId,
-                deployedAddress: _gameImplementation
-            })
+            GameImplementationV1Version({ id: latestGameImplementationVersionId, deployedAddress: _gameImplementation })
         );
     }
 

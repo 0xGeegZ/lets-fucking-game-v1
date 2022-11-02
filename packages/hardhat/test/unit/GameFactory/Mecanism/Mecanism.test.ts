@@ -518,7 +518,7 @@ describe('GameFactoryContract', function () {
 
         const currentGameImplementationV1VersionId = await this.gameFactory
           .connect(this.owner)
-          .latestGameImplementationV1VersionId()
+          .latestGameImplementationVersionId()
 
         const registrationAmountFirst =
           this.authorizedAmounts[this.authorizedAmounts.length - 1]

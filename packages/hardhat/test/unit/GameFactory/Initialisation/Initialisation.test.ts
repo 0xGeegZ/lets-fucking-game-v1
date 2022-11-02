@@ -89,7 +89,7 @@ describe('GameFactoryContract', function () {
     describe('when GameFactory gets deployed', function () {
       it('should set the correct values to state variables', async function () {
         const responseLatestGameImplementationV1VersionId =
-          await this.gameFactory.latestGameImplementationV1VersionId()
+          await this.gameFactory.latestGameImplementationVersionId()
         const responseGameImplementationV1 =
           await this.gameFactory.gameImplementations(
             responseLatestGameImplementationV1VersionId
