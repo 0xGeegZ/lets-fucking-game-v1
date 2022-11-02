@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.6;
+pragma solidity >=0.8.6;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -14,6 +14,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
     using Address for address;
 
     bool private _isBase;
+
     uint256 private randNonce;
 
     address public owner;
