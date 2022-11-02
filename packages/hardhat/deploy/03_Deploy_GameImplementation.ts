@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -16,7 +16,7 @@ const func: DeployFunction = async function ({
     log: true,
   }
 
-  log('Deploying GameImplementation contract')
+  log('Deploying GameImplementationV1 contract')
   const { address: cronExternalAddress } = await deployments.get('CronExternal')
   const libraries = {
     libraries: {
@@ -28,15 +28,15 @@ const func: DeployFunction = async function ({
     address: gameImplementationAddress,
     newlyDeployed: gameImplementationNewlyDeployed,
     receipt: { gasUsed: gameImplementationGasUsed },
-  } = await deploy('GameImplementation', { ...options, ...libraries })
+  } = await deploy('GameImplementationV1', { ...options, ...libraries })
 
   if (gameImplementationNewlyDeployed) {
     log(
-      `✅ Contract GameImplementation deployed at ${gameImplementationAddress} using ${gameImplementationGasUsed} gas`
+      `✅ Contract GameImplementationV1 deployed at ${gameImplementationAddress} using ${gameImplementationGasUsed} gas`
     )
   }
 
-  log('Adding GameImplementation to Keeper delegators')
+  log('Adding GameImplementationV1 to Keeper delegators')
 
   const { address: cronUpkeepAddress } = await deployments.get('CronUpkeep')
 

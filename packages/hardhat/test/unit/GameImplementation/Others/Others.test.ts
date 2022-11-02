@@ -5,7 +5,7 @@ import { ethers } from 'hardhat'
 import { initialiseTestData } from '../../../factories/setup'
 import { setUpGameReadyToPlay, setUpGameWithAWinner } from '../../../helpers'
 
-describe('GameImplementationContract - Others', function () {
+describe('GameImplementationV1Contract - Others', function () {
   beforeEach(initialiseTestData)
 
   context('Creator functions', function () {
@@ -646,7 +646,7 @@ describe('GameImplementationContract - Others', function () {
             this.deployedPayableGame
               .connect(this.alice)
               .transferFactoryOwnership(this.alice.address),
-            'Caller is not the factory'
+            'Caller is not the admin or factory'
           )
         })
       })

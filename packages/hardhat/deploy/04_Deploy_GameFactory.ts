@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction } from 'hardhat-deploy/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -25,7 +25,7 @@ const func: DeployFunction = async function ({
   }
 
   const { address: gameImplementationAddress } = await deployments.get(
-    'GameImplementation'
+    'GameImplementationV1'
   )
 
   const { address: cronUpkeepAddress } = await deployments.get('CronUpkeep')

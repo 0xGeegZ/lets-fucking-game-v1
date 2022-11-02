@@ -41,13 +41,13 @@ describe('GameFactoryContract', function () {
     })
   })
 
-  context('GameFactory setNewGameImplementation', function () {
+  context('GameFactory setNewGameImplementationV1', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
           this.gameFactory
             .connect(this.alice)
-            .setNewGameImplementation(this.gameImplementation.address),
+            .setNewGameImplementationV1(this.gameImplementation.address),
           'Caller is not the admin'
         )
       })
@@ -57,19 +57,19 @@ describe('GameFactoryContract', function () {
       it('should add the new implementation version to gameImplementations', async function () {
         await this.gameFactory
           .connect(this.owner)
-          .setNewGameImplementation(this.secondGameImplementation.address)
-        const responseGameImplementations1 =
+          .setNewGameImplementationV1(this.secondGameImplementationV1.address)
+        const responseGameImplementationV1s1 =
           await this.gameFactory.gameImplementations('0')
-        const responseGameImplementations2 =
+        const responseGameImplementationV1s2 =
           await this.gameFactory.gameImplementations('1')
 
-        expect(responseGameImplementations1.id).to.be.equal('0')
-        expect(responseGameImplementations1.deployedAddress).to.be.equal(
+        expect(responseGameImplementationV1s1.id).to.be.equal('0')
+        expect(responseGameImplementationV1s1.deployedAddress).to.be.equal(
           this.gameImplementation.address
         )
-        expect(responseGameImplementations2.id).to.be.equal('1')
-        expect(responseGameImplementations2.deployedAddress).to.be.equal(
-          this.secondGameImplementation.address
+        expect(responseGameImplementationV1s2.id).to.be.equal('1')
+        expect(responseGameImplementationV1s2.deployedAddress).to.be.equal(
+          this.secondGameImplementationV1.address
         )
       })
     })

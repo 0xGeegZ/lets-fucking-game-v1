@@ -28,7 +28,7 @@ const func: DeployFunction = async function ({
     }
 
     const { interface: gameImplementationInterface } =
-      await ethers.getContractFactory('GameImplementation', libraries)
+      await ethers.getContractFactory('GameImplementationV1', libraries)
 
     const { address: gameFactoryAddress } = await deployments.get('GameFactory')
 

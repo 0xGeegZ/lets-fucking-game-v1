@@ -14,7 +14,7 @@ import {
   setUpGameWithAWinner,
 } from '../../../helpers'
 
-describe('GameImplementationContract - Mecanism', function () {
+describe('GameImplementationV1Contract - Mecanism', function () {
   beforeEach(initialiseTestData)
 
   context('Registering to game', function () {

@@ -2,12 +2,13 @@
 pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
-// TODO GUIGUI RENAME TO GAME IMPLEMENTATION V1
-contract GameImplementation {
+contract GameImplementationV1 is ReentrancyGuard {
     using Address for address;
 
     bool private _isBase;
@@ -125,6 +126,21 @@ contract GameImplementation {
         uint256 creatorFee;
         string encodedCron;
         Prize[] prizes;
+    }
+
+    struct GameStatus {
+        address creator;
+        uint256 roundId;
+        string gameName;
+        string gameImage;
+        uint256 playerAddressesCount;
+        uint256 maxPlayers;
+        uint256 registrationAmount;
+        uint256 playTimeRange;
+        uint256 treasuryFee;
+        uint256 creatorFee;
+        bool contractPaused;
+        bool gameInProgress;
     }
 
     ///
@@ -374,7 +390,7 @@ contract GameImplementation {
      * @dev TODO NEXT VERSION Update triggerDailyCheckpoint to mae it only callable by keeper
      */
     function triggerDailyCheckpoint() external onlyAdminOrKeeper onlyNotPaused {
-        if (gameInProgress == true) {
+        if (gameInProgress) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
         } else if (playerAddresses.length == maxPlayers) _startGame();
@@ -404,12 +420,12 @@ contract GameImplementation {
     function claimPrize(uint256 _roundId) external onlyIfRoundId(_roundId) {
         for (uint256 i = 0; i < winners[_roundId].length; i++)
             if (winners[_roundId][i].playerAddress == msg.sender) {
-                require(winners[_roundId][i].prizeClaimed == false, "Prize for this game already claimed");
+                require(!winners[_roundId][i].prizeClaimed, "Prize for this game already claimed");
                 require(address(this).balance >= winners[_roundId][i].amountWon, "Not enough funds in contract");
 
                 winners[_roundId][i].prizeClaimed = true;
-                _safeTransfert(msg.sender, winners[_roundId][i].amountWon);
                 emit GamePrizeClaimed(msg.sender, _roundId, winners[_roundId][i].amountWon);
+                _safeTransfert(msg.sender, winners[_roundId][i].amountWon);
                 return;
             }
         require(false, "Player did not win this game");
@@ -472,6 +488,7 @@ contract GameImplementation {
      * @notice Transfert funds
      * @param _receiver the receiver address
      * @param _amount the amount to transfert
+     * @dev TODO NEXT VERSION use SafeERC20 library from OpenZeppelin
      */
     function _safeTransfert(address _receiver, uint256 _amount) internal onlyIfEnoughtBalance(_amount) {
         (bool success, ) = _receiver.call{ value: _amount }("");
@@ -564,7 +581,7 @@ contract GameImplementation {
         for (uint256 i = 0; i < playerAddresses.length; i++) {
             Player storage player = players[playerAddresses[i]];
             // Refresh player status to having lost if player has not played
-            if (player.hasPlayedRound == false && player.hasLost == false) _setPlayerAsHavingLost(player);
+            if (!player.hasPlayedRound && !player.hasLost) _setPlayerAsHavingLost(player);
             else {
                 // Reset round limits and round status for each remaining user
                 _resetRoundRange(player);
@@ -603,6 +620,10 @@ contract GameImplementation {
         require(msg.value == prizepool, "Need to send prizepool amount");
     }
 
+    /**
+     * @notice Internal function for prizes adding management
+     * @param _prizes list of prize details
+     */
     function _addPrizes(Prize[] memory _prizes) internal {
         uint256 prizepool = 0;
         for (uint256 i = 0; i < _prizes.length; i++) {
@@ -616,6 +637,10 @@ contract GameImplementation {
         }
     }
 
+    /**
+     * @notice Internal function to add a Prize
+     * @param _prize the prize to add
+     */
     function _addPrize(Prize memory _prize) internal {
         prizes[roundId].push(_prize);
         emit PrizeAdded(
@@ -628,11 +653,19 @@ contract GameImplementation {
         );
     }
 
-    function _isGamePayable() internal view returns (bool) {
+    /**
+     * @notice Internal function to check if game is payable
+     * @return isPayable set to true if game is payable
+     */
+    function _isGamePayable() internal view returns (bool isPayable) {
         return registrationAmount > 0;
     }
 
-    function _isGameAllPrizesStandard() internal view returns (bool) {
+    /**
+     * @notice Internal function to check if all games are of type standard
+     * @return isStandard set to true if all games are of type standard
+     */
+    function _isGameAllPrizesStandard() internal view returns (bool isStandard) {
         for (uint256 i = 0; i < prizes[roundId].length; i++) if (prizes[roundId][i].standard != 0) return false;
         return true;
     }
@@ -640,15 +673,15 @@ contract GameImplementation {
     /**
      * @notice Returns a number between 0 and 24 minus the current length of a round
      * @param _playerAddress the player address
-     * @return the generated number
+     * @return randomNumber the generated number
      */
-    function _randMod(address _playerAddress) internal returns (uint256) {
+    function _randMod(address _playerAddress) internal returns (uint256 randomNumber) {
         // Increase nonce
         randNonce++;
         uint256 maxUpperRange = 25 - playTimeRange; // We use 25 because modulo excludes the higher limit
-        uint256 randomNumber = uint256(keccak256(abi.encodePacked(block.timestamp, _playerAddress, randNonce))) %
+        uint256 randNumber = uint256(keccak256(abi.encodePacked(block.timestamp, _playerAddress, randNonce))) %
             maxUpperRange;
-        return randomNumber;
+        return randNumber;
     }
 
     /**
@@ -675,9 +708,9 @@ contract GameImplementation {
 
     /**
      * @notice Check if all remaining players are ok to split pot
-     * @return true if all remaining players are ok to split pot, false otherwise
+     * @return isSplitOk set to true if all remaining players are ok to split pot, false otherwise
      */
-    function _isAllPlayersSplitOk() internal view returns (bool) {
+    function _isAllPlayersSplitOk() internal view returns (bool isSplitOk) {
         uint256 remainingPlayersSplitOkCounter = 0;
         uint256 remainingPlayersLength = _getRemainingPlayersCount();
         for (uint256 i = 0; i < playerAddresses.length; i++)
@@ -688,9 +721,9 @@ contract GameImplementation {
 
     /**
      * @notice Get the number of remaining players for the current game
-     * @return the number of remaining players for the current game
+     * @return remainingPlayersCount the number of remaining players for the current game
      */
-    function _getRemainingPlayersCount() internal view returns (uint256) {
+    function _getRemainingPlayersCount() internal view returns (uint256 remainingPlayersCount) {
         uint256 remainingPlayers = 0;
         for (uint256 i = 0; i < playerAddresses.length; i++)
             if (!players[playerAddresses[i]].hasLost) remainingPlayers++;
@@ -704,7 +737,6 @@ contract GameImplementation {
      */
 
     function _pause() internal onlyNotPaused {
-        // Pause first to ensure no more interaction with contract
         contractPaused = true;
         CronUpkeepInterface(cronUpkeep).deleteCronJob(cronUpkeepJobId);
     }
@@ -714,6 +746,16 @@ contract GameImplementation {
      * @dev Callable by admin or creator
      */
     function _unpause() internal onlyPaused {
+        contractPaused = false;
+
+        // Reset round limits and round status for each remaining user
+        for (uint256 i = 0; i < playerAddresses.length; i++) {
+            Player storage player = players[playerAddresses[i]];
+            if (!player.hasLost) {
+                _resetRoundRange(player);
+                player.hasPlayedRound = false;
+            }
+        }
         uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
         cronUpkeepJobId = nextCronJobIDs;
 
@@ -722,18 +764,6 @@ contract GameImplementation {
             bytes("triggerDailyCheckpoint()"),
             encodedCron
         );
-
-        // Reset round limits and round status for each remaining user
-        for (uint256 i = 0; i < playerAddresses.length; i++) {
-            Player storage player = players[playerAddresses[i]];
-            if (player.hasLost == false) {
-                _resetRoundRange(player);
-                player.hasPlayedRound = false;
-            }
-        }
-
-        // Unpause last to ensure that everything is ok
-        contractPaused = false;
     }
 
     ///
@@ -742,105 +772,102 @@ contract GameImplementation {
 
     /**
      * @notice Return game informations
+     * @return gameStatus the game status data with params as follow :
+     *  gameStatus.creator the creator address of the game
+     *  gameStatus.roundId the roundId of the game
+     *  gameStatus.gameName the name of the game
+     *  gameStatus.gameImage the image of the game
+     *  gameStatus.playerAddressesCount the number of registered players
+     *  gameStatus.maxPlayers the maximum players of the game
+     *  gameStatus.registrationAmount the registration amount of the game
+     *  gameStatus.playTimeRange the player time range of the game
+     *  gameStatus.treasuryFee the treasury fee of the game
+     *  gameStatus.creatorFee the creator fee of the game
+     *  gameStatus.contractPaused a boolean set to true if game is paused
+     *  gameStatus.gameInProgress a boolean set to true if game is in progress
      */
-    function getStatus()
-        external
-        view
-        returns (
-            address,
-            uint256,
-            string memory,
-            string memory,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            bool,
-            bool
-        )
-    {
-        return (
-            creator,
-            roundId,
-            gameName,
-            gameImage,
-            playerAddresses.length,
-            maxPlayers,
-            registrationAmount,
-            playTimeRange,
-            treasuryFee,
-            creatorFee,
-            contractPaused,
-            gameInProgress
-        );
+    function getStatus() external view returns (GameStatus memory gameStatus) {
+        return
+            GameStatus({
+                creator: creator,
+                roundId: roundId,
+                gameName: gameName,
+                gameImage: gameImage,
+                playerAddressesCount: playerAddresses.length,
+                maxPlayers: maxPlayers,
+                registrationAmount: registrationAmount,
+                playTimeRange: playTimeRange,
+                treasuryFee: treasuryFee,
+                creatorFee: creatorFee,
+                contractPaused: contractPaused,
+                gameInProgress: gameInProgress
+            });
     }
 
     /**
      * @notice Return the players addresses for the current game
-     * @return list of players addresses
+     * @return gamePlayerAddresses list of players addresses
      */
-    function getPlayerAddresses() external view returns (address[] memory) {
+    function getPlayerAddresses() external view returns (address[] memory gamePlayerAddresses) {
         return playerAddresses;
     }
 
     /**
      * @notice Return a player for the current game
      * @param _player the player address
-     * @return player if finded
+     * @return gamePlayer if finded
      */
-    function getPlayer(address _player) external view returns (Player memory) {
+    function getPlayer(address _player) external view returns (Player memory gamePlayer) {
         return players[_player];
     }
 
     /**
      * @notice Return the winners for a round id
      * @param _roundId the round id
-     * @return list of Winner
+     * @return gameWinners list of Winner
      */
-    function getWinners(uint256 _roundId) external view onlyIfRoundId(_roundId) returns (Winner[] memory) {
+    function getWinners(uint256 _roundId) external view onlyIfRoundId(_roundId) returns (Winner[] memory gameWinners) {
         return winners[_roundId];
     }
 
     /**
      * @notice Return the winners for a round id
      * @param _roundId the round id
-     * @return list of Prize
+     * @return gamePrizes list of Prize
      */
-    function getPrizes(uint256 _roundId) external view onlyIfRoundId(_roundId) returns (Prize[] memory) {
+    function getPrizes(uint256 _roundId) external view onlyIfRoundId(_roundId) returns (Prize[] memory gamePrizes) {
         return prizes[_roundId];
     }
 
     /**
      * @notice Check if all remaining players are ok to split pot
-     * @return true if all remaining players are ok to split pot, false otherwise
+     * @return isSplitOk set to true if all remaining players are ok to split pot, false otherwise
      */
-    function isAllPlayersSplitOk() external view returns (bool) {
+    function isAllPlayersSplitOk() external view returns (bool isSplitOk) {
         return _isAllPlayersSplitOk();
     }
 
     /**
      * @notice Check if Game is payable
-     * @return true if game is payable, false otherwise
+     * @return isPayable set to true if game is payable, false otherwise
      */
-    function isGamePayable() external view returns (bool) {
+    function isGamePayable() external view returns (bool isPayable) {
         return _isGamePayable();
     }
 
     /**
      * @notice Check if Game prizes are standard
-     * @return true if game prizes are standard, false otherwise
+     * @return isStandard true if game prizes are standard, false otherwise
      */
-    function isGameAllPrizesStandard() external view returns (bool) {
+    function isGameAllPrizesStandard() external view returns (bool isStandard) {
         return _isGameAllPrizesStandard();
     }
 
     /**
      * @notice Get the number of remaining players for the current game
-     * @return the number of remaining players for the current game
+     * @return remainingPlayersCount the number of remaining players for the current game
      */
-    function getRemainingPlayersCount() external view returns (uint256) {
+    function getRemainingPlayersCount() external view returns (uint256 remainingPlayersCount) {
         return _getRemainingPlayersCount();
     }
 
@@ -907,9 +934,8 @@ contract GameImplementation {
     {
         uint256 currentCreatorAmount = creatorAmount;
         creatorAmount = 0;
-        _safeTransfert(creator, currentCreatorAmount);
-
         emit CreatorFeeClaimed(currentCreatorAmount);
+        _safeTransfert(creator, currentCreatorAmount);
     }
 
     ///
@@ -928,9 +954,8 @@ contract GameImplementation {
     {
         uint256 currentTreasuryAmount = treasuryAmount;
         treasuryAmount = 0;
-        _safeTransfert(owner, currentTreasuryAmount);
-
         emit TreasuryFeeClaimed(currentTreasuryAmount);
+        _safeTransfert(owner, currentTreasuryAmount);
     }
 
     /**
@@ -945,9 +970,8 @@ contract GameImplementation {
     {
         uint256 currentTreasuryAmount = treasuryAmount;
         treasuryAmount = 0;
-        _safeTransfert(factory, currentTreasuryAmount);
-
         emit TreasuryFeeClaimedByFactory(currentTreasuryAmount);
+        _safeTransfert(factory, currentTreasuryAmount);
     }
 
     /**
@@ -972,6 +996,7 @@ contract GameImplementation {
      */
     function setCronUpkeep(address _cronUpkeep) external onlyAdminOrFactory onlyAddressInit(_cronUpkeep) {
         cronUpkeep = _cronUpkeep;
+        emit CronUpkeepUpdated(cronUpkeepJobId, cronUpkeep);
 
         uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
         cronUpkeepJobId = nextCronJobIDs;
@@ -981,8 +1006,6 @@ contract GameImplementation {
             bytes("triggerDailyCheckpoint()"),
             encodedCron
         );
-
-        emit CronUpkeepUpdated(cronUpkeepJobId, cronUpkeep);
     }
 
     /**
@@ -995,13 +1018,14 @@ contract GameImplementation {
 
         encodedCron = CronExternal.toEncodedSpec(_encodedCron);
 
+        emit EncodedCronUpdated(cronUpkeepJobId, _encodedCron);
+
         CronUpkeepInterface(cronUpkeep).updateCronJob(
             cronUpkeepJobId,
             address(this),
             bytes("triggerDailyCheckpoint()"),
             encodedCron
         );
-        emit EncodedCronUpdated(cronUpkeepJobId, _encodedCron);
     }
 
     /**
@@ -1295,7 +1319,7 @@ contract GameImplementation {
      * @notice Modifier that ensure that we can't initialize the implementation contract
      */
     modifier onlyIfNotBase() {
-        require(_isBase == false, "The implementation contract can't be initialized");
+        require(!_isBase, "The implementation contract can't be initialized");
         _;
     }
 
