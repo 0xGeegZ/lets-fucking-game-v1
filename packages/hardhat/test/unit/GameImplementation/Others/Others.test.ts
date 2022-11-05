@@ -25,19 +25,19 @@ describe('GameV1Contract - Others', function () {
           await this.deployedPayableGame
             .connect(this.owner)
             .setGameName(newName)
-          const updatedName = await this.deployedPayableGame.gameName()
+          const updatedName = await this.deployedPayableGame.name()
           expect(updatedName).to.be.equal(newName)
         })
       })
     })
 
-    describe('setGameImage', function () {
+    describe('setImage', function () {
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
             this.deployedPayableGame
               .connect(this.bob)
-              .setGameImage('https://www.new-ipfs-image.com'),
+              .setImage('https://www.new-ipfs-image.com'),
             'Caller is not the creator'
           )
         })
@@ -48,8 +48,8 @@ describe('GameV1Contract - Others', function () {
           const newImageLink = 'https://www.new-ipfs-image.com'
           await this.deployedPayableGame
             .connect(this.owner)
-            .setGameImage(newImageLink)
-          const updatedImage = await this.deployedPayableGame.gameImage()
+            .setImage(newImageLink)
+          const updatedImage = await this.deployedPayableGame.image()
           expect(updatedImage).to.be.equal(newImageLink)
         })
       })

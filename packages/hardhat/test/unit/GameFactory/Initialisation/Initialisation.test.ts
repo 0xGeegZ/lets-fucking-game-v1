@@ -15,10 +15,10 @@ describe('GameFactoryContract', function () {
             creator: this.bob.address,
             owner: this.owner.address,
             cronUpkeep: this.cronUpkeep.address,
-            gameName: this.gameName,
-            gameImage: this.gameImage,
-            gameVersion: '0',
-            gameId: '0',
+            name: this.name,
+            image: this.image,
+            version: '0',
+            id: '0',
             playTimeRange: this.playTimeRange,
             maxPlayers: this.maxPlayers,
             registrationAmount: this.correctRegistrationAmount,
@@ -42,8 +42,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
-            this.gameName,
-            this.gameImage,
+            this.name,
+            this.image,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
@@ -67,10 +67,10 @@ describe('GameFactoryContract', function () {
             creator: this.bob.address,
             owner: this.owner.address,
             cronUpkeep: this.cronUpkeep.address,
-            gameName: this.gameName,
-            gameImage: this.gameImage,
-            gameVersion: '0',
-            gameId: '0',
+            name: this.name,
+            image: this.image,
+            version: '0',
+            id: '0',
             playTimeRange: this.playTimeRange,
             maxPlayers: this.maxPlayers,
             registrationAmount: this.correctRegistrationAmount,
@@ -88,7 +88,7 @@ describe('GameFactoryContract', function () {
     describe('when GameFactory gets deployed', function () {
       it('should set the correct values to state variables', async function () {
         const responseLatestGameV1VersionId =
-          await this.gameFactory.latestGameVersionId()
+          await this.gameFactory.latestVersionId()
         const responseGameV1 = await this.gameFactory.games(
           responseLatestGameV1VersionId
         )

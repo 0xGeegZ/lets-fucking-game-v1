@@ -36,32 +36,86 @@ const config: HardhatUserConfig = {
     compilers: [
       {
         version: process.env.SOLC_VERSION || '0.8.6',
+        settings: {
+          optimizer: {
+            enabled:
+              (process.env.SOLIDITY_OPTIMIZER &&
+                'true' === process.env.SOLIDITY_OPTIMIZER.toLowerCase()) ||
+              false,
+            runs:
+              (process.env.SOLIDITY_OPTIMIZER_RUNS &&
+                Boolean(parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) &&
+                parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) ||
+              200,
+          },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
+        },
       },
       {
         version: '0.8.6',
+        settings: {
+          optimizer: {
+            enabled:
+              (process.env.SOLIDITY_OPTIMIZER &&
+                'true' === process.env.SOLIDITY_OPTIMIZER.toLowerCase()) ||
+              false,
+            runs:
+              (process.env.SOLIDITY_OPTIMIZER_RUNS &&
+                Boolean(parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) &&
+                parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) ||
+              200,
+          },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
+        },
       },
       {
         version: '0.4.24',
-      },
-    ],
-    settings: {
-      optimizer: {
-        enabled:
-          (process.env.SOLIDITY_OPTIMIZER &&
-            'true' === process.env.SOLIDITY_OPTIMIZER.toLowerCase()) ||
-          false,
-        runs:
-          (process.env.SOLIDITY_OPTIMIZER_RUNS &&
-            Boolean(parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) &&
-            parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) ||
-          200,
-      },
-      outputSelection: {
-        '*': {
-          '*': ['storageLayout'],
+        settings: {
+          optimizer: {
+            enabled:
+              (process.env.SOLIDITY_OPTIMIZER &&
+                'true' === process.env.SOLIDITY_OPTIMIZER.toLowerCase()) ||
+              false,
+            runs:
+              (process.env.SOLIDITY_OPTIMIZER_RUNS &&
+                Boolean(parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) &&
+                parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) ||
+              200,
+          },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
         },
       },
-    },
+    ],
+    // settings: {
+    //   optimizer: {
+    //     enabled:
+    //       (process.env.SOLIDITY_OPTIMIZER &&
+    //         'true' === process.env.SOLIDITY_OPTIMIZER.toLowerCase()) ||
+    //       false,
+    //     runs:
+    //       (process.env.SOLIDITY_OPTIMIZER_RUNS &&
+    //         Boolean(parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) &&
+    //         parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) ||
+    //       200,
+    //   },
+    //   outputSelection: {
+    //     '*': {
+    //       '*': ['storageLayout'],
+    //     },
+    //   },
+    // },
   },
   docgen: {
     path: './docs',

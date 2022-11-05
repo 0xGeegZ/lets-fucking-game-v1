@@ -144,8 +144,8 @@ const initialiseTestData = async function () {
   this.bob = bob
   this.alice = alice
 
-  this.gameName = "Let's Fucking Game VMP"
-  this.gameImage = ''
+  this.name = "Let's Fucking Game VMP"
+  this.image = ''
 
   this.maxPlayers = 10
   this.playTimeRange = 2
