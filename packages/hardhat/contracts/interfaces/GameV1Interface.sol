@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import { CronUpkeepInterface } from "./CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
-interface GameImplementationV1Interface {
+interface GameV1Interface {
     ///STRUCTS
 
     /**
@@ -71,7 +71,7 @@ interface GameImplementationV1Interface {
         address cronUpkeep;
         string gameName;
         string gameImage;
-        uint256 gameImplementationVersion;
+        uint256 gameVersion;
         uint256 gameId;
         uint256 playTimeRange;
         uint256 maxPlayers;
@@ -201,7 +201,7 @@ interface GameImplementationV1Interface {
      *  @param _initialization.cronUpkeep the cron upkeep address
      *  @param _initialization.gameName the game name
      *  @param _initialization.gameImage the game image path
-     *  @param _initialization.gameImplementationVersion the version of the game implementation
+     *  @param _initialization.gameVersion the version of the game implementation
      *  @param _initialization.gameId the unique game id (fix)
      *  @param _initialization.playTimeRange the time range during which a player can play in hour
      *  @param _initialization.maxPlayers the maximum number of players for a game

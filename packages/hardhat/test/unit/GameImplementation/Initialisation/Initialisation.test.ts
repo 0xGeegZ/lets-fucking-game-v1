@@ -2,7 +2,7 @@ import { expect } from 'chai'
 
 import { initialiseTestData } from '../../../factories/setup'
 
-describe('GameImplementationV1Contract - Initialisation', function () {
+describe('GameV1Contract - Initialisation', function () {
   beforeEach(initialiseTestData)
 
   context('Contract Initialisation', function () {

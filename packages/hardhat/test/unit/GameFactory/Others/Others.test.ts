@@ -41,35 +41,29 @@ describe('GameFactoryContract', function () {
     })
   })
 
-  context('GameFactory setNewGameImplementationV1', function () {
+  context('GameFactory setNewGameV1', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
-          this.gameFactory
-            .connect(this.alice)
-            .setNewGameImplementationV1(this.gameImplementation.address),
+          this.gameFactory.connect(this.alice).setNewGameV1(this.game.address),
           'Caller is not the admin'
         )
       })
     })
 
     describe('when called by admin', function () {
-      it('should add the new implementation version to gameImplementations', async function () {
+      it('should add the new implementation version to games', async function () {
         await this.gameFactory
           .connect(this.owner)
-          .setNewGameImplementationV1(this.secondGameImplementationV1.address)
-        const responseGameImplementationV1s1 =
-          await this.gameFactory.gameImplementations('0')
-        const responseGameImplementationV1s2 =
-          await this.gameFactory.gameImplementations('1')
+          .setNewGameV1(this.secondGameV1.address)
+        const responseGameV1s1 = await this.gameFactory.games('0')
+        const responseGameV1s2 = await this.gameFactory.games('1')
 
-        expect(responseGameImplementationV1s1.id).to.be.equal('0')
-        expect(responseGameImplementationV1s1.deployedAddress).to.be.equal(
-          this.gameImplementation.address
-        )
-        expect(responseGameImplementationV1s2.id).to.be.equal('1')
-        expect(responseGameImplementationV1s2.deployedAddress).to.be.equal(
-          this.secondGameImplementationV1.address
+        expect(responseGameV1s1.id).to.be.equal('0')
+        expect(responseGameV1s1.deployedAddress).to.be.equal(this.game.address)
+        expect(responseGameV1s2.id).to.be.equal('1')
+        expect(responseGameV1s2.deployedAddress).to.be.equal(
+          this.secondGameV1.address
         )
       })
     })

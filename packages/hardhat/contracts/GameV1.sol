@@ -5,12 +5,12 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
-import { GameImplementationV1Interface } from "./interfaces/GameImplementationV1Interface.sol";
+import { GameV1Interface } from "./interfaces/GameV1Interface.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
-contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard, Pausable {
+contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
     using Address for address;
 
     bool private _isBase;
@@ -42,7 +42,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
     string public gameName;
     string public gameImage;
 
-    uint256 public gameImplementationVersion;
+    uint256 public gameVersion;
 
     uint256 public playTimeRange; // time length of a round in hours
 
@@ -74,7 +74,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
      *  @param _initialization.cronUpkeep the cron upkeep address
      *  @param _initialization.gameName the game name
      *  @param _initialization.gameImage the game image path
-     *  @param _initialization.gameImplementationVersion the version of the game implementation
+     *  @param _initialization.gameVersion the version of the game implementation
      *  @param _initialization.gameId the unique game id (fix)
      *  @param _initialization.playTimeRange the time range during which a player can play in hour
      *  @param _initialization.maxPlayers the maximum number of players for a game
@@ -115,7 +115,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
         creatorAmount = 0;
 
         gameId = _initialization.gameId;
-        gameImplementationVersion = _initialization.gameImplementationVersion;
+        gameVersion = _initialization.gameVersion;
 
         roundId = 0;
         playTimeRange = _initialization.playTimeRange;
