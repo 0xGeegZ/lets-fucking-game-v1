@@ -609,23 +609,23 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
 
     /**
      * @notice Return game informations
-     * @return gameStatus the game status data with params as follow :
-     *  gameStatus.creator the creator address of the game
-     *  gameStatus.roundId the roundId of the game
-     *  gameStatus.gameName the name of the game
-     *  gameStatus.gameImage the image of the game
-     *  gameStatus.playerAddressesCount the number of registered players
-     *  gameStatus.maxPlayers the maximum players of the game
-     *  gameStatus.registrationAmount the registration amount of the game
-     *  gameStatus.playTimeRange the player time range of the game
-     *  gameStatus.treasuryFee the treasury fee of the game
-     *  gameStatus.creatorFee the creator fee of the game
-     *  gameStatus.contractPaused a boolean set to true if game is paused
-     *  gameStatus.gameInProgress a boolean set to true if game is in progress
+     * @return gameData the game status data with params as follow :
+     *  gameData.creator the creator address of the game
+     *  gameData.roundId the roundId of the game
+     *  gameData.gameName the name of the game
+     *  gameData.gameImage the image of the game
+     *  gameData.playerAddressesCount the number of registered players
+     *  gameData.maxPlayers the maximum players of the game
+     *  gameData.registrationAmount the registration amount of the game
+     *  gameData.playTimeRange the player time range of the game
+     *  gameData.treasuryFee the treasury fee of the game
+     *  gameData.creatorFee the creator fee of the game
+     *  gameData.contractPaused a boolean set to true if game is paused
+     *  gameData.gameInProgress a boolean set to true if game is in progress
      */
-    function getStatus() external view override returns (GameStatus memory gameStatus) {
+    function getGameData() external view override returns (GameData memory gameData) {
         return
-            GameStatus({
+            GameData({
                 creator: creator,
                 roundId: roundId,
                 gameName: gameName,
