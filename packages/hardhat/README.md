@@ -1,11 +1,5 @@
 # Let's Fucking Game - Smart Contract
 
-# Coverage Report
-
-| Statements                                                                         | Functions                                                                        | Lines                                                                    |
-| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| ![Statements](https://img.shields.io/badge/statements-71.73%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-65.19%25-red.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-67.43%25-red.svg?style=flat) |
-
 # Prerequisites
 
 ```shell

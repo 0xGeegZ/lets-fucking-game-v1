@@ -5,7 +5,9 @@
   "scripts": {
     "prepare": "husky install",
     "dev": "yarn workspace lets-fucking-game-dapp dev",
-    "build": "yarn workspace lets-fucking-game-dapp build",
+    "build": "yarn build:hardhat && yarn build:dapp",
+    "build:hardhat": "yarn workspace lets-fucking-game-hardhat build",
+    "build:dapp": "yarn workspace lets-fucking-game-dapp build",
     "export": "yarn workspace lets-fucking-game-dapp export",
     "start": "yarn workspace lets-fucking-game-dapp start",
     "chain": "yarn workspace lets-fucking-game-hardhat chain",

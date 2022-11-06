@@ -1,3 +1,9 @@
+# Coverage Report
+
+| Statements                                                                         | Functions                                                                        | Lines                                                                    |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| ![Statements](https://img.shields.io/badge/statements-71.73%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-65.19%25-red.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-67.43%25-red.svg?style=flat) |
+
 # Let's Fucking Game
 
 This application was done during the [Chainlink Hackathon Fall 2022](https://chainlinkfall2022.devpost.com/)
@@ -132,26 +138,37 @@ Secondary :
 
 ## Quick Start
 
-Clone the repo and install all dependencies:
+### Clone the repo:
 
 ```bash
 git clone https://github.com/lets-fucking-game/lets-fucking-game
 cd lets-fucking-game
-
-yarn install
 ```
 
-Start up the local Hardhat network and deploy all contracts:
+### Install all dependencies:
+
+```bash
+yarn install      # install deps
+yarn run build    # install solc and other tools in the docker image
+```
+
+Don't forget to copy the .env.example file to a file named .env, and then edit it to fill in the details.
+
+### Start up the local Hardhat network and deploy all contracts:
 
 ```bash
 yarn chain
 ```
+
+### Startup the dapp
 
 In a second terminal start up the local development server run the front-end app:
 
 ```bash
 yarn dev
 ```
+
+### Metamask configuration
 
 To interact with the local network, follow this step-by-step guide on how to use [MetaMask with a Hardhat node](https://support.chainstack.com/hc/en-us/articles/4408642503449-Using-MetaMask-with-a-Hardhat-node).
 
