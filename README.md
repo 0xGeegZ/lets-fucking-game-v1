@@ -4,13 +4,18 @@ This application was done during the [Chainlink Hackathon Fall 2022](https://cha
 
 Contracts deployed on BNB CHAIN TESTNET :
 
-- Multicall contracts [0xB24037c082964A0FAe62Ac36964FfeB4728A5488](https://testnet.bscscan.com/address/0xB24037c082964A0FAe62Ac36964FfeB4728A5488#code)
-- MulticallV3 contracts [0x16A689E0Ab5171CC3607670B4d57303C8E35E05a](https://testnet.bscscan.com/address/0x16A689E0Ab5171CC3607670B4d57303C8E35E05a#code)
+PRIMARY :
+
+- GameFactory contract [0x5024CfeB0F5FbA922912C3aF50232B54E744a58F](https://testnet.bscscan.com/address/0x5024cfeb0f5fba922912c3af50232b54e744a58f#code)
+- GameV1 BASE contract [0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE](https://testnet.bscscan.com/address/0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE#code)
+
+SECONDARY :
+
+- CronUpkeep contract [0x260b35f5fec14D3de4Fe451F6aE0f533C091b050](https://testnet.bscscan.com/address/0x260b35f5fec14D3de4Fe451F6aE0f533C091b050#code)
 - CronUpkeepDelegate contract [0x464c700C2B6Db2386A9D36a8327B44e45286e58A](https://testnet.bscscan.com/address/0x464c700C2B6Db2386A9D36a8327B44e45286e58A#code)
 - CronExternal contract [0xff7C99af63679d4AD6065FD90844BF4011A672b2](https://testnet.bscscan.com/address/0xff7C99af63679d4AD6065FD90844BF4011A672b2#code)
-- CronUpkeep contract [0x260b35f5fec14D3de4Fe451F6aE0f533C091b050](https://testnet.bscscan.com/address/0x260b35f5fec14D3de4Fe451F6aE0f533C091b050#code)
-- GameV1 contract [0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE](https://testnet.bscscan.com/address/0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE#code)
-- GameFactory contract [0x5024CfeB0F5FbA922912C3aF50232B54E744a58F](https://testnet.bscscan.com/address/0x5024cfeb0f5fba922912c3af50232b54e744a58f#code)
+- Multicall contracts [0xB24037c082964A0FAe62Ac36964FfeB4728A5488](https://testnet.bscscan.com/address/0xB24037c082964A0FAe62Ac36964FfeB4728A5488#code)
+- MulticallV3 contracts [0x16A689E0Ab5171CC3607670B4d57303C8E35E05a](https://testnet.bscscan.com/address/0x16A689E0Ab5171CC3607670B4d57303C8E35E05a#code)
 
 ## Inspiration
 
