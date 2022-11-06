@@ -9,11 +9,11 @@ describe('GameV1Contract - Others', function () {
   beforeEach(initialiseTestData)
 
   context('Creator functions', function () {
-    describe('setGameName', function () {
+    describe('setName', function () {
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
-            this.deployedPayableGame.connect(this.bob).setGameName('New name'),
+            this.deployedPayableGame.connect(this.bob).setName(this.newName),
             'Caller is not the creator'
           )
         })
@@ -21,36 +21,11 @@ describe('GameV1Contract - Others', function () {
 
       describe('when caller is the creator', function () {
         it('should change the name of the Game Line', async function () {
-          const newName = 'New name'
           await this.deployedPayableGame
             .connect(this.owner)
-            .setGameName(newName)
+            .setName(this.newName)
           const updatedName = await this.deployedPayableGame.name()
-          expect(updatedName).to.be.equal(newName)
-        })
-      })
-    })
-
-    describe('setImage', function () {
-      describe('when caller is not the creator', function () {
-        it('should revert with correct error message', async function () {
-          await expectRevert(
-            this.deployedPayableGame
-              .connect(this.bob)
-              .setImage('https://www.new-ipfs-image.com'),
-            'Caller is not the creator'
-          )
-        })
-      })
-
-      describe('when caller is the creator', function () {
-        it('should change the image link of the Game Line', async function () {
-          const newImageLink = 'https://www.new-ipfs-image.com'
-          await this.deployedPayableGame
-            .connect(this.owner)
-            .setImage(newImageLink)
-          const updatedImage = await this.deployedPayableGame.image()
-          expect(updatedImage).to.be.equal(newImageLink)
+          expect(updatedName).to.be.equal(this.newName)
         })
       })
     })

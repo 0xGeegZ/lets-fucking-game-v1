@@ -69,8 +69,7 @@ interface GameV1Interface {
         address owner;
         address creator;
         address cronUpkeep;
-        string name;
-        string image;
+        bytes32 name;
         uint256 version;
         uint256 id;
         uint256 playTimeRange;
@@ -85,8 +84,7 @@ interface GameV1Interface {
     struct GameData {
         address creator;
         uint256 roundId;
-        string name;
-        string image;
+        bytes32 name;
         uint256 playerAddressesCount;
         uint256 maxPlayers;
         uint256 registrationAmount;
@@ -200,7 +198,6 @@ interface GameV1Interface {
      *  @param _initialization.owner the general admin address
      *  @param _initialization.cronUpkeep the cron upkeep address
      *  @param _initialization.name the game name
-     *  @param _initialization.image the game image path
      *  @param _initialization.version the version of the game implementation
      *  @param _initialization.id the unique game id (fix)
      *  @param _initialization.playTimeRange the time range during which a player can play in hour
@@ -209,7 +206,7 @@ interface GameV1Interface {
      *  @param _initialization.treasuryFee the treasury fee in percent
      *  @param _initialization.creatorFee creator fee in percent
      *  @param _initialization.encodedCron the cron string
-     *  @param _initialization.prizes the cron string
+     *  @param _initialization.prizes the prizes list
      * @dev TODO NEXT VERSION Remove _isGameAllPrizesStandard limitation to include other prize typ
      * @dev TODO NEXT VERSION Make it only accessible to factory
      */
@@ -277,7 +274,6 @@ interface GameV1Interface {
      *  gameData.creator the creator address of the game
      *  gameData.roundId the roundId of the game
      *  gameData.name the name of the game
-     *  gameData.image the image of the game
      *  gameData.playerAddressesCount the number of registered players
      *  gameData.maxPlayers the maximum players of the game
      *  gameData.registrationAmount the registration amount of the game
@@ -349,14 +345,7 @@ interface GameV1Interface {
      * @param _name the new game name
      * @dev Callable by creator
      */
-    function setGameName(string calldata _name) external;
-
-    /**
-     * @notice Set the image of the game
-     * @param _image the new game image
-     * @dev Callable by creator
-     */
-    function setImage(string calldata _image) external;
+    function setName(bytes32 _name) external;
 
     /**
      * @notice Set the maximum allowed players for the game

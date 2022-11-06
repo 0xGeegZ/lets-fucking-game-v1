@@ -190,7 +190,6 @@ describe('GameFactoryContract', function () {
               .connect(this.owner)
               .createNewGame(
                 this.name,
-                this.image,
                 this.maxPlayers,
                 this.playTimeRange,
                 this.correctRegistrationAmount,
@@ -218,7 +217,6 @@ describe('GameFactoryContract', function () {
             .connect(this.owner)
             .createNewGame(
               this.name,
-              this.image,
               this.maxPlayers,
               this.playTimeRange,
               registrationAmount,

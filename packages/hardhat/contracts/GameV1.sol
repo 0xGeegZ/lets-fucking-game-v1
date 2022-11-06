@@ -39,8 +39,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
     uint256 public id; // id is fix and represent the fixed id for the game
     uint256 public roundId; // roundId gets incremented every time the game restarts
 
-    string public name;
-    string public image;
+    bytes32 public name;
 
     uint256 public version;
 
@@ -73,7 +72,6 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      *  @param _initialization.owner the general admin address
      *  @param _initialization.cronUpkeep the cron upkeep address
      *  @param _initialization.name the game name
-     *  @param _initialization.image the game image path
      *  @param _initialization.version the version of the game implementation
      *  @param _initialization.id the unique game id (fix)
      *  @param _initialization.playTimeRange the time range during which a player can play in hour
@@ -103,7 +101,6 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         factory = msg.sender;
 
         name = _initialization.name;
-        image = _initialization.image;
 
         randNonce = 0;
 
@@ -613,7 +610,6 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      *  gameData.creator the creator address of the game
      *  gameData.roundId the roundId of the game
      *  gameData.name the name of the game
-     *  gameData.image the image of the game
      *  gameData.playerAddressesCount the number of registered players
      *  gameData.maxPlayers the maximum players of the game
      *  gameData.registrationAmount the registration amount of the game
@@ -629,7 +625,6 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
                 creator: creator,
                 roundId: roundId,
                 name: name,
-                image: image,
                 playerAddressesCount: playerAddresses.length,
                 maxPlayers: maxPlayers,
                 registrationAmount: registrationAmount,
@@ -729,17 +724,8 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @param _name the new game name
      * @dev Callable by creator
      */
-    function setGameName(string calldata _name) external override onlyCreator {
+    function setName(bytes32 _name) external override onlyCreator {
         name = _name;
-    }
-
-    /**
-     * @notice Set the image of the game
-     * @param _image the new game image
-     * @dev Callable by creator
-     */
-    function setImage(string calldata _image) external override onlyCreator {
-        image = _image;
     }
 
     /**
