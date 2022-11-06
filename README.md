@@ -1,9 +1,12 @@
 # Let's Fucking Game
 
 This application was done during the [Chainlink Hackathon Fall 2022](https://chainlinkfall2022.devpost.com/)
+<<<<<<< HEAD
 
 TODO UPDATE DEMO LINK
 [LIVE DEMO](https://chainlink-demo.app)
+=======
+>>>>>>> f3c9094b922c958e981bb58c3dbd74928fb112b0
 
 ## Inspiration
 
@@ -101,6 +104,8 @@ Primary :
 
 Secondary :
 
+- React Hooks for Data Fetching with [SWR](https://swr.vercel.app/)
+- State Management with [Redux](https://react-redux.js.org/)
 - Hooking with [Wagmi](https://github.com/wagmi-dev/wagmi)
 - Securing with [Mythril](https://github.com/ConsenSys/mythril)
 - Analyzing with [Slither](https://github.com/crytic/slither)
