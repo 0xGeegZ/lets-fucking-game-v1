@@ -9,8 +9,13 @@ const func: DeployFunction = async function ({
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
   const { deploy, log } = deployments
-  const { deployer } = await getNamedAccounts()
+  const { deployer: deployerAddress } = await getNamedAccounts()
   const chainId = await getChainId()
+
+  const options = {
+    from: deployerAddress,
+    log: true,
+  }
 
   const isLocalDeployment = chainId === '31337' || chainId === '1337'
   log('Local Network Detected, Deploying external contracts')
@@ -20,7 +25,7 @@ const func: DeployFunction = async function ({
     address: multicallAddress,
     newlyDeployed: multicallNewlyDeployed,
     receipt: { gasUsed: multicallGasUsed },
-  } = await deploy('Multicall', { from: deployer })
+  } = await deploy('Multicall', options)
 
   if (multicallNewlyDeployed) {
     log(
@@ -28,11 +33,13 @@ const func: DeployFunction = async function ({
     )
   }
 
+  log('Deploying Multicall3 contracts')
+
   const {
     address: multicall3Address,
     newlyDeployed: multicall3NewlyDeployed,
     receipt: { gasUsed: multicall3GasUsed },
-  } = await deploy('Multicall3', { from: deployer })
+  } = await deploy('Multicall3', options)
 
   if (multicall3NewlyDeployed) {
     log(
@@ -40,7 +47,8 @@ const func: DeployFunction = async function ({
     )
   }
 
-  if (isLocalDeployment) return
+  if (isLocalDeployment || !multicallNewlyDeployed || !multicall3NewlyDeployed)
+    return
 
   try {
     log(`✅ Verifying contract Multicall`)

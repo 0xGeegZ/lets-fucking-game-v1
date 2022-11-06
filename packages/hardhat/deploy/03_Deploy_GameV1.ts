@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 import { delay } from '../helpers/delay'
 
@@ -36,11 +36,9 @@ const func: DeployFunction = async function ({
     receipt: { gasUsed: gameGasUsed },
   } = await deploy('GameV1', { ...options, ...libraries })
 
-  if (gameNewlyDeployed) {
-    log(
-      `✅ Contract GameV1 deployed at ${gameAddress} using ${gameGasUsed} gas`
-    )
-  }
+  if (!gameNewlyDeployed) return
+
+  log(`✅ Contract GameV1 deployed at ${gameAddress} using ${gameGasUsed} gas`)
 
   log('Adding GameV1 to Keeper delegators')
 

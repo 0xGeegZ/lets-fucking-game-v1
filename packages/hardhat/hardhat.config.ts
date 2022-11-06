@@ -141,7 +141,6 @@ const config: HardhatUserConfig = {
         (process.env.ALLOW_UNLIMITED_CONTRACT_SIZE &&
           'true' === process.env.ALLOW_UNLIMITED_CONTRACT_SIZE.toLowerCase()) ||
         false,
-      tags: ['test', 'dev'],
     },
     custom: {
       url: process.env.CUSTOM_NETWORK_URL || '',
@@ -155,94 +154,78 @@ const config: HardhatUserConfig = {
         path: process.env.CUSTOM_NETWORK_ACCOUNTS_PATH || '',
       },
       saveDeployments: true,
-      tags: ['prod'],
-    },
-    arbitrumTestnet: {
-      url: process.env.ARBITRUM_TESTNET_URL || '',
-      accounts: getWallet(),
-      saveDeployments: true,
-      tags: ['staging'],
-    },
-    auroraTestnet: {
-      url: process.env.AURORA_TESTNET_URL || '',
-      accounts: getWallet(),
-      saveDeployments: true,
-      tags: ['staging'],
-    },
-    avalancheFujiTestnet: {
-      url: process.env.AVALANCHE_FUJI_TESTNET_URL || '',
-      accounts: getWallet(),
-      saveDeployments: true,
-      tags: ['staging'],
     },
     bscTestnet: {
       url: process.env.BSC_TESTNET_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
-      tags: ['staging'],
+    },
+    arbitrumTestnet: {
+      url: process.env.ARBITRUM_TESTNET_URL || '',
+      accounts: getWallet(),
+      saveDeployments: true,
+    },
+    auroraTestnet: {
+      url: process.env.AURORA_TESTNET_URL || '',
+      accounts: getWallet(),
+      saveDeployments: true,
+    },
+    avalancheFujiTestnet: {
+      url: process.env.AVALANCHE_FUJI_TESTNET_URL || '',
+      accounts: getWallet(),
+      saveDeployments: true,
     },
     ftmTestnet: {
       url: process.env.FTM_TESTNET_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
-      tags: ['staging'],
     },
     goerli: {
       url: process.env.GOERLI_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
-      tags: ['staging'],
     },
     harmonyTest: {
       url: process.env.HARMONY_TEST_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
-      tags: ['staging'],
     },
     hecoTestnet: {
       url: process.env.HECO_TESTNET_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
-      tags: ['staging'],
     },
     kovan: {
       url: process.env.KOVAN_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
-      tags: ['staging'],
     },
     moonbaseAlpha: {
       url: process.env.MOONBASE_ALPHA_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
-      tags: ['staging'],
     },
     polygonMumbai: {
       url: process.env.POLYGON_MUMBAI_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
-      tags: ['staging'],
     },
     rinkeby: {
       url: process.env.RINKEBY_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
-      tags: ['staging'],
     },
     ropsten: {
       url: process.env.ROPSTEN_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
-      tags: ['staging'],
     },
     sokol: {
       url: process.env.SOKOL_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
-      tags: ['staging'],
     },
   },
-  // TODO user hardhat deploy ?? SEE : https://github.com/wighawag/hardhat-deploy#4-hardhat-etherscan-verify
   etherscan: {
     apiKey: {
       arbitrumTestnet: process.env.ARBISCAN_API_KEY || '',

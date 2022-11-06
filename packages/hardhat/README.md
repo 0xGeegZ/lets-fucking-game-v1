@@ -2,8 +2,8 @@
 
 # Coverage Report
 
-| Statements                                                                              | Functions                                                                             | Lines                                                                         |
-| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Statements                                                                         | Functions                                                                        | Lines                                                                    |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | ![Statements](https://img.shields.io/badge/statements-71.73%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-65.19%25-red.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-67.43%25-red.svg?style=flat) |
 
 # Prerequisites
@@ -62,7 +62,7 @@ In this project, copy the .env.example file to a file named .env, and then edit 
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NETWORK_RPC_URL`             | One key by RCP network (see env.example). Required to deploy to public networks. Obtain from [Infura's site](https://infura.io).                                                                                                   |
 | `DEPLOYER_WALLET_PRIVATE_KEY` | The private key of the account which will send the deployment transaction. The account must have enough ETH to deploy the contracts, as well as LINK which can be obtained from [Chainlink's faucets](https://faucets.chain.link). |
-| `ETHERSCAN_API_KEY`           | Your Etherscan API key to verify contract code on Etherscan.                                                                                                                                                                       |
+| `ETHERSCAN_API_KEY`           | You'll need an `Blockchain Explorers API Key` configured in your env file. You can get one from the [Etherscan API site.](https://etherscan.io/apis) for example.                                                                  |
 
 With a valid .env file in place, first deploy your contract:
 

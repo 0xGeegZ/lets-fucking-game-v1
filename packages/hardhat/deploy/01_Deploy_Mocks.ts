@@ -1,5 +1,5 @@
-import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction } from 'hardhat-deploy/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -11,6 +11,6 @@ const func: DeployFunction = async function ({
   await deploy('LinkToken', { from: deployer, log: true })
 }
 
-func.tags = ['all', 'test', 'mocks']
+func.tags = ['all', 'test', 'dev', 'mocks']
 
 export default func
