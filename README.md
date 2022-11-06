@@ -1,6 +1,6 @@
 # Let's Fucking Game
 
-This application was done during the [Chainlink Hackaton Fall 2002](https://chainlinkfall2022.devpost.com/)
+This application was done during the [Chainlink Hackathon Fall 2022](https://chainlinkfall2022.devpost.com/)
 
 ## Inspiration
 
