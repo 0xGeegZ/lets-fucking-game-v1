@@ -116,7 +116,6 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
     /**
      * @notice Create a new game
      * @param _name the game name
-     * @param _image the game image path
      * @param _maxPlayers the max players for the game
      * @param _playTimeRange the player time range
      * @param _registrationAmount the registration amount
@@ -125,8 +124,7 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
      * @param _encodedCron the encoded cron as * * * * *
      */
     function createNewGame(
-        string memory _name,
-        string memory _image,
+        bytes32 _name,
         uint256 _maxPlayers,
         uint256 _playTimeRange,
         uint256 _registrationAmount,
@@ -161,7 +159,6 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
         initialization.owner = owner();
         initialization.cronUpkeep = cronUpkeep;
         initialization.name = _name;
-        initialization.image = _image;
         initialization.version = latestVersionId;
         initialization.id = nextId;
         initialization.playTimeRange = _playTimeRange;

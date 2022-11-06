@@ -144,8 +144,8 @@ const initialiseTestData = async function () {
   this.bob = bob
   this.alice = alice
 
-  this.name = "Let's Fucking Game VMP"
-  this.image = ''
+  this.name = ethers.utils.formatBytes32String("Let's Fucking Game VMP")
+  this.newName = ethers.utils.formatBytes32String('New Name')
 
   this.maxPlayers = 10
   this.playTimeRange = 2

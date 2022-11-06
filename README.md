@@ -1,6 +1,12 @@
 # Let's Fucking Game
 
 This application was done during the [Chainlink Hackathon Fall 2022](https://chainlinkfall2022.devpost.com/)
+<<<<<<< HEAD
+
+TODO UPDATE DEMO LINK
+[LIVE DEMO](https://chainlink-demo.app)
+=======
+>>>>>>> f3c9094b922c958e981bb58c3dbd74928fb112b0
 
 ## Inspiration
 

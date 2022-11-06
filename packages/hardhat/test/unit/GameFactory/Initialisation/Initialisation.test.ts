@@ -16,7 +16,6 @@ describe('GameFactoryContract', function () {
             owner: this.owner.address,
             cronUpkeep: this.cronUpkeep.address,
             name: this.name,
-            image: this.image,
             version: '0',
             id: '0',
             playTimeRange: this.playTimeRange,
@@ -43,7 +42,6 @@ describe('GameFactoryContract', function () {
           .connect(this.bob)
           .createNewGame(
             this.name,
-            this.image,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
@@ -68,7 +66,6 @@ describe('GameFactoryContract', function () {
             owner: this.owner.address,
             cronUpkeep: this.cronUpkeep.address,
             name: this.name,
-            image: this.image,
             version: '0',
             id: '0',
             playTimeRange: this.playTimeRange,

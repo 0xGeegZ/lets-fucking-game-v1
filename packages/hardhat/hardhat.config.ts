@@ -98,24 +98,6 @@ const config: HardhatUserConfig = {
         },
       },
     ],
-    // settings: {
-    //   optimizer: {
-    //     enabled:
-    //       (process.env.SOLIDITY_OPTIMIZER &&
-    //         'true' === process.env.SOLIDITY_OPTIMIZER.toLowerCase()) ||
-    //       false,
-    //     runs:
-    //       (process.env.SOLIDITY_OPTIMIZER_RUNS &&
-    //         Boolean(parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) &&
-    //         parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) ||
-    //       200,
-    //   },
-    //   outputSelection: {
-    //     '*': {
-    //       '*': ['storageLayout'],
-    //     },
-    //   },
-    // },
   },
   docgen: {
     path: './docs',
