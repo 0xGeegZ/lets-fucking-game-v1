@@ -2,6 +2,16 @@
 
 This application was done during the [Chainlink Hackathon Fall 2022](https://chainlinkfall2022.devpost.com/)
 
+Contracts deployed on BNB CHAIN TESTNET :
+
+- Multicall contracts [0xB24037c082964A0FAe62Ac36964FfeB4728A5488](https://testnet.bscscan.com/address/0xB24037c082964A0FAe62Ac36964FfeB4728A5488#code)
+- MulticallV3 contracts [0x16A689E0Ab5171CC3607670B4d57303C8E35E05a](https://testnet.bscscan.com/address/0x16A689E0Ab5171CC3607670B4d57303C8E35E05a#code)
+- CronUpkeepDelegate contract [0x464c700C2B6Db2386A9D36a8327B44e45286e58A](https://testnet.bscscan.com/address/0x464c700C2B6Db2386A9D36a8327B44e45286e58A#code)
+- CronExternal contract [0xff7C99af63679d4AD6065FD90844BF4011A672b2](https://testnet.bscscan.com/address/0xff7C99af63679d4AD6065FD90844BF4011A672b2#code)
+- CronUpkeep contract [0x260b35f5fec14D3de4Fe451F6aE0f533C091b050](https://testnet.bscscan.com/address/0x260b35f5fec14D3de4Fe451F6aE0f533C091b050#code)
+- GameV1 contract [0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE](https://testnet.bscscan.com/address/0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE#code)
+- GameFactory contract [0x5024CfeB0F5FbA922912C3aF50232B54E744a58F](https://testnet.bscscan.com/address/0x5024cfeb0f5fba922912c3af50232b54e744a58f#code)
+
 ## Inspiration
 
 We could run into a storytelling exercise and tell you that this was thought of as an innovative new way to engage your web3 community on twitter while providing a simple and fun experience.
@@ -32,9 +42,9 @@ The game creator can also manage the winners structure to allow more or less pla
 
 Mono Repo boilerplate crafted from multiple other boileplates. This help us to bootstrap this project in the best conditions :
 
-- https://github.com/hackbg/chainlink-fullstack/ : For the monorepo configuration
+- [https://github.com/hackbg/chainlink-fullstack/](https://github.com/hackbg/chainlink-fullstack/) : For the monorepo configuration
 - [https://github.com/emretepedev/solidity-hardhat-typescript-boilerplate](https://github.com/emretepedev/solidity-hardhat-typescript-boilerplate) : For the Smart Contract Project configuration
-- https://github.com/pancakeswap/pancake-frontend : For the front end project configuration
+- [https://github.com/pancakeswap/pancake-frontend](https://github.com/pancakeswap/pancake-frontend) : For the front end project configuration
 
 Smart contract : Solidity, Hardhat and Chainlink Keeper
 
@@ -168,11 +178,11 @@ This will run the deploy scripts to a local Hardhat network:
 yarn deploy
 ```
 
-Update this command line to deploy all smart contract a on specific network.
+SEE [hardhat package.json](./packages/hardhat/package.json) to see all deployment commands.
 
 ## Auto-Funding
 
-The Hardhat project will attempt to auto-fund any newly deployed contract that uses Any-API or VRF, which otherwise has to be done manually.
+The Hardhat project will attempt to auto-fund the keeper deployed contract, which otherwise has to be done manually.
 
 The amount in LINK to send as part of this process can be modified in this [Hardhat Config](https://github.com/lets-fucking-game/lets-fucking-game/blob/main/packages/hardhat/helper-hardhat-config.ts), and are configurable per network.
 
@@ -180,11 +190,13 @@ The amount in LINK to send as part of this process can be modified in this [Hard
 | ---------- | :------------------------------------------------ | :------------ |
 | fundAmount | Amount of LINK to transfer when funding contracts | 1 LINK        |
 
-If you wish to deploy the smart contracts without performing the auto-funding, run the following command when doing your deployment:
+## Verify on Blockchain Explorers
 
-```bash
-yarn deploy <NETWORK> <CONTRACT>
-```
+You'll need an `Blockchain Explorers API Key` configured in your env file.
+
+All deployment script include verify part.
+
+For more information, SEE the [README](./packages/hardhat/README.md).
 
 ## Test
 
@@ -194,30 +206,10 @@ If the test command is executed without a specified network it will run locally 
 yarn test:contracts
 ```
 
-Integration tests must be run on a public testnet that has Chainlink oracles responding:
-
-```bash
-yarn test:contracts --network kovan
-```
-
 For coverage report:
 
 ```bash
 yarn coverage:contracts
-```
-
-## Verify on Etherscan
-
-You'll need an `ETHERSCAN_API_KEY` environment variable. You can get one from the [Etherscan API site.](https://etherscan.io/apis)
-
-```bash
-npx hardhat verify --network <NETWORK> <CONTRACT_ADDRESS> <CONSTRUCTOR_PARAMETERS>
-```
-
-example:
-
-```bash
-npx hardhat verify --network kovan 0x9279791897f112a41FfDa267ff7DbBC46b96c296 "0x9326BFA02ADD2366b30bacB125260Af641031331"
 ```
 
 ## Format
@@ -235,7 +227,11 @@ yarn format:hardhat
 yarn lint:dapp
 ```
 
+# Miscellaneous
+
+SEE [hardhat package](./packages/hardhat/) to see all smart contracts miscellaneous.
+SEE [dapp package](./packages/dapp/) to see all dapp miscellaneous.
+
 ## References
 
 - [Chainlink Docs](https://docs.chain.link)
-- [Chainlink Fullstack Repo](https://github.com/hackbg/chainlink-fullstack/)

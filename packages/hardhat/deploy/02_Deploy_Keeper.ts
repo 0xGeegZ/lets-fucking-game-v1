@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 import { delay } from '../helpers/delay'
 
@@ -66,11 +66,11 @@ const func: DeployFunction = async function ({
     args: cronUpkeepArgs,
   })
 
-  if (cronUpkeepNewlyDeployed) {
-    log(
-      `✅ Contract CronUpkeep deployed at ${cronUpkeepAddress} using ${cronUpkeepGasUsed} gas`
-    )
-  }
+  if (!cronUpkeepNewlyDeployed) return
+
+  log(
+    `✅ Contract CronUpkeep deployed at ${cronUpkeepAddress} using ${cronUpkeepGasUsed} gas`
+  )
 
   if (isLocalDeployment) return
 
@@ -93,6 +93,6 @@ const func: DeployFunction = async function ({
   }
 }
 
-func.tags = ['all', 'lfg', 'main', 'keeper', 'test']
+func.tags = ['all', 'test', 'dev', 'staging', 'prod', 'keeper']
 
 export default func

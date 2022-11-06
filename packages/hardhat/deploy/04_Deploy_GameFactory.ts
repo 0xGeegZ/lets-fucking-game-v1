@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 import { delay } from '../helpers/delay'
 
@@ -58,11 +58,10 @@ const func: DeployFunction = async function ({
     args: gameFactoryArgs,
   })
 
-  if (gameFactoryNewlyDeployed) {
-    log(
-      `✅ Contract GameFactory deployed at ${gameFactoryAddress} using ${gameFactoryGasUsed} gas`
-    )
-  }
+  if (!gameFactoryNewlyDeployed) return
+  log(
+    `✅ Contract GameFactory deployed at ${gameFactoryAddress} using ${gameFactoryGasUsed} gas`
+  )
 
   log('Adding GameFactory to Keeper delegators')
   const { interface: cronUpkeepInterface } = await ethers.getContractFactory(

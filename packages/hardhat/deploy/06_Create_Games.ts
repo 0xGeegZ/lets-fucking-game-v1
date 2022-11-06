@@ -19,9 +19,11 @@ const func: DeployFunction = async function ({
 
   const registrationAmount = ethers.utils.parseEther('0.0001')
   const zeroRegistrationAmount = ethers.utils.parseEther('0')
+
+  // const freeGamePrizepool = 0.1
+  // const freeGamePrizepoolAmount = ethers.utils.parseEther('0.1')
   const freeGamePrizepool = 1
   const freeGamePrizepoolAmount = ethers.utils.parseEther('1')
-
   const treasuryFee = 500 // 5%
   const creatorFee = 500 // 5%
 
@@ -42,10 +44,10 @@ const func: DeployFunction = async function ({
   updatedPrizes.push({ ...prizes[0] })
 
   updatedPrizes[0].amount = ethers.utils.parseEther(
-    `${freeGamePrizepool * 0.8}`
+    `${freeGamePrizepool * 0.5}`
   )
   updatedPrizes[1].amount = ethers.utils.parseEther(
-    `${freeGamePrizepool * 0.2}`
+    `${freeGamePrizepool * 0.5}`
   )
   updatedPrizes[1].position = 2
 
@@ -92,7 +94,7 @@ const func: DeployFunction = async function ({
   log(`✅ New free game created`)
 }
 
-func.tags = ['all', 'test', 'dev', 'staging', 'create-game']
+func.tags = ['all', 'test', 'dev', 'staging', 'create-games']
 func.dependencies = ['game-factory']
 
 export default func

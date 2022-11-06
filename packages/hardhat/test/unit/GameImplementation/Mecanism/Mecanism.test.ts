@@ -1158,6 +1158,7 @@ describe('GameV1Contract - Mecanism', function () {
           .connect(this.mockKeeper)
           .triggerDailyCheckpoint()
 
+        // TODO ensure that address have receive right amount
         await expect(
           this.deployedFreeGame
             .connect(this.players[finalistIndex])
@@ -1167,9 +1168,11 @@ describe('GameV1Contract - Mecanism', function () {
           .withArgs(
             this.players[finalistIndex].address,
             roundId,
+            // TODO use fee to calculate 0.45
             ethers.utils.parseEther(`${this.freeGamePrizepool * 0.45}`)
           )
 
+        // TODO ensure that address have receive right amount
         await expect(
           this.deployedFreeGame
             .connect(this.players[secondFinalistIndex])
@@ -1179,6 +1182,7 @@ describe('GameV1Contract - Mecanism', function () {
           .withArgs(
             this.players[secondFinalistIndex].address,
             roundId,
+            // TODO use fee to calculate 0.45
             ethers.utils.parseEther(`${this.freeGamePrizepool * 0.45}`)
           )
       })
