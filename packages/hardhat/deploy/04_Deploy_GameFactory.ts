@@ -2,14 +2,19 @@ import { ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
 
+import { delay } from '../helpers/delay'
+
 const func: DeployFunction = async function ({
   deployments,
+  getChainId,
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
   const { deploy, log } = deployments
 
   const { deployer: deployerAddress } = await getNamedAccounts()
+  const chainId = await getChainId()
 
+  const isLocalDeployment = chainId === '31337' || chainId === '1337'
   const deployer = await ethers.getSigner(deployerAddress)
 
   const options = {
@@ -38,18 +43,19 @@ const func: DeployFunction = async function ({
   )
 
   log('Deploying GameFactory contract')
+  const gameFactoryArgs = [
+    gameAddress,
+    cronUpkeepAddress,
+    gameCreationAmount,
+    authorizedAmounts,
+  ]
   const {
     address: gameFactoryAddress,
     newlyDeployed: gameFactoryNewlyDeployed,
     receipt: { gasUsed: gameFactoryGasUsed },
   } = await deploy('GameFactory', {
     ...options,
-    args: [
-      gameAddress,
-      cronUpkeepAddress,
-      gameCreationAmount,
-      authorizedAmounts,
-    ],
+    args: gameFactoryArgs,
   })
 
   if (gameFactoryNewlyDeployed) {
@@ -70,9 +76,22 @@ const func: DeployFunction = async function ({
     deployer
   )
   cronUpkeep.addDelegator(gameFactoryAddress)
+
+  if (isLocalDeployment) return
+
+  try {
+    log(`✅ Verifying contract GameFactory`)
+    await hre.run('verify:verify', {
+      address: gameFactoryAddress,
+      constructorArguments: gameFactoryArgs,
+    })
+    await delay(10 * 1000)
+  } catch (error) {
+    console.error('Error during contract verification', error.message)
+  }
 }
 
-func.tags = ['all', 'lfg', 'main', 'game-factory', 'test']
-func.dependencies = ['game-implementation', 'keeper']
+func.tags = ['all', 'test', 'dev', 'staging', 'prod', 'game-factory']
+func.dependencies = ['game', 'keeper']
 
 export default func

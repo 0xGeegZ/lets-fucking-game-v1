@@ -1,13 +1,19 @@
 import { ethers } from 'hardhat'
-import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction } from 'hardhat-deploy/types'
+
+import { delay } from '../helpers/delay'
 
 const func: DeployFunction = async function ({
   deployments,
+  getChainId,
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
   const { deploy, log } = deployments
   const { deployer } = await getNamedAccounts()
+  const chainId = await getChainId()
+
+  const isLocalDeployment = chainId === '31337' || chainId === '1337'
 
   const CRON_MAX_JOBS = 100
   const options = {
@@ -44,6 +50,12 @@ const func: DeployFunction = async function ({
   }
 
   log('Deploying CronUpkeep contract')
+  const cronUpkeepArgs = [
+    deployer,
+    cronUpkeepDelegate.address,
+    CRON_MAX_JOBS,
+    ethers.utils.toUtf8Bytes(''),
+  ]
   const {
     address: cronUpkeepAddress,
     newlyDeployed: cronUpkeepNewlyDeployed,
@@ -51,18 +63,33 @@ const func: DeployFunction = async function ({
   } = await deploy('CronUpkeep', {
     ...options,
     ...libraries,
-    args: [
-      deployer,
-      cronUpkeepDelegate.address,
-      CRON_MAX_JOBS,
-      ethers.utils.toUtf8Bytes(''),
-    ],
+    args: cronUpkeepArgs,
   })
 
   if (cronUpkeepNewlyDeployed) {
     log(
       `✅ Contract CronUpkeep deployed at ${cronUpkeepAddress} using ${cronUpkeepGasUsed} gas`
     )
+  }
+
+  if (isLocalDeployment) return
+
+  try {
+    log(`✅ Verifying contract CronExternal`)
+    await hre.run('verify:verify', {
+      address: cronExternalAddress,
+      constructorArguments: [],
+    })
+    await delay(10 * 1000)
+
+    log(`✅ Verifying contract CronUpkeep`)
+    await hre.run('verify:verify', {
+      address: cronUpkeepAddress,
+      constructorArguments: cronUpkeepArgs,
+    })
+    await delay(10 * 1000)
+  } catch (error) {
+    console.error('Error during contract verification', error.message)
   }
 }
 

@@ -1,13 +1,19 @@
 import { ethers } from 'hardhat'
-import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction } from 'hardhat-deploy/types'
+
+import { delay } from '../helpers/delay'
 
 const func: DeployFunction = async function ({
   deployments,
+  getChainId,
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
   const { deploy, log } = deployments
   const { deployer: deployerAddress } = await getNamedAccounts()
+  const chainId = await getChainId()
+
+  const isLocalDeployment = chainId === '31337' || chainId === '1337'
 
   const deployer = await ethers.getSigner(deployerAddress)
 
@@ -51,9 +57,22 @@ const func: DeployFunction = async function ({
     deployer
   )
   cronUpkeep.addDelegator(gameAddress)
+
+  if (isLocalDeployment) return
+
+  try {
+    log(`✅ Verifying contract GameV1`)
+    await hre.run('verify:verify', {
+      address: gameAddress,
+      constructorArguments: [],
+    })
+    await delay(10 * 1000)
+  } catch (error) {
+    console.error('Error during contract verification', error.message)
+  }
 }
 
-func.tags = ['all', 'lfg', 'main', 'game-implementation', 'test']
+func.tags = ['all', 'test', 'dev', 'staging', 'prod', 'game']
 func.dependencies = ['keeper']
 
 export default func

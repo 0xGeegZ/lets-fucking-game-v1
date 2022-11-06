@@ -5,7 +5,8 @@
   "version": "0.0.1",
   "author": "@GuiDieudo",
   "scripts": {
-    "chain": "hardhat node --show-stack-traces",
+    "chain": "hardhat node",
+    "chain:debug": "hardhat node --show-stack-traces",
     "chain:stop": "lsof -ti tcp:8545 | xargs kill ",
     "chain:force": "yarn clean && yarn chain:stop && yarn chain",
     "start": "hardhat node",
@@ -17,7 +18,7 @@
     "size": "hardhat size-contracts",
     "prepend-spdx": "hardhat prepend-spdx-license",
     "deploy": "bin/deploy.sh",
-    "deploy:all": "npx hardhat deploy --tags all --network",
+    "deploy:all": "npx hardhat deploy --network",
     "verify": "hardhat verify --network",
     "test": "yarn test:clean && hardhat test",
     "test:clean": "rm -rf ./artifacts && rm -rf  ./cache && yarn clean && yarn typechain",
