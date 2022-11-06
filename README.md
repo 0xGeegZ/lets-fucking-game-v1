@@ -2,9 +2,6 @@
 
 This application was done during the [Chainlink Hackaton Fall 2002](https://chainlinkfall2022.devpost.com/)
 
-TODO UPDATE DEMO LINK
-[LIVE DEMO](https://chainlink-demo.app)
-
 ## Inspiration
 
 We could run into a storytelling exercise and tell you that this was thought of as an innovative new way to engage your web3 community on twitter while providing a simple and fun experience.
