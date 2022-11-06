@@ -1,22 +1,27 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.6;
+pragma solidity >=0.8.6;
+
+import "@openzeppelin/contracts/utils/Address.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-import { GameImplementationInterface } from "./interfaces/GameImplementationInterface.sol";
+import { GameV1Interface } from "./interfaces/GameV1Interface.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 
-contract GameFactory is Pausable, Ownable {
+contract GameFactory is Pausable, Ownable, ReentrancyGuard {
+    using Address for address;
+
     address public cronUpkeep;
 
-    uint256 public nextGameId = 0;
+    uint256 public nextId = 0;
 
     uint256 public gameCreationAmount;
 
-    uint256 public latestGameImplementationVersionId;
-    GameImplementationVersion[] public gameImplementations;
+    uint256 public latestVersionId;
+    GameV1Version[] public games;
 
     Game[] public deployedGames;
 
@@ -38,15 +43,16 @@ contract GameFactory is Pausable, Ownable {
     }
 
     /**
-     * @notice GameImplementationVersion structure that contain all usefull data for a game Implementation version
+     * @notice GameV1Version structure that contain all usefull data for a game Implementation version
      */
-    struct GameImplementationVersion {
+    struct GameV1Version {
         uint256 id;
         address deployedAddress;
     }
 
     /**
      * @notice AuthorizedAmount structure that contain all usefull data bout an authorized amount
+     * @dev TODO NEXT VERSION add default Name and Image to AuthorizedAmount
      */
     struct AuthorizedAmount {
         uint256 amount;
@@ -60,7 +66,7 @@ contract GameFactory is Pausable, Ownable {
     /**
      * @notice Called when a game is created
      */
-    event GameCreated(uint256 nextGameId, address gameAddress, uint256 implementationVersion, address creatorAddress);
+    event GameCreated(uint256 nextId, address gameAddress, uint256 implementationVersion, address creatorAddress);
     /**
      * @notice Called when a transfert have failed
      */
@@ -76,27 +82,21 @@ contract GameFactory is Pausable, Ownable {
 
     /**
      * @notice Constructor Tha initialised the factory configuration
-     * @param _gameImplementation the game implementation address
+     * @param _game the game implementation address
      * @param _cronUpkeep the keeper address
      * @param _gameCreationAmount the game creation amount
      * @param _authorizedAmounts the list of authorized amounts for game creation
      */
     constructor(
-        address _gameImplementation,
+        address _game,
         address _cronUpkeep,
         uint256 _gameCreationAmount,
         uint256[] memory _authorizedAmounts
-    )
-        onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts)
-        onlyAddressInit(_gameImplementation)
-        onlyAddressInit(_cronUpkeep)
-    {
+    ) onlyIfAuthorizedAmountsIsNotEmpty(_authorizedAmounts) onlyAddressInit(_game) onlyAddressInit(_cronUpkeep) {
         cronUpkeep = _cronUpkeep;
         gameCreationAmount = _gameCreationAmount;
 
-        gameImplementations.push(
-            GameImplementationVersion({ id: latestGameImplementationVersionId, deployedAddress: _gameImplementation })
-        );
+        games.push(GameV1Version({ id: latestVersionId, deployedAddress: _game }));
 
         for (uint256 i = 0; i < _authorizedAmounts.length; i++) {
             if (!_isExistAuthorizedAmounts(_authorizedAmounts[i])) {
@@ -115,8 +115,7 @@ contract GameFactory is Pausable, Ownable {
 
     /**
      * @notice Create a new game
-     * @param _gameName the game name
-     * @param _gameImage the game image path
+     * @param _name the game name
      * @param _maxPlayers the max players for the game
      * @param _playTimeRange the player time range
      * @param _registrationAmount the registration amount
@@ -125,16 +124,16 @@ contract GameFactory is Pausable, Ownable {
      * @param _encodedCron the encoded cron as * * * * *
      */
     function createNewGame(
-        string memory _gameName,
-        string memory _gameImage,
+        bytes32 _name,
         uint256 _maxPlayers,
         uint256 _playTimeRange,
         uint256 _registrationAmount,
         uint256 _treasuryFee,
         uint256 _creatorFee,
-        string memory _encodedCron
+        string memory _encodedCron,
+        GameV1Interface.Prize[] memory _prizes
     )
-        public
+        external
         payable
         whenNotPaused
         onlyGameCreationAmount
@@ -142,40 +141,37 @@ contract GameFactory is Pausable, Ownable {
         onlyIfNotUsedRegistrationAmounts(_registrationAmount)
         returns (address game)
     {
-        address latestGameImplementationAddress = gameImplementations[latestGameImplementationVersionId]
-            .deployedAddress;
-        address payable newGameAddress = payable(Clones.clone(latestGameImplementationAddress));
+        address latestGameV1Address = games[latestVersionId].deployedAddress;
+        address payable newGameAddress = payable(Clones.clone(latestGameV1Address));
+
+        usedAuthorizedAmounts[_registrationAmount].isUsed = true;
+        deployedGames.push(
+            Game({ id: nextId, versionId: latestVersionId, creator: msg.sender, deployedAddress: newGameAddress })
+        );
+        emit GameCreated(nextId, newGameAddress, latestVersionId, msg.sender);
+        nextId += 1;
 
         CronUpkeepInterface(cronUpkeep).addDelegator(newGameAddress);
 
-        GameImplementationInterface.Initialization memory initialization;
-        initialization._creator = msg.sender;
-        initialization._owner = owner();
-        initialization._cronUpkeep = cronUpkeep;
-        initialization._gameName = _gameName;
-        initialization._gameImage = _gameImage;
-        initialization._gameImplementationVersion = latestGameImplementationVersionId;
-        initialization._gameId = nextGameId;
-        initialization._playTimeRange = _playTimeRange;
-        initialization._maxPlayers = _maxPlayers;
-        initialization._registrationAmount = _registrationAmount;
-        initialization._treasuryFee = _treasuryFee;
-        initialization._creatorFee = _creatorFee;
-        initialization._encodedCron = _encodedCron;
+        // Declare structure and initialize later to avoid stack too deep exception
+        GameV1Interface.Initialization memory initialization;
+        initialization.creator = msg.sender;
+        initialization.owner = owner();
+        initialization.cronUpkeep = cronUpkeep;
+        initialization.name = _name;
+        initialization.version = latestVersionId;
+        initialization.id = nextId;
+        initialization.playTimeRange = _playTimeRange;
+        initialization.maxPlayers = _maxPlayers;
+        initialization.registrationAmount = _registrationAmount;
+        initialization.treasuryFee = _treasuryFee;
+        initialization.creatorFee = _creatorFee;
+        initialization.encodedCron = _encodedCron;
+        initialization.prizes = _prizes;
 
-        GameImplementationInterface(newGameAddress).initialize(initialization);
+        uint256 prizepool = msg.value - gameCreationAmount;
+        GameV1Interface(newGameAddress).initialize{ value: prizepool }(initialization);
 
-        deployedGames.push(
-            Game({
-                id: nextGameId,
-                versionId: latestGameImplementationVersionId,
-                creator: msg.sender,
-                deployedAddress: newGameAddress
-            })
-        );
-        emit GameCreated(nextGameId, newGameAddress, latestGameImplementationVersionId, msg.sender);
-        nextGameId += 1;
-        usedAuthorizedAmounts[_registrationAmount].isUsed = true;
         return newGameAddress;
     }
 
@@ -184,15 +180,16 @@ contract GameFactory is Pausable, Ownable {
     ///
     /**
      * @notice Transfert funds
-     * @param receiver the receiver address
-     * @param amount the amount to transfert
+     * @param _receiver the receiver address
+     * @param _amount the amount to transfert
+     * @dev TODO NEXT VERSION use SafeERC20 library from OpenZeppelin
      */
-    function _safeTransfert(address receiver, uint256 amount) internal {
+    function _safeTransfert(address _receiver, uint256 _amount) internal {
         uint256 balance = address(this).balance;
-        if (balance < amount) require(false, "Not enough in contract balance");
-        (bool success, ) = receiver.call{ value: amount }("");
+        if (balance < _amount) require(false, "Not enough in contract balance");
+        (bool success, ) = _receiver.call{ value: _amount }("");
         if (!success) {
-            emit FailedTransfer(receiver, amount);
+            emit FailedTransfer(_receiver, _amount);
             require(false, "Transfer failed.");
         }
     }
@@ -200,13 +197,11 @@ contract GameFactory is Pausable, Ownable {
     /**
      * @notice Check if authorized amount exist
      * @param _authorizedAmount the authorized amount to check
-     * @return true if exist false if not
+     * @return isExist true if exist false if not
      */
-    function _isExistAuthorizedAmounts(uint256 _authorizedAmount) internal view returns (bool) {
+    function _isExistAuthorizedAmounts(uint256 _authorizedAmount) internal view returns (bool isExist) {
         for (uint256 i = 0; i < authorizedAmounts.length; i++) {
-            if (authorizedAmounts[i] == _authorizedAmount) {
-                return true;
-            }
+            if (authorizedAmounts[i] == _authorizedAmount) return true;
         }
         return false;
     }
@@ -217,26 +212,30 @@ contract GameFactory is Pausable, Ownable {
 
     /**
      * @notice Get the list of deployed games
-     * @return the list of games
+     * @return games the list of games
      */
-    function getDeployedGames() external view returns (Game[] memory) {
+    function getDeployedGames() external view returns (Game[] memory games) {
         return deployedGames;
     }
 
     /**
      * @notice Get the list of authorized amounts
-     * @return the list of authorized amounts
+     * @return gameAuthorisedAmounts the list of authorized amounts
      */
-    function getAuthorizedAmounts() external view returns (uint256[] memory) {
+    function getAuthorizedAmounts() external view returns (uint256[] memory gameAuthorisedAmounts) {
         return authorizedAmounts;
     }
 
     /**
      * @notice Get authorized amount
      * @param _authorizedAmount the authorized amount to get
-     * @return the authorized amount
+     * @return gameAuthorisedAmount the authorized amount
      */
-    function getAuthorizedAmount(uint256 _authorizedAmount) external view returns (AuthorizedAmount memory) {
+    function getAuthorizedAmount(uint256 _authorizedAmount)
+        external
+        view
+        returns (AuthorizedAmount memory gameAuthorisedAmount)
+    {
         return usedAuthorizedAmounts[_authorizedAmount];
     }
 
@@ -246,14 +245,12 @@ contract GameFactory is Pausable, Ownable {
 
     /**
      * @notice Set the game implementation address
-     * @param _gameImplementation the new game implementation address
+     * @param _game the new game implementation address
      * @dev Callable by admin
      */
-    function setNewGameImplementation(address _gameImplementation) public onlyAdmin {
-        latestGameImplementationVersionId += 1;
-        gameImplementations.push(
-            GameImplementationVersion({ id: latestGameImplementationVersionId, deployedAddress: _gameImplementation })
-        );
+    function setNewGameV1(address _game) external onlyAdmin {
+        latestVersionId += 1;
+        games.push(GameV1Version({ id: latestVersionId, deployedAddress: _game }));
     }
 
     /**
@@ -261,7 +258,7 @@ contract GameFactory is Pausable, Ownable {
      * @param _authorizedAmounts the list of authorized amounts to add
      * @dev Callable by admin
      */
-    function addAuthorizedAmounts(uint256[] memory _authorizedAmounts) public onlyAdmin {
+    function addAuthorizedAmounts(uint256[] memory _authorizedAmounts) external onlyAdmin {
         for (uint256 i = 0; i < _authorizedAmounts.length; i++) {
             if (!_isExistAuthorizedAmounts(_authorizedAmounts[i])) {
                 authorizedAmounts.push(_authorizedAmounts[i]);
@@ -278,26 +275,26 @@ contract GameFactory is Pausable, Ownable {
      * @param _cronUpkeep the new keeper address
      * @dev Callable by admin
      */
-    function updateCronUpkeep(address _cronUpkeep) public onlyAdmin onlyAddressInit(_cronUpkeep) {
+    function updateCronUpkeep(address _cronUpkeep) external onlyAdmin onlyAddressInit(_cronUpkeep) {
         cronUpkeep = _cronUpkeep;
+        emit CronUpkeepUpdated(cronUpkeep);
 
         for (uint256 i = 0; i < deployedGames.length; i++) {
             Game memory game = deployedGames[i];
-            GameImplementationInterface(payable(game.deployedAddress)).setCronUpkeep(cronUpkeep);
+            GameV1Interface(payable(game.deployedAddress)).setCronUpkeep(cronUpkeep);
         }
-        emit CronUpkeepUpdated(cronUpkeep);
     }
 
     /**
      * @notice Pause the factory and all games and associated keeper job
      * @dev Callable by admin
      */
-    function pauseAllGamesAndFactory() public onlyAdmin {
+    function pauseAllGamesAndFactory() external onlyAdmin whenNotPaused {
         // pause first to ensure no more interaction with contract
-        pause();
+        _pause();
         for (uint256 i = 0; i < deployedGames.length; i++) {
             Game memory game = deployedGames[i];
-            GameImplementationInterface(payable(game.deployedAddress)).pause();
+            GameV1Interface(payable(game.deployedAddress)).pause();
         }
     }
 
@@ -305,26 +302,27 @@ contract GameFactory is Pausable, Ownable {
      * @notice Resume the factory and all games and associated keeper job
      * @dev Callable by admin
      */
-    function ResumeAllGamesAndFactory() public onlyAdmin {
+    function resumeAllGamesAndFactory() external onlyAdmin whenPaused {
+        // unpause last to ensure that everything is ok
+        _unpause();
+
         for (uint256 i = 0; i < deployedGames.length; i++) {
             Game memory game = deployedGames[i];
-            GameImplementationInterface(payable(game.deployedAddress)).unpause();
+            GameV1Interface(payable(game.deployedAddress)).unpause();
         }
-        // unpause last to ensure that everything is ok
-        unpause();
     }
 
     /**
      * @notice Pause the factory
      */
-    function pause() public onlyAdmin whenNotPaused {
+    function pause() external onlyAdmin whenNotPaused {
         _pause();
     }
 
     /**
      * @notice Unpause the factory
      */
-    function unpause() public onlyAdmin whenPaused {
+    function unpause() external onlyAdmin whenPaused {
         _unpause();
     }
 
@@ -337,7 +335,7 @@ contract GameFactory is Pausable, Ownable {
      * @param _adminAddress the new admin address
      * @dev Callable by admin
      */
-    function transferAdminOwnership(address _adminAddress) public onlyAdmin onlyAddressInit(_adminAddress) {
+    function transferAdminOwnership(address _adminAddress) external onlyAdmin onlyAddressInit(_adminAddress) {
         transferOwnership(_adminAddress);
     }
 
@@ -345,7 +343,7 @@ contract GameFactory is Pausable, Ownable {
      * @notice Allow admin to withdraw all funds of smart contract
      * @dev Callable by admin
      */
-    function withdrawFunds() public onlyAdmin {
+    function withdrawFunds() external onlyAdmin {
         _safeTransfert(owner(), address(this).balance);
     }
 
@@ -391,7 +389,7 @@ contract GameFactory is Pausable, Ownable {
      * @notice Modifier that ensure that amount sended is game creation amount
      */
     modifier onlyGameCreationAmount() {
-        require(msg.value == gameCreationAmount, "Only game creation amount is allowed");
+        require(msg.sender == owner() || msg.value >= gameCreationAmount, "Only game creation amount is allowed");
         _;
     }
 
@@ -412,7 +410,10 @@ contract GameFactory is Pausable, Ownable {
      * @param _registrationAmount authorized amount
      */
     modifier onlyIfNotUsedRegistrationAmounts(uint256 _registrationAmount) {
-        require(usedAuthorizedAmounts[_registrationAmount].isUsed == false, "registrationAmout is already used");
+        require(
+            _registrationAmount == 0 || !usedAuthorizedAmounts[_registrationAmount].isUsed,
+            "registrationAmout is already used"
+        );
         _;
     }
 

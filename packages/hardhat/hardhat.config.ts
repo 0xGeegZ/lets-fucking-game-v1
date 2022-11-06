@@ -4,6 +4,7 @@ import '@nomicfoundation/hardhat-toolbox'
 // import 'hardhat-gas-reporter'
 // import 'solidity-coverage'
 // import '@typechain/hardhat'
+// TODO add hardhat upgrades https://docs.openzeppelin.com/upgrades-plugins/1.x/hardhat-upgrades
 import 'hardhat-contract-sizer'
 import 'hardhat-deploy'
 import 'hardhat-docgen'
@@ -12,7 +13,6 @@ import 'hardhat-spdx-license-identifier'
 import '@tenderly/hardhat-tenderly'
 import '@nomicfoundation/hardhat-chai-matchers'
 import 'hardhat-storage-layout'
-import 'hardhat-interface-generator'
 import '@appliedblockchain/chainlink-plugins-fund-link'
 import './tasks/accounts'
 import './tasks/storage-layout'
@@ -35,37 +35,69 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: process.env.SOLC_VERSION || '0.8.9',
-      },
-      {
-        version: '0.8.7',
+        version: process.env.SOLC_VERSION || '0.8.6',
+        settings: {
+          optimizer: {
+            enabled:
+              (process.env.SOLIDITY_OPTIMIZER &&
+                'true' === process.env.SOLIDITY_OPTIMIZER.toLowerCase()) ||
+              false,
+            runs:
+              (process.env.SOLIDITY_OPTIMIZER_RUNS &&
+                Boolean(parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) &&
+                parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) ||
+              200,
+          },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
+        },
       },
       {
         version: '0.8.6',
+        settings: {
+          optimizer: {
+            enabled:
+              (process.env.SOLIDITY_OPTIMIZER &&
+                'true' === process.env.SOLIDITY_OPTIMIZER.toLowerCase()) ||
+              false,
+            runs:
+              (process.env.SOLIDITY_OPTIMIZER_RUNS &&
+                Boolean(parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) &&
+                parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) ||
+              200,
+          },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
+        },
       },
       {
         version: '0.4.24',
-      },
-    ],
-    // version: process.env.SOLC_VERSION || '0.8.6',
-    settings: {
-      optimizer: {
-        enabled:
-          (process.env.SOLIDITY_OPTIMIZER &&
-            'true' === process.env.SOLIDITY_OPTIMIZER.toLowerCase()) ||
-          false,
-        runs:
-          (process.env.SOLIDITY_OPTIMIZER_RUNS &&
-            Boolean(parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) &&
-            parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) ||
-          200,
-      },
-      outputSelection: {
-        '*': {
-          '*': ['storageLayout'],
+        settings: {
+          optimizer: {
+            enabled:
+              (process.env.SOLIDITY_OPTIMIZER &&
+                'true' === process.env.SOLIDITY_OPTIMIZER.toLowerCase()) ||
+              false,
+            runs:
+              (process.env.SOLIDITY_OPTIMIZER_RUNS &&
+                Boolean(parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) &&
+                parseInt(process.env.SOLIDITY_OPTIMIZER_RUNS)) ||
+              200,
+          },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
         },
       },
-    },
+    ],
   },
   docgen: {
     path: './docs',
@@ -123,78 +155,77 @@ const config: HardhatUserConfig = {
       },
       saveDeployments: true,
     },
+    bscTestnet: {
+      url: process.env.BSC_TESTNET_URL || '',
+      accounts: getWallet(),
+      saveDeployments: true,
+    },
     arbitrumTestnet: {
-      url: process.env.ARBITRUM_TESTNET_RPC_URL || '',
+      url: process.env.ARBITRUM_TESTNET_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
     auroraTestnet: {
-      url: process.env.AURORA_TESTNET_RPC_URL || '',
+      url: process.env.AURORA_TESTNET_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
     avalancheFujiTestnet: {
-      url: process.env.AVALANCHE_FUJI_TESTNET_RPC_URL || '',
-      accounts: getWallet(),
-      saveDeployments: true,
-    },
-    bscTestnet: {
-      url: process.env.BSC_TESTNET_RPC_URL || '',
+      url: process.env.AVALANCHE_FUJI_TESTNET_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
     ftmTestnet: {
-      url: process.env.FTM_TESTNET_RPC_URL || '',
+      url: process.env.FTM_TESTNET_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
     goerli: {
-      url: process.env.GOERLI_RPC_URL || '',
+      url: process.env.GOERLI_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
     harmonyTest: {
-      url: process.env.HARMONY_TEST_RPC_URL || '',
+      url: process.env.HARMONY_TEST_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
     hecoTestnet: {
-      url: process.env.HECO_TESTNET_RPC_URL || '',
+      url: process.env.HECO_TESTNET_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
     kovan: {
-      url: process.env.KOVAN_RPC_URL || '',
+      url: process.env.KOVAN_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
     moonbaseAlpha: {
-      url: process.env.MOONBASE_ALPHA_RPC_URL || '',
+      url: process.env.MOONBASE_ALPHA_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
     polygonMumbai: {
-      url: process.env.POLYGON_MUMBAI_RPC_URL || '',
+      url: process.env.POLYGON_MUMBAI_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
     rinkeby: {
-      url: process.env.RINKEBY_RPC_URL || '',
+      url: process.env.RINKEBY_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
     ropsten: {
-      url: process.env.ROPSTEN_RPC_URL || '',
+      url: process.env.ROPSTEN_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
     sokol: {
-      url: process.env.SOKOL_RPC_URL || '',
+      url: process.env.SOKOL_URL || '',
       accounts: getWallet(),
       saveDeployments: true,
     },
   },
-  // TODO user hardhat deploy ?? SEE : https://github.com/wighawag/hardhat-deploy#4-hardhat-etherscan-verify
   etherscan: {
     apiKey: {
       arbitrumTestnet: process.env.ARBISCAN_API_KEY || '',

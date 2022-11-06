@@ -1,30 +1,19 @@
 import { deployments, ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
-// import { ONE_DAY_IN_SECONDS } from '@/test/helpers'
 import { ONE_DAY_IN_SECONDS } from '../helpers'
 
 const AUTHORIZED_AMOUNTS = [
-  0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
+  0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
 ]
 
 const setupTest = deployments.createFixture(
-  async (
-    { deployments, getNamedAccounts, ethers }: HardhatRuntimeEnvironment,
-    {
-      gameName,
-      gameImage,
-      maxPlayers,
-      playTimeRange,
-      correctRegistrationAmount,
-      gameCreationAmount,
-      treasuryFee,
-      creatorFee,
-      encodedCron,
-    }
-  ) => {
-    // await deployments.fixture(['lfg'])
-    await deployments.fixture()
+  async ({
+    deployments,
+    getNamedAccounts,
+    ethers,
+  }: HardhatRuntimeEnvironment) => {
+    await deployments.fixture('test')
 
     const { deploy, log } = deployments
     const { deployer: deployerAddress } = await getNamedAccounts()
@@ -62,28 +51,20 @@ const setupTest = deployments.createFixture(
 
     const gameFactoryContract = await deployments.get('GameFactory')
 
-    const gameImplementationContract = await deployments.get(
-      'GameImplementation',
-      libraries
-    )
-    const cronUpkeepDelegateContract = await deployments.get(
-      'CronUpkeepDelegate'
-    )
+    const gameContract = await deployments.get('GameV1', libraries)
+
     const cronUpkeepContract = await deployments.get('CronUpkeep', libraries)
 
-    const secondGameImplementationContract = await deploy(
-      'GameImplementation',
-      { ...options, ...libraries }
-    )
+    const secondGameV1Contract = await deploy('GameV1', {
+      ...options,
+      ...libraries,
+    })
 
-    const gameImplementationInterface = await ethers.getContractFactory(
-      'GameImplementation',
-      libraries
-    )
+    const gameInterface = await ethers.getContractFactory('GameV1', libraries)
 
-    const secondGameImplementation = new ethers.Contract(
-      secondGameImplementationContract.address,
-      gameImplementationInterface.interface,
+    const secondGameV1 = new ethers.Contract(
+      secondGameV1Contract.address,
+      gameInterface.interface,
       deployer
     )
 
@@ -106,49 +87,43 @@ const setupTest = deployments.createFixture(
       deployer
     )
 
-    const gameImplementation = new ethers.Contract(
-      gameImplementationContract.address,
-      gameImplementationInterface.interface,
+    const game = new ethers.Contract(
+      gameContract.address,
+      gameInterface.interface,
       deployer
     )
 
-    await gameFactory.createNewGame(
-      gameName,
-      gameImage,
-      maxPlayers,
-      playTimeRange,
-      correctRegistrationAmount,
-      treasuryFee,
-      creatorFee,
-      encodedCron,
-      { value: gameCreationAmount }
+    const payableGame = await gameFactory.deployedGames('0')
+
+    const deployedPayableGame = new ethers.Contract(
+      payableGame.deployedAddress,
+      gameInterface.interface,
+      deployer
     )
 
-    const game = await gameFactory.deployedGames('0')
+    const freeGame = await gameFactory.deployedGames('1')
 
-    const deployedGame = new ethers.Contract(
-      game.deployedAddress,
-      gameImplementationInterface.interface,
+    const deployedFreeGame = new ethers.Contract(
+      freeGame.deployedAddress,
+      gameInterface.interface,
       deployer
     )
 
     const GameFactoryContract = await ethers.getContractFactory('GameFactory')
 
-    const GameImplementationContract = await ethers.getContractFactory(
-      'GameImplementation',
-      libraries
-    )
+    const GameV1Contract = await ethers.getContractFactory('GameV1', libraries)
 
     return {
       deployer,
       GameFactoryContract,
-      GameImplementationContract,
+      GameV1Contract,
       // cronExternal,
       gameFactory,
-      gameImplementation,
+      game,
       cronUpkeep,
-      secondGameImplementation,
-      deployedGame,
+      secondGameV1,
+      deployedPayableGame,
+      deployedFreeGame,
     }
   }
 )
@@ -162,12 +137,15 @@ const initialiseTestData = async function () {
   // first signer is deployer, associating to mockKeeeper
   ;[mockKeeper, bob, alice, ...players] = await ethers.getSigners()
 
+  if (players.length < 10)
+    throw new Error('Not enough players to launch test suit')
+
   this.players = players
   this.bob = bob
   this.alice = alice
 
-  this.gameName = "Let's Fucking Game VMP"
-  this.gameImage = ''
+  this.name = ethers.utils.formatBytes32String("Let's Fucking Game VMP")
+  this.newName = ethers.utils.formatBytes32String('New Name')
 
   this.maxPlayers = 10
   this.playTimeRange = 2
@@ -176,12 +154,12 @@ const initialiseTestData = async function () {
   this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
   this.zeroRegistrationAmount = ethers.utils.parseEther('0')
 
+  this.freeGamePrizepool = 1
+  this.freeGamePrizepoolAmount = ethers.utils.parseEther('1')
+
   this.gameCreationAmount = ethers.utils.parseEther('0.1')
   this.treasuryFee = 500 // 5%
   this.creatorFee = 500 // 5%
-
-  // this.treasuryFee = ethers.utils.parseEther('0.00005')
-  // this.creatorFee = ethers.utils.parseEther('0.00005')
 
   // prizeAmount equals total prize amount minus treasury fee
   this.prizeAmount = ethers.utils.parseEther('0.0009')
@@ -202,39 +180,55 @@ const initialiseTestData = async function () {
     ethers.utils.parseEther(`${amount}`)
   )
 
+  this.prizes = [
+    {
+      position: '1',
+      amount: this.correctRegistrationAmount.mul(this.maxPlayers),
+      standard: '0',
+      contractAddress: '0x0000000000000000000000000000000000000000',
+      tokenId: '1',
+    },
+  ]
+
+  const updatedPrizes = []
+  updatedPrizes.push({ ...this.prizes[0] })
+  updatedPrizes.push({ ...this.prizes[0] })
+
+  updatedPrizes[0].amount = ethers.utils.parseEther(
+    `${this.freeGamePrizepool * 0.8}`
+  )
+  updatedPrizes[1].amount = ethers.utils.parseEther(
+    `${this.freeGamePrizepool * 0.2}`
+  )
+  updatedPrizes[1].position = 2
+
+  this.freeGamePrizes = updatedPrizes
+
   const {
     deployer,
     GameFactoryContract,
-    GameImplementationContract,
+    GameV1Contract,
     // cronExternal,
     gameFactory,
-    gameImplementation,
+    game,
     cronUpkeep,
-    secondGameImplementation,
-    deployedGame,
-  } = await setupTest({
-    gameName: this.gameName,
-    gameImage: this.gameImage,
-    maxPlayers: this.maxPlayers,
-    playTimeRange: this.playTimeRange,
-    correctRegistrationAmount: this.correctRegistrationAmount,
-    gameCreationAmount: this.gameCreationAmount,
-    treasuryFee: this.treasuryFee,
-    creatorFee: this.creatorFee,
-    encodedCron: this.encodedCron,
-  })
+    secondGameV1,
+    deployedPayableGame,
+    deployedFreeGame,
+  } = await setupTest()
 
   this.owner = deployer
 
-  this.GameImplementationContract = GameImplementationContract
+  this.GameV1Contract = GameV1Contract
   this.GameFactoryContract = GameFactoryContract
   // this.cronExternal = cronExternal
 
   this.cronUpkeep = cronUpkeep
   this.gameFactory = gameFactory
-  this.gameImplementation = gameImplementation
-  this.secondGameImplementation = secondGameImplementation
-  this.deployedGame = deployedGame
+  this.game = game
+  this.secondGameV1 = secondGameV1
+  this.deployedPayableGame = deployedPayableGame
+  this.deployedFreeGame = deployedFreeGame
 }
 
 module.exports = {

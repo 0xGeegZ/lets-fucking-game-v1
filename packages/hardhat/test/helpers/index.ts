@@ -197,9 +197,9 @@ const getTwoLastPlayersVoteSplitPot = async function ({
     mockKeeper,
   })
 
-  contract.connect(players[player1Index]).voteToSplitPot()
+  await contract.connect(players[player1Index]).voteToSplitPot()
 
-  contract.connect(players[player2Index]).voteToSplitPot()
+  await contract.connect(players[player2Index]).voteToSplitPot()
 }
 
 module.exports = {

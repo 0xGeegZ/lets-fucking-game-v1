@@ -14,7 +14,7 @@ const func: DeployFunction = async function ({
   const chainId = await getChainId()
   let linkTokenAddress: string
 
-  if (chainId == '31337') {
+  if (chainId === '31337' || chainId === '1337') {
     const linkToken = await get('LinkToken')
     linkTokenAddress = linkToken.address
   } else {
@@ -34,7 +34,7 @@ const func: DeployFunction = async function ({
   }
 }
 
-func.tags = ['all', 'lfg', 'main', 'fund-link']
-module.exports.dependencies = ['keeper']
+func.tags = ['all', 'test', 'dev', 'fund-link']
+func.dependencies = ['keeper']
 
 export default func

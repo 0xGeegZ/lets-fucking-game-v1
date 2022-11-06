@@ -10,11 +10,11 @@ const func: DeployFunction = async function ({
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
   const { deploy, log } = deployments
-
   const { deployer: deployerAddress } = await getNamedAccounts()
   const chainId = await getChainId()
 
   const isLocalDeployment = chainId === '31337' || chainId === '1337'
+
   const deployer = await ethers.getSigner(deployerAddress)
 
   const options = {
@@ -22,6 +22,7 @@ const func: DeployFunction = async function ({
     log: true,
   }
 
+  log('Deploying GameV1 contract')
   const { address: cronExternalAddress } = await deployments.get('CronExternal')
   const libraries = {
     libraries: {
@@ -29,41 +30,20 @@ const func: DeployFunction = async function ({
     },
   }
 
-  const { address: gameAddress } = await deployments.get('GameV1')
+  const {
+    address: gameAddress,
+    newlyDeployed: gameNewlyDeployed,
+    receipt: { gasUsed: gameGasUsed },
+  } = await deploy('GameV1', { ...options, ...libraries })
+
+  if (!gameNewlyDeployed) return
+
+  log(`✅ Contract GameV1 deployed at ${gameAddress} using ${gameGasUsed} gas`)
+
+  log('Adding GameV1 to Keeper delegators')
 
   const { address: cronUpkeepAddress } = await deployments.get('CronUpkeep')
 
-  const gameCreationAmount = ethers.utils.parseEther('0.1')
-
-  const AUTHORIZED_AMOUNTS = [
-    0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
-  ]
-  const authorizedAmounts = AUTHORIZED_AMOUNTS.map((amount) =>
-    ethers.utils.parseEther(`${amount}`)
-  )
-
-  log('Deploying GameFactory contract')
-  const gameFactoryArgs = [
-    gameAddress,
-    cronUpkeepAddress,
-    gameCreationAmount,
-    authorizedAmounts,
-  ]
-  const {
-    address: gameFactoryAddress,
-    newlyDeployed: gameFactoryNewlyDeployed,
-    receipt: { gasUsed: gameFactoryGasUsed },
-  } = await deploy('GameFactory', {
-    ...options,
-    args: gameFactoryArgs,
-  })
-
-  if (!gameFactoryNewlyDeployed) return
-  log(
-    `✅ Contract GameFactory deployed at ${gameFactoryAddress} using ${gameFactoryGasUsed} gas`
-  )
-
-  log('Adding GameFactory to Keeper delegators')
   const { interface: cronUpkeepInterface } = await ethers.getContractFactory(
     'CronUpkeep',
     libraries
@@ -74,15 +54,15 @@ const func: DeployFunction = async function ({
     cronUpkeepInterface,
     deployer
   )
-  cronUpkeep.addDelegator(gameFactoryAddress)
+  cronUpkeep.addDelegator(gameAddress)
 
   if (isLocalDeployment) return
 
   try {
-    log(`✅ Verifying contract GameFactory`)
+    log(`✅ Verifying contract GameV1`)
     await hre.run('verify:verify', {
-      address: gameFactoryAddress,
-      constructorArguments: gameFactoryArgs,
+      address: gameAddress,
+      constructorArguments: [],
     })
     await delay(10 * 1000)
   } catch (error) {
@@ -90,7 +70,7 @@ const func: DeployFunction = async function ({
   }
 }
 
-func.tags = ['all', 'test', 'dev', 'staging', 'prod', 'game-factory']
-func.dependencies = ['game', 'keeper']
+func.tags = ['all', 'test', 'dev', 'staging', 'prod', 'game']
+func.dependencies = ['keeper']
 
 export default func

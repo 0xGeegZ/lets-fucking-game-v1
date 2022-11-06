@@ -18,6 +18,11 @@ export const networkConfig: Record<
     fee: '100000000000000000',
     fundAmount: '1000000000000000000',
   },
+  '1337': {
+    name: 'localhost',
+    fee: '100000000000000000',
+    fundAmount: '1000000000000000000',
+  },
   '56': {
     name: 'bnb',
     linkToken: '0x404460C6A5EdE2D891e8297795264fDe62ADBB75',

@@ -1,10 +1,9 @@
 import fs from 'fs'
 
 const contractsDir = __dirname + '/../build'
-const filePath = contractsDir + '/deployedContracts.json'
+const filePath = contractsDir + '/internal.json'
 
 const saveContract = ({ contractName, chainId, contractData }) => {
-  // const contractName = Object.keys(contractData[chainId])[0];
   const rawdata = fs.readFileSync(filePath)
   const deployedContracts = JSON.parse(rawdata)
 
@@ -36,7 +35,7 @@ const saveContract = ({ contractName, chainId, contractData }) => {
     delete old.olds
 
     // Desactivating history on local chain
-    if (chainId === '31337') olds = []
+    if (chainId === '31337' || chainId === '1337') olds = []
 
     deployedContracts[chainId][contractName] = {
       ...contractData[chainId][contractName],
@@ -48,7 +47,7 @@ const saveContract = ({ contractName, chainId, contractData }) => {
   fs.writeFileSync(filePath, JSON.stringify(deployedContracts))
 }
 
-const saveContractData = (contractData) => {
+export const saveContractData = (contractData) => {
   if (!fs.existsSync(contractsDir)) {
     fs.mkdirSync(contractsDir)
   }
@@ -58,7 +57,7 @@ const saveContractData = (contractData) => {
       fs.writeFileSync(filePath, JSON.stringify({}))
     }
   } catch (error) {
-    console.lerrorog('Error during file creation : ', error)
+    console.error('Error during file creation : ', error)
     return
   }
 
@@ -73,4 +72,3 @@ const saveContractData = (contractData) => {
     saveContract({ contractName, chainId, contractData })
   )
 }
-module.exports = saveContractData

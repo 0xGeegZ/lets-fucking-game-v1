@@ -41,35 +41,29 @@ describe('GameFactoryContract', function () {
     })
   })
 
-  context('GameFactory setNewGameImplementation', function () {
+  context('GameFactory setNewGameV1', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
         await expectRevert(
-          this.gameFactory
-            .connect(this.alice)
-            .setNewGameImplementation(this.gameImplementation.address),
+          this.gameFactory.connect(this.alice).setNewGameV1(this.game.address),
           'Caller is not the admin'
         )
       })
     })
 
     describe('when called by admin', function () {
-      it('should add the new implementation version to gameImplementations', async function () {
+      it('should add the new implementation version to games', async function () {
         await this.gameFactory
           .connect(this.owner)
-          .setNewGameImplementation(this.secondGameImplementation.address)
-        const responseGameImplementations1 =
-          await this.gameFactory.gameImplementations('0')
-        const responseGameImplementations2 =
-          await this.gameFactory.gameImplementations('1')
+          .setNewGameV1(this.secondGameV1.address)
+        const responseGameV1s1 = await this.gameFactory.games('0')
+        const responseGameV1s2 = await this.gameFactory.games('1')
 
-        expect(responseGameImplementations1.id).to.be.equal('0')
-        expect(responseGameImplementations1.deployedAddress).to.be.equal(
-          this.gameImplementation.address
-        )
-        expect(responseGameImplementations2.id).to.be.equal('1')
-        expect(responseGameImplementations2.deployedAddress).to.be.equal(
-          this.secondGameImplementation.address
+        expect(responseGameV1s1.id).to.be.equal('0')
+        expect(responseGameV1s1.deployedAddress).to.be.equal(this.game.address)
+        expect(responseGameV1s2.id).to.be.equal('1')
+        expect(responseGameV1s2.deployedAddress).to.be.equal(
+          this.secondGameV1.address
         )
       })
     })
@@ -138,67 +132,113 @@ describe('GameFactoryContract', function () {
   context('GameFactory updateCronUpkeep', function () {
     describe('when called by non admin', function () {
       it('should revert with correct message', async function () {
-        // TODO Implement Test
-        expect(true).to.be.false
+        await expectRevert(
+          this.gameFactory
+            .connect(this.alice)
+            .updateCronUpkeep(this.owner.address),
+          'Caller is not the admin'
+        )
       })
     })
 
     describe('when called by admin', function () {
       it('should update keeper address for the factory and all games and associated keeper job', async function () {
-        // TODO Implement Test
+        // TODO deploy a new keeper to update keeper data
+        // this.gameFactory.connect(this.owner).updateCronUpkeep(this.owner.address)
         expect(true).to.be.false
       })
 
-      it('should revert if keeper address is not init', async function () {
-        // TODO Implement Test
-        expect(true).to.be.false
+      it('should revert if keeper address is not a contract address', async function () {
+        await expectRevert(
+          this.gameFactory
+            .connect(this.owner)
+            .updateCronUpkeep(this.bob.address),
+          'Transaction reverted: function call to a non-contract account'
+        )
+      })
+      it('should revert if keeper address is not initialized', async function () {
+        await expectRevert(
+          this.gameFactory.connect(this.owner).updateCronUpkeep(''),
+          'resolver or addr is not configured for ENS name'
+        )
       })
     })
   })
 
   context(
-    'GameFactory pauseAllGamesAndFactory & ResumeAllGamesAndFactory',
+    'GameFactory pauseAllGamesAndFactory & resumeAllGamesAndFactory',
     function () {
       describe('when called by non admin', function () {
         it('should revert with correct message', async function () {
-          // TODO Implement Test
-          expect(true).to.be.false
+          await expectRevert(
+            this.gameFactory.connect(this.bob).pauseAllGamesAndFactory(),
+            'Caller is not the admin'
+          )
+          await expectRevert(
+            this.gameFactory.connect(this.bob).resumeAllGamesAndFactory(),
+            'Caller is not the admin'
+          )
         })
       })
 
       describe('when called by admin', function () {
         it('should pause the factory and all games and associated keeper job', async function () {
-          // TODO Implement Test
-          expect(true).to.be.false
+          await this.gameFactory.connect(this.owner).pauseAllGamesAndFactory()
+
+          await expectRevert(
+            this.gameFactory
+              .connect(this.owner)
+              .createNewGame(
+                this.name,
+                this.maxPlayers,
+                this.playTimeRange,
+                this.correctRegistrationAmount,
+                this.treasuryFee,
+                this.creatorFee,
+                this.encodedCron,
+                this.prizes,
+                { value: this.gameCreationAmount }
+              ),
+            'Pausable: paused'
+          )
         })
 
         it('should resume the factory and all games and associated keeper job', async function () {
-          // TODO Implement Test
-          expect(true).to.be.false
-        })
-      })
-    }
-  )
+          await this.gameFactory.connect(this.owner).pauseAllGamesAndFactory()
+          await this.gameFactory.connect(this.owner).resumeAllGamesAndFactory()
 
-  context(
-    'GameFactory pauseAllGamesAndFactory & ResumeAllGamesAndFactory',
-    function () {
-      describe('when called by non admin', function () {
-        it('should revert with correct message', async function () {
-          // TODO Implement Test
-          expect(true).to.be.false
-        })
-      })
+          const registrationAmount =
+            this.authorizedAmounts[this.authorizedAmounts.length - 1]
 
-      describe('when called by admin', function () {
-        it('should pause the factory and all games and associated keeper job', async function () {
-          // TODO Implement Test
-          expect(true).to.be.false
+          const updatedPrizes = this.prizes
+          updatedPrizes[0].amount = registrationAmount.mul(this.maxPlayers)
+
+          await this.gameFactory
+            .connect(this.owner)
+            .createNewGame(
+              this.name,
+              this.maxPlayers,
+              this.playTimeRange,
+              registrationAmount,
+              this.treasuryFee,
+              this.creatorFee,
+              this.encodedCron,
+              updatedPrizes,
+              { value: this.gameCreationAmount }
+            )
         })
 
-        it('should resume the factory and all games and associated keeper job', async function () {
-          // TODO Implement Test
-          expect(true).to.be.false
+        it('should revert if call resumeAllGamesAndFactory before pauseAllGamesAndFactory', async function () {
+          await expectRevert(
+            this.gameFactory.connect(this.owner).resumeAllGamesAndFactory(),
+            'Pausable: not paused'
+          )
+          await this.gameFactory.connect(this.owner).pauseAllGamesAndFactory()
+
+          await expectRevert(
+            this.gameFactory.connect(this.owner).pauseAllGamesAndFactory(),
+            'Pausable: paused'
+          )
         })
       })
     }
