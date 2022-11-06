@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import { CronUpkeepInterface } from "./CronUpkeepInterface.sol";
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
-interface GameImplementationV1Interface {
+interface GameV1Interface {
     ///STRUCTS
 
     /**
@@ -69,10 +69,10 @@ interface GameImplementationV1Interface {
         address owner;
         address creator;
         address cronUpkeep;
-        string gameName;
-        string gameImage;
-        uint256 gameImplementationVersion;
-        uint256 gameId;
+        string name;
+        string image;
+        uint256 version;
+        uint256 id;
         uint256 playTimeRange;
         uint256 maxPlayers;
         uint256 registrationAmount;
@@ -82,19 +82,19 @@ interface GameImplementationV1Interface {
         Prize[] prizes;
     }
 
-    struct GameStatus {
+    struct GameData {
         address creator;
         uint256 roundId;
-        string gameName;
-        string gameImage;
+        string name;
+        string image;
         uint256 playerAddressesCount;
         uint256 maxPlayers;
         uint256 registrationAmount;
         uint256 playTimeRange;
         uint256 treasuryFee;
         uint256 creatorFee;
-        bool contractPaused;
-        bool gameInProgress;
+        bool isPaused;
+        bool isInProgress;
     }
 
     ///
@@ -112,7 +112,7 @@ interface GameImplementationV1Interface {
     /**
      * @notice Called when the keeper reset the game
      */
-    event ResetGame(uint256 timelock, uint256 resetGameId);
+    event ResetGame(uint256 timelock, uint256 resetId);
     /**
      * @notice Called when a player lost a game
      */
@@ -199,10 +199,10 @@ interface GameImplementationV1Interface {
      *  @param _initialization.creator the game creator
      *  @param _initialization.owner the general admin address
      *  @param _initialization.cronUpkeep the cron upkeep address
-     *  @param _initialization.gameName the game name
-     *  @param _initialization.gameImage the game image path
-     *  @param _initialization.gameImplementationVersion the version of the game implementation
-     *  @param _initialization.gameId the unique game id (fix)
+     *  @param _initialization.name the game name
+     *  @param _initialization.image the game image path
+     *  @param _initialization.version the version of the game implementation
+     *  @param _initialization.id the unique game id (fix)
      *  @param _initialization.playTimeRange the time range during which a player can play in hour
      *  @param _initialization.maxPlayers the maximum number of players for a game
      *  @param _initialization.registrationAmount the amount that players will need to pay to enter in the game
@@ -273,21 +273,21 @@ interface GameImplementationV1Interface {
 
     /**
      * @notice Return game informations
-     * @return gameStatus the game status data with params as follow :
-     *  gameStatus.creator the creator address of the game
-     *  gameStatus.roundId the roundId of the game
-     *  gameStatus.gameName the name of the game
-     *  gameStatus.gameImage the image of the game
-     *  gameStatus.playerAddressesCount the number of registered players
-     *  gameStatus.maxPlayers the maximum players of the game
-     *  gameStatus.registrationAmount the registration amount of the game
-     *  gameStatus.playTimeRange the player time range of the game
-     *  gameStatus.treasuryFee the treasury fee of the game
-     *  gameStatus.creatorFee the creator fee of the game
-     *  gameStatus.contractPaused a boolean set to true if game is paused
-     *  gameStatus.gameInProgress a boolean set to true if game is in progress
+     * @return gameData the game status data with params as follow :
+     *  gameData.creator the creator address of the game
+     *  gameData.roundId the roundId of the game
+     *  gameData.name the name of the game
+     *  gameData.image the image of the game
+     *  gameData.playerAddressesCount the number of registered players
+     *  gameData.maxPlayers the maximum players of the game
+     *  gameData.registrationAmount the registration amount of the game
+     *  gameData.playTimeRange the player time range of the game
+     *  gameData.treasuryFee the treasury fee of the game
+     *  gameData.creatorFee the creator fee of the game
+     *  gameData.isPaused a boolean set to true if game is paused
+     *  gameData.isInProgress a boolean set to true if game is in progress
      */
-    function getStatus() external view returns (GameStatus memory gameStatus);
+    function getGameData() external view returns (GameData memory gameData);
 
     /**
      * @notice Return the players addresses for the current game
@@ -346,17 +346,17 @@ interface GameImplementationV1Interface {
 
     /**
      * @notice Set the name of the game
-     * @param _gameName the new game name
+     * @param _name the new game name
      * @dev Callable by creator
      */
-    function setGameName(string calldata _gameName) external;
+    function setGameName(string calldata _name) external;
 
     /**
      * @notice Set the image of the game
-     * @param _gameImage the new game image
+     * @param _image the new game image
      * @dev Callable by creator
      */
-    function setGameImage(string calldata _gameImage) external;
+    function setImage(string calldata _image) external;
 
     /**
      * @notice Set the maximum allowed players for the game

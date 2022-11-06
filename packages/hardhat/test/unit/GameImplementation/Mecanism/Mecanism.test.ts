@@ -14,7 +14,7 @@ import {
   setUpGameWithAWinner,
 } from '../../../helpers'
 
-describe('GameImplementationV1Contract - Mecanism', function () {
+describe('GameV1Contract - Mecanism', function () {
   beforeEach(initialiseTestData)
 
   context('Registering to game', function () {
@@ -322,7 +322,7 @@ describe('GameImplementationV1Contract - Mecanism', function () {
         mockKeeper: this.mockKeeper,
       })
 
-      const isStartedGame = await this.deployedPayableGame.gameInProgress()
+      const isStartedGame = await this.deployedPayableGame.isInProgress()
       expect(isStartedGame).to.be.true
     })
 
@@ -892,7 +892,7 @@ describe('GameImplementationV1Contract - Mecanism', function () {
       })
 
       it('should reset the game', async function () {
-        const previousGameId = 0
+        const previousId = 0
         const winnerIndex = 4
         await setUpGameWithAWinner({
           players: this.players,
@@ -904,7 +904,7 @@ describe('GameImplementationV1Contract - Mecanism', function () {
         const updatedPlayerAddressesList =
           await this.deployedPayableGame.getPlayerAddresses()
 
-        const updatedGameId = await this.deployedPayableGame.roundId()
+        const updatedId = await this.deployedPayableGame.roundId()
 
         expect(updatedPlayerAddressesList.length).to.equal(0)
         for (let i = 0; i < updatedPlayerAddressesList.length; i++) {
@@ -913,7 +913,7 @@ describe('GameImplementationV1Contract - Mecanism', function () {
           )
         }
 
-        expect(updatedGameId).to.equal(previousGameId + 1)
+        expect(updatedId).to.equal(previousId + 1)
       })
 
       it('should emit the ResetGame event', async function () {
@@ -939,7 +939,7 @@ describe('GameImplementationV1Contract - Mecanism', function () {
     describe('when the game does not exist', function () {
       it('should revert', async function () {
         const winnerIndex = 0
-        const inexistantGameId = 10
+        const inexistantId = 10
         await setUpGameWithAWinner({
           players: this.players,
           winnerIndex,
@@ -951,7 +951,7 @@ describe('GameImplementationV1Contract - Mecanism', function () {
         await expectRevert(
           this.deployedPayableGame
             .connect(this.players[winnerIndex])
-            .claimPrize(inexistantGameId),
+            .claimPrize(inexistantId),
           'This round does not exist'
         )
       })
@@ -961,7 +961,7 @@ describe('GameImplementationV1Contract - Mecanism', function () {
       it('should revert', async function () {
         const winnerIndex = 0
         const impostorIndex = 3
-        const existantGameId = 0
+        const existantId = 0
         await setUpGameWithAWinner({
           players: this.players,
           winnerIndex,
@@ -974,7 +974,7 @@ describe('GameImplementationV1Contract - Mecanism', function () {
         await expectRevert(
           this.deployedPayableGame
             .connect(this.players[impostorIndex])
-            .claimPrize(existantGameId),
+            .claimPrize(existantId),
           'Player did not win this game'
         )
       })
@@ -983,7 +983,7 @@ describe('GameImplementationV1Contract - Mecanism', function () {
     describe('when the prize for the game as been claimed already', function () {
       it('should revert', async function () {
         const winnerIndex = 0
-        const existantGameId = 0
+        const existantId = 0
         await setUpGameWithAWinner({
           players: this.players,
           winnerIndex,
@@ -994,12 +994,12 @@ describe('GameImplementationV1Contract - Mecanism', function () {
         })
         await this.deployedPayableGame
           .connect(this.players[winnerIndex])
-          .claimPrize(existantGameId)
+          .claimPrize(existantId)
 
         await expectRevert(
           this.deployedPayableGame
             .connect(this.players[winnerIndex])
-            .claimPrize(existantGameId),
+            .claimPrize(existantId),
           'Prize for this game already claimed'
         )
       })
@@ -1008,7 +1008,7 @@ describe('GameImplementationV1Contract - Mecanism', function () {
     describe('when the user did win an existing game not already claimed', function () {
       it('should transfer the prize to the winner', async function () {
         const winnerIndex = 3
-        const existantGameId = 0
+        const existantId = 0
 
         await setUpGameWithAWinner({
           players: this.players,
@@ -1026,7 +1026,7 @@ describe('GameImplementationV1Contract - Mecanism', function () {
         )
         const tx = await this.deployedPayableGame
           .connect(this.players[winnerIndex])
-          .claimPrize(existantGameId)
+          .claimPrize(existantId)
 
         const receipt = await tx.wait()
         const gasPrice = tx.gasPrice
@@ -1049,7 +1049,7 @@ describe('GameImplementationV1Contract - Mecanism', function () {
 
       it('should emit the GamePrizeClaimed event with the correct data', async function () {
         const winnerIndex = 0
-        const existantGameId = 0
+        const existantId = 0
         await setUpGameWithAWinner({
           players: this.players,
           winnerIndex,
@@ -1062,12 +1062,12 @@ describe('GameImplementationV1Contract - Mecanism', function () {
         await expect(
           this.deployedPayableGame
             .connect(this.players[winnerIndex])
-            .claimPrize(existantGameId)
+            .claimPrize(existantId)
         )
           .to.emit(this.deployedPayableGame, 'GamePrizeClaimed')
           .withArgs(
             this.players[winnerIndex].address,
-            existantGameId,
+            existantId,
             this.prizeAmount
           )
       })

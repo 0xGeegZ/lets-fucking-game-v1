@@ -5,12 +5,12 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
-import { GameImplementationV1Interface } from "./interfaces/GameImplementationV1Interface.sol";
+import { GameV1Interface } from "./interfaces/GameV1Interface.sol";
 import { CronUpkeepInterface } from "./interfaces/CronUpkeepInterface.sol";
 
 import { Cron as CronExternal } from "@chainlink/contracts/src/v0.8/libraries/external/Cron.sol";
 
-contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard, Pausable {
+contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
     using Address for address;
 
     bool private _isBase;
@@ -36,19 +36,19 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
     uint256 public creatorFee; // treasury rate (e.g. 200 = 2%, 150 = 1.50%)
     uint256 public creatorAmount; // treasury amount that was not claimed
 
-    uint256 public gameId; // gameId is fix and represent the fixed id for the game
+    uint256 public id; // id is fix and represent the fixed id for the game
     uint256 public roundId; // roundId gets incremented every time the game restarts
 
-    string public gameName;
-    string public gameImage;
+    string public name;
+    string public image;
 
-    uint256 public gameImplementationVersion;
+    uint256 public version;
 
     uint256 public playTimeRange; // time length of a round in hours
 
     uint256 public maxPlayers;
 
-    bool public gameInProgress; // helps the keeper determine if a game has started or if we need to start it
+    bool public isInProgress; // helps the keeper determine if a game has started or if we need to start it
 
     address[] public playerAddresses;
     mapping(address => Player) public players;
@@ -72,10 +72,10 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
      *  @param _initialization.creator the game creator
      *  @param _initialization.owner the general admin address
      *  @param _initialization.cronUpkeep the cron upkeep address
-     *  @param _initialization.gameName the game name
-     *  @param _initialization.gameImage the game image path
-     *  @param _initialization.gameImplementationVersion the version of the game implementation
-     *  @param _initialization.gameId the unique game id (fix)
+     *  @param _initialization.name the game name
+     *  @param _initialization.image the game image path
+     *  @param _initialization.version the version of the game implementation
+     *  @param _initialization.id the unique game id (fix)
      *  @param _initialization.playTimeRange the time range during which a player can play in hour
      *  @param _initialization.maxPlayers the maximum number of players for a game
      *  @param _initialization.registrationAmount the amount that players will need to pay to enter in the game
@@ -102,8 +102,8 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
         creator = _initialization.creator;
         factory = msg.sender;
 
-        gameName = _initialization.gameName;
-        gameImage = _initialization.gameImage;
+        name = _initialization.name;
+        image = _initialization.image;
 
         randNonce = 0;
 
@@ -114,8 +114,8 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
         treasuryAmount = 0;
         creatorAmount = 0;
 
-        gameId = _initialization.gameId;
-        gameImplementationVersion = _initialization.gameImplementationVersion;
+        id = _initialization.id;
+        version = _initialization.version;
 
         roundId = 0;
         playTimeRange = _initialization.playTimeRange;
@@ -225,7 +225,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
      * @dev TODO NEXT VERSION Update triggerDailyCheckpoint to mae it only callable by keeper
      */
     function triggerDailyCheckpoint() external override onlyAdminOrKeeper whenNotPaused {
-        if (gameInProgress) {
+        if (isInProgress) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
         } else if (playerAddresses.length == maxPlayers) _startGame();
@@ -297,7 +297,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
      */
     function _startGame() internal {
         for (uint256 i = 0; i < playerAddresses.length; i++) _resetRoundRange(players[playerAddresses[i]]);
-        gameInProgress = true;
+        isInProgress = true;
         emit StartedGame(block.timestamp, playerAddresses.length);
     }
 
@@ -305,7 +305,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
      * @notice Reset the game (called at the end of the current game)
      */
     function _resetGame() internal {
-        gameInProgress = false;
+        isInProgress = false;
         for (uint256 i = 0; i < playerAddresses.length; i++) delete players[playerAddresses[i]];
 
         delete playerAddresses;
@@ -609,35 +609,35 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
 
     /**
      * @notice Return game informations
-     * @return gameStatus the game status data with params as follow :
-     *  gameStatus.creator the creator address of the game
-     *  gameStatus.roundId the roundId of the game
-     *  gameStatus.gameName the name of the game
-     *  gameStatus.gameImage the image of the game
-     *  gameStatus.playerAddressesCount the number of registered players
-     *  gameStatus.maxPlayers the maximum players of the game
-     *  gameStatus.registrationAmount the registration amount of the game
-     *  gameStatus.playTimeRange the player time range of the game
-     *  gameStatus.treasuryFee the treasury fee of the game
-     *  gameStatus.creatorFee the creator fee of the game
-     *  gameStatus.contractPaused a boolean set to true if game is paused
-     *  gameStatus.gameInProgress a boolean set to true if game is in progress
+     * @return gameData the game status data with params as follow :
+     *  gameData.creator the creator address of the game
+     *  gameData.roundId the roundId of the game
+     *  gameData.name the name of the game
+     *  gameData.image the image of the game
+     *  gameData.playerAddressesCount the number of registered players
+     *  gameData.maxPlayers the maximum players of the game
+     *  gameData.registrationAmount the registration amount of the game
+     *  gameData.playTimeRange the player time range of the game
+     *  gameData.treasuryFee the treasury fee of the game
+     *  gameData.creatorFee the creator fee of the game
+     *  gameData.isPaused a boolean set to true if game is paused
+     *  gameData.isInProgress a boolean set to true if game is in progress
      */
-    function getStatus() external view override returns (GameStatus memory gameStatus) {
+    function getGameData() external view override returns (GameData memory gameData) {
         return
-            GameStatus({
+            GameData({
                 creator: creator,
                 roundId: roundId,
-                gameName: gameName,
-                gameImage: gameImage,
+                name: name,
+                image: image,
                 playerAddressesCount: playerAddresses.length,
                 maxPlayers: maxPlayers,
                 registrationAmount: registrationAmount,
                 playTimeRange: playTimeRange,
                 treasuryFee: treasuryFee,
                 creatorFee: creatorFee,
-                contractPaused: paused(),
-                gameInProgress: gameInProgress
+                isPaused: paused(),
+                isInProgress: isInProgress
             });
     }
 
@@ -726,20 +726,20 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
 
     /**
      * @notice Set the name of the game
-     * @param _gameName the new game name
+     * @param _name the new game name
      * @dev Callable by creator
      */
-    function setGameName(string calldata _gameName) external override onlyCreator {
-        gameName = _gameName;
+    function setGameName(string calldata _name) external override onlyCreator {
+        name = _name;
     }
 
     /**
      * @notice Set the image of the game
-     * @param _gameImage the new game image
+     * @param _image the new game image
      * @dev Callable by creator
      */
-    function setGameImage(string calldata _gameImage) external override onlyCreator {
-        gameImage = _gameImage;
+    function setImage(string calldata _image) external override onlyCreator {
+        image = _image;
     }
 
     /**
@@ -1127,7 +1127,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
      * @notice Modifier that ensure that the game is in progress
      */
     modifier onlyIfGameIsInProgress() {
-        require(gameInProgress, "Game is not in progress");
+        require(isInProgress, "Game is not in progress");
         _;
     }
 
@@ -1135,7 +1135,7 @@ contract GameImplementationV1 is GameImplementationV1Interface, ReentrancyGuard,
      * @notice Modifier that ensure that the game is not in progress
      */
     modifier onlyIfGameIsNotInProgress() {
-        require(!gameInProgress, "Game is already in progress");
+        require(!isInProgress, "Game is already in progress");
         _;
     }
 

@@ -5,20 +5,20 @@ import { initialiseTestData } from '../../../factories/setup'
 
 describe('GameFactoryContract', function () {
   beforeEach(initialiseTestData)
-  context('GameImplementationV1 deployed', function () {
+  context('GameV1 deployed', function () {
     // TODO should only allow factoy to call initialize function ?
 
     describe('when an account tries to initialize the base contract', function () {
       it('should revert with the correct reason', async function () {
         await expectRevert(
-          this.gameImplementation.initialize({
+          this.game.initialize({
             creator: this.bob.address,
             owner: this.owner.address,
             cronUpkeep: this.cronUpkeep.address,
-            gameName: this.gameName,
-            gameImage: this.gameImage,
-            gameImplementationVersion: '0',
-            gameId: '0',
+            name: this.name,
+            image: this.image,
+            version: '0',
+            id: '0',
             playTimeRange: this.playTimeRange,
             maxPlayers: this.maxPlayers,
             registrationAmount: this.correctRegistrationAmount,
@@ -42,8 +42,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
-            this.gameName,
-            this.gameImage,
+            this.name,
+            this.image,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
@@ -59,19 +59,18 @@ describe('GameFactoryContract', function () {
           .getDeployedGames()
 
         const clonedContract = deployedGames[deployedGames.length - 1]
-        const clonedGameContract =
-          await this.GameImplementationV1Contract.attach(
-            clonedContract.deployedAddress
-          )
+        const clonedGameContract = await this.GameV1Contract.attach(
+          clonedContract.deployedAddress
+        )
         await expectRevert(
           clonedGameContract.initialize({
             creator: this.bob.address,
             owner: this.owner.address,
             cronUpkeep: this.cronUpkeep.address,
-            gameName: this.gameName,
-            gameImage: this.gameImage,
-            gameImplementationVersion: '0',
-            gameId: '0',
+            name: this.name,
+            image: this.image,
+            version: '0',
+            id: '0',
             playTimeRange: this.playTimeRange,
             maxPlayers: this.maxPlayers,
             registrationAmount: this.correctRegistrationAmount,
@@ -88,22 +87,19 @@ describe('GameFactoryContract', function () {
   context('GameFactory constructor', function () {
     describe('when GameFactory gets deployed', function () {
       it('should set the correct values to state variables', async function () {
-        const responseLatestGameImplementationV1VersionId =
-          await this.gameFactory.latestGameImplementationVersionId()
-        const responseGameImplementationV1 =
-          await this.gameFactory.gameImplementations(
-            responseLatestGameImplementationV1VersionId
-          )
+        const responseLatestGameV1VersionId =
+          await this.gameFactory.latestVersionId()
+        const responseGameV1 = await this.gameFactory.games(
+          responseLatestGameV1VersionId
+        )
         const responseOwner = await this.gameFactory.owner()
 
         const responseAuthorizedAmounts =
           await this.gameFactory.getAuthorizedAmounts()
 
         expect(responseOwner).to.be.equal(this.owner.address)
-        expect(responseLatestGameImplementationV1VersionId).to.be.equal('0')
-        expect(responseGameImplementationV1.deployedAddress).to.be.equal(
-          this.gameImplementation.address
-        )
+        expect(responseLatestGameV1VersionId).to.be.equal('0')
+        expect(responseGameV1.deployedAddress).to.be.equal(this.game.address)
         expect(responseAuthorizedAmounts.toString()).to.be.equal(
           this.authorizedAmounts.toString()
         )

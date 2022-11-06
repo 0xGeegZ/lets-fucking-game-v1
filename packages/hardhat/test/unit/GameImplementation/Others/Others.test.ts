@@ -5,7 +5,7 @@ import { ethers } from 'hardhat'
 import { initialiseTestData } from '../../../factories/setup'
 import { setUpGameReadyToPlay, setUpGameWithAWinner } from '../../../helpers'
 
-describe('GameImplementationV1Contract - Others', function () {
+describe('GameV1Contract - Others', function () {
   beforeEach(initialiseTestData)
 
   context('Creator functions', function () {
@@ -25,19 +25,19 @@ describe('GameImplementationV1Contract - Others', function () {
           await this.deployedPayableGame
             .connect(this.owner)
             .setGameName(newName)
-          const updatedName = await this.deployedPayableGame.gameName()
+          const updatedName = await this.deployedPayableGame.name()
           expect(updatedName).to.be.equal(newName)
         })
       })
     })
 
-    describe('setGameImage', function () {
+    describe('setImage', function () {
       describe('when caller is not the creator', function () {
         it('should revert with correct error message', async function () {
           await expectRevert(
             this.deployedPayableGame
               .connect(this.bob)
-              .setGameImage('https://www.new-ipfs-image.com'),
+              .setImage('https://www.new-ipfs-image.com'),
             'Caller is not the creator'
           )
         })
@@ -48,8 +48,8 @@ describe('GameImplementationV1Contract - Others', function () {
           const newImageLink = 'https://www.new-ipfs-image.com'
           await this.deployedPayableGame
             .connect(this.owner)
-            .setGameImage(newImageLink)
-          const updatedImage = await this.deployedPayableGame.gameImage()
+            .setImage(newImageLink)
+          const updatedImage = await this.deployedPayableGame.image()
           expect(updatedImage).to.be.equal(newImageLink)
         })
       })
@@ -296,7 +296,7 @@ describe('GameImplementationV1Contract - Others', function () {
     describe('claimTreasuryFeeToFactory', function () {
       describe('when caller is the game factory', function () {
         it('should withdraw the treasury fee to factory', async function () {
-          // TODO GUIGUI FIXME gameFactory contract can't call gameImplementation function
+          // TODO GUIGUI FIXME gameFactory contract can't call game function
           expect(true).to.be.false
           // const winnerIndex = 4
           // await setUpGameWithAWinner({
@@ -342,7 +342,7 @@ describe('GameImplementationV1Contract - Others', function () {
         })
 
         it('should revert with correct error message if factory claim fee twice', async function () {
-          // TODO FIXME factory contract can't call gameImplementation function
+          // TODO FIXME factory contract can't call game function
           expect(true).to.be.false
           // const winnerIndex = 4
           // await setUpGameWithAWinner({
@@ -523,7 +523,7 @@ describe('GameImplementationV1Contract - Others', function () {
           )
         })
         it('should withdraw all the contract funds and transfer them to the factory address', async function () {
-          // TODO  GUIGUI FIXME gameFactory contract can't call gameImplementation function (invalid signer or provider)
+          // TODO  GUIGUI FIXME gameFactory contract can't call game function (invalid signer or provider)
           expect(true).to.be.false
           // const fundReceiverAddress = this.players[5].address
           // await setUpGameReadyToPlay({
@@ -653,7 +653,7 @@ describe('GameImplementationV1Contract - Others', function () {
 
       describe('when called by admin', function () {
         it('should transfer the factory to given address', async function () {
-          // TODO GUIGUI FIXME gameFactory contract can't call gameImplementation function (invalid signer or provider)
+          // TODO GUIGUI FIXME gameFactory contract can't call game function (invalid signer or provider)
           expect(true).to.be.false
           // await this.deployedPayableGame
           //   .connect(this.gameFactory)

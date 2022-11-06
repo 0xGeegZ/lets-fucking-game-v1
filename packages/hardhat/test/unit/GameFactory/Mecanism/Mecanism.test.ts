@@ -19,8 +19,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
-            this.gameName,
-            this.gameImage,
+            this.name,
+            this.image,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
@@ -36,17 +36,15 @@ describe('GameFactoryContract', function () {
           .getDeployedGames()
 
         const newGame = deployedGames[deployedGames.length - 1]
-        const clonedGameContract =
-          await this.GameImplementationV1Contract.attach(
-            newGame.deployedAddress
-          )
+        const clonedGameContract = await this.GameV1Contract.attach(
+          newGame.deployedAddress
+        )
 
         const responseOwner = await clonedGameContract.owner()
         const responseCreator = await clonedGameContract.creator()
         const responseFactory = await clonedGameContract.factory()
-        const responseGameId = await clonedGameContract.roundId()
-        const responseGameImplementationV1Version =
-          await clonedGameContract.gameImplementationVersion()
+        const responseId = await clonedGameContract.roundId()
+        const responseGameV1Version = await clonedGameContract.version()
         const responsePlayTimeRange = await clonedGameContract.playTimeRange()
         const responseMaxPlayers = await clonedGameContract.maxPlayers()
         const responseRegistrationAmount =
@@ -57,9 +55,9 @@ describe('GameFactoryContract', function () {
         expect(responseOwner).to.be.equal(this.owner.address)
         expect(responseCreator).to.be.equal(this.bob.address)
         expect(responseFactory).to.be.equal(this.gameFactory.address)
-        expect(responseGameId).to.be.equal('0')
-        expect(responseGameImplementationV1Version).to.be.equal('0')
-        expect(responseGameId).to.be.equal('0')
+        expect(responseId).to.be.equal('0')
+        expect(responseGameV1Version).to.be.equal('0')
+        expect(responseId).to.be.equal('0')
         expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
         expect(responseRegistrationAmount).to.be.equal(registrationAmount)
@@ -84,8 +82,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
-            this.gameName,
-            this.gameImage,
+            this.name,
+            this.image,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
@@ -101,32 +99,28 @@ describe('GameFactoryContract', function () {
           .getDeployedGames()
 
         const newGame = deployedGames[deployedGames.length - 1]
-        const clonedGameContract =
-          await this.GameImplementationV1Contract.attach(
-            newGame.deployedAddress
-          )
+        const clonedGameContract = await this.GameV1Contract.attach(
+          newGame.deployedAddress
+        )
 
         const responseOwner = await clonedGameContract.owner()
         const responseCreator = await clonedGameContract.creator()
         const responseFactory = await clonedGameContract.factory()
-        const responseGameId = await clonedGameContract.roundId()
-        const responseGameImplementationV1Version =
-          await clonedGameContract.gameImplementationVersion()
+        const responseId = await clonedGameContract.roundId()
+        const responseGameV1Version = await clonedGameContract.version()
         const responsePlayTimeRange = await clonedGameContract.playTimeRange()
         const responseMaxPlayers = await clonedGameContract.maxPlayers()
         const responseRegistrationAmount =
           await clonedGameContract.registrationAmount()
         const responseTreasuryFee = await clonedGameContract.treasuryFee()
         const responseCreatorFee = await clonedGameContract.creatorFee()
-        const responsePrizes = await clonedGameContract.getPrizes(
-          responseGameId
-        )
+        const responsePrizes = await clonedGameContract.getPrizes(responseId)
         expect(responseOwner).to.be.equal(this.owner.address)
         expect(responseCreator).to.be.equal(this.bob.address)
         expect(responseFactory).to.be.equal(this.gameFactory.address)
-        expect(responseGameId).to.be.equal('0')
-        expect(responseGameImplementationV1Version).to.be.equal('0')
-        expect(responseGameId).to.be.equal('0')
+        expect(responseId).to.be.equal('0')
+        expect(responseGameV1Version).to.be.equal('0')
+        expect(responseId).to.be.equal('0')
         expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
         expect(responseRegistrationAmount).to.be.equal(registrationAmount)
@@ -147,7 +141,7 @@ describe('GameFactoryContract', function () {
         const emptyauthorizedAmounts = []
         await expectRevert(
           this.GameFactoryContract.connect(this.owner).deploy(
-            this.gameImplementation.address,
+            this.game.address,
             this.cronUpkeep.address,
             this.gameCreationAmount,
             emptyauthorizedAmounts
@@ -166,8 +160,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
-            this.gameName,
-            this.gameImage,
+            this.name,
+            this.image,
             this.maxPlayers,
             this.playTimeRange,
             sameRegistrationAmount,
@@ -182,8 +176,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.alice)
             .createNewGame(
-              this.gameName,
-              this.gameImage,
+              this.name,
+              this.image,
               this.maxPlayers,
               this.playTimeRange,
               sameRegistrationAmount,
@@ -215,8 +209,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.alice)
             .createNewGame(
-              this.gameName,
-              this.gameImage,
+              this.name,
+              this.image,
               this.maxPlayers,
               this.playTimeRange,
               registrationAmount,
@@ -241,8 +235,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.alice)
             .createNewGame(
-              this.gameName,
-              this.gameImage,
+              this.name,
+              this.image,
               this.maxPlayers,
               this.playTimeRange,
               registrationAmount,
@@ -267,8 +261,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.alice)
             .createNewGame(
-              this.gameName,
-              this.gameImage,
+              this.name,
+              this.image,
               this.maxPlayers,
               this.playTimeRange,
               registrationAmount,
@@ -295,8 +289,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
-            this.gameName,
-            this.gameImage,
+            this.name,
+            this.image,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
@@ -316,32 +310,28 @@ describe('GameFactoryContract', function () {
           .getDeployedGames()
 
         const newGame = deployedGames[deployedGames.length - 1]
-        const clonedGameContract =
-          await this.GameImplementationV1Contract.attach(
-            newGame.deployedAddress
-          )
+        const clonedGameContract = await this.GameV1Contract.attach(
+          newGame.deployedAddress
+        )
 
         const responseOwner = await clonedGameContract.owner()
         const responseCreator = await clonedGameContract.creator()
         const responseFactory = await clonedGameContract.factory()
-        const responseGameId = await clonedGameContract.roundId()
-        const responseGameImplementationV1Version =
-          await clonedGameContract.gameImplementationVersion()
+        const responseId = await clonedGameContract.roundId()
+        const responseGameV1Version = await clonedGameContract.version()
         const responsePlayTimeRange = await clonedGameContract.playTimeRange()
         const responseMaxPlayers = await clonedGameContract.maxPlayers()
         const responseRegistrationAmount =
           await clonedGameContract.registrationAmount()
         const responseTreasuryFee = await clonedGameContract.treasuryFee()
         const responseCreatorFee = await clonedGameContract.creatorFee()
-        const responsePrizes = await clonedGameContract.getPrizes(
-          responseGameId
-        )
+        const responsePrizes = await clonedGameContract.getPrizes(responseId)
         expect(responseOwner).to.be.equal(this.owner.address)
         expect(responseCreator).to.be.equal(this.bob.address)
         expect(responseFactory).to.be.equal(this.gameFactory.address)
-        expect(responseGameId).to.be.equal('0')
-        expect(responseGameImplementationV1Version).to.be.equal('0')
-        expect(responseGameId).to.be.equal('0')
+        expect(responseId).to.be.equal('0')
+        expect(responseGameV1Version).to.be.equal('0')
+        expect(responseId).to.be.equal('0')
         expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
         expect(responseRegistrationAmount).to.be.equal(registrationAmount)
@@ -369,8 +359,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
-            this.gameName,
-            this.gameImage,
+            this.name,
+            this.image,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
@@ -390,32 +380,28 @@ describe('GameFactoryContract', function () {
           .getDeployedGames()
 
         const newGame = deployedGames[deployedGames.length - 1]
-        const clonedGameContract =
-          await this.GameImplementationV1Contract.attach(
-            newGame.deployedAddress
-          )
+        const clonedGameContract = await this.GameV1Contract.attach(
+          newGame.deployedAddress
+        )
 
         const responseOwner = await clonedGameContract.owner()
         const responseCreator = await clonedGameContract.creator()
         const responseFactory = await clonedGameContract.factory()
-        const responseGameId = await clonedGameContract.roundId()
-        const responseGameImplementationV1Version =
-          await clonedGameContract.gameImplementationVersion()
+        const responseId = await clonedGameContract.roundId()
+        const responseGameV1Version = await clonedGameContract.version()
         const responsePlayTimeRange = await clonedGameContract.playTimeRange()
         const responseMaxPlayers = await clonedGameContract.maxPlayers()
         const responseRegistrationAmount =
           await clonedGameContract.registrationAmount()
         const responseTreasuryFee = await clonedGameContract.treasuryFee()
         const responseCreatorFee = await clonedGameContract.creatorFee()
-        const responsePrizes = await clonedGameContract.getPrizes(
-          responseGameId
-        )
+        const responsePrizes = await clonedGameContract.getPrizes(responseId)
         expect(responseOwner).to.be.equal(this.owner.address)
         expect(responseCreator).to.be.equal(this.bob.address)
         expect(responseFactory).to.be.equal(this.gameFactory.address)
-        expect(responseGameId).to.be.equal('0')
-        expect(responseGameImplementationV1Version).to.be.equal('0')
-        expect(responseGameId).to.be.equal('0')
+        expect(responseId).to.be.equal('0')
+        expect(responseGameV1Version).to.be.equal('0')
+        expect(responseId).to.be.equal('0')
         expect(responsePlayTimeRange).to.be.equal(this.playTimeRange)
         expect(responseMaxPlayers).to.be.equal(this.maxPlayers)
         expect(responseRegistrationAmount).to.be.equal(registrationAmount)
@@ -447,8 +433,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
-            this.gameName,
-            this.gameImage,
+            this.name,
+            this.image,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
@@ -465,8 +451,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
-            this.gameName,
-            this.gameImage,
+            this.name,
+            this.image,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmount,
@@ -494,8 +480,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.alice)
             .createNewGame(
-              this.gameName,
-              this.gameImage,
+              this.name,
+              this.image,
               this.maxPlayers,
               this.playTimeRange,
               registrationAmount,
@@ -512,13 +498,11 @@ describe('GameFactoryContract', function () {
 
     describe('when new game gets created', function () {
       it('should add the new game in deployedGames', async function () {
-        const currentId = await this.gameFactory
-          .connect(this.owner)
-          .nextGameId()
+        const currentId = await this.gameFactory.connect(this.owner).nextId()
 
-        const currentGameImplementationV1VersionId = await this.gameFactory
+        const currentGameV1VersionId = await this.gameFactory
           .connect(this.owner)
-          .latestGameImplementationVersionId()
+          .latestVersionId()
 
         const registrationAmountFirst =
           this.authorizedAmounts[this.authorizedAmounts.length - 1]
@@ -531,8 +515,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.bob)
           .createNewGame(
-            this.gameName,
-            this.gameImage,
+            this.name,
+            this.image,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmountFirst,
@@ -554,8 +538,8 @@ describe('GameFactoryContract', function () {
         await this.gameFactory
           .connect(this.alice)
           .createNewGame(
-            this.gameName,
-            this.gameImage,
+            this.name,
+            this.image,
             this.maxPlayers,
             this.playTimeRange,
             registrationAmountSecond,
@@ -574,22 +558,16 @@ describe('GameFactoryContract', function () {
         const secondGame = deployedGames[deployedGames.length - 1]
 
         expect(firstGame.id).to.be.equal(currentId)
-        expect(firstGame.versionId).to.be.equal(
-          currentGameImplementationV1VersionId
-        )
+        expect(firstGame.versionId).to.be.equal(currentGameV1VersionId)
         expect(firstGame.creator).to.be.equal(this.bob.address)
 
         expect(secondGame.id).to.be.equal(+currentId + 1)
-        expect(secondGame.versionId).to.be.equal(
-          currentGameImplementationV1VersionId
-        )
+        expect(secondGame.versionId).to.be.equal(currentGameV1VersionId)
         expect(secondGame.creator).to.be.equal(this.alice.address)
       })
 
       it('should emit the GameCreated event with the correct data', async function () {
-        const currentId = await this.gameFactory
-          .connect(this.owner)
-          .nextGameId()
+        const currentId = await this.gameFactory.connect(this.owner).nextId()
 
         const registrationAmount =
           this.authorizedAmounts[this.authorizedAmounts.length - 1]
@@ -601,8 +579,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
-              this.gameName,
-              this.gameImage,
+              this.name,
+              this.image,
               this.maxPlayers,
               this.playTimeRange,
               registrationAmount,
@@ -626,8 +604,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
-              this.gameName,
-              this.gameImage,
+              this.name,
+              this.image,
               this.maxPlayers,
               this.playTimeRange,
               this.correctRegistrationAmount,
@@ -654,8 +632,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
-              this.gameName,
-              this.gameImage,
+              this.name,
+              this.image,
               outOfRangeMaxPlayers1,
               this.playTimeRange,
               registrationAmount,
@@ -672,8 +650,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
-              this.gameName,
-              this.gameImage,
+              this.name,
+              this.image,
               outOfRangeMaxPlayers2,
               this.playTimeRange,
               registrationAmount,
@@ -700,8 +678,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
-              this.gameName,
-              this.gameImage,
+              this.name,
+              this.image,
               this.maxPlayers,
               outOfRangePlayTimeRange1,
               registrationAmount,
@@ -718,8 +696,8 @@ describe('GameFactoryContract', function () {
           this.gameFactory
             .connect(this.bob)
             .createNewGame(
-              this.gameName,
-              this.gameImage,
+              this.name,
+              this.image,
               this.maxPlayers,
               outOfRangePlayTimeRange2,
               registrationAmount,
@@ -752,8 +730,8 @@ describe('GameFactoryContract', function () {
       await this.gameFactory
         .connect(this.bob)
         .createNewGame(
-          this.gameName,
-          this.gameImage,
+          this.name,
+          this.image,
           this.maxPlayers,
           this.playTimeRange,
           registrationAmountFirst,
@@ -774,8 +752,8 @@ describe('GameFactoryContract', function () {
       await this.gameFactory
         .connect(this.alice)
         .createNewGame(
-          this.gameName,
-          this.gameImage,
+          this.name,
+          this.image,
           this.maxPlayers,
           this.playTimeRange,
           registrationAmountSecond,

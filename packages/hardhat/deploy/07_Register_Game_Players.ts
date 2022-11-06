@@ -27,8 +27,10 @@ const func: DeployFunction = async function ({
       },
     }
 
-    const { interface: gameImplementationInterface } =
-      await ethers.getContractFactory('GameImplementationV1', libraries)
+    const { interface: gameInterface } = await ethers.getContractFactory(
+      'GameV1',
+      libraries
+    )
 
     const { address: gameFactoryAddress } = await deployments.get('GameFactory')
 
@@ -49,7 +51,7 @@ const func: DeployFunction = async function ({
 
     const payableGame = new ethers.Contract(
       payableGameDeployedAddress,
-      gameImplementationInterface,
+      gameInterface,
       deployer
     )
 
@@ -68,7 +70,7 @@ const func: DeployFunction = async function ({
 
     const freeGame = new ethers.Contract(
       freeGameDeployedAddress,
-      gameImplementationInterface,
+      gameInterface,
       deployer
     )
 

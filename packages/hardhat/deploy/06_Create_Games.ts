@@ -15,8 +15,8 @@ const func: DeployFunction = async function ({
 
     const deployer = await ethers.getSigner(deployerAddress)
 
-    const gameName = "Let's Fucking Game VMP"
-    const gameImage = ''
+    const name = "Let's Fucking Game VMP"
+    const image = ''
     const gameCreationAmount = ethers.utils.parseEther('0.1')
 
     const maxPlayers = 10
@@ -70,8 +70,8 @@ const func: DeployFunction = async function ({
 
     log('Creating new payable game')
     await gameFactory.createNewGame(
-      gameName,
-      gameImage,
+      name,
+      image,
       maxPlayers,
       playTimeRange,
       registrationAmount,
@@ -85,8 +85,8 @@ const func: DeployFunction = async function ({
 
     log('Creating new free game')
     await gameFactory.createNewGame(
-      gameName,
-      gameImage,
+      name,
+      image,
       maxPlayers,
       playTimeRange,
       zeroRegistrationAmount,

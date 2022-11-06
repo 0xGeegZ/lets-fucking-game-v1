@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction } from 'hardhat-deploy/types'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -24,9 +24,7 @@ const func: DeployFunction = async function ({
     },
   }
 
-  const { address: gameImplementationAddress } = await deployments.get(
-    'GameImplementationV1'
-  )
+  const { address: gameAddress } = await deployments.get('GameV1')
 
   const { address: cronUpkeepAddress } = await deployments.get('CronUpkeep')
 
@@ -47,7 +45,7 @@ const func: DeployFunction = async function ({
   } = await deploy('GameFactory', {
     ...options,
     args: [
-      gameImplementationAddress,
+      gameAddress,
       cronUpkeepAddress,
       gameCreationAmount,
       authorizedAmounts,
