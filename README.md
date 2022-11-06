@@ -98,6 +98,8 @@ Primary :
 
 Secondary :
 
+- React Hooks for Data Fetching with [SWR](https://swr.vercel.app/)
+- State Management with [Redux](https://react-redux.js.org/)
 - Hooking with [Wagmi](https://github.com/wagmi-dev/wagmi)
 - Securing with [Mythril](https://github.com/ConsenSys/mythril)
 - Analyzing with [Slither](https://github.com/crytic/slither)
