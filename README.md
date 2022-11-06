@@ -1,9 +1,3 @@
-# Coverage Report
-
-| Statements                                                                         | Functions                                                                        | Lines                                                                    |
-| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| ![Statements](https://img.shields.io/badge/statements-71.73%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-65.19%25-red.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-67.43%25-red.svg?style=flat) |
-
 # Let's Fucking Game
 
 This application was done during the [Chainlink Hackathon Fall 2022](https://chainlinkfall2022.devpost.com/)
