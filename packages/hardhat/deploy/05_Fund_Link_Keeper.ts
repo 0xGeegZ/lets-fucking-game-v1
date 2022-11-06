@@ -34,7 +34,7 @@ const func: DeployFunction = async function ({
   }
 }
 
-func.tags = ['all', 'lfg', 'main', 'fund-link', 'test']
+func.tags = ['all', 'test', 'dev', 'fund-link']
 func.dependencies = ['keeper']
 
 export default func

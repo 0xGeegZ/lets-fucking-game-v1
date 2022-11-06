@@ -2,7 +2,7 @@ import fs from 'fs'
 import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
-import saveContractData from '../helpers/saveContractData'
+import { saveContractData } from '../helpers/saveContractData'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -76,12 +76,12 @@ const func: DeployFunction = async function ({
   log('✅ Contracts data was copied to the dapp')
 }
 
-func.tags = ['all', 'dev', 'lfg']
+func.tags = ['all', 'dev', 'staging', 'prod', 'save-contract-data']
 func.dependencies = [
-  'game-factory',
-  'game-implementation',
-  'keeper',
   'multicall',
+  'keeper',
+  'game-implementation',
+  'game-factory',
 ]
 
 export default func

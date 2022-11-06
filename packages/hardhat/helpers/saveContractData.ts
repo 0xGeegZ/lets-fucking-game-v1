@@ -47,7 +47,7 @@ const saveContract = ({ contractName, chainId, contractData }) => {
   fs.writeFileSync(filePath, JSON.stringify(deployedContracts))
 }
 
-const saveContractData = (contractData) => {
+export const saveContractData = (contractData) => {
   if (!fs.existsSync(contractsDir)) {
     fs.mkdirSync(contractsDir)
   }
@@ -72,4 +72,3 @@ const saveContractData = (contractData) => {
     saveContract({ contractName, chainId, contractData })
   )
 }
-module.exports = saveContractData
