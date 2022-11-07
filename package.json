@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "prepare": "husky install",
     "dev": "yarn workspace lets-fucking-game-dapp dev",
     "build": "yarn build:hardhat && yarn build:dapp",
     "build:hardhat": "yarn workspace lets-fucking-game-hardhat build",
@@ -19,6 +18,8 @@
     "lint:dapp": "yarn workspace lets-fucking-game-dapp lint",
     "format:dapp": "yarn workspace lets-fucking-game-dapp format",
     "format:contracts": "yarn workspace lets-fucking-game-hardhat format",
+    "prepare": "husky install",
+    "postinstall": "cd packages/dapp && yarn install",
     "hook:pre-push": "cd packages/hardhat && tsc --noEmit && shellcheck bin/* && cspell lint --dot --gitignore '**/{*,''}{.,''}*' && prettier '**/{*,''}.{json,js,ts,sol}' --check && solhint 'contracts/*.sol' && eslint '**/{*,''}.{json,js,ts}'"
   },
   "husky": {
