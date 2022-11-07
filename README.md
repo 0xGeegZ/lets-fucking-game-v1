@@ -124,11 +124,18 @@ Secondary :
 - Formatting with [Prettier](https://prettier.io)
 - Designing with [Emotion](https://emotion.sh/docs/introduction)
 
+Deployment :
+
+- Deploying with [Vercel](https://vercel.com/)
+- Containerization with [Docker Compose](https://docs.docker.com/compose/)
+- CI / CD with [Github Action](https://github.com/features/actions)
+
 ## Requirements
 
 - [Node](https://nodejs.org/en/download/)
 - [Yarn](https://classic.yarnpkg.com/en/docs/install/#mac-stable)
 - [Git](https://git-scm.com/downloads)
+- [Docker](https://www.docker.com/)
 
 ## Quick Start
 
