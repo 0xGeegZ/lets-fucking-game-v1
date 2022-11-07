@@ -47,7 +47,7 @@ import {
   getCrossFarmingReceiverAddress,
 } from 'utils/addressHelpers'
 
-import { GameFactory, GameImplementationV1 } from 'config/types/typechain'
+import { GameFactory, GameImplementationV1 } from '@types/typechain'
 
 // ABI
 import profileABI from 'config/abi/pancakeProfile.json'

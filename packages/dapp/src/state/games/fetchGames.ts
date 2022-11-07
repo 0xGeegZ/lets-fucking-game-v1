@@ -1,5 +1,6 @@
 import { getGameFactoryV1Contract } from 'utils/contractHelpers'
-import { GameFactory, GameImplementationV1Interface } from 'config/types/typechain'
+// import { GameFactory, GameImplementationV1Interface } from 'config/types/typechain'
+import { GameFactory, GameImplementationV1Interface } from '@types/typechain'
 import { fetchPublicGamesData } from './fetchPublicGameData'
 import { State, SerializedGame, DeserializedGame, DeserializedGameUserData } from '../types'
 
