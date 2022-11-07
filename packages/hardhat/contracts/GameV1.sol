@@ -178,7 +178,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
             hasPlayedRound: false,
             hasLost: false,
             isSplitOk: false,
-            position: maxPlayers,
+            position: playerAddresses.length + 1,
             roundRangeUpperLimit: 0,
             roundRangeLowerLimit: 0
         });

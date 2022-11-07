@@ -62,6 +62,8 @@ import {
   getNonBscVaultContract,
   getCrossFarmingProxyContract,
 } from 'utils/contractHelpers'
+import internal from 'config/internal/internal.json'
+
 import { useSigner } from 'wagmi'
 
 // Imports below migrated from Exchange useContract.ts
@@ -351,7 +353,11 @@ export function usePairContract(pairAddress?: string, withSignerIfPossible?: boo
 }
 
 export function useMulticallContract() {
+  // TODO Guigui load multicall contract adress and ABIs directly from internal
   const { chainId } = useActiveWeb3React()
+  if (internal[chainId])
+    return useContract<Multicall>(internal[chainId].MultiCall3.address, internal[chainId].MultiCall3.abi, false)
+
   return useContract<Multicall>(getMulticallAddress(chainId), multiCallAbi, false)
 }
 

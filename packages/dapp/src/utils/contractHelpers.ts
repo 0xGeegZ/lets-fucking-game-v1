@@ -315,9 +315,21 @@ export const getCakePredictionsContract = (address: string, signer?: Signer | Pr
 export const getChainlinkOracleContract = (address: string, signer?: Signer | Provider, chainId?: number) => {
   return getContract({ abi: chainlinkOracleAbi, address, signer, chainId }) as ChainlinkOracle
 }
+// export const getMulticallContract = (chainId: ChainId) => {
+//   return getContract({ abi: MultiCallAbi, address: getMulticallAddress(chainId), chainId }) as Multicall
+// }
+// TODO Guigui load multicall contract adress and ABIs directly from internal
 export const getMulticallContract = (chainId: ChainId) => {
+  if (internal[chainId])
+    return getContract({
+      abi: internal[chainId].MultiCall3.abi,
+      address: internal[chainId].MultiCall3.address,
+      chainId,
+    }) as Multicall
+
   return getContract({ abi: MultiCallAbi, address: getMulticallAddress(chainId), chainId }) as Multicall
 }
+
 export const getBunnySpecialCakeVaultContract = (signer?: Signer | Provider) => {
   return getContract({
     abi: bunnySpecialCakeVaultAbi,

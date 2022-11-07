@@ -20,7 +20,12 @@ export const getMasterChefAddress = (chainId?: number) => {
 export const getMasterChefV1Address = () => {
   return getAddress(addresses.masterChefV1)
 }
-export const getMulticallAddress = (chainId?: number) => {
+// export const getMulticallAddress = (chainId?: number) => {
+//   return getAddress(addresses.multiCall, chainId)
+// }
+// TODO Guigui load multicall contract adress and ABIs directly from internal
+export const getMulticallAddress = (chainId: number) => {
+  if (internal[chainId]) return internal[chainId].MultiCall3.address
   return getAddress(addresses.multiCall, chainId)
 }
 export const getLotteryV2Address = () => {

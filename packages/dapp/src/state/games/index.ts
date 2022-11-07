@@ -193,6 +193,7 @@ export const fetchGameUserDataAsync = createAsyncThunk<
   'games/fetchGameUserDataAsync',
   async ({ account, pids, proxyAddress, chainId }, config) => {
     // TODO Guigui load user data if needed
+    console.log('fetchGameUserDataAsync')
     // const poolLength = config.getState().games.poolLength ?? (await fetchMasterChefGamePoolLength(ChainId.BSC))
     // const gamesConfig = await getFarmConfig(chainId)
     // const gamesCanFetch = gamesConfig.filter((gameConfig) => pids.includes(gameConfig.pid))

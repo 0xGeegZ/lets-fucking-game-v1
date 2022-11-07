@@ -3,21 +3,23 @@ import { CallOverrides, Contract } from '@ethersproject/contracts'
 import { Provider } from '@ethersproject/providers'
 import { ChainId } from '@pancakeswap/sdk'
 import multicallAbi from './Multicall.json'
+import internal from 'config/internal/internal.json'
 
-// TODO Guigui add multicall contract adress directly from internal
+// TODO Guigui load multicall contract adress and ABIs directly from internal
 export const multicallAddresses = {
   1: '0xcA11bde05977b3631167028862bE2a173976CA11',
   4: '0xcA11bde05977b3631167028862bE2a173976CA11',
   5: '0xcA11bde05977b3631167028862bE2a173976CA11',
   56: '0xcA11bde05977b3631167028862bE2a173976CA11',
   97: '0xcA11bde05977b3631167028862bE2a173976CA11',
-  31337: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
 }
 
 export const getMulticallContract = (chainId: ChainId, provider) => {
-  if (multicallAddresses[chainId]) {
-    return new Contract(multicallAddresses[chainId], multicallAbi, provider)
-  }
+  if (internal[chainId])
+    return new Contract(internal[chainId].MultiCall3.address, internal[chainId].MultiCall3.abi, provider)
+
+  if (multicallAddresses[chainId]) return new Contract(multicallAddresses[chainId], multicallAbi, provider)
+
   return null
 }
 

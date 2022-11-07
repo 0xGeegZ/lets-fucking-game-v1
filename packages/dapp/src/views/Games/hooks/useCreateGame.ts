@@ -25,26 +25,7 @@ export const useCreateGame = ({ game }) => {
   const { data, error, status, mutate } = useSWRContract({
     contract: gameFactoryContract,
     methodName: 'createNewGame',
-    params: [
-      name,
-      image,
-      maxPlayers,
-      playTimeRange,
-      registrationAmount,
-      treasuryFee,
-      creatorFee,
-      encodedCron,
-      prizes,
-      // _gameName : name,
-      //  _gameImage : image,
-      //  _maxPlayers : maxPlayers,
-      //  _playTimeRange : playTimeRange,
-      //  _registrationAmount : registrationAmount,
-      //  _treasuryFee : treasuryFee,
-      //  _creatorFee : creatorFee,
-      //  _encodedCron : encodedCron,
-      //  _prizes : prizes
-    ],
+    params: [name, image, maxPlayers, playTimeRange, registrationAmount, treasuryFee, creatorFee, encodedCron, prizes],
   })
   console.log('🚀 ~ file: useCreateGame.ts ~ line 32 ~ useCreateGame ~ mutate', mutate)
   console.log('🚀 ~ file: useCreateGame.ts ~ line 32 ~ useCreateGame ~ status', status)

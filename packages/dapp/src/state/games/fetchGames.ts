@@ -44,6 +44,7 @@ function gameTransformer(gameResult) {
 const fetchGames = async (chainId: number): Promise<SerializedGame[]> => {
   const gameFactoryContract: GameFactory = getGameFactoryV1Contract(chainId)
   const gamesToFetch: GameFactory.GameStructOutput[] = await gameFactoryContract.getDeployedGames()
+  console.log('🚀 ~ file: fetchGames.ts ~ line 47 ~ fetchGames ~ gamesToFetch', gamesToFetch)
 
   // TODO GUIGUI ADD other function call if needed
   const [gameResult] = await Promise.all([fetchPublicGamesData(gamesToFetch, chainId)])
