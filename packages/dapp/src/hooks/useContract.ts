@@ -16,7 +16,7 @@ import { useMemo } from 'react'
 import { getMulticallAddress, getPredictionsV1Address, getZapAddress } from 'utils/addressHelpers'
 import {
   getGameFactoryV1Contract,
-  getGameImplementationV1Contract,
+  getGameV1Contract,
   getAnniversaryAchievementContract,
   getBCakeFarmBoosterContract,
   getBCakeFarmBoosterProxyFactoryContract,
@@ -91,15 +91,12 @@ export const useGameFactoryV1Contract = () => {
   return useMemo(() => getGameFactoryV1Contract(chainId, providerOrSigner), [chainId, providerOrSigner])
 }
 
-// TODO GUIGUI getGameImplementationV1Contract
-export const useGameImplementationV1Contract = (address: string) => {
+// TODO GUIGUI getGameV1Contract
+export const useGameV1Contract = (address: string) => {
   // const { data: signer } = useSigner()
   const providerOrSigner = useProviderOrSigner(true)
   const { chainId } = useActiveChainId()
-  return useMemo(
-    () => getGameImplementationV1Contract(address, chainId, providerOrSigner),
-    [address, chainId, providerOrSigner],
-  )
+  return useMemo(() => getGameV1Contract(address, chainId, providerOrSigner), [address, chainId, providerOrSigner])
 }
 
 export const useIfoV1Contract = (address: string) => {
@@ -355,10 +352,13 @@ export function usePairContract(pairAddress?: string, withSignerIfPossible?: boo
 export function useMulticallContract() {
   // TODO Guigui load multicall contract adress and ABIs directly from internal
   const { chainId } = useActiveWeb3React()
-  if (internal[chainId])
-    return useContract<Multicall>(internal[chainId].MultiCall3.address, internal[chainId].MultiCall3.abi, false)
 
-  return useContract<Multicall>(getMulticallAddress(chainId), multiCallAbi, false)
+  const address = internal[chainId] ? internal[chainId].MultiCall3.address : getMulticallAddress(chainId)
+  const abi = internal[chainId] ? internal[chainId].MultiCall3.abi : multiCallAbi
+  // if (internal[chainId])
+  //   return useContract<Multicall>(internal[chainId].MultiCall3.address, internal[chainId].MultiCall3.abi, false)
+
+  return useContract<Multicall>(address, abi, false)
 }
 
 export const usePotterytVaultContract = (address) => {

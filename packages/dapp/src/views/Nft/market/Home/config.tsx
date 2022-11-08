@@ -9,7 +9,7 @@ const config = (t: ContextApi['t']) => {
         t(
           'Trades are settled in WBNB, which is a wrapped version of BNB used on BNB Smart Chain. That means that when you sell an item, WBNB is sent to your wallet instead of BNB.',
         ),
-        t('You can instantly swap your WBNB for BNB with no trading fees on Let\'s Fucking Game.'),
+        t("You can instantly swap your WBNB for BNB with no trading fees on Let's Fucking Game."),
       ],
     },
     {
@@ -26,7 +26,7 @@ const config = (t: ContextApi['t']) => {
       title: t('What are the fees?'),
       description: [
         t(
-          '100% of all platform fees taken by Let's Fucking Game from sales are used to buy back and BURN CAKE tokens in our weekly CAKE burns.',
+          "100% of all platform fees taken by Let's Fucking Game from sales are used to buy back and BURN CAKE tokens in our weekly CAKE burns.",
         ),
         t(
           'Platform fees: 2% is subtracted from NFT sales on the market. Subject to change.Collection fees: Additional fees may be taken by collection creators, once those collections are live. These will not contribute to the CAKE burns.',

@@ -18,11 +18,11 @@ import { useTranslation } from '@pancakeswap/localization'
 import Image from 'next/image'
 import NextLink from 'next/link'
 import styled, { useTheme } from 'styled-components'
+import CreateProxyButton from 'views/Farms/components/YieldBooster/components/CreateProxyButton'
 import { useBCakeProxyContractAddress } from '../hooks/useBCakeProxyContractAddress'
 import { useUserBoosterStatus } from '../hooks/useUserBoosterStatus'
 import { useUserLockedCakeStatus } from '../hooks/useUserLockedCakeStatus'
 import boosterCardImage from '../images/boosterCardImage.png'
-import CreateProxyButton from './YieldBooster/components/CreateProxyButton'
 
 export const CardWrapper = styled.div`
   position: relative;

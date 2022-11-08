@@ -7,7 +7,7 @@ import Image from 'next/image'
 import { memo, useEffect, useRef } from 'react'
 import { useChainCurrentBlock } from 'state/block/hooks'
 import styled, { keyframes } from 'styled-components'
-import { getStatus } from '../../../Ifos/hooks/helpers'
+// import { getStatus } from '../../../Ifos/hooks/helpers'
 import { IFOImage, IFOMobileImage } from './images'
 import * as S from './Styled'
 
@@ -86,9 +86,10 @@ const IFOBanner = () => {
   const ifoName = activeIfoWithBlocks?.name ?? 'XXX'
 
   const isIfoAlive = !!(currentBlock && activeIfoWithBlocks && activeIfoWithBlocks.endBlock > currentBlock)
-  const status = isIfoAlive
-    ? getStatus(currentBlock, activeIfoWithBlocks.startBlock, activeIfoWithBlocks.endBlock)
-    : null
+  const status = null
+  //    isIfoAlive
+  //     ? getStatus(currentBlock, activeIfoWithBlocks.startBlock, activeIfoWithBlocks.endBlock)
+  //     : null
   const { isMobile } = useMatchBreakpoints()
   useEffect(() => {
     if (!headingRef.current) return

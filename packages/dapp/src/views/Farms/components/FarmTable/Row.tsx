@@ -6,6 +6,8 @@ import useDelayedUnmount from 'hooks/useDelayedUnmount'
 import { useFarmUser } from 'state/farms/hooks'
 
 import { FarmAuctionTag, CoreTag } from 'components/Tags'
+import BoostedApr from 'views/Farms/components/YieldBooster/components/BoostedApr'
+import BoostedTag from 'views/Farms/components/YieldBooster/components/BoostedTag'
 import Apr, { AprProps } from './Apr'
 import Farm, { FarmProps } from './Farm'
 
@@ -16,8 +18,6 @@ import Liquidity, { LiquidityProps } from './Liquidity'
 import ActionPanel from './Actions/ActionPanel'
 import CellLayout from './CellLayout'
 import { DesktopColumnSchema, MobileColumnSchema, FarmWithStakedValue } from '../types'
-import BoostedApr from 'views/Farms/components/YieldBooster/components/BoostedApr'
-import BoostedTag from 'views/Farms/components/YieldBooster/components/BoostedTag'
 
 export interface RowProps {
   apr: AprProps

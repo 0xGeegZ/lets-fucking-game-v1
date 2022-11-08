@@ -47,7 +47,7 @@ import {
   getCrossFarmingReceiverAddress,
 } from 'utils/addressHelpers'
 
-import { GameFactory, GameImplementationV1 } from '@types/typechain'
+import { GameFactory, GameV1 } from 'config/types/typechain'
 
 // ABI
 import profileABI from 'config/abi/pancakeProfile.json'
@@ -188,14 +188,14 @@ export const getGameFactoryV1Contract = (chainId?: number, signer?: Signer | Pro
     chainId,
   }) as GameFactory
 }
-// TODO GUIGUI getGameImplementationV1Contract
-export const getGameImplementationV1Contract = (address: string, chainId?: number, signer?: Signer | Provider) => {
+// TODO GUIGUI getGameV1Contract
+export const getGameV1Contract = (address: string, chainId?: number, signer?: Signer | Provider) => {
   return getContract({
-    abi: internal[chainId || ChainId.BSC].GameImplementationV1.abi,
+    abi: internal[chainId || ChainId.BSC].GameV1.abi,
     address,
     signer,
     chainId,
-  }) as GameImplementationV1
+  }) as GameV1
 }
 
 export const getLpContract = (address: string, chainId?: number, signer?: Signer | Provider) => {

@@ -19,7 +19,6 @@ import useNativeCurrency from 'hooks/useNativeCurrency'
 import { computeSlippageAdjustedAmounts } from 'utils/exchange'
 import { CAKE, USDC } from '@pancakeswap/tokens'
 import getLpAddress from 'utils/getLpAddress'
-import { getTokenAddress } from 'views/Swap/components/Chart/utils'
 import tryParseAmount from '@pancakeswap/utils/tryParseAmount'
 import { AppState, useAppDispatch } from '../index'
 import { useCurrencyBalances } from '../wallet/hooks'
@@ -69,8 +68,8 @@ export function useSingleTokenSwapInfo(
   outputCurrencyId: string | undefined,
   outputCurrency: Currency | undefined,
 ): { [key: string]: number } {
-  const token0Address = getTokenAddress(inputCurrencyId)
-  const token1Address = getTokenAddress(outputCurrencyId)
+  const token0Address = 'getTokenAddress(inputCurrencyId)'
+  const token1Address = 'getTokenAddress(outputCurrencyId)'
 
   const parsedAmount = tryParseAmount('1', inputCurrency ?? undefined)
 

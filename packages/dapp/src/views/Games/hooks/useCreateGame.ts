@@ -1,9 +1,5 @@
 import { ChainId } from '@pancakeswap/sdk'
-import {
-  getChainlinkOracleContract,
-  getGameFactoryV1Contract,
-  getGameImplementationV1Contract,
-} from 'utils/contractHelpers'
+import { getChainlinkOracleContract, getGameFactoryV1Contract, getGameV1Contract } from 'utils/contractHelpers'
 import { useSWRContract } from 'hooks/useSWRContract'
 import { useGameFactoryV1Contract } from 'hooks/useContract'
 

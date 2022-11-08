@@ -5,7 +5,7 @@ import { isAddress } from 'utils'
 import { useTranslation } from '@pancakeswap/localization'
 import { WrappedTokenInfo } from '@pancakeswap/tokens'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { StablePair } from 'views/AddLiquidity/AddStableLiquidity/hooks/useStableLPDerivedMintInfo'
+// import { StablePair } from 'views/AddLiquidity/AddStableLiquidity/hooks/useStableLPDerivedMintInfo'
 
 import { useBUSDCurrencyAmount } from 'hooks/useBUSDPrice'
 import { formatNumber } from 'utils/formatBalance'
@@ -86,7 +86,7 @@ interface CurrencyInputPanelProps {
   currency?: Currency | null
   disableCurrencySelect?: boolean
   hideBalance?: boolean
-  pair?: Pair | StablePair | null
+  pair?: Pair | null
   otherCurrency?: Currency | null
   id: string
   showCommonBases?: boolean

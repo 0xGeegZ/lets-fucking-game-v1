@@ -15,6 +15,7 @@ import orderBy from 'lodash/orderBy'
 import SearchBar from '../components/SearchBar'
 import Collections from './Collections'
 import Newest from './Newest'
+// eslint-disable-next-line import/no-named-as-default
 import config from './config'
 
 const Gradient = styled(Box)`

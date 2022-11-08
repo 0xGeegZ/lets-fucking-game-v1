@@ -83,7 +83,7 @@ function MyApp(props: AppProps<{ initialReduxState: any }>) {
           name="twitter:title"
           content="🥞 Let's Fucking Game - A next evolution DeFi exchange on BNB Smart Chain (BSC)"
         />
-        <title>Let's Fucking Game</title>
+        <title>Let&apos;s Fucking Game</title>
         {(Component as NextPageWithLayout).mp && (
           // eslint-disable-next-line @next/next/no-sync-scripts
           <script src="https://public.bnbstatic.com/static/js/mp-webview-sdk/webview-v1.0.0.min.js" id="mp-webview" />

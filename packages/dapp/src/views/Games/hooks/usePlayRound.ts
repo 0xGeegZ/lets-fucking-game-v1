@@ -1,11 +1,7 @@
 import { ChainId } from '@pancakeswap/sdk'
-import {
-  getChainlinkOracleContract,
-  getGameFactoryV1Contract,
-  getGameImplementationV1Contract,
-} from 'utils/contractHelpers'
+import { getChainlinkOracleContract, getGameFactoryV1Contract, getGameV1Contract } from 'utils/contractHelpers'
 import { useSWRContract } from 'hooks/useSWRContract'
-import { useGameImplementationV1Contract } from 'hooks/useContract'
+import { useGameV1Contract } from 'hooks/useContract'
 
 import { Zero } from '@ethersproject/constants'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
@@ -15,11 +11,11 @@ import { BigNumber } from '@ethersproject/bignumber'
 export const usePlayRound = (gameAddress: string) => {
   // const { account, chainId } = useActiveWeb3React()
 
-  const gameImplementationV1Contract = useGameImplementationV1Contract(gameAddress)
-  // const gameImplementationV1Contract = useGameImplementationV1Contract(account, chainId)
+  const gameV1Contract = useGameV1Contract(gameAddress)
+  // const gameV1Contract = useGameV1Contract(account, chainId)
 
   const { data, error, status, mutate } = useSWRContract({
-    contract: gameImplementationV1Contract,
+    contract: gameV1Contract,
     methodName: 'playRound',
     params: [],
   })

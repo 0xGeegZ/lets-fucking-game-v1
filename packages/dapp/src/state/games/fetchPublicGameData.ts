@@ -1,8 +1,8 @@
 import { ChainId } from '@pancakeswap/sdk'
 import chunk from 'lodash/chunk'
-import { multicallv3, multicallv2 } from 'utils/multicall'
+import { multicallv2 } from 'utils/multicall'
 import internal from 'config/internal/internal.json'
-import { GameFactory } from '@types/typechain'
+import { GameFactory } from 'config/types/typechain'
 import { useSWRMulticall } from 'hooks/useSWRContract'
 
 export const fetchPublicGamesData = async (

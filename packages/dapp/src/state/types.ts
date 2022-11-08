@@ -3,7 +3,7 @@ import { parseUnits } from '@ethersproject/units'
 import { SerializedFarmPublicData } from '@pancakeswap/farms'
 import { Token } from '@pancakeswap/sdk'
 import BigNumber from 'bignumber.js'
-import { GameFactory, GameImplementationV1Interface } from '@types/typechain'
+import { GameFactory, GameV1Interface } from 'config/types/typechain'
 
 import {
   CampaignType,

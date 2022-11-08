@@ -20,8 +20,8 @@ import { useBCakeProxyContract } from 'hooks/useContract'
 import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { getFullDisplayBalance } from 'utils/formatBalance'
+import useProxyStakedActions from 'views/Farms/components/YieldBooster/hooks/useProxyStakedActions'
 import { useBCakeProxyContractAddress } from '../hooks/useBCakeProxyContractAddress'
-import useProxyStakedActions from './YieldBooster/hooks/useProxyStakedActions'
 
 export const StepperCircle = styled.div`
   height: 20px;

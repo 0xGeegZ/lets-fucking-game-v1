@@ -1,18 +1,18 @@
 import { ChainId } from '@pancakeswap/sdk'
-import { getGameImplementationV1Contract } from 'utils/contractHelpers'
+import { getGameV1Contract } from 'utils/contractHelpers'
 import { useSWRContract } from 'hooks/useSWRContract'
-import { useGameImplementationV1Contract } from 'hooks/useContract'
+import { useGameV1Contract } from 'hooks/useContract'
 import { FetchStatus } from 'config/constants/types'
 import { BigNumber } from '@ethersproject/bignumber'
 
 export const useClaimPrize = (gameAddress: string, roundId: BigNumber) => {
   // const { account, chainId } = useActiveWeb3React()
 
-  const gameImplementationV1Contract = useGameImplementationV1Contract(gameAddress)
-  // const gameImplementationV1Contract = useGameImplementationV1Contract(account, chainId)
+  const gameV1Contract = useGameV1Contract(gameAddress)
+  // const gameV1Contract = useGameV1Contract(account, chainId)
 
   const { data, error, status, mutate } = useSWRContract({
-    contract: gameImplementationV1Contract,
+    contract: gameV1Contract,
     methodName: 'claimPrize',
     params: [roundId],
   })
