@@ -8,9 +8,9 @@ import RoiCalculatorModal from 'components/RoiCalculatorModal'
 import BCakeCalculator from 'views/Farms/components/YieldBooster/components/BCakeCalculator'
 import { useFarmFromPid, useFarmUser } from 'state/farms/hooks'
 import styled from 'styled-components'
-import { YieldBoosterStateContext } from '../YieldBooster/components/ProxyFarmContainer'
-import useBoostMultiplier from '../YieldBooster/hooks/useBoostMultiplier'
-import { useGetBoostedMultiplier } from '../YieldBooster/hooks/useGetBoostedAPR'
+import { YieldBoosterStateContext } from 'views/Farms/components/YieldBooster/components/ProxyFarmContainer'
+import useBoostMultiplier from 'views/Farms/components/YieldBooster/hooks/useBoostMultiplier'
+import { useGetBoostedMultiplier } from 'views/Farms/components/YieldBooster/hooks/useGetBoostedAPR'
 
 const ApyLabelContainer = styled(Flex)`
   cursor: pointer;

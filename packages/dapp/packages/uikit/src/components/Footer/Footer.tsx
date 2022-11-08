@@ -30,14 +30,19 @@ const MenuItem: React.FC<React.PropsWithChildren<FooterProps>> = ({
   buyCakeLabel,
   ...props
 }) => {
+  console.log("🚀 ~ file: Footer.tsx ~ line 111 ~ items", items);
   return (
     <StyledFooter data-theme="dark" p={["40px 16px", null, "56px 40px 32px 40px"]} {...props} justifyContent="center">
       <Flex flexDirection="column" width={["100%", null, "1200px;"]}>
+        {/* TODO UPDATE LOGO */}
         <StyledIconMobileContainer display={["block", null, "none"]}>
-          {/* TODO UPDATE LOGO */}
           <LogoWithTextIcon isDark width="130px" />
         </StyledIconMobileContainer>
-        <Flex
+        <Box display={["none", null, "block"]}>
+          <LogoWithTextIcon isDark width="160px" />
+        </Box>
+
+        {/* <Flex
           order={[2, null, 1]}
           flexDirection={["column", null, "row"]}
           justifyContent="space-between"
@@ -67,18 +72,28 @@ const MenuItem: React.FC<React.PropsWithChildren<FooterProps>> = ({
               ))}
             </StyledList>
           ))}
-          <Box display={["none", null, "block"]}>
-            <LogoWithTextIcon isDark width="160px" />
-          </Box>
-        </Flex>
-        <StyledSocialLinks order={[2]} pb={["42px", null, "32px"]} mb={["0", null, "32px"]} />
+          <Box display={["none", null, "block"]}><LogoWithTextIcon isDark width="160px" /> </Box>
+        </Flex> */}
+        {/* <StyledSocialLinks order={[2]} pb={["42px", null, "32px"]} mb={["0", null, "32px"]} /> */}
         <StyledToolsContainer
           data-theme="dark"
           order={[1, null, 3]}
           flexDirection={["column", null, "row"]}
           justifyContent="space-between"
         >
-          <Flex order={[2, null, 1]} alignItems="center">
+          <Flex order={[2, null, 1]} mb={["24px", null, "0"]} alignItems="center">
+            {/* <ThemeSwitcher isDark={isDark} toggleTheme={toggleTheme} />
+            <LangSelector
+              currentLang={currentLang}
+              langs={langs}
+              setLang={setLang}
+              color="textSubtle"
+              dropdownPosition="top-right"
+            /> */}
+            {/* <StyledSocialLinks order={[2]} pb={["42px", null, "32px"]} mb={["0", null, "32px"]} /> */}
+            <StyledSocialLinks order={[2]} />
+          </Flex>
+          <Flex order={[1, null, 2]} mb={["24px", null, "0"]} justifyContent="space-between" alignItems="center">
             <ThemeSwitcher isDark={isDark} toggleTheme={toggleTheme} />
             <LangSelector
               currentLang={currentLang}
@@ -87,13 +102,11 @@ const MenuItem: React.FC<React.PropsWithChildren<FooterProps>> = ({
               color="textSubtle"
               dropdownPosition="top-right"
             />
-          </Flex>
-          <Flex order={[1, null, 2]} mb={["24px", null, "0"]} justifyContent="space-between" alignItems="center">
             {/* <Box mr="20px">
               <CakePrice cakePriceUsd={cakePriceUsd} color="textSubtle" />
             </Box> */}
             {/* TODO Update Cake Button */}
-            <Button
+            {/* <Button
               data-theme="light"
               as="a"
               href="https://pancakeswap.finance/swap?outputCurrency=0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82&chainId=56"
@@ -102,7 +115,7 @@ const MenuItem: React.FC<React.PropsWithChildren<FooterProps>> = ({
               endIcon={<ArrowForwardIcon color="backgroundAlt" />}
             >
               {buyCakeLabel}
-            </Button>
+            </Button> */}
           </Flex>
         </StyledToolsContainer>
       </Flex>

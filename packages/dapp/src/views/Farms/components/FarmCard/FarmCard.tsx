@@ -9,13 +9,12 @@ import styled from 'styled-components'
 import { getBlockExploreLink } from 'utils'
 import getLiquidityUrlPathParts from 'utils/getLiquidityUrlPathParts'
 import { multiChainPaths } from 'state/info/constant'
+import BoostedApr from 'views/Farms/components/YieldBooster/components/BoostedApr'
 import { FarmWithStakedValue } from '../types'
 import ApyButton from './ApyButton'
 import CardActionsContainer from './CardActionsContainer'
 import CardHeading from './CardHeading'
 import DetailsSection from './DetailsSection'
-
-import BoostedApr from '../YieldBooster/components/BoostedApr'
 
 const StyledCard = styled(Card)`
   align-self: baseline;

@@ -43,7 +43,7 @@ const Menu = (props) => {
         }}
         rightSide={
           <>
-            <GlobalSettings mode={SettingsMode.GLOBAL} />
+            {/* <GlobalSettings mode={SettingsMode.GLOBAL} /> */}
             <NetworkSwitcher />
             <UserMenu />
           </>
@@ -60,7 +60,7 @@ const Menu = (props) => {
         footerLinks={getFooterLinks}
         activeItem={activeMenuItem?.href}
         activeSubItem={activeSubMenuItem?.href}
-        buyCakeLabel={t('Buy CAKE')}
+        buyCakeLabel={t('Find a game')}
         {...props}
       />
     </>

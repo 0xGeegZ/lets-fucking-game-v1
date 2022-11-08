@@ -131,6 +131,29 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
         </Button>
       </Link>
       {/* TODO REACTIVATE after integration phase */}
+      {!account ? (
+        <>
+          PROUTPROUT
+          <ConnectWalletButton mt="8px" width="100%" />
+        </>
+      ) : shouldUseProxyFarm ? (
+        <>
+          <ProxyStakedContainer {...game} lpLabel={lpLabel} addLiquidityUrl={addLiquidityUrl} displayApr={displayApr}>
+            {(props) => <StakeAction {...props} />}
+          </ProxyStakedContainer>
+        </>
+      ) : (
+        // <StakedContainer {...game} lpLabel={lpLabel} addLiquidityUrl={addLiquidityUrl} displayApr={displayApr}>
+        //   {(props) => <StakeAction {...props} />}
+        // </StakedContainer>
+        <>
+          <Button /* onClick={handleRegisterPlayer} disabled={!isValid || isUserCreated || isLoading || !isAcknowledged} */
+          >
+            {t('Register')}
+          </Button>
+        </>
+      )}
+
       {/* {!account ? (
         <ConnectWalletButton mt="8px" width="100%" />
       ) : shouldUseProxyFarm ? (

@@ -21,8 +21,8 @@ import DepositModal from '../DepositModal'
 import StakedLP from '../StakedLP'
 import { FarmWithStakedValue } from '../types'
 import WithdrawModal from '../WithdrawModal'
-import { YieldBoosterStateContext } from '../YieldBooster/components/ProxyFarmContainer'
-import { YieldBoosterState } from '../YieldBooster/hooks/useYieldBoosterState'
+import { YieldBoosterStateContext } from 'views/Farms/components/YieldBooster/components/ProxyFarmContainer'
+import { YieldBoosterState } from 'views/Farms/components/YieldBooster/hooks/useYieldBoosterState'
 
 interface FarmCardActionsProps extends FarmWithStakedValue {
   lpLabel?: string

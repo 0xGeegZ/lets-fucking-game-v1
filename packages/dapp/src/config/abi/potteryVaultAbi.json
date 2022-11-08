@@ -12,7 +12,7 @@
         "type": "address"
       },
       {
-        "internalType": "contract IPancakeSwapPotteryDraw",
+        "internalType": "contract ILet's Fucking GamePotteryDraw",
         "name": "_potteryDraw",
         "type": "address"
       },

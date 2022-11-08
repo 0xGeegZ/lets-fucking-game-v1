@@ -3,7 +3,7 @@ import { Tag, Flex, Heading, Box, Skeleton } from '@pancakeswap/uikit'
 import { Token } from '@pancakeswap/sdk'
 import { FarmAuctionTag, CoreTag, StableFarmTag } from 'components/Tags'
 import { TokenPairImage } from 'components/TokenImage'
-import BoostedTag from '../YieldBooster/components/BoostedTag'
+import BoostedTag from 'views/Farms/components/YieldBooster/components/BoostedTag'
 
 export interface ExpandableSectionProps {
   lpLabel?: string

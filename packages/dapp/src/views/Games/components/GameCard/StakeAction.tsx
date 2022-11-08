@@ -17,12 +17,12 @@ import { pickFarmTransactionTx } from 'state/global/actions'
 import { getCrossFarmingSenderContract } from 'utils/contractHelpers'
 import { useTransactionAdder, useNonBscFarmPendingTransaction } from 'state/transactions/hooks'
 import { FarmTransactionStatus, NonBscFarmStepType } from 'state/transactions/actions'
+import { YieldBoosterStateContext } from 'views/Farms/components/YieldBooster/components/ProxyFarmContainer'
+import { YieldBoosterState } from 'views/Farms/components/YieldBooster/hooks/useYieldBoosterState'
 import DepositModal from '../DepositModal'
 import StakedLP from '../StakedLP'
 import { GameWithStakedValue } from '../types'
 import WithdrawModal from '../WithdrawModal'
-import { YieldBoosterStateContext } from '../YieldBooster/components/ProxyFarmContainer'
-import { YieldBoosterState } from '../YieldBooster/hooks/useYieldBoosterState'
 
 interface GameCardActionsProps extends GameWithStakedValue {
   lpLabel?: string

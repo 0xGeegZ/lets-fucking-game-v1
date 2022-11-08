@@ -80,7 +80,7 @@ const config: (
     //   ].map((item) => addMenuItemSupported(item, chainId)),
     // },
     {
-      label: t(''),
+      label: t('Games '),
       href: '/games',
       icon: EarnIcon,
       fillIcon: EarnFillIcon,

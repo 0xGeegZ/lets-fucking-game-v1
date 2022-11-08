@@ -6,11 +6,11 @@ import BigNumber from 'bignumber.js'
 import { getBalanceNumber } from 'utils/formatBalance'
 import { BIG_ZERO } from 'utils/bigNumber'
 import { useRouter } from 'next/router'
+import ProxyFarmContainer from 'views/Farms/components/YieldBooster/components/ProxyFarmContainer'
 import { getDisplayApr } from '../getDisplayApr'
 
 import Row, { RowProps } from './Row'
 import { DesktopColumnSchema, FarmWithStakedValue } from '../types'
-import ProxyFarmContainer from '../YieldBooster/components/ProxyFarmContainer'
 
 export interface ITableProps {
   farms: FarmWithStakedValue[]

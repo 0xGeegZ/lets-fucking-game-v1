@@ -16,8 +16,8 @@ import Liquidity, { LiquidityProps } from './Liquidity'
 import ActionPanel from './Actions/ActionPanel'
 import CellLayout from './CellLayout'
 import { DesktopColumnSchema, MobileColumnSchema, FarmWithStakedValue } from '../types'
-import BoostedApr from '../YieldBooster/components/BoostedApr'
-import BoostedTag from '../YieldBooster/components/BoostedTag'
+import BoostedApr from 'views/Farms/components/YieldBooster/components/BoostedApr'
+import BoostedTag from 'views/Farms/components/YieldBooster/components/BoostedTag'
 
 export interface RowProps {
   apr: AprProps

@@ -2,6 +2,7 @@ import { Language } from "../LangSelector/types";
 import { FooterLinkType } from "./types";
 import { TwitterIcon, TelegramIcon, RedditIcon, InstagramIcon, GithubIcon, DiscordIcon, MediumIcon } from "../Svg";
 
+// TODO GUIGUI : Update links
 export const footerLinks: FooterLinkType[] = [
   // {
   //   label: "About",
@@ -78,9 +79,14 @@ export const footerLinks: FooterLinkType[] = [
 
 export const socials = [
   {
+    label: "Github",
+    icon: GithubIcon,
+    href: "https://github.com/lets-fucking-game",
+  },
+  {
     label: "Twitter",
     icon: TwitterIcon,
-    href: "https://twitter.com/",
+    href: "https://twitter.com/0xGeegZ",
   },
   // {
   //   label: "Telegram",
@@ -92,15 +98,15 @@ export const socials = [
   //     },
   //     {
   //       label: "Bahasa Indonesia",
-  //       href: "https://t.me/PancakeSwapIndonesia",
+  //       href: "https://t.me/Let's Fucking GameIndonesia",
   //     },
   //     {
   //       label: "中文",
-  //       href: "https://t.me/PancakeSwap_CN",
+  //       href: "https://t.me/Let's Fucking Game_CN",
   //     },
   //     {
   //       label: "Tiếng Việt",
-  //       href: "https://t.me/PancakeSwapVN",
+  //       href: "https://t.me/Let's Fucking GameVN",
   //     },
   //     {
   //       label: "Italiano",
@@ -116,7 +122,7 @@ export const socials = [
   //     },
   //     {
   //       label: "Português",
-  //       href: "https://t.me/PancakeSwapPortuguese",
+  //       href: "https://t.me/Let's Fucking GamePortuguese",
   //     },
   //     {
   //       label: "Español",
@@ -132,7 +138,7 @@ export const socials = [
   //     },
   //     {
   //       label: "Deutsch",
-  //       href: "https://t.me/PancakeSwap_DE",
+  //       href: "https://t.me/Let's Fucking Game_DE",
   //     },
   //     {
   //       label: "Filipino",
@@ -140,15 +146,15 @@ export const socials = [
   //     },
   //     {
   //       label: "ქართული ენა",
-  //       href: "https://t.me/PancakeSwapGeorgia",
+  //       href: "https://t.me/Let's Fucking GameGeorgia",
   //     },
   //     {
   //       label: "हिन्दी",
-  //       href: "https://t.me/PancakeSwapINDIA",
+  //       href: "https://t.me/Let's Fucking GameINDIA",
   //     },
   //     {
   //       label: "Announcements",
-  //       href: "https://t.me/PancakeSwapAnn",
+  //       href: "https://t.me/Let's Fucking GameAnn",
   //     },
   //   ],
   // },
@@ -162,21 +168,16 @@ export const socials = [
   //   icon: InstagramIcon,
   //   href: "https://instagram.com/pancakeswap_official",
   // },
-  {
-    label: "Github",
-    icon: GithubIcon,
-    href: "https://github.com/",
-  },
-  {
-    label: "Discord",
-    icon: DiscordIcon,
-    href: "https://discord.gg/pancakeswap",
-  },
-  {
-    label: "Medium",
-    icon: MediumIcon,
-    href: "https://medium.com/",
-  },
+  //   {
+  //     label: "Discord",
+  //     icon: DiscordIcon,
+  //     href: "https://discord.gg/pancakeswap",
+  //   },
+  //   {
+  //     label: "Medium",
+  //     icon: MediumIcon,
+  //     href: "https://medium.com/",
+  //   },
 ];
 
 export const langs: Language[] = [...Array(20)].map((_, i) => ({

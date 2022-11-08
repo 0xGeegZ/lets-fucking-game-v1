@@ -1,8 +1,8 @@
 import { ReactElement, createContext, useMemo, memo } from 'react'
 import _noop from 'lodash/noop'
 
+import useYieldBoosterState, { YieldBoosterState } from 'views/Farms/components/YieldBooster/hooks/useYieldBoosterState'
 import { FarmWithStakedValue } from '../../types'
-import useYieldBoosterState, { YieldBoosterState } from '../hooks/useYieldBoosterState'
 
 interface ProxyFarmContainerPropsType {
   children: ReactElement
