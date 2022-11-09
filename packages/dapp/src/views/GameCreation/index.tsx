@@ -4,6 +4,7 @@ import Page from 'components/Layout/Page'
 import { useProfile } from 'state/profile/hooks'
 import PageLoader from 'components/Loader/PageLoader'
 import { useRouter } from 'next/router'
+import { SUPPORT_GAMES } from 'config/constants/supportChains'
 import Header from './Header'
 import GameCreationProvider from './contexts/GameCreationProvider'
 import Steps from './Steps'
@@ -34,5 +35,7 @@ const GameCreation = () => {
     </>
   )
 }
+
+GameCreation.chains = SUPPORT_GAMES
 
 export default GameCreation

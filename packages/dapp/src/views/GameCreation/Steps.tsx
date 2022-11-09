@@ -1,12 +1,12 @@
 import { useContext } from 'react'
 import { useTranslation } from '@pancakeswap/localization'
 import { useWeb3React } from '@pancakeswap/wagmi'
-import NoWalletConnected from './WalletNotConnected'
+import GameConfirmationAndContractCreation from './GameConfirmationAndContractCreation'
+import GameCreation from './GameCreation'
 import { GameCreationContext } from './contexts/GameCreationProvider'
-import Mint from './Mint'
-import ProfilePicture from './ProfilePicture'
-import TeamSelection from './TeamSelection'
-import UserName from './UserName'
+import NoWalletConnected from './WalletNotConnected'
+import PrizepoolConfiguration from './PrizepoolConfiguration'
+import SuccesOrErrorMessage from './SuccesOrErrorMessage'
 
 const Steps = () => {
   const { t } = useTranslation()
@@ -22,19 +22,19 @@ const Steps = () => {
   }
 
   if (currentStep === 0) {
-    return <Mint />
+    return <GameCreation />
   }
 
   if (currentStep === 1) {
-    return <ProfilePicture />
+    return <PrizepoolConfiguration />
   }
 
   if (currentStep === 2) {
-    return <TeamSelection />
+    return <GameConfirmationAndContractCreation />
   }
 
   if (currentStep === 3) {
-    return <UserName />
+    return <SuccesOrErrorMessage />
   }
 
   return null

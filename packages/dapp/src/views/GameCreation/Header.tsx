@@ -12,10 +12,10 @@ const Wrapper = styled.div`
 `
 
 const steps = (t: TranslateFunction) => [
-  t('Get Starter Collectible'),
-  t('Set Profile Picture'),
-  t('Join Team'),
-  t('Set Name'),
+  t('Game creation'),
+  t('Prizepool configuration'),
+  t('Game confirmation and contract creation'),
+  t('Success or error message'),
 ]
 
 const Header: React.FC<React.PropsWithChildren> = () => {
@@ -27,12 +27,7 @@ const Header: React.FC<React.PropsWithChildren> = () => {
       <Heading as="h1" scale="xxl" color="secondary" mb="8px" id="profile-setup-title">
         {t('Create Game')}
       </Heading>
-      <Heading as="h2" scale="lg" mb="8px">
-        {t('Show off your stats and collectibles with your unique profile')}
-      </Heading>
-      <Text color="textSubtle" mb="8px">
-        {t('Total cost: 1.5 CAKE')}
-      </Text>
+
       <Link href="/profile">
         <Button mb="24px" scale="sm" variant="secondary">
           {t('Back to profile')}

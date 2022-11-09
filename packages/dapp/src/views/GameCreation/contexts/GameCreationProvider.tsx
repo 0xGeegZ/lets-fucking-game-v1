@@ -1,55 +1,75 @@
 import { createContext, useEffect, useMemo, useReducer } from 'react'
-import { useWeb3React } from '@pancakeswap/wagmi'
-import { getBunnyFactoryContract } from 'utils/contractHelpers'
-import { MINT_COST, REGISTER_COST, ALLOWANCE_MULTIPLIER } from '../config'
-import { Actions, State, ContextType } from './types'
 
-const totalCost = MINT_COST.add(REGISTER_COST)
-const allowance = totalCost.mul(ALLOWANCE_MULTIPLIER)
+import { getBunnyFactoryContract } from 'utils/contractHelpers'
+import { useWeb3React } from '@pancakeswap/wagmi'
+import { CREATOR_EDGE_MAX, CREATOR_EDGE_MIN, HOUSE_EDGE_MAX, HOUSE_EDGE_MIN } from '../config'
+import { Actions, BNB, ContextType, NFT, State } from './types'
 
 const initialState: State = {
   isInitialized: false,
   currentStep: 0,
-  teamId: null,
-  selectedNft: {
-    collectionAddress: null,
-    tokenId: null,
-  },
-  userName: '',
-  minimumCakeRequired: totalCost,
-  allowance,
+  houseEdge: HOUSE_EDGE_MIN,
+  creatorEdge: CREATOR_EDGE_MIN,
+  registrationAmount: 0,
+  maxPlayers: 0,
+  playTimeRange: 2,
+  encodedCron: '',
+
+  numberPlayersAllowedToWin: 0,
+  prizeType: 'Standart',
+  successMessage: null,
+  errorMessage: null,
 }
 
 const reducer = (state: State, action: Actions): State => {
   switch (action.type) {
-    case 'initialize':
+    case 'previous_step':
       return {
         ...state,
-        isInitialized: true,
-        currentStep: action.step,
+        currentStep: state.currentStep - 1,
       }
     case 'next_step':
       return {
         ...state,
         currentStep: state.currentStep + 1,
       }
-    case 'set_team':
+    case 'initialize':
       return {
         ...state,
-        teamId: action.teamId,
+        isInitialized: true,
+        currentStep: action.currentStep,
       }
-    case 'set_selected_nft':
+    case 'game_creation':
       return {
         ...state,
-        selectedNft: {
-          tokenId: action.tokenId,
-          collectionAddress: action.collectionAddress,
-        },
+        isInitialized: true,
+        currentStep: state.currentStep,
+        houseEdge: action.houseEdge,
+        creatorEdge: action.creatorEdge,
+        registrationAmount: action.registrationAmount,
+        maxPlayers: action.maxPlayers,
+        playTimeRange: action.playTimeRange,
+        encodedCron: action.encodedCron,
       }
-    case 'set_username':
+    case 'prize_configuration':
       return {
         ...state,
-        userName: action.userName,
+        numberPlayersAllowedToWin: action.numberPlayersAllowedToWin,
+        prizeType: action.prizeType,
+        currentStep: state.currentStep,
+      }
+    case 'game_confirmation_and_contract_creation':
+      return {
+        ...state,
+        currentStep: state.currentStep,
+      }
+
+    case 'success_or_error_message':
+      return {
+        successMessage: action.successMessage,
+        errorMessage: action.errorMessage,
+        currentStep: state.currentStep,
+        ...state,
       }
     default:
       return state
@@ -67,13 +87,14 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     let isSubscribed = true
 
     const fetchData = async () => {
-      const bunnyFactoryContract = getBunnyFactoryContract()
+      const bunnyFactoryContract = getBunnyFactoryContract() // Replace with the contract of the game factory
       const canMint = await bunnyFactoryContract.canMint(account)
-      dispatch({ type: 'initialize', step: canMint ? 0 : 1 })
+
+      dispatch({ type: 'initialize', currentStep: 0 })
 
       // When changing wallets quickly unmounting before the hasClaim finished causes a React error
       if (isSubscribed) {
-        dispatch({ type: 'initialize', step: canMint ? 0 : 1 })
+        dispatch({ type: 'initialize', currentStep: 0 })
       }
     }
 
@@ -88,13 +109,54 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
 
   const actions: ContextType['actions'] = useMemo(
     () => ({
-      nextStep: () => dispatch({ type: 'next_step' }),
-      setTeamId: (teamId: number) => dispatch({ type: 'set_team', teamId }),
-      setSelectedNft: (tokenId: string, collectionAddress: string) =>
-        dispatch({ type: 'set_selected_nft', tokenId, collectionAddress }),
-      setUserName: (userName: string) => dispatch({ type: 'set_username', userName }),
+      previousStep: (currentStep: number) => dispatch({ type: 'previous_step', currentStep: currentStep - 1 }),
+      nextStep: (currentStep: number) => dispatch({ type: 'next_step', currentStep: currentStep + 1 }),
+      setInitialize: (currentStep: number) => dispatch({ type: 'initialize', currentStep }),
+      setGameCreation: (
+        currentStep: number,
+        houseEdge: number,
+        creatorEdge: number,
+        registrationAmount: number,
+        maxPlayers: number,
+        playTimeRange: number,
+        encodedCron: string,
+      ) =>
+        dispatch({
+          type: 'game_creation',
+          currentStep,
+          houseEdge,
+          creatorEdge,
+          registrationAmount,
+          maxPlayers,
+          playTimeRange,
+          encodedCron,
+        }),
+      setPrizeConfiguration: (
+        numberPlayersAllowedToWin: number,
+        prizeType: NFT | BNB | 'Standart',
+        currentStep: number,
+      ) =>
+        dispatch({
+          type: 'prize_configuration',
+          currentStep,
+          numberPlayersAllowedToWin,
+          prizeType,
+        }),
+      setGameConfirmationAndContractCreation: (currentStep: number) =>
+        dispatch({
+          type: 'game_confirmation_and_contract_creation',
+          currentStep,
+          ...state,
+        }),
+      setSuccessOrErrorMessage: (successMessage: string | null, errorMessage: string | null, currentStep: number) =>
+        dispatch({
+          type: 'success_or_error_message',
+          currentStep,
+          successMessage,
+          errorMessage,
+        }),
     }),
-    [dispatch],
+    [dispatch, state.currentStep],
   )
 
   return <GameCreationContext.Provider value={{ ...state, actions }}>{children}</GameCreationContext.Provider>
