@@ -54,6 +54,7 @@ const Mint: React.FC<React.PropsWithChildren> = () => {
     }
   }, [starterNfts])
 
+  // TODO GUIGUI APPROVE CONFIRME TRANSACTION HOOK
   const { isApproving, isApproved, isConfirmed, isConfirming, handleApprove, handleConfirm } =
     useApproveConfirmTransaction({
       onRequiresApproval: async () => {

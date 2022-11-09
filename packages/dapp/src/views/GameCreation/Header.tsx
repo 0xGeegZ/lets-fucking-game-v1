@@ -28,9 +28,9 @@ const Header: React.FC<React.PropsWithChildren> = () => {
         {t('Create Game')}
       </Heading>
 
-      <Link href="/profile">
+      <Link href="/games">
         <Button mb="24px" scale="sm" variant="secondary">
-          {t('Back to profile')}
+          {t('Back to games')}
         </Button>
       </Link>
       <Breadcrumbs>

@@ -14,11 +14,11 @@ const GameCreation = () => {
   const { isInitialized, isLoading, hasProfile } = useProfile()
   const router = useRouter()
 
-  useEffect(() => {
-    if (account && hasProfile) {
-      router.push(`/profile/${account.toLowerCase()}`)
-    }
-  }, [account, hasProfile, router])
+  //   useEffect(() => {
+  //     if (account && hasProfile) {
+  //       router.push(`/profile/${account.toLowerCase()}`)
+  //     }
+  //   }, [account, hasProfile, router])
 
   if (!isInitialized || isLoading) {
     return <PageLoader />

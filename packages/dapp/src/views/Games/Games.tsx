@@ -17,7 +17,7 @@ import { useTranslation } from '@pancakeswap/localization'
 import { getFarmApr } from 'utils/apr'
 import orderBy from 'lodash/orderBy'
 import { latinise } from 'utils/latinise'
-import { useUserFarmStakedOnly, useUserFarmsViewMode } from 'state/user/hooks'
+import { useUserFarmStakedOnly, useUserGamesViewMode } from 'state/user/hooks'
 import { ViewMode } from 'state/user/actions'
 import { useRouter } from 'next/router'
 import PageHeader from 'components/PageHeader'
@@ -155,7 +155,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const normalizedUrlSearch = useMemo(() => (typeof urlQuery?.search === 'string' ? urlQuery.search : ''), [urlQuery])
   const query = normalizedUrlSearch && !_query ? normalizedUrlSearch : _query
 
-  const [viewMode, setViewMode] = useUserFarmsViewMode()
+  const [viewMode, setViewMode] = useUserGamesViewMode()
   const { account } = useWeb3React()
   const [sortOption, setSortOption] = useState('hot')
   const { observerRef, isIntersecting } = useIntersectionObserver()
@@ -427,11 +427,11 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
             </Flex>
           </FinishedTextContainer>
         )}
-        {viewMode === ViewMode.TABLE ? (
+        {/* {viewMode === ViewMode.TABLE ? (
           <Table farms={chosenGamesMemoized} cakePrice={cakePrice} userDataReady={userDataReady} />
-        ) : (
-          <FlexLayout>{children}</FlexLayout>
-        )}
+        ) : ( */}
+        <FlexLayout>{children}</FlexLayout>
+        {/* )} */}
         {account && !userDataLoaded && stakedOnly && (
           <Flex justifyContent="center">
             <Loading />

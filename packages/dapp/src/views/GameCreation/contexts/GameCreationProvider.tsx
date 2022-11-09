@@ -16,7 +16,7 @@ const initialState: State = {
   encodedCron: '',
 
   numberPlayersAllowedToWin: 0,
-  prizeType: 'Standart',
+  prizeType: 'STANDARD',
   successMessage: null,
   errorMessage: null,
 }
@@ -133,7 +133,7 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         }),
       setPrizeConfiguration: (
         numberPlayersAllowedToWin: number,
-        prizeType: NFT | BNB | 'Standart',
+        prizeType: NFT | BNB | 'STANDARD',
         currentStep: number,
       ) =>
         dispatch({

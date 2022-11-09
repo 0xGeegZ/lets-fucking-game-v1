@@ -14,7 +14,6 @@ import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { ChainId, WBNB } from '@pancakeswap/sdk'
 import ClaimButton from './ClaimButton'
 import PlayButton from './PlayButton'
-import CreateGameButton from './CreateGameButton'
 import RegisterButton from './RegisterButton'
 import VoteSplitButton from './VoteSplitButton'
 import { HarvestActionContainer, ProxyHarvestActionContainer } from '../GameTable/Actions/HarvestAction'
@@ -156,7 +155,6 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
         <>
           <PlayButton gameAddress="0x86f13647f5b308e915a48b7e9dc15a216e3d8dbe" />
           <ClaimButton gameAddress="0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE" roundId={EthersBigNumber.from(1)} />
-          {/* <CreateGameButton gameAddress="0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE" roundId={new BigNumber(1)} /> */}
           <RegisterButton
             gameAddress="0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE"
             registrationAmount={EthersBigNumber.from(1)}

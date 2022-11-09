@@ -17,6 +17,7 @@ import {
   updateUserDeadline,
   updateUserExpertMode,
   updateUserFarmStakedOnly,
+  updateUserGamesViewMode,
   updateUserFarmsViewMode,
   updateUserPoolStakedOnly,
   updateUserPoolsViewMode,
@@ -199,6 +200,9 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(updateUserFarmsViewMode, (state, { payload: { userFarmsViewMode } }) => {
       state.userFarmsViewMode = userFarmsViewMode
+    })
+    .addCase(updateUserGamesViewMode, (state, { payload: { userGamesViewMode } }) => {
+      state.userGamesViewMode = userGamesViewMode
     })
     .addCase(updateUserPredictionAcceptedRisk, (state, { payload: { userAcceptedRisk } }) => {
       state.userPredictionAcceptedRisk = userAcceptedRisk

@@ -1,13 +1,13 @@
 import { Heading, Text, Button, Flex, Card, CardBody } from '@pancakeswap/uikit'
 
 import { useTranslation } from '@pancakeswap/localization'
-import useGameCreation from './contexts/hook'
+import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import NextStepButton from './NextStepButton'
 import BackStepButton from './BackStepButton'
 
 const SuccesOrErrorMessage: React.FC<React.PropsWithChildren> = () => {
   const { t } = useTranslation()
-  const { actions } = useGameCreation()
+  const { actions } = useGameContext()
 
   const InformationsCards = () => {
     const {
@@ -23,7 +23,7 @@ const SuccesOrErrorMessage: React.FC<React.PropsWithChildren> = () => {
       prizeType,
       successMessage,
       errorMessage,
-    } = useGameCreation()
+    } = useGameContext()
 
     const errorMessageFake = 'Status of errors'
     const successMessageFake = 'Status of success'

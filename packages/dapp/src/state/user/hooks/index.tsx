@@ -244,6 +244,22 @@ export function useUserPoolsViewMode(): [ViewMode, (viewMode: ViewMode) => void]
   return [userPoolsViewMode, setUserPoolsViewMode]
 }
 
+export function useUserGamesViewMode(): [ViewMode, (viewMode: ViewMode) => void] {
+  const dispatch = useAppDispatch()
+  const userGamesViewMode = useSelector<AppState, AppState['user']['userGamesViewMode']>((state) => {
+    return state.user.userGamesViewMode
+  })
+
+  const setUserGamesViewMode = useCallback(
+    (viewMode: ViewMode) => {
+      dispatch(updateUserFarmsViewMode({ userGamesViewMode: viewMode }))
+    },
+    [dispatch],
+  )
+
+  return [userGamesViewMode, setUserGamesViewMode]
+}
+
 export function useUserFarmsViewMode(): [ViewMode, (viewMode: ViewMode) => void] {
   const dispatch = useAppDispatch()
   const userFarmsViewMode = useSelector<AppState, AppState['user']['userFarmsViewMode']>((state) => {

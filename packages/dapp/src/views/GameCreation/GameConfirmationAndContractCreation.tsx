@@ -2,9 +2,11 @@ import { Card, CardBody, Flex, Heading, Text } from '@pancakeswap/uikit'
 
 import { useTranslation } from '@pancakeswap/localization'
 import styled from 'styled-components'
+import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import NextStepButton from './NextStepButton'
-import useGameCreation from './contexts/hook'
+
 import BackStepButton from './BackStepButton'
+import CreateGameButton from './CreateGameButton'
 
 const BulletList = styled.ul`
   list-style-type: none;
@@ -38,9 +40,9 @@ const RecapConfigGame = () => {
     prizeType,
     successMessage,
     errorMessage,
-  } = useGameCreation()
+  } = useGameContext()
 
-  console.log('check state redux : ', useGameCreation())
+  console.log('check state redux : ', useGameContext())
 
   return (
     <>
@@ -121,7 +123,7 @@ const RecapConfigGame = () => {
 }
 
 const GameConfirmationAndContractCreation: React.FC<React.PropsWithChildren> = () => {
-  const { actions } = useGameCreation()
+  const { actions, ...game } = useGameContext()
   const { t } = useTranslation()
 
   return (
@@ -130,7 +132,7 @@ const GameConfirmationAndContractCreation: React.FC<React.PropsWithChildren> = (
         {t('Step %num%', { num: 3 })}
       </Text>
       <Heading as="h3" scale="xl" mb="24px">
-        {t('Game confirmation and contract creation')}
+        {t('Game confirmation')}
       </Heading>
       <RecapConfigGame />
       <Flex
@@ -145,11 +147,7 @@ const GameConfirmationAndContractCreation: React.FC<React.PropsWithChildren> = (
         >
           {t('Previous Step')}
         </BackStepButton>
-        <NextStepButton
-          onClick={actions.nextStep} /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
-        >
-          {t('Next Step')}
-        </NextStepButton>
+        <CreateGameButton game={game} />
       </Flex>
     </>
   )

@@ -43,6 +43,7 @@ export const updateUserFarmStakedOnly = createAction<{ userFarmStakedOnly: FarmS
 export const updateUserPoolStakedOnly = createAction<{ userPoolStakedOnly: boolean }>('user/updateUserPoolStakedOnly')
 export const updateUserPoolsViewMode = createAction<{ userPoolsViewMode: ViewMode }>('user/updateUserPoolsViewMode')
 export const updateUserFarmsViewMode = createAction<{ userFarmsViewMode: ViewMode }>('user/updateUserFarmsViewMode')
+export const updateUserGamesViewMode = createAction<{ userGamesViewMode: ViewMode }>('user/updateUserGamesViewMode')
 export const updateUserPredictionAcceptedRisk = createAction<{ userAcceptedRisk: boolean }>(
   'user/updateUserPredictionAcceptedRisk',
 )

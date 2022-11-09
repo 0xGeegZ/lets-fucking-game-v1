@@ -20,7 +20,7 @@ export type Actions =
       type: 'prize_configuration'
       currentStep: number
       numberPlayersAllowedToWin: number
-      prizeType: NFT | BNB | 'Standart'
+      prizeType: NFT | BNB | 'STANDARD'
     }
   | {
       type: 'game_confirmation_and_contract_creation'
@@ -32,7 +32,7 @@ export type Actions =
       playTimeRange: number
       encodedCron: string
       numberPlayersAllowedToWin: number
-      prizeType: NFT | BNB | 'Standart'
+      prizeType: NFT | BNB | 'STANDARD'
     }
   | {
       type: 'success_or_error_message'
@@ -51,7 +51,7 @@ export interface State {
   playTimeRange: number
   encodedCron: string
   numberPlayersAllowedToWin: number
-  prizeType: NFT | BNB | 'Standart'
+  prizeType: NFT | BNB | 'STANDARD'
   successMessage: string | null
   errorMessage: string | null
 }
@@ -72,7 +72,7 @@ export interface ContextType extends State {
     ) => void
     setPrizeConfiguration: (
       numberPlayersAllowedToWin: number,
-      prizeType: NFT | BNB | 'Standart',
+      prizeType: NFT | BNB | 'STANDARD',
       currentStep: number,
     ) => void
     setGameConfirmationAndContractCreation: (
@@ -84,7 +84,7 @@ export interface ContextType extends State {
       playTimeRange: number,
       encodedCron: string,
       numberPlayersAllowedToWin: number,
-      prizeType: NFT | BNB | 'Standart',
+      prizeType: NFT | BNB | 'STANDARD',
     ) => void
     setSuccessOrErrorMessage: (successMessage: string | null, errorMessage: string | null, currentStep: number) => void
   }

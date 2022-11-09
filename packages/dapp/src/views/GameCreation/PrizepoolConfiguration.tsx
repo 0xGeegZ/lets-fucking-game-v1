@@ -8,18 +8,19 @@ import { GameCreationContext } from './contexts/GameCreationProvider'
 import NextStepButton from './NextStepButton'
 import SelectionCard from './SelectionCard'
 import imageTest from '../../../public/images/chains/1.png'
-import useGameCreation from 'views/GameCreation/contexts/hook'
+import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import BackStepButton from './BackStepButton'
 
 // TODO: Refacto by split components
 const AllowedPlayersToWinSelection = () => {
-  const { numberPlayersAllowedToWin: selectedAllowedNumber, prizeType, currentStep, actions } = useGameCreation()
+  const { numberPlayersAllowedToWin: selectedAllowedNumber, prizeType, currentStep, actions } = useGameContext()
 
   const handleAllowedWinners = (value) => {
-    actions.setPrizeConfiguration(value, prizeType, currentStep)
+    actions.setPrizeConfiguration(+value, prizeType, currentStep)
   }
 
-  const numberPlayers = 6
+  // TODO get number of player dynamically
+  const numberPlayers = 10
   let halfNumberPlayers
   const listOfAllowedNumber = []
   if (numberPlayers % 2 === 0) {
@@ -46,10 +47,10 @@ const AllowedPlayersToWinSelection = () => {
               return (
                 <SelectionCard
                   name={iteration.toString()}
-                  value={iteration.toString()}
+                  value={iteration}
                   image={imageTest}
                   onChange={handleAllowedWinners}
-                  isChecked={selectedAllowedNumber.toString() === iteration.toString()}
+                  isChecked={selectedAllowedNumber === iteration}
                 >
                   <RowBetween>
                     <CommunityIcon mr="8px" />
@@ -67,13 +68,13 @@ const AllowedPlayersToWinSelection = () => {
 
 // TODO: Refacto by split components
 const PrizeTypeSelection = () => {
-  const { prizeType: selectedPrizeType, numberPlayersAllowedToWin, currentStep, actions } = useGameCreation()
+  const { prizeType: selectedPrizeType, numberPlayersAllowedToWin, currentStep, actions } = useGameContext()
 
   const handlePrizeType = (value) => {
     actions.setPrizeConfiguration(numberPlayersAllowedToWin, value, currentStep)
   }
 
-  const prizeTypeSelection = ['Standart', 'ERC20', 'ERC721', 'ERC1155']
+  const prizeTypeSelection = ['STANDARD', 'ERC20', 'ERC721', 'ERC1155']
 
   return (
     <>
@@ -94,7 +95,7 @@ const PrizeTypeSelection = () => {
                   image={imageTest}
                   onChange={handlePrizeType}
                   isChecked={selectedPrizeType === prizeType}
-                  disabled={prizeType === 'ERC1155' || prizeType === 'ERC721'}
+                  disabled={prizeType !== 'STANDARD'}
                 >
                   <RowBetween>
                     <CommunityIcon mr="8px" />
@@ -119,7 +120,7 @@ const PrizepoolConfiguration: React.FC = () => {
         {t('Step %num%', { num: 2 })}
       </Text>
       <Heading as="h3" scale="xl" mb="24px">
-        {t('Prizepool  configuration')}
+        {t('Prizepool configuration')}
       </Heading>
       <AllowedPlayersToWinSelection />
       <PrizeTypeSelection />

@@ -8,16 +8,17 @@ import { GameCreationContext } from './contexts/GameCreationProvider'
 import NextStepButton from './NextStepButton'
 import SelectionCard from './SelectionCard'
 import imageTest from '../../../public/images/chains/1.png'
-import useGameCreation from 'views/GameCreation/contexts/hook'
+import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import Select, { OptionProps } from 'components/Select/Select'
-import { ethers } from 'ethers'
+import { parseEther } from '@ethersproject/units'
+
 import BackStepButton from './BackStepButton'
 
 // TODO: Refacto by split components
 // TODO: Fix persist selection -> step 3 is wrong...
 const EdgeSelection = () => {
   const { houseEdge, creatorEdge, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
-    useGameCreation()
+    useGameContext()
 
   const handleHouseEdgeOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
@@ -50,43 +51,43 @@ const EdgeSelection = () => {
     },
     {
       label: '1%',
-      value: 0.01,
+      value: 100,
     },
     {
       label: '2%',
-      value: 0.02,
+      value: 200,
     },
     {
       label: '3%',
-      value: 0.03,
+      value: 300,
     },
     {
       label: '4%',
-      value: 0.04,
+      value: 400,
     },
     {
       label: '5%',
-      value: 0.05,
+      value: 500,
     },
     {
       label: '6%',
-      value: 0.06,
+      value: 600,
     },
     {
       label: '7%',
-      value: 0.07,
+      value: 700,
     },
     {
       label: '8%',
-      value: 0.08,
+      value: 800,
     },
     {
       label: '9%',
-      value: 0.09,
+      value: 900,
     },
     {
       label: '10%',
-      value: 0.1,
+      value: 1000,
     },
   ]
 
@@ -97,23 +98,23 @@ const EdgeSelection = () => {
     },
     {
       label: '1%',
-      value: 0.01,
+      value: 100,
     },
     {
       label: '2%',
-      value: 0.02,
+      value: 200,
     },
     {
       label: '3%',
-      value: 0.03,
+      value: 300,
     },
     {
       label: '4%',
-      value: 0.04,
+      value: 400,
     },
     {
       label: '5%',
-      value: 0.05,
+      value: 500,
     },
   ]
 
@@ -141,7 +142,6 @@ const EdgeSelection = () => {
               </Text>
               <Select options={allowedValuesHouseEdge} onOptionChange={handleHouseEdgeOptionChange}></Select>
             </Flex>
-
             <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
               <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
                 {'Creator scale selection'}
@@ -157,7 +157,7 @@ const EdgeSelection = () => {
 
 const RegistrationAmountSelection = () => {
   const { houseEdge, creatorEdge, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
-    useGameCreation()
+    useGameContext()
 
   const handleRegistrationAmountOptionChange = (option: OptionProps) => {
     actions.setGameCreation(currentStep, houseEdge, creatorEdge, option.value, maxPlayers, playTimeRange, encodedCron)
@@ -167,7 +167,7 @@ const RegistrationAmountSelection = () => {
   const authorizedAmounts = AUTHORIZED_AMOUNTS.map((amount) => {
     return {
       label: amount + ' BNB',
-      value: ethers.utils.parseEther(`${amount}`),
+      value: parseEther(`${amount}`),
     }
   })
 
@@ -190,7 +190,7 @@ const RegistrationAmountSelection = () => {
 
 const MaximumPlayersSelection = () => {
   const { houseEdge, creatorEdge, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
-    useGameCreation()
+    useGameContext()
 
   const handleMaximumPlayersOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
@@ -262,7 +262,7 @@ const MaximumPlayersSelection = () => {
 
 const PlayTimeRangeSelection = () => {
   const { houseEdge, creatorEdge, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
-    useGameCreation()
+    useGameContext()
 
   const handlePlayTimeRangeOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
@@ -293,6 +293,10 @@ const PlayTimeRangeSelection = () => {
       label: '4 hours',
       value: 4,
     },
+    {
+      label: '5 hours',
+      value: 5,
+    },
   ]
 
   return (
@@ -313,10 +317,10 @@ const PlayTimeRangeSelection = () => {
 }
 
 const EncodedCronSelection = () => {
-  const [encodedCron, setEncodedCron] = useState('')
+  const [encodedCron, setEncodedCron] = useState('0 8 * * *')
 
   const { houseEdge, creatorEdge, registrationAmount, maxPlayers, playTimeRange, currentStep, actions } =
-    useGameCreation()
+    useGameContext()
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
@@ -378,8 +382,15 @@ const OtherOptionsSelection = () => {
 }
 
 const GameCreation: React.FC = () => {
-  const { actions } = useContext(GameCreationContext)
+  //   const { actions } = useContext(GameCreationContext)
+
   const { t } = useTranslation()
+
+  const { currentStep, actions } = useGameContext()
+
+  // TODO GUIGUI REMOVE AFTER TEST
+  actions.setGameCreation(currentStep, 500, 200, 0.05, 10, 2, '0 8 * * *')
+  //   actions.setGameCreation(2, 'STANDARD', currentStep)
 
   return (
     <>
@@ -387,11 +398,11 @@ const GameCreation: React.FC = () => {
         {t('Step %num%', { num: 2 })}
       </Text>
       <Heading as="h3" scale="xl" mb="24px">
-        {t('Prizepool  configuration')}
+        {t('Game configuration')}
       </Heading>
       <EdgeSelection />
       <OtherOptionsSelection />
-      {/* //TODO: implement validation */}
+      {/* //TODO: implement fields validation */}
       <Flex
         justifyContent="space-between"
         alignItems="center"
@@ -399,6 +410,7 @@ const GameCreation: React.FC = () => {
         pl={['4px', null, '0']}
         mb="8px"
       >
+        {/* TODO disable button if all fields are not populated */}
         <NextStepButton
           onClick={actions.nextStep} /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
         >
