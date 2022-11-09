@@ -28,31 +28,25 @@ const BulletList = styled.ul`
 
 const RecapConfigGame = () => {
   const {
-    isInitialized,
-    currentStep,
-    houseEdge,
-    creatorEdge,
+    treasuryFee,
+    creatorFee,
     registrationAmount,
     maxPlayers,
     playTimeRange,
     encodedCron,
     numberPlayersAllowedToWin,
     prizeType,
-    successMessage,
-    errorMessage,
   } = useGameContext()
-
-  console.log('check state redux : ', useGameContext())
 
   return (
     <>
       <Card mb="24px">
         <CardBody>
           <Heading as="h4" scale="lg" mb="8px">
-            Game confirmation & contract creation
+            Confirm your game configuration
           </Heading>
           <Text as="p" color="textSubtle" mb="24px">
-            Almost complete !
+            You could update configuration later if game is not in progress
           </Text>
           <Flex
             justifyContent="space-between"
@@ -64,53 +58,56 @@ const RecapConfigGame = () => {
             <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
               <BulletList>
                 <li>
-                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline" lineHeight={1.1}>
-                    House edge: {houseEdge * 100} %
+                  <Text textAlign="center" color="textSubtle" display="inline">
+                    Registration amount : {registrationAmount.toString()} BNB
                   </Text>
                 </li>
                 <li>
-                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline" lineHeight={1.1}>
-                    Creator edge: {creatorEdge * 100} %
-                  </Text>
-                </li>
-              </BulletList>
-            </Flex>
-
-            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
-              <BulletList>
-                <li>
-                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline" lineHeight={1.1}>
-                    {registrationAmount.toString()} BNB
-                  </Text>
-                </li>
-                <li>
-                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline" lineHeight={1.1}>
-                    {maxPlayers} players max
-                  </Text>
-                </li>
-                <li>
-                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline" lineHeight={1.1}>
-                    {playTimeRange} for play time range
-                  </Text>
-                </li>
-                <li>
-                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline" lineHeight={1.1}>
-                    {encodedCron} is the selected encodedCron
+                  <Text textAlign="center" color="textSubtle" display="inline">
+                    Maximum players : {maxPlayers}
                   </Text>
                 </li>
               </BulletList>
             </Flex>
-
             <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
               <BulletList>
                 <li>
-                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline" lineHeight={1.1}>
-                    {numberPlayersAllowedToWin} players allowed to win
+                  <Text textAlign="center" color="textSubtle" display="inline">
+                    Daily play time range : {playTimeRange}H
                   </Text>
                 </li>
                 <li>
-                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline" lineHeight={1.1}>
-                    {prizeType} is the type of prize to upload
+                  <Text textAlign="center" color="textSubtle" display="inline">
+                    {/* // TODO GUIGUI HANDLE CRON TO HUMAN READABLE */}
+                    Selected Cron : {encodedCron}
+                  </Text>
+                </li>
+              </BulletList>
+            </Flex>
+            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
+              <BulletList>
+                <li>
+                  <Text textAlign="center" color="textSubtle" display="inline">
+                    Winners : {numberPlayersAllowedToWin}
+                  </Text>
+                </li>
+                <li>
+                  <Text textAlign="center" color="textSubtle" display="inline">
+                    Prize type : {prizeType}
+                  </Text>
+                </li>
+              </BulletList>
+            </Flex>
+            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
+              <BulletList>
+                <li>
+                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline" lineHeight={2.5}>
+                    Treasury fee : {treasuryFee / 100} %
+                  </Text>
+                </li>
+                <li>
+                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline">
+                    Creator fee: {creatorFee / 100} %
                   </Text>
                 </li>
               </BulletList>
@@ -132,7 +129,7 @@ const GameConfirmationAndContractCreation: React.FC<React.PropsWithChildren> = (
         {t('Step %num%', { num: 3 })}
       </Text>
       <Heading as="h3" scale="xl" mb="24px">
-        {t('Game confirmation')}
+        {t('Contract creation')}
       </Heading>
       <RecapConfigGame />
       <Flex

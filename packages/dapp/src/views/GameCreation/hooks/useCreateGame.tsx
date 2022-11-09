@@ -6,9 +6,16 @@ import { ToastDescriptionWithTx } from 'components/Toast'
 import { useGameFactoryV1Contract } from 'hooks/useContract'
 import { parseEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
-import { BigNumber } from '@ethersproject/bignumber'
+import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 
 export const useCreateGame = (game) => {
+  const { t } = useTranslation()
+  const { toastSuccess } = useToast()
+  const contract = useGameFactoryV1Contract()
+  const { actions } = useGameContext()
+
+  const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
+
   // TODO handle name
   const {
     /* name, */ maxPlayers,
@@ -18,48 +25,38 @@ export const useCreateGame = (game) => {
     creatorFee,
     encodedCron,
     numberPlayersAllowedToWin,
-    prizeType,
+    // prizeType,
   } = game
 
-  // TODO Load from smart contract
-  const gameCreationAmountEther = parseEther('0.1')
-  const registrationAmountEther = parseEther(`${registrationAmount}`)
-
-  const prizes = [
-    {
-      position: 1,
-      amount: parseEther(`${registrationAmount * maxPlayers}`),
+  const createPrize = (index, totalWinners) => {
+    return {
+      position: index,
+      amount: parseEther(`${(registrationAmount * maxPlayers) / totalWinners}`),
+      // TODO use prizeType
       standard: 0,
       contractAddress: '0x0000000000000000000000000000000000000000',
       tokenId: 1,
-    },
-  ]
+    }
+  }
+
+  const mapper = new Array(numberPlayersAllowedToWin).fill('').map((_, i) => i + 1)
+  const prizes = mapper.map((index) => createPrize(index, numberPlayersAllowedToWin))
+
+  // TODO GUIGUI Load gameCreationAmount directly from smart contract
+  const gameCreationAmountEther = parseEther('0.1')
+  const registrationAmountEther = parseEther(`${registrationAmount}`)
 
   const name = formatBytes32String("Let's Fucking Game VMP")
 
-  //   const prizes = [...Array(numberPlayersAllowedToWin).keys()]
-  //   console.log('🚀 ~ file: useCreateGame.tsx ~ line 25 ~ useCreateGame ~ Array(numberPlayersAllowedToWin)', prizes)
-
-  const { t } = useTranslation()
-  const { toastSuccess } = useToast()
-  const contract = useGameFactoryV1Contract()
-
-  const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
-
   const handleCreateGame = useCallback(async () => {
-    console.log('🚀 ~ file: useCreateGame.tsx ~ line 86 ~ handleCreateGame ~ treasuryFee', treasuryFee)
-    console.log('🚀 ~ file: useCreateGame.tsx ~ line 86 ~ handleCreateGame ~ creatorFee', creatorFee)
-
     const receipt = await fetchWithCatchTxError(() =>
       contract.createNewGame(
         name,
         maxPlayers,
         playTimeRange,
         registrationAmountEther,
-        100,
-        100,
-        // treasuryFee,
-        // creatorFee,
+        treasuryFee,
+        creatorFee,
         encodedCron,
         prizes,
         { value: gameCreationAmountEther },
@@ -73,6 +70,7 @@ export const useCreateGame = (game) => {
           {t('You have successfully claimed your prize.')}
         </ToastDescriptionWithTx>,
       )
+      actions.nextStep()
     }
   }, [
     fetchWithCatchTxError,
@@ -84,10 +82,11 @@ export const useCreateGame = (game) => {
     treasuryFee,
     creatorFee,
     encodedCron,
-    // prizes,
+    prizes,
     gameCreationAmountEther,
     toastSuccess,
     t,
+    actions,
   ])
 
   return { isPending, handleCreateGame }

@@ -82,13 +82,13 @@ export const socials = [
     label: "Github",
     icon: GithubIcon,
     href: "https://github.com/lets-fucking-game",
-    items: [],
+    // items: [],
   },
   {
     label: "Twitter",
     icon: TwitterIcon,
     href: "https://twitter.com/0xGeegZ",
-    items: [],
+    // items: [],
   },
   // {
   //   label: "Telegram",

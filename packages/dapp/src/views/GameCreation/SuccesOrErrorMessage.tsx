@@ -13,8 +13,8 @@ const SuccesOrErrorMessage: React.FC<React.PropsWithChildren> = () => {
     const {
       isInitialized,
       currentStep,
-      houseEdge,
-      creatorEdge,
+      treasuryFee,
+      creatorFee,
       registrationAmount,
       maxPlayers,
       playTimeRange,
@@ -24,9 +24,6 @@ const SuccesOrErrorMessage: React.FC<React.PropsWithChildren> = () => {
       successMessage,
       errorMessage,
     } = useGameContext()
-
-    const errorMessageFake = 'Status of errors'
-    const successMessageFake = 'Status of success'
 
     // TODO: improve style
     // TODO: add validation form
@@ -43,24 +40,17 @@ const SuccesOrErrorMessage: React.FC<React.PropsWithChildren> = () => {
           <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
             <Card mb="24px">
               <CardBody>
-                <Heading as="h4" scale="lg" mb="8px">
-                  Error status
+                <Heading as="h4" scale="lg" mb="16px">
+                  Your game is ready
                 </Heading>
-                <Text as="p" color="textSubtle" mb="24px">
-                  {errorMessageFake}
+                <Text as="p" color="textSubtle" mb="8px">
+                  Your game was successfully created.
                 </Text>
-              </CardBody>
-            </Card>
-          </Flex>
-          <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
-            <Card mb="24px">
-              <CardBody>
-                <Heading as="h4" scale="lg" mb="8px">
-                  Success status
-                </Heading>
-                <Text as="p" color="textSubtle" mb="24px">
-                  {successMessageFake}
+                <Text as="p" color="textSubtle" mb="16px">
+                  Let&lsquo;s find some player to start the game :)
                 </Text>
+                {/* // TODO GUIGUI ADD A LINK TO CREATED SMART CONTRACT */}
+                {/* // TODO GUIGUI ADD A button to share a tweet */}
               </CardBody>
             </Card>
           </Flex>
@@ -75,23 +65,19 @@ const SuccesOrErrorMessage: React.FC<React.PropsWithChildren> = () => {
         {t('Step %num%', { num: 4 })}
       </Text>
       <Heading as="h3" scale="xl" mb="24px">
-        {t('Succes or error message')}
+        {t('Game created')}
       </Heading>
       <InformationsCards />
-      <Flex
+      {/* <Flex
         justifyContent="space-between"
         alignItems="center"
         pr={[null, null, '4px']}
         pl={['4px', null, '0']}
         mb="8px"
       >
-        <BackStepButton
-          onClick={actions.previousStep} /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
-        >
-          {t('Previous Step')}
-        </BackStepButton>
-        <Button>{t('Start Game')}</Button>
-      </Flex>
+       
+       
+      </Flex> */}
     </>
   )
 }

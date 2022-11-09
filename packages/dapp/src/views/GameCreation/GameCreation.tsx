@@ -17,14 +17,14 @@ import BackStepButton from './BackStepButton'
 // TODO: Refacto by split components
 // TODO: Fix persist selection -> step 3 is wrong...
 const EdgeSelection = () => {
-  const { houseEdge, creatorEdge, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
+  const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
     useGameContext()
 
-  const handleHouseEdgeOptionChange = (option: OptionProps) => {
+  const handleTreasuryFeeOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
       currentStep,
       option.value,
-      creatorEdge,
+      creatorFee,
       registrationAmount,
       maxPlayers,
       playTimeRange,
@@ -32,10 +32,10 @@ const EdgeSelection = () => {
     )
   }
 
-  const handleCreatorEdgeOptionChange = (option: OptionProps) => {
+  const handleCreatorFeeOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
       currentStep,
-      houseEdge,
+      treasuryFee,
       option.value,
       registrationAmount,
       maxPlayers,
@@ -44,19 +44,7 @@ const EdgeSelection = () => {
     )
   }
 
-  const allowedValuesHouseEdge = [
-    {
-      label: '0%',
-      value: 0,
-    },
-    {
-      label: '1%',
-      value: 100,
-    },
-    {
-      label: '2%',
-      value: 200,
-    },
+  const allowedValuesTreasuryFee = [
     {
       label: '3%',
       value: 300,
@@ -91,7 +79,7 @@ const EdgeSelection = () => {
     },
   ]
 
-  const allowedValuesCreatorEdge = [
+  const allowedValuesCreatorFee = [
     {
       label: '0%',
       value: 0,
@@ -121,12 +109,12 @@ const EdgeSelection = () => {
   return (
     <>
       <Text as="h2" color="textSubtle" mb="8px">
-        Edge selection
+        Creator & Treasury fee
       </Text>
       <Text as="p" color="textSubtle" mb="24px">
         Make a choice !
       </Text>
-      {allowedValuesHouseEdge && (
+      {allowedValuesTreasuryFee && (
         <>
           {/* //TODO: implement dynamic height to dropdown */}
           <Flex
@@ -138,15 +126,15 @@ const EdgeSelection = () => {
           >
             <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
               <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-                {'House scale selection'}
+                {'Treasury fee (for us)'}
               </Text>
-              <Select options={allowedValuesHouseEdge} onOptionChange={handleHouseEdgeOptionChange}></Select>
+              <Select options={allowedValuesTreasuryFee} onOptionChange={handleTreasuryFeeOptionChange}></Select>
             </Flex>
             <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
               <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-                {'Creator scale selection'}
+                {'Creator fee (for you)'}
               </Text>
-              <Select options={allowedValuesCreatorEdge} onOptionChange={handleCreatorEdgeOptionChange}></Select>
+              <Select options={allowedValuesCreatorFee} onOptionChange={handleCreatorFeeOptionChange}></Select>
             </Flex>
           </Flex>
         </>
@@ -156,14 +144,16 @@ const EdgeSelection = () => {
 }
 
 const RegistrationAmountSelection = () => {
-  const { houseEdge, creatorEdge, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
+  const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
     useGameContext()
 
   const handleRegistrationAmountOptionChange = (option: OptionProps) => {
-    actions.setGameCreation(currentStep, houseEdge, creatorEdge, option.value, maxPlayers, playTimeRange, encodedCron)
+    actions.setGameCreation(currentStep, treasuryFee, creatorFee, option.value, maxPlayers, playTimeRange, encodedCron)
   }
 
-  const AUTHORIZED_AMOUNTS = [0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10]
+  // TODO GUIGUI HANDLE FREE GAMES AND LOAD AUTHORIZED AMOUNTS FROM CONFIG
+  // const AUTHORIZED_AMOUNTS = [0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10]
+  const AUTHORIZED_AMOUNTS = [0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10]
   const authorizedAmounts = AUTHORIZED_AMOUNTS.map((amount) => {
     return {
       label: amount + ' BNB',
@@ -189,14 +179,14 @@ const RegistrationAmountSelection = () => {
 }
 
 const MaximumPlayersSelection = () => {
-  const { houseEdge, creatorEdge, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
+  const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
     useGameContext()
 
   const handleMaximumPlayersOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
       currentStep,
-      houseEdge,
-      creatorEdge,
+      treasuryFee,
+      creatorFee,
       registrationAmount,
       option.value,
       playTimeRange,
@@ -261,14 +251,14 @@ const MaximumPlayersSelection = () => {
 }
 
 const PlayTimeRangeSelection = () => {
-  const { houseEdge, creatorEdge, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
+  const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
     useGameContext()
 
   const handlePlayTimeRangeOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
       currentStep,
-      houseEdge,
-      creatorEdge,
+      treasuryFee,
+      creatorFee,
       registrationAmount,
       maxPlayers,
       option.value,
@@ -319,13 +309,13 @@ const PlayTimeRangeSelection = () => {
 const EncodedCronSelection = () => {
   const [encodedCron, setEncodedCron] = useState('0 8 * * *')
 
-  const { houseEdge, creatorEdge, registrationAmount, maxPlayers, playTimeRange, currentStep, actions } =
+  const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, currentStep, actions } =
     useGameContext()
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
     setEncodedCron(value)
-    actions.setGameCreation(currentStep, houseEdge, creatorEdge, registrationAmount, maxPlayers, playTimeRange, value)
+    actions.setGameCreation(currentStep, treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, value)
   }
 
   return (
@@ -382,15 +372,11 @@ const OtherOptionsSelection = () => {
 }
 
 const GameCreation: React.FC = () => {
-  //   const { actions } = useContext(GameCreationContext)
+  const { actions } = useContext(GameCreationContext)
 
   const { t } = useTranslation()
 
-  const { currentStep, actions } = useGameContext()
-
-  // TODO GUIGUI REMOVE AFTER TEST
-  actions.setGameCreation(currentStep, 500, 200, 0.05, 10, 2, '0 8 * * *')
-  //   actions.setGameCreation(2, 'STANDARD', currentStep)
+  const { currentStep } = useGameContext()
 
   return (
     <>

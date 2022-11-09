@@ -15,7 +15,7 @@ const SocialLinks: React.FC<React.PropsWithChildren<FlexProps>> = ({ ...props })
       };
       const Icon = social.icon;
       const mr = index < socials.length - 1 ? "24px" : 0;
-      if (social.items) {
+      if (social?.items) {
         return (
           <Dropdown key={social.label} position="top" target={<Icon {...iconProps} mr={mr} />}>
             {social.items.map((item) => (

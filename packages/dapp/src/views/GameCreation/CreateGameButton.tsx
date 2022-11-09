@@ -7,8 +7,8 @@ import { useCreateGame } from 'views/GameCreation/hooks/useCreateGame'
 // TODO GUIGUI MOOVE IT TO TYPES
 interface CreateGameButtonProps {
   currentStep: number
-  houseEdge: number
-  creatorEdge: number
+  treasuryFee: number
+  creatorFee: number
   registrationAmount: number
   maxPlayers: number
   playTimeRange: number

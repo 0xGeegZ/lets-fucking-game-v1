@@ -9,8 +9,8 @@ export type Actions =
       // TODO Guillaume : It can be '' type to initialize state but we must prevent submit in frontend if this value is selected
       type: 'game_creation'
       currentStep: number
-      houseEdge: number
-      creatorEdge: number
+      treasuryFee: number
+      creatorFee: number
       registrationAmount: number
       maxPlayers: number
       playTimeRange: number
@@ -25,8 +25,8 @@ export type Actions =
   | {
       type: 'game_confirmation_and_contract_creation'
       currentStep: number
-      houseEdge: number
-      creatorEdge: number
+      treasuryFee: number
+      creatorFee: number
       registrationAmount: number
       maxPlayers: number
       playTimeRange: number
@@ -44,8 +44,8 @@ export type Actions =
 export interface State {
   isInitialized: boolean
   currentStep: number
-  houseEdge: number
-  creatorEdge: number
+  treasuryFee: number
+  creatorFee: number
   registrationAmount: number
   maxPlayers: number
   playTimeRange: number
@@ -63,8 +63,8 @@ export interface ContextType extends State {
     setInitialize: (currentStep: number) => void
     setGameCreation: (
       currentStep: number,
-      houseEdge: number,
-      creatorEdge: number,
+      treasuryFee: number,
+      creatorFee: number,
       registrationAmount: number,
       maxPlayers: number,
       playTimeRange: number,
@@ -77,8 +77,8 @@ export interface ContextType extends State {
     ) => void
     setGameConfirmationAndContractCreation: (
       currentStep: number,
-      houseEdge: number,
-      creatorEdge: number,
+      treasuryFee: number,
+      creatorFee: number,
       registrationAmount: number,
       maxPlayers: number,
       playTimeRange: number,

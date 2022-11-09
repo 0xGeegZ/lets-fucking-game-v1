@@ -12,10 +12,10 @@ const Wrapper = styled.div`
 `
 
 const steps = (t: TranslateFunction) => [
-  t('Game creation'),
+  t('Game configuration'),
   t('Prizepool configuration'),
-  t('Game confirmation and contract creation'),
-  t('Success or error message'),
+  t('Contract creation'),
+  t('Confirmation'),
 ]
 
 const Header: React.FC<React.PropsWithChildren> = () => {

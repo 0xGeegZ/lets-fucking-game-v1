@@ -84,7 +84,7 @@ const PrizeTypeSelection = () => {
             Prize type
           </Heading>
           <Text as="p" color="textSubtle" mb="24px">
-            Make a choice !
+            More choices soon !
           </Text>
           {prizeTypeSelection &&
             prizeTypeSelection.map((prizeType) => {
