@@ -1,6 +1,8 @@
 import { useTranslation } from '@pancakeswap/localization'
 import { Flex, Skeleton, Text, Button } from '@pancakeswap/uikit'
 import BigNumber from 'bignumber.js'
+import { BigNumber as EthersBigNumber } from '@ethersproject/bignumber'
+
 import ConnectWalletButton from 'components/ConnectWalletButton'
 import { useContext } from 'react'
 import styled from 'styled-components'
@@ -10,6 +12,11 @@ import { YieldBoosterStateContext } from 'views/Farms/components/YieldBooster/co
 import { getMasterChefAddress } from 'utils/addressHelpers'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { ChainId, WBNB } from '@pancakeswap/sdk'
+import ClaimButton from './ClaimButton'
+import PlayButton from './PlayButton'
+import CreateGameButton from './CreateGameButton'
+import RegisterButton from './RegisterButton'
+import VoteSplitButton from './VoteSplitButton'
 import { HarvestActionContainer, ProxyHarvestActionContainer } from '../GameTable/Actions/HarvestAction'
 import { ProxyStakedContainer, StakedContainer } from '../GameTable/Actions/StakedAction'
 import { GameWithStakedValue } from '../types'
@@ -54,6 +61,7 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
   const lpSymbol = 'lpSymbol'
   const lpAddress = getMasterChefAddress(chainId)
 
+  const { address, roundId } = game || {}
   const { earnings } = game.userData || {}
   const { shouldUseProxyFarm } = useContext(YieldBoosterStateContext)
   const isReady = false
@@ -125,15 +133,14 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
         <Skeleton width={80} height={18} mb="4px" />
       )}
       {/* TODO Remove after integration phase */}
-      <Link href="/games/1" passHref>
+      {/* <Link href="/games/1" passHref>
         <Button as="a" id="showGameDetails" mt="8px" width="100%">
           {t('Show Game Details')}
         </Button>
-      </Link>
+      </Link> */}
       {/* TODO REACTIVATE after integration phase */}
       {!account ? (
         <>
-          PROUTPROUT
           <ConnectWalletButton mt="8px" width="100%" />
         </>
       ) : shouldUseProxyFarm ? (
@@ -147,10 +154,15 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
         //   {(props) => <StakeAction {...props} />}
         // </StakedContainer>
         <>
-          <Button /* onClick={handleRegisterPlayer} disabled={!isValid || isUserCreated || isLoading || !isAcknowledged} */
-          >
-            {t('Register')}
-          </Button>
+          <PlayButton gameAddress="0x86f13647f5b308e915a48b7e9dc15a216e3d8dbe" />
+          <ClaimButton gameAddress="0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE" roundId={EthersBigNumber.from(1)} />
+          {/* <CreateGameButton gameAddress="0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE" roundId={new BigNumber(1)} /> */}
+          <RegisterButton
+            gameAddress="0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE"
+            registrationAmount={EthersBigNumber.from(1)}
+            gameCreationAmount={EthersBigNumber.from(1)}
+          />
+          <VoteSplitButton gameAddress="0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE" roundId={EthersBigNumber.from(1)} />
         </>
       )}
 
