@@ -27,7 +27,8 @@
     "format:write": "prettier --write \"**/*.{js,jsx,ts,tsx,json}\"",
     "prepare": "husky install",
     "postinstall": "patch-package",
-    "uikit": "cd ./packages/uikit && yarn storybook"
+    "uikit": "cd ./packages/uikit && yarn storybook",
+    "deadfile": "npx unimported --flow"
   },
   "browserslist": {
     "production": [
