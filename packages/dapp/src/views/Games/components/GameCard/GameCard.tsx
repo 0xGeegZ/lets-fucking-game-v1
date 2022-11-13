@@ -70,7 +70,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({
       ? `$${liquidity.toNumber().toLocaleString(undefined, { maximumFractionDigits: 0 })}`
       : ''
 
-  const lpLabel = 'lpLabel' // game.lpSymbol && game.lpSymbol.toUpperCase().replace('PANCAKE', '')
+  const lpLabel = 'Game #1' // game.lpSymbol && game.lpSymbol.toUpperCase().replace('PANCAKE', '')
   const earnLabel = t('CAKE + Fees') // game.dual ? game.dual.earnLabel : t('CAKE + Fees')
 
   const liquidityUrlPathParts = 'getLiquidityUrlPathParts({'
@@ -104,7 +104,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({
         />
         {!removed && (
           <Flex justifyContent="space-between" alignItems="center">
-            <Text>{t('APR')}:</Text>
+            <Text>{t('Earn')}:</Text>
             <Text bold style={{ display: 'flex', alignItems: 'center' }}>
               {game.apr ? (
                 <>
@@ -142,7 +142,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({
           </Flex>
         )}
         <Flex justifyContent="space-between">
-          <Text>{t('Earn')}:</Text>
+          <Text>{t('Players')}:</Text>
           <Text bold>{earnLabel}</Text>
         </Flex>
         <CardActionsContainer

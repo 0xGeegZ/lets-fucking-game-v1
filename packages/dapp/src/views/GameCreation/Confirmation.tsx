@@ -5,11 +5,11 @@ import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import NextStepButton from './NextStepButton'
 import BackStepButton from './BackStepButton'
 
-const SuccesOrErrorMessage: React.FC<React.PropsWithChildren> = () => {
+const Confirmation: React.FC<React.PropsWithChildren> = () => {
   const { t } = useTranslation()
   const { actions } = useGameContext()
 
-  const InformationsCards = () => {
+  const ConfirmationsCards = () => {
     const {
       isInitialized,
       currentStep,
@@ -49,7 +49,7 @@ const SuccesOrErrorMessage: React.FC<React.PropsWithChildren> = () => {
                 <Text as="p" color="textSubtle" mb="16px">
                   Let&lsquo;s find some player to start the game :)
                 </Text>
-                {/* // TODO GUIGUI ADD A LINK TO CREATED SMART CONTRACT */}
+                {/* // TODO GUIGUI ADD A LINK TO CREATED SMART CONTRACT on explorer */}
                 {/* // TODO GUIGUI ADD A button to share a tweet */}
               </CardBody>
             </Card>
@@ -67,19 +67,9 @@ const SuccesOrErrorMessage: React.FC<React.PropsWithChildren> = () => {
       <Heading as="h3" scale="xl" mb="24px">
         {t('Game created')}
       </Heading>
-      <InformationsCards />
-      {/* <Flex
-        justifyContent="space-between"
-        alignItems="center"
-        pr={[null, null, '4px']}
-        pl={['4px', null, '0']}
-        mb="8px"
-      >
-       
-       
-      </Flex> */}
+      <ConfirmationsCards />
     </>
   )
 }
 
-export default SuccesOrErrorMessage
+export default Confirmation

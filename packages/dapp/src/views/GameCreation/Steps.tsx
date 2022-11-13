@@ -6,7 +6,7 @@ import GameCreation from './GameCreation'
 import { GameCreationContext } from './contexts/GameCreationProvider'
 import NoWalletConnected from './WalletNotConnected'
 import PrizepoolConfiguration from './PrizepoolConfiguration'
-import SuccesOrErrorMessage from './SuccesOrErrorMessage'
+import Confirmation from './Confirmation'
 
 const Steps = () => {
   const { t } = useTranslation()
@@ -34,7 +34,7 @@ const Steps = () => {
   }
 
   if (currentStep === 3) {
-    return <SuccesOrErrorMessage />
+    return <Confirmation />
   }
 
   return null

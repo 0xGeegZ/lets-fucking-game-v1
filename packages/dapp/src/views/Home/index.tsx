@@ -27,6 +27,7 @@ import CheckPrizesSection from './components/CheckPrizesSection/CheckPrizesSecti
 import Games from './components/Games'
 
 import { CHECK_PRIZES_BG } from './pageSectionStyles'
+import Why from './components/Why/Why'
 
 const StyledHeroSection = styled(PageSection)`
   padding-top: 16px;
@@ -117,7 +118,7 @@ const Home: React.FC<React.PropsWithChildren> = () => {
         <MetricsSection />
       </PageSection>
 
-      <PageSection
+      {/* <PageSection
         innerProps={{ style: HomeSectionContainerStyles }}
         background={theme.colors.background}
         containerProps={{
@@ -132,7 +133,7 @@ const Home: React.FC<React.PropsWithChildren> = () => {
           </InnerWedgeWrapper>
         </OuterWedgeWrapper>
         <SalesSection {...swapSectionData(t)} />
-      </PageSection>
+      </PageSection> */}
       <PageSection
         // dividerPosition="top"
         // dividerFill={{ light: theme.colors.background }}
@@ -146,7 +147,7 @@ const Home: React.FC<React.PropsWithChildren> = () => {
         <Games />
       </PageSection>
 
-      <PageSection
+      {/* <PageSection
         innerProps={{ style: HomeSectionContainerStyles }}
         background={theme.colors.gradientCardHeader}
         index={2}
@@ -158,7 +159,7 @@ const Home: React.FC<React.PropsWithChildren> = () => {
           </InnerWedgeWrapper>
         </OuterWedgeWrapper>
         <SalesSection {...earnSectionData(t)} />
-        {/* TODO: until we are enable fetch multi-chain farms */}
+        { //TODO: until we are enable fetch multi-chain farms }
         {chainId === ChainId.BSC && <GamesPoolsRow />}
       </PageSection>
       <PageSection
@@ -179,7 +180,7 @@ const Home: React.FC<React.PropsWithChildren> = () => {
       >
         <SalesSection {...cakeSectionData(t)} />
         <CakeDataRow />
-      </PageSection>
+      </PageSection> */}
       <PageSection
         dividerPosition="top"
         dividerFill={{ light: theme.colors.background }}
@@ -199,14 +200,14 @@ const Home: React.FC<React.PropsWithChildren> = () => {
       <PageSection background={CHECK_PRIZES_BG} hasCurvedDivider={false} index={2}>
         <CheckPrizesSection />
       </PageSection>
-      {/* <PageSection
-        innerProps={{ style: HomeSectionContainerStyles }}
-        background="linear-gradient(180deg, #7645D9 0%, #5121B1 100%)"
+      <PageSection
+        dividerPosition="top"
+        dividerFill={{ light: theme.colors.background }}
+        clipFill={{ light: '#9A9FD0', dark: '#66578D' }}
         index={2}
-        hasCurvedDivider={false}
       >
-        <Footer />
-      </PageSection> */}
+        <Why />
+      </PageSection>
     </>
   )
 }

@@ -11,10 +11,10 @@ import { FARM_AUCTION_HOSTING_IN_SECONDS } from '../../config/constants'
 
 const deserializeGameUserData = (game: SerializedGame): DeserializedGameUserData => {
   return {
-    allowance: game.userData ? new BigNumber(game.userData.allowance) : BIG_ZERO,
-    tokenBalance: game.userData ? new BigNumber(game.userData.tokenBalance) : BIG_ZERO,
-    stakedBalance: game.userData ? new BigNumber(game.userData.stakedBalance) : BIG_ZERO,
-    earnings: game.userData ? new BigNumber(game.userData.earnings) : BIG_ZERO,
+    allowance: game?.userData ? new BigNumber(game.userData.allowance) : BIG_ZERO,
+    tokenBalance: game?.userData ? new BigNumber(game.userData.tokenBalance) : BIG_ZERO,
+    stakedBalance: game?.userData ? new BigNumber(game.userData.stakedBalance) : BIG_ZERO,
+    earnings: game?.userData ? new BigNumber(game.userData.earnings) : BIG_ZERO,
     proxy: {
       allowance: game?.userData?.proxy ? new BigNumber(game?.userData?.proxy.allowance) : BIG_ZERO,
       tokenBalance: game?.userData?.proxy ? new BigNumber(game?.userData?.proxy.tokenBalance) : BIG_ZERO,

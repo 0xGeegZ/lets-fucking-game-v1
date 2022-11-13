@@ -16,9 +16,8 @@ const ClaimButton: React.FC<React.PropsWithChildren<ClaimButtonProps>> = ({ game
 
   return (
     <Button
-      mt="8px"
-      width="100%"
-      ml="auto"
+      //   mt="8px"
+      //   ml="4px"
       disabled={isDisabledButton}
       endIcon={isPending ? <AutoRenewIcon spin color="currentColor" /> : null}
       onClick={handleClaim}
