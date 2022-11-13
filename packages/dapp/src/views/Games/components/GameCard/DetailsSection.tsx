@@ -1,6 +1,7 @@
 import { useTranslation } from '@pancakeswap/localization'
 import styled from 'styled-components'
 import { Text, Flex, LinkExternal, Skeleton } from '@pancakeswap/uikit'
+import ActionButton from 'views/Farms/components/YieldBooster/components/ActionButton'
 
 export interface ExpandableSectionProps {
   bscScanAddress?: string
@@ -15,7 +16,14 @@ const StyledLinkExternal = styled(LinkExternal)`
   font-weight: 400;
 `
 
-const DetailsSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = ({ bscScanAddress, infoAddress }) => {
+const ActionContainer = styled.div`
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
+
+const DetailsSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = ({ bscScanAddress }) => {
   const {
     t,
     currentLanguage: { locale },
@@ -44,6 +52,9 @@ const DetailsSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> 
       )} */}
       <StyledLinkExternal href={bscScanAddress}>{t('View Contract')}</StyledLinkExternal>
       {/* <StyledLinkExternal href={infoAddress}>{t('See Pair Info')}</StyledLinkExternal> */}
+      <ActionContainer style={{ paddingTop: 16 }}>
+        <ActionButton title={`${t('Game Rules')}`} description={t("More info about Let's Fucking Game")} />
+      </ActionContainer>
     </Wrapper>
   )
 }

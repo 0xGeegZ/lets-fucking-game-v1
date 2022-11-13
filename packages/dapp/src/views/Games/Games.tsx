@@ -334,7 +334,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
               {t('Register to a game to start playing.')}
             </GameH2>
             <NextLinkFromReactRouter to="/games/auction" prefetch={false}>
-              <Button variant="text" disabled="true">
+              <Button variant="text" disabled>
                 <Text color="primary" bold fontSize="16px" mr="4px">
                   {t('My Games')}
                 </Text>

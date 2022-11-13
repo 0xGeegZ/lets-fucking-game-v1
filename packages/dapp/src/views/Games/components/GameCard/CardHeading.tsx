@@ -1,18 +1,16 @@
 import styled from 'styled-components'
-import { Tag, Flex, Heading, Box, Skeleton } from '@pancakeswap/uikit'
+import { Tag, Flex, Heading, Skeleton } from '@pancakeswap/uikit'
 import { Token } from '@pancakeswap/sdk'
-import { FarmAuctionTag, CoreTag, StableFarmTag } from 'components/Tags'
-import { TokenPairImage } from 'components/TokenImage'
+import { CoreTag } from 'components/Tags'
 import BoostedTag from 'views/Farms/components/YieldBooster/components/BoostedTag'
+import BigNumber from 'bignumber.js'
+import { CurrencyLogo } from 'components/Logo'
 
 export interface ExpandableSectionProps {
-  lpLabel?: string
-  multiplier?: string
-  isCommunityGame?: boolean
+  name?: string
   token: Token
-  quoteToken: Token
+  prizepool: BigNumber
   boosted?: boolean
-  isStable?: boolean
 }
 
 const Wrapper = styled(Flex)`
@@ -26,32 +24,28 @@ const MultiplierTag = styled(Tag)`
 `
 
 const CardHeading: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = ({
-  lpLabel,
-  multiplier,
-  isCommunityGame,
+  name,
   token,
-  quoteToken,
+  prizepool,
   boosted,
-  isStable,
 }) => {
-  const isReady = multiplier !== undefined
+  const isReady = prizepool !== undefined
 
   return (
     <Wrapper justifyContent="space-between" alignItems="center" mb="12px">
       {isReady ? (
         // <TokenPairImage variant="inverted" primaryToken={token} secondaryToken={quoteToken} width={64} height={64} />
-        <Skeleton mr="8px" width={63} height={63} variant="circle" />
+        <CurrencyLogo address={token.address} size="24px" />
       ) : (
         <Skeleton mr="8px" width={63} height={63} variant="circle" />
       )}
       <Flex flexDirection="column" alignItems="flex-end">
-        {isReady ? <Heading mb="4px">{lpLabel.split(' ')[0]}</Heading> : <Skeleton mb="4px" width={60} height={18} />}
+        {isReady ? <Heading mb="4px">{name}</Heading> : <Skeleton mb="4px" width={60} height={18} />}
         <Flex justifyContent="center">
-          {isStable ? <StableFarmTag mr="4px" /> : null}
-          {isReady ? <Box>{isCommunityGame ? <FarmAuctionTag /> : <CoreTag />}</Box> : null}
-          {boosted && <BoostedTag ml="4px" />}
-          {isReady ? (
-            <MultiplierTag variant="secondary">{multiplier}</MultiplierTag>
+          {isReady ? <CoreTag mr="4px" /> : <Skeleton ml="4px" width={42} height={28} />}
+          {isReady && boosted ? <BoostedTag ml="4px" /> : <Skeleton ml="4px" width={42} height={28} />}
+          {isReady && prizepool ? (
+            <MultiplierTag variant="secondary">{`x${prizepool.toNumber()}`}</MultiplierTag>
           ) : (
             <Skeleton ml="4px" width={42} height={28} />
           )}

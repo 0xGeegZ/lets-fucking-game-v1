@@ -16,7 +16,7 @@ import BackStepButton from './BackStepButton'
 
 // TODO: Refacto by split components
 // TODO: Fix persist selection -> step 3 is wrong...
-const EdgeSelection = () => {
+const FeeSelection = () => {
   const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
     useGameContext()
 
@@ -111,9 +111,7 @@ const EdgeSelection = () => {
       <Text as="h2" color="textSubtle" mb="8px">
         Creator & Treasury fee
       </Text>
-      <Text as="p" color="textSubtle" mb="24px">
-        Make a choice !
-      </Text>
+
       {allowedValuesTreasuryFee && (
         <>
           {/* //TODO: implement dynamic height to dropdown */}
@@ -339,10 +337,7 @@ const OtherOptionsSelection = () => {
   return (
     <>
       <Text as="h2" color="textSubtle" mb="8px">
-        Other options selection
-      </Text>
-      <Text as="p" color="textSubtle" mb="24px">
-        Make a choice !
+        Main game configuration
       </Text>
       <Flex
         justifyContent="space-between"
@@ -386,16 +381,10 @@ const GameCreation: React.FC = () => {
       <Heading as="h3" scale="xl" mb="24px">
         {t('Game configuration')}
       </Heading>
-      <EdgeSelection />
       <OtherOptionsSelection />
+      <FeeSelection />
       {/* //TODO: implement fields validation */}
-      <Flex
-        justifyContent="space-between"
-        alignItems="center"
-        pr={[null, null, '4px']}
-        pl={['4px', null, '0']}
-        mb="8px"
-      >
+      <Flex justifyContent="end" alignItems="center" pr={[null, null, '4px']} pl={['4px', null, '0']} mb="8px">
         {/* TODO disable button if all fields are not populated */}
         <NextStepButton
           onClick={actions.nextStep} /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */

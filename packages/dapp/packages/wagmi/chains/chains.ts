@@ -1,4 +1,4 @@
-import { rinkeby, mainnet, goerli, hardhat } from 'wagmi/chains'
+import { rinkeby, mainnet, goerli } from 'wagmi/chains'
 import { Chain } from 'wagmi'
 
 export const avalandche: Chain = {
@@ -115,4 +115,23 @@ export const bscTest: Chain = {
   testnet: true,
 }
 
-export { rinkeby, mainnet, goerli, hardhat }
+export const hardhat: Chain = {
+  id: 31337,
+  name: 'Hardhat',
+  network: 'hardhat',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Hardhat Native Token',
+    symbol: 'tETH',
+  },
+  rpcUrls: {
+    public: 'http://localhost:8545/',
+    default: 'http://localhost:8545/',
+  },
+  blockExplorers: {
+    default: { name: 'BscScan', url: 'https://testnet.bscscan.com' },
+  },
+  testnet: true,
+}
+
+export { rinkeby, mainnet, goerli }

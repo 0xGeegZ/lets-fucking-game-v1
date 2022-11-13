@@ -1,5 +1,5 @@
 import { useTranslation } from '@pancakeswap/localization'
-import { Card, Flex, Skeleton, Text } from '@pancakeswap/uikit'
+import { Card, Flex, Skeleton, Text, RocketIcon, Heading } from '@pancakeswap/uikit'
 import BigNumber from 'bignumber.js'
 import ExpandableSectionButton from 'components/ExpandableSectionButton'
 import { BASE_ADD_LIQUIDITY_URL } from 'config'
@@ -42,132 +42,98 @@ const ExpandingWrapper = styled.div`
 
 interface GameCardProps {
   game: GameWithStakedValue
-  displayApr: string
-  removed: boolean
-  cakePrice?: BigNumber
   account?: string
-  originalLiquidity?: BigNumber
 }
 
-const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({
-  game,
-  displayApr,
-  removed,
-  cakePrice,
-  account,
-  originalLiquidity,
-}) => {
+const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, account }) => {
   const { t } = useTranslation()
   const { chainId } = useActiveWeb3React()
 
   const [showExpandableSection, setShowExpandableSection] = useState(false)
 
-  const liquidity =
-    game?.liquidity && originalLiquidity?.gt(0) ? game.liquidity.plus(originalLiquidity) : game.liquidity
+  //   const { name, roundId, id, isDeleted,isGameStarted, maxPlayers, playerAddressesCount, registrationAmount, address, prizepool,encodedCron,  playerData: {isPLaying, wonAmount, nextFromRange,nextToRange,isWonLastGames, isCanVoteSplitPot,isInTimeRange } } = game
 
-  const totalValueFormatted =
-    liquidity && liquidity.gt(0)
-      ? `$${liquidity.toNumber().toLocaleString(undefined, { maximumFractionDigits: 0 })}`
-      : ''
+  const name = 'Cake Game'
+  const isDeleted = false
+  const isGameStarted = false
 
-  const lpLabel = 'Game #1' // game.lpSymbol && game.lpSymbol.toUpperCase().replace('PANCAKE', '')
-  const earnLabel = t('CAKE + Fees') // game.dual ? game.dual.earnLabel : t('CAKE + Fees')
+  const roundId = new BigNumber('1')
+  const encodedCron = '0 18 * * *'
+  const id = new BigNumber('1')
 
-  const liquidityUrlPathParts = 'getLiquidityUrlPathParts({'
-  // const liquidityUrlPathParts = getLiquidityUrlPathParts({
-  //   quoteTokenAddress: game.quoteToken.address,
-  //   tokenAddress: game.token.address,
-  //   chainId,
-  // })
-  const addLiquidityUrl = `${BASE_ADD_LIQUIDITY_URL}/${liquidityUrlPathParts}`
-  // const { lpAddress } = game
-  const lpAddress = getMasterChefAddress(chainId)
-  // const isPromotedGame = game.token.symbol === 'CAKE'
+  const maxPlayers = new BigNumber('10')
+  const playerAddressesCount = new BigNumber('5')
+  const registrationAmount = new BigNumber('0.1')
+  const prizepool = registrationAmount.multipliedBy(maxPlayers)
+  const address = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+
+  const isPlaying = false
+  const wonAmount = new BigNumber('1')
+  const nextFromRange = new Date().getTime()
+  const nextToRange = new Date().getTime()
+  const isWonLastGames = false
+  const isCanVoteSplitPot = false
+  const isInTimeRange = false
+
   const isPromotedGame = true
-  const { stakedBalance, proxy, tokenBalance } = game.userData
-
   const toggleExpandableSection = useCallback(() => {
     setShowExpandableSection((prev) => !prev)
   }, [])
 
+  const isReady = game !== undefined
+
   return (
     <StyledCard isActive={isPromotedGame}>
       <GameCardInnerContainer>
-        <CardHeading
-          lpLabel={lpLabel}
-          multiplier="40"
-          token={WBNB[chainId]}
-          quoteToken={WBNB[chainId]}
-          isCommunityGame={false}
-          boosted
-          isStable={false}
-        />
-        {!removed && (
-          <Flex justifyContent="space-between" alignItems="center">
-            <Text>{t('Earn')}:</Text>
-            <Text bold style={{ display: 'flex', alignItems: 'center' }}>
-              {game.apr ? (
-                <>
-                  {!game.contractPaused ? (
-                    <BoostedApr
-                      mr="4px"
-                      lpRewardsApr={game.lpRewardsApr}
-                      apr={game.apr}
-                      pid={1}
-                      lpTotalSupply={new BigNumber(0)}
-                      userBalanceInFarm={new BigNumber(0)}
-                    />
-                  ) : null}
-                  <ApyButton
-                    variant="text-and-button"
-                    pid={1}
-                    lpTokenPrice={new BigNumber(0)}
-                    lpSymbol="LFG"
-                    multiplier="40"
-                    lpLabel="lpLabel"
-                    addLiquidityUrl="addLiquidityUrl"
-                    cakePrice={new BigNumber(5)}
-                    apr={15}
-                    displayApr={displayApr}
-                    lpRewardsApr={game.lpRewardsApr}
-                    strikethrough
-                    useTooltipText
-                    boosted
-                  />
-                </>
-              ) : (
-                <Skeleton height={24} width={80} />
-              )}
-            </Text>
+        <CardHeading name={name} token={WBNB[chainId]} prizepool={prizepool} boosted />
+
+        {!isDeleted && (
+          <Flex justifyContent="space-between">
+            <Heading mr="4px">{t('To earn')}: </Heading>
+            {isReady ? (
+              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                <RocketIcon m="4px" color="success" />
+                <Text bold color="success" fontSize={16}>
+                  {t('Up to ')}
+                  {prizepool.toNumber()}BNB
+                </Text>
+              </Text>
+            ) : (
+              <Skeleton height={24} width={80} />
+            )}
           </Flex>
         )}
+
         <Flex justifyContent="space-between">
-          <Text>{t('Players')}:</Text>
-          <Text bold>{earnLabel}</Text>
+          <Heading mr="4px">{t('Players')}: </Heading>
+          {isReady ? (
+            <Text bold>
+              {playerAddressesCount.toNumber()}/{maxPlayers.toNumber()}
+            </Text>
+          ) : (
+            <Skeleton height={24} width={80} />
+          )}
         </Flex>
+
         <CardActionsContainer
-          game={game}
-          lpLabel={lpLabel}
+          address={address}
+          roundId={roundId}
+          isGameStarted={isGameStarted}
+          wonAmount={wonAmount}
+          nextFromRange={nextFromRange}
+          nextToRange={nextToRange}
+          encodedCron={encodedCron}
+          isPlaying={isPlaying}
+          isWonLastGames={isWonLastGames}
+          isCanVoteSplitPot={isCanVoteSplitPot}
+          isInTimeRange={isInTimeRange}
           account={account}
-          addLiquidityUrl={addLiquidityUrl}
-          displayApr={displayApr}
         />
       </GameCardInnerContainer>
 
       <ExpandingWrapper>
         <ExpandableSectionButton onClick={toggleExpandableSection} expanded={showExpandableSection} />
-        {showExpandableSection && (
-          <DetailsSection
-            removed={removed}
-            bscScanAddress={getBlockExploreLink(lpAddress, 'address', chainId)}
-            infoAddress={`/info${multiChainPaths[chainId]}/pools/${lpAddress}`}
-            totalValueFormatted={totalValueFormatted}
-            lpLabel={lpLabel}
-            addLiquidityUrl={addLiquidityUrl}
-            isCommunity
-            auctionHostingEndDate="tomorrow"
-          />
-        )}
+        {showExpandableSection && <DetailsSection bscScanAddress={getBlockExploreLink(address, 'address', chainId)} />}
       </ExpandingWrapper>
     </StyledCard>
   )
