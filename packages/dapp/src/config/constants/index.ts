@@ -14,9 +14,6 @@ export const INITIAL_ALLOWED_SLIPPAGE = 50
 // 20 minutes, denominated in seconds
 export const DEFAULT_DEADLINE_FROM_NOW = 60 * 20
 
-export { default as ifosConfig } from './ifo'
-export { default as poolsConfig } from './pools'
-
 export const FAST_INTERVAL = 10000
 export const SLOW_INTERVAL = 60000
 
@@ -31,3 +28,6 @@ export const PREDICTION_TOOLTIP_DISMISS_KEY = 'prediction-switcher-dismiss-toolt
 export const GELATO_NATIVE = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
 export const EXCHANGE_DOCS_URLS = 'https://docs.pancakeswap.finance/products/pancakeswap-exchange'
+
+export const ONE_DAY_UNIX = 86400 // 24h * 60m * 60s
+export const ONE_HOUR_SECONDS = 3600

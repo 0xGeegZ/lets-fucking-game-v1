@@ -4,7 +4,7 @@ import { atomWithStorage, createJSONStorage } from 'jotai/utils'
 
 const storage = createJSONStorage(() => sessionStorage)
 export const featureFarmApiAtom = atomWithStorage<typeof FLAG_FARM>(
-  'feature-farm-api',
+  'feature-game-api',
   FLAG_FARM,
   // @ts-ignore
   storage,
@@ -13,7 +13,7 @@ export const featureFarmApiAtom = atomWithStorage<typeof FLAG_FARM>(
 featureFarmApiAtom.onMount = (set) => {
   const params = new URL(window.location.href).searchParams
   const flag = params.get('use')
-  if (flag === 'farmApi') {
+  if (flag === 'gameApi') {
     set('api')
   }
 }

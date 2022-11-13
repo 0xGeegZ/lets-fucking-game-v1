@@ -1,6 +1,5 @@
 import { createContext, useEffect, useMemo, useReducer } from 'react'
 
-import { getBunnyFactoryContract } from 'utils/contractHelpers'
 import { useWeb3React } from '@pancakeswap/wagmi'
 import { CREATOR_EDGE_MAX, CREATOR_EDGE_MIN, HOUSE_EDGE_MAX, HOUSE_EDGE_MIN } from '../config'
 import { Actions, BNB, ContextType, NFT, State } from './types'
@@ -87,8 +86,7 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     let isSubscribed = true
 
     const fetchData = async () => {
-      const bunnyFactoryContract = getBunnyFactoryContract() // Replace with the contract of the game factory
-      const canMint = await bunnyFactoryContract.canMint(account)
+      // TODO LOAD INITIAL DATA (if needed)
 
       dispatch({ type: 'initialize', currentStep: 0 })
 

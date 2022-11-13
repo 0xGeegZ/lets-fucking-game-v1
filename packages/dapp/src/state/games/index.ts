@@ -1,35 +1,18 @@
-import { getFarmConfig } from '@pancakeswap/farms/constants'
-import { createFarmFetcher } from '@pancakeswap/farms'
-import { ChainId } from '@pancakeswap/sdk'
 import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit'
 import type {
   UnknownAsyncThunkFulfilledAction,
   UnknownAsyncThunkPendingAction,
   UnknownAsyncThunkRejectedAction,
 } from '@reduxjs/toolkit/dist/matchers'
-import BigNumber from 'bignumber.js'
-import masterchefABI from 'config/abi/masterchef.json'
+
 import { FARM_API } from 'config/constants/endpoints'
-import { getFarmsPriceHelperLpFiles } from 'config/constants/priceHelperLps'
 import stringify from 'fast-json-stable-stringify'
-import fromPairs from 'lodash/fromPairs'
 import type { AppState } from 'state'
-import { getMasterChefAddress } from 'utils/addressHelpers'
-import { getBalanceAmount } from 'utils/formatBalance'
-import multicall, { multicallv2 } from 'utils/multicall'
 import { chains } from 'utils/wagmi'
-import splitProxyFarms from 'views/Farms/components/YieldBooster/helpers/splitProxyFarms'
-import { verifyBscNetwork } from 'utils/verifyBscNetwork'
-import { GameFactory, GameV1Interface } from 'config/types/typechain'
+
 import { resetUserState } from '../global/actions'
 import { SerializedGame, SerializedGamesState } from '../types'
 import fetchGames from './fetchGames'
-import {
-  fetchGameUserAllowances,
-  fetchGameUserEarnings,
-  fetchGameUserStakedBalances,
-  fetchGameUserTokenBalances,
-} from './fetchGameUser'
 
 const fetchGamePublicDataPkg = async ({ chainId }): Promise<SerializedGame[]> => fetchGames(chainId)
 
@@ -47,13 +30,19 @@ export const fetchInitialGamesData = createAsyncThunk<SerializedGame[], { chainI
   'games/fetchInitialGamesData',
   async ({ chainId }) => {
     const games = await fetchGames(chainId)
+    console.log('🚀 ~ file: index.ts ~ line 33 ~ games', games)
     return games.map((game) => ({
       ...game,
       userData: {
-        allowance: '0',
-        tokenBalance: '0',
-        stakedBalance: '0',
-        earnings: '0',
+        isPlaying: false,
+        isCreator: false,
+        isAdmin: false,
+        wonAmount: 0,
+        nextFromRange: 0,
+        nextToRange: 0,
+        isWonLastGames: false,
+        isCanVoteSplitPot: false,
+        isInTimeRange: false,
       },
     }))
   },
@@ -107,7 +96,7 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
 )
 
 interface GameUserDataResponse {
-  pid: number
+  id: number
   allowance: string
   tokenBalance: string
   stakedBalance: string
@@ -142,7 +131,7 @@ interface GameUserDataResponse {
 
 //   const gameAllowances = userGameAllowances.map((gameAllowance, index) => {
 //     return {
-//       pid: games[index].pid,
+//       id: games[index].id,
 //       allowance: userGameAllowances[index],
 //       tokenBalance: userGameTokenBalances[index],
 //       stakedBalance: userStakedBalances[index],
@@ -170,7 +159,7 @@ interface GameUserDataResponse {
 
 //   const normalGameAllowances = userGameAllowances.map((_, index) => {
 //     return {
-//       pid: games[index].pid,
+//       id: games[index].id,
 //       allowance: userGameAllowances[index],
 //       tokenBalance: userGameTokenBalances[index],
 //       stakedBalance: userStakedBalances[index],
@@ -183,18 +172,18 @@ interface GameUserDataResponse {
 
 export const fetchGameUserDataAsync = createAsyncThunk<
   GameUserDataResponse[],
-  { account: string; pids: number[]; proxyAddress?: string; chainId: number },
+  { account: string; chainId: number },
   {
     state: AppState
   }
 >(
   'games/fetchGameUserDataAsync',
-  async ({ account, pids, proxyAddress, chainId }, config) => {
+  async ({ account, chainId }, config) => {
     // TODO Guigui load user data if needed
     console.log('fetchGameUserDataAsync')
     // const poolLength = config.getState().games.poolLength ?? (await fetchMasterChefGamePoolLength(ChainId.BSC))
     // const gamesConfig = await getFarmConfig(chainId)
-    // const gamesCanFetch = gamesConfig.filter((gameConfig) => pids.includes(gameConfig.pid))
+    // const gamesCanFetch = gamesConfig.filter((gameConfig) => ids.includes(gameConfig.id))
     // if (proxyAddress && gamesCanFetch?.length && verifyBscNetwork(chainId)) {
     //   const { normalFarms, farmsWithProxy } = splitProxyFarms(gamesCanFetch)
 
@@ -243,15 +232,22 @@ export const gamesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(resetUserState, (state) => {
+      console.log('🚀 ~ file: index.ts ~ line 252 ~ state.data=state.data.map ~ state.data', state.data)
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       state.data = state.data.map((game) => {
         return {
           ...game,
           userData: {
-            allowance: '0',
-            tokenBalance: '0',
-            stakedBalance: '0',
-            earnings: '0',
+            isPlaying: false,
+            isCreator: false,
+            isAdmin: false,
+            wonAmount: 0,
+            nextFromRange: 0,
+            nextToRange: 0,
+            isWonLastGames: false,
+            isCanVoteSplitPot: false,
+            isInTimeRange: false,
           },
         }
       })
@@ -268,9 +264,9 @@ export const gamesSlice = createSlice({
       // TODO GUIGUI
       // const [gamePayload, poolLength, regularCakePerBlock] = action.payload
       // console.log('🚀 ~ file: index.ts ~ line 321 ~ builder.addCase ~ gamePayload', gamePayload)
-      // const gamePayloadPidMap = fromPairs(gamePayload.map((gameData) => [gameData.pid, gameData]))
+      // const gamePayloadPidMap = fromPairs(gamePayload.map((gameData) => [gameData.id, gameData]))
       // state.data = state.data.map((game) => {
-      //   const liveGameData = gamePayloadPidMap[game.pid]
+      //   const liveGameData = gamePayloadPidMap[game.id]
       //   return { ...game, ...liveGameData }
       // })
       // state.poolLength = poolLength
@@ -280,7 +276,7 @@ export const gamesSlice = createSlice({
     // Update games with user data
     builder.addCase(fetchGameUserDataAsync.fulfilled, (state, action) => {
       // TODO GUIGUI
-      // const userDataMap = fromPairs(action.payload.map((userDataEl) => [userDataEl.pid, userDataEl]))
+      // const userDataMap = fromPairs(action.payload.map((userDataEl) => [userDataEl.id, userDataEl]))
       // state.data = state.data.map((game) => {
       //   const userDataEl = userDataMap[game.roundId]
       //   if (userDataEl) {

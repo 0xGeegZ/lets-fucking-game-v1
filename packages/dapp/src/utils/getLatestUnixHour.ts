@@ -1,4 +1,4 @@
-import { ONE_HOUR_SECONDS } from 'config/constants/info'
+import { ONE_HOUR_SECONDS } from 'config/constants'
 import { getUnixTime } from 'date-fns'
 
 // Returns unix timestamp rounded down to nearest hour

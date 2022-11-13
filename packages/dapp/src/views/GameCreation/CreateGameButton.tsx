@@ -2,19 +2,20 @@ import { useMemo } from 'react'
 import { useTranslation } from '@pancakeswap/localization'
 import { Button, AutoRenewIcon } from '@pancakeswap/uikit'
 import { useCreateGame } from 'views/GameCreation/hooks/useCreateGame'
-
+import { BNB, NFT } from './contexts/types'
 // TODO USE TYPECHAIN INTERFACE ??
 // TODO GUIGUI MOOVE IT TO TYPES
 interface CreateGameButtonProps {
-  currentStep: number
-  treasuryFee: number
-  creatorFee: number
-  registrationAmount: number
-  maxPlayers: number
-  playTimeRange: number
-  encodedCron: string
-  numberPlayersAllowedToWin: number
-  prizeType: NFT | BNB | 'STANDARD'
+  game: any
+  // currentStep: number
+  // treasuryFee: number
+  // creatorFee: number
+  // registrationAmount: number
+  // maxPlayers: number
+  // playTimeRange: number
+  // encodedCron: string
+  // numberPlayersAllowedToWin: number
+  // prizeType: NFT | BNB | 'STANDARD'
 }
 
 const CreateGameButton: React.FC<React.PropsWithChildren<CreateGameButtonProps>> = ({ game }) => {

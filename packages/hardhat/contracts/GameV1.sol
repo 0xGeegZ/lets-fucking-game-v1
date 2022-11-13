@@ -622,7 +622,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
     function getGameData() external view override returns (GameData memory gameData) {
         return
             GameData({
-                creator: creator,
+                id: id,
                 roundId: roundId,
                 name: name,
                 playerAddressesCount: playerAddresses.length,
@@ -632,7 +632,10 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
                 treasuryFee: treasuryFee,
                 creatorFee: creatorFee,
                 isPaused: paused(),
-                isInProgress: isInProgress
+                isInProgress: isInProgress,
+                creator: creator,
+                admin: owner,
+                encodedCron: encodedCron
             });
     }
 

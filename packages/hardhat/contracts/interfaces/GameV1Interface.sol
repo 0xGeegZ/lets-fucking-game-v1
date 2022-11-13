@@ -82,7 +82,7 @@ interface GameV1Interface {
     }
 
     struct GameData {
-        address creator;
+        uint256 id;
         uint256 roundId;
         bytes32 name;
         uint256 playerAddressesCount;
@@ -93,6 +93,9 @@ interface GameV1Interface {
         uint256 creatorFee;
         bool isPaused;
         bool isInProgress;
+        address creator;
+        address admin;
+        bytes encodedCron;
     }
 
     ///

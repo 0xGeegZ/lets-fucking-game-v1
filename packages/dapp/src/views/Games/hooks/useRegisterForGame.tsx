@@ -4,6 +4,8 @@ import { useToast } from '@pancakeswap/uikit'
 import useCatchTxError from 'hooks/useCatchTxError'
 import { ToastDescriptionWithTx } from 'components/Toast'
 import { useGameV1Contract } from 'hooks/useContract'
+import BigNumber from 'bignumber.js'
+import { BigNumber as EthersBigNumber } from '@ethersproject/bignumber'
 
 export const useRegisterForGame = (
   gameAddress: string,
@@ -17,9 +19,9 @@ export const useRegisterForGame = (
   const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
 
   const handleRegister = useCallback(async () => {
-    const receipt = await fetchWithCatchTxError(() =>
-      contract.registerForGame(registrationAmount.add(gameCreationAmount)),
-    )
+    const registerAmount = EthersBigNumber.from(registrationAmount).add(EthersBigNumber.from(gameCreationAmount))
+
+    const receipt = await fetchWithCatchTxError(() => contract.registerForGame({ value: registerAmount }))
 
     if (receipt?.status) {
       toastSuccess(
@@ -29,7 +31,7 @@ export const useRegisterForGame = (
         </ToastDescriptionWithTx>,
       )
     }
-  }, [fetchWithCatchTxError, contract, registrationAmount, gameCreationAmount, toastSuccess, t])
+  }, [registrationAmount, gameCreationAmount, fetchWithCatchTxError, contract, toastSuccess, t])
 
   return { isPending, handleRegister }
 }

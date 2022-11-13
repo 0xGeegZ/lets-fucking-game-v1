@@ -5,14 +5,13 @@ import { bscTokens } from '@pancakeswap/tokens'
 import { useTranslation } from '@pancakeswap/localization'
 import useIntersectionObserver from 'hooks/useIntersectionObserver'
 import { useEffect, useState } from 'react'
-import { usePriceCakeBusd } from 'state/farms/hooks'
+import { usePriceCakeBusd } from 'state/games/hooks'
 import styled from 'styled-components'
 import { formatBigNumber, formatLocalisedCompactNumber } from 'utils/formatBalance'
 import { multicallv2 } from 'utils/multicall'
 import useSWR from 'swr'
 import { SLOW_INTERVAL } from 'config/constants'
 import { BigNumber } from '@ethersproject/bignumber'
-import { getCakeVaultV2Contract } from 'utils/contractHelpers'
 
 const StyledColumn = styled(Flex)<{ noMobileBorder?: boolean; noDesktopBorder?: boolean }>`
   flex-direction: column;
@@ -73,7 +72,7 @@ const emissionsPerBlock = 11.16
  * https://bscscan.com/tx/0xd5ffea4d9925d2f79249a4ce05efd4459ed179152ea5072a2df73cd4b9e88ba7
  */
 const planetFinanceBurnedTokensWei = BigNumber.from('637407922445268000000000')
-const cakeVault = getCakeVaultV2Contract()
+// const cakeVault = getCakeVaultV2Contract()
 
 const CakeDataRow = () => {
   const { t } = useTranslation()
@@ -102,7 +101,7 @@ const CakeDataRow = () => {
             requireSuccess: false,
           },
         }),
-        cakeVault.totalLockedAmount(),
+        BigNumber.from('10000000000'),
       ])
       const [totalSupply, burned] = tokenDataResultRaw.flat()
 

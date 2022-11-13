@@ -32,6 +32,7 @@ import {
   updateUserPoolsViewMode,
   ViewMode,
   updateUserFarmsViewMode,
+  updateUserGamesViewMode,
   updateUserPredictionChartDisclaimerShow,
   updateUserPredictionChainlinkChartDisclaimerShow,
   updateUserPredictionAcceptedRisk,
@@ -252,7 +253,7 @@ export function useUserGamesViewMode(): [ViewMode, (viewMode: ViewMode) => void]
 
   const setUserGamesViewMode = useCallback(
     (viewMode: ViewMode) => {
-      dispatch(updateUserFarmsViewMode({ userGamesViewMode: viewMode }))
+      dispatch(updateUserGamesViewMode({ userGamesViewMode: viewMode }))
     },
     [dispatch],
   )

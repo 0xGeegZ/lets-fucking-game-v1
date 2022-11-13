@@ -10,14 +10,12 @@ import styled from 'styled-components'
 import FlexLayout from 'components/Layout/Flex'
 import Page from 'components/Layout/Page'
 import { useGames, usePollGamesWithUserData, usePriceCakeBusd } from 'state/games/hooks'
-import { useCakeVaultUserData } from 'state/pools/hooks'
 import useIntersectionObserver from 'hooks/useIntersectionObserver'
 import { DeserializedGame } from 'state/types'
 import { useTranslation } from '@pancakeswap/localization'
-import { getFarmApr } from 'utils/apr'
 import orderBy from 'lodash/orderBy'
 import { latinise } from 'utils/latinise'
-import { useUserFarmStakedOnly, useUserGamesViewMode } from 'state/user/hooks'
+import { useUserGamesViewMode } from 'state/user/hooks'
 import { ViewMode } from 'state/user/actions'
 import { useRouter } from 'next/router'
 import PageHeader from 'components/PageHeader'
@@ -26,9 +24,7 @@ import Select, { OptionProps } from 'components/Select/Select'
 import Loading from 'components/Loading'
 import ToggleView from 'components/ToggleView/ToggleView'
 import ScrollToTopButton from 'components/ScrollToTopButton/ScrollToTopButtonV2'
-import Table from './components/GameTable/GameTable'
 import GameTabButtons from './components/GameTabButtons'
-import { GameWithStakedValue } from './components/types'
 import { BCakeBoosterCard } from './components/BCakeBoosterCard'
 
 const ControlContainer = styled.div`
@@ -161,9 +157,10 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { observerRef, isIntersecting } = useIntersectionObserver()
   const chosenGamesLength = useRef(0)
 
-  const isArchived = pathname.includes('archived')
+  const isDeleted = pathname.includes('archived')
+  const isPlayingOnly = pathname.includes('history')
   const isInactive = pathname.includes('history')
-  const isActive = !isInactive && !isArchived
+  const isActive = !isInactive && !isDeleted
 
   // useCakeVaultUserData()
 
@@ -173,67 +170,34 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   // Connected users should see loading indicator until first userData has loaded
   const userDataReady = !account || (!!account && userDataLoaded)
 
-  const [stakedOnly, setStakedOnly] = useUserFarmStakedOnly(isActive)
+  const [isNotFullOnly, setStakedOnly] = useState(isActive)
   const [boostedOnly, setBoostedOnly] = useState(false)
 
-  const activeGames = games.filter((game) => !game.contractPaused)
-  const inactiveGames = games.filter((game) => game.contractPaused)
-  const archivedGames = games
+  const activeGames = games.filter((game) => !game.isDeleted)
+  const inactiveGames = games.filter((game) => !game.isInProgress)
 
-  const stakedOnlyGames = activeGames.filter(
-    (game) =>
-      game.userData &&
-      (new BigNumber(game.userData.stakedBalance).isGreaterThan(0) ||
-        new BigNumber(game.userData.proxy?.stakedBalance).isGreaterThan(0)),
-  )
+  const playingOnlyGames = games.filter((game) => game.userData && game.userData.isPlaying)
 
-  const stakedInactiveGames = inactiveGames.filter(
-    (game) =>
-      game.userData &&
-      (new BigNumber(game.userData.stakedBalance).isGreaterThan(0) ||
-        new BigNumber(game.userData.proxy?.stakedBalance).isGreaterThan(0)),
-  )
+  const deletedGames = games.filter((game) => game.isDeleted)
 
-  const stakedArchivedGames = archivedGames.filter(
-    (game) =>
-      game.userData &&
-      (new BigNumber(game.userData.stakedBalance).isGreaterThan(0) ||
-        new BigNumber(game.userData.proxy?.stakedBalance).isGreaterThan(0)),
-  )
+  // const archivedGames = archivedGames.filter((game) => game.userData && false)
 
-  // TODO update farmList with GameList
+  // TODO update gameList with GameList
   // TODO GUIGUI UPDATE GameWithStakedValue INTERFACE TO GAME INTERFACE
-  const farmsList = useCallback(
-    (farmsToDisplay: DeserializedGame[]): GameWithStakedValue[] => {
-      let farmsToDisplayWithAPR: GameWithStakedValue[] = farmsToDisplay.map((game) => {
+  const gamesList = useCallback(
+    (gamesToDisplay: DeserializedGame[]): DeserializedGame[] => {
+      let gamesToDisplayWithAPR: DeserializedGame[] = gamesToDisplay.map((game) => {
         return game
-        // if (!game.lpTotalInQuoteToken || !game.quoteTokenPriceBusd) {
-        //   return game
-        // }
-
-        // const totalLiquidity = new BigNumber(game.lpTotalInQuoteToken).times(game.quoteTokenPriceBusd)
-        // const { cakeRewardsApr, lpRewardsApr } = isActive
-        //   ? getFarmApr(
-        //       chainId,
-        //       new BigNumber(game.poolWeight),
-        //       cakePrice,
-        //       totalLiquidity,
-        //       game.lpAddress,
-        //       regularCakePerBlock,
-        //     )
-        //   : { cakeRewardsApr: 0, lpRewardsApr: 0 }
-
-        // return { ...game, apr: cakeRewardsApr, lpRewardsApr, liquidity: totalLiquidity }
       })
 
       if (query) {
         const lowercaseQuery = latinise(query.toLowerCase())
-        farmsToDisplayWithAPR = farmsToDisplayWithAPR.filter((game: GameWithStakedValue) => {
-          return latinise(game.gameName.toLowerCase()).includes(lowercaseQuery)
+        gamesToDisplayWithAPR = gamesToDisplayWithAPR.filter((game: DeserializedGame) => {
+          return latinise(game.name.toLowerCase()).includes(lowercaseQuery)
         })
       }
 
-      return farmsToDisplayWithAPR
+      return gamesToDisplayWithAPR
     },
     [query],
   )
@@ -246,14 +210,18 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   const chosenGames = useMemo(() => {
     let chosenFs = []
+
     if (isActive) {
-      chosenFs = stakedOnly ? farmsList(stakedOnlyGames) : farmsList(activeGames)
+      chosenFs = gamesList(activeGames)
     }
     if (isInactive) {
-      chosenFs = stakedOnly ? farmsList(stakedInactiveGames) : farmsList(inactiveGames)
+      chosenFs = gamesList(inactiveGames)
     }
-    if (isArchived) {
-      chosenFs = stakedOnly ? farmsList(stakedArchivedGames) : farmsList(archivedGames)
+    if (isDeleted) {
+      chosenFs = gamesList(deletedGames)
+    }
+    if (isPlayingOnly) {
+      chosenFs = gamesList(playingOnlyGames)
     }
 
     if (boostedOnly) {
@@ -262,41 +230,39 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     return chosenFs
   }, [
-    activeGames,
-    farmsList,
-    inactiveGames,
-    archivedGames,
     isActive,
     isInactive,
-    isArchived,
-    stakedArchivedGames,
-    stakedInactiveGames,
-    stakedOnly,
-    stakedOnlyGames,
+    isDeleted,
+    isPlayingOnly,
     boostedOnly,
+    gamesList,
+    activeGames,
+    inactiveGames,
+    deletedGames,
+    playingOnlyGames,
   ])
 
   const chosenGamesMemoized = useMemo(() => {
-    const sortGames = (gamesToSort: GameWithStakedValue[]): GameWithStakedValue[] => {
+    const sortGames = (gamesToSort: DeserializedGame[]): DeserializedGame[] => {
       switch (sortOption) {
-        case 'apr':
-          return orderBy(gamesToSort, (game: GameWithStakedValue) => game.apr + game.lpRewardsApr, 'desc')
-        case 'multiplier':
+        case 'hot':
+          return orderBy(gamesToSort, (game: DeserializedGame) => game.playerAddressesCount, 'desc')
+        case 'amount':
           return orderBy(
             gamesToSort,
-            (game: GameWithStakedValue) => (game.registrationAmount ? Number(game.registrationAmount) : 0),
+            (game: DeserializedGame) => (game.registrationAmount ? Number(game.registrationAmount) : 0),
             'desc',
           )
         case 'earned':
           return orderBy(
             gamesToSort,
-            (game: GameWithStakedValue) => (game.userData ? Number(game.userData.earnings) : 0),
+            (game: DeserializedGame) => (game.userData ? Number(game.userData.wonAmount) : 0),
             'desc',
           )
-        case 'liquidity':
-          return orderBy(gamesToSort, (game: GameWithStakedValue) => Number(game.liquidity), 'desc')
+        case 'playing':
+          return orderBy(gamesToSort, (game: DeserializedGame) => Number(game.userData.isPlaying), 'desc')
         case 'latest':
-          return orderBy(gamesToSort, (game: GameWithStakedValue) => Number(game.roundId), 'desc')
+          return orderBy(gamesToSort, (game: DeserializedGame) => Number(game.roundId), 'desc')
         default:
           return gamesToSort
       }
@@ -309,11 +275,11 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     if (isIntersecting) {
-      setNumberOfGamesVisible((farmsCurrentlyVisible) => {
-        if (farmsCurrentlyVisible <= chosenGamesLength.current) {
-          return farmsCurrentlyVisible + NUMBER_OF_FARMS_VISIBLE
+      setNumberOfGamesVisible((gamesCurrentlyVisible) => {
+        if (gamesCurrentlyVisible <= chosenGamesLength.current) {
+          return gamesCurrentlyVisible + NUMBER_OF_FARMS_VISIBLE
         }
-        return farmsCurrentlyVisible
+        return gamesCurrentlyVisible
       })
     }
   }, [isIntersecting])
@@ -355,23 +321,23 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
             {/* <ToggleView idPrefix="clickGame" viewMode={viewMode} onToggle={setViewMode} /> */}
             <ToggleWrapper>
               <Toggle
-                id="staked-only-farms"
-                checked={stakedOnly}
-                onChange={() => setStakedOnly(!stakedOnly)}
+                id="staked-only-games"
+                checked={isNotFullOnly}
+                onChange={() => setStakedOnly(!isNotFullOnly)}
                 scale="sm"
               />
               <Text> {t('Not full only')}</Text>
             </ToggleWrapper>
             <ToggleWrapper>
               <Toggle
-                id="staked-only-farms"
+                id="staked-only-games"
                 checked={boostedOnly}
                 onChange={() => setBoostedOnly((prev) => !prev)}
                 scale="sm"
               />
               <Text> {t('Booster Available')}</Text>
             </ToggleWrapper>
-            <GameTabButtons hasStakeInFinishedGames={stakedInactiveGames.length > 0} />
+            <GameTabButtons hasStakeInFinishedGames={deletedGames.length > 0} />
           </ViewControls>
           <FilterContainer>
             <LabelWrapper>
@@ -404,7 +370,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
             </LabelWrapper>
           </FilterContainer>
         </ControlContainer>
-        {isInactive && (
+        {/* {isInactive && (
           <FinishedTextContainer>
             <Text fontSize={['16px', null, '20px']} color="failure" pr="4px">
               {t("Don't see the game you are staking?")}
@@ -420,19 +386,21 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
                 external
                 color="failure"
                 fontSize={['16px', null, '20px']}
-                href="https://v1-farms.pancakeswap.finance/games/history"
+                href="https://v1-games.pancakeswap.finance/games/history"
               >
-                {t('check out v1 farms')}.
+                {t('check out v1 games')}.
               </FinishedTextLink>
             </Flex>
           </FinishedTextContainer>
-        )}
+        )} */}
         {/* {viewMode === ViewMode.TABLE ? (
-          <Table farms={chosenGamesMemoized} cakePrice={cakePrice} userDataReady={userDataReady} />
+          <Table games={chosenGamesMemoized} cakePrice={cakePrice} userDataReady={userDataReady} />
         ) : ( */}
         <FlexLayout>{children}</FlexLayout>
         {/* )} */}
-        {account && !userDataLoaded && stakedOnly && (
+
+        {/* // TODO GUIGUI UPDATE CONDITION */}
+        {account && !userDataLoaded && isNotFullOnly && (
           <Flex justifyContent="center">
             <Loading />
           </Flex>

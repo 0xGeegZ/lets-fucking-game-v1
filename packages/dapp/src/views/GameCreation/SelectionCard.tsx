@@ -6,7 +6,7 @@ interface SelectionCardProps {
   value: string | number
   isChecked?: boolean
   onChange: (val: any) => void
-  image: string
+  image: any
   disabled?: boolean
 }
 

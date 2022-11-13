@@ -4,24 +4,21 @@ import erc20ABI from 'config/abi/erc20.json'
 import masterchefABI from 'config/abi/masterchef.json'
 import nonBscVault from 'config/abi/nonBscVault.json'
 import multicall, { multicallv2 } from 'utils/multicall'
-import { getMasterChefAddress, getNonBscVaultAddress } from 'utils/addressHelpers'
-import { SerializedFarmConfig } from 'config/constants/types'
 import { verifyBscNetwork } from 'utils/verifyBscNetwork'
-import { getCrossFarmingReceiverContract } from 'utils/contractHelpers'
-import { farmFetcher } from '../../../apis/farms/src/helper'
+import { isChainTestnet } from 'utils/wagmi'
+import { SerializedGame } from '../types'
 
 export const fetchGameUserAllowances = async (
   account: string,
-  gamesToFetch: SerializedFarmConfig[],
+  gamesToFetch: SerializedGame[],
   chainId: number,
   proxyAddress?: string,
 ) => {
   const isBscNetwork = verifyBscNetwork(chainId)
-  const masterChefAddress = isBscNetwork ? getMasterChefAddress(chainId) : getNonBscVaultAddress(chainId)
 
   const calls = gamesToFetch.map((game) => {
-    const lpContractAddress = game.lpAddress
-    return { address: lpContractAddress, name: 'allowance', params: [account, proxyAddress || masterChefAddress] }
+    const contractAddress = game.address
+    return { address: contractAddress, name: 'allowance', params: [account, proxyAddress] }
   })
 
   const rawLpAllowances = await multicall<BigNumber[]>(erc20ABI, calls, chainId)
@@ -32,15 +29,11 @@ export const fetchGameUserAllowances = async (
   return parsedLpAllowances
 }
 
-export const fetchGameUserTokenBalances = async (
-  account: string,
-  gamesToFetch: SerializedFarmConfig[],
-  chainId: number,
-) => {
+export const fetchGameUserTokenBalances = async (account: string, gamesToFetch: SerializedGame[], chainId: number) => {
   const calls = gamesToFetch.map((game) => {
-    const lpContractAddress = game.lpAddress
+    const contractAddress = game.address
     return {
-      address: lpContractAddress,
+      address: contractAddress,
       name: 'balanceOf',
       params: [account],
     }
@@ -53,19 +46,14 @@ export const fetchGameUserTokenBalances = async (
   return parsedTokenBalances
 }
 
-export const fetchGameUserStakedBalances = async (
-  account: string,
-  gamesToFetch: SerializedFarmConfig[],
-  chainId: number,
-) => {
+export const fetchGameUserStakedBalances = async (account: string, gamesToFetch: SerializedGame[], chainId: number) => {
   const isBscNetwork = verifyBscNetwork(chainId)
-  const masterChefAddress = isBscNetwork ? getMasterChefAddress(chainId) : getNonBscVaultAddress(chainId)
 
   const calls = gamesToFetch.map((game) => {
     return {
-      address: masterChefAddress,
+      address: account,
       name: 'userInfo',
-      params: [game.vaultPid ?? game.pid, account],
+      params: [game.id],
     }
   })
 
@@ -81,17 +69,16 @@ export const fetchGameUserStakedBalances = async (
   return parsedStakedBalances
 }
 
-export const fetchGameUserEarnings = async (account: string, gamesToFetch: SerializedFarmConfig[], chainId: number) => {
+export const fetchGameUserEarnings = async (account: string, gamesToFetch: SerializedGame[], chainId: number) => {
   const isBscNetwork = verifyBscNetwork(chainId)
-  const multiCallChainId = farmFetcher.isTestnet(chainId) ? ChainId.BSC_TESTNET : ChainId.BSC
-  const userAddress = isBscNetwork ? account : await fetchCProxyAddress(account, multiCallChainId)
-  const masterChefAddress = getMasterChefAddress(multiCallChainId)
+  const multiCallChainId = isChainTestnet(chainId) ? ChainId.BSC_TESTNET : ChainId.BSC
+  const userAddress = account
 
   const calls = gamesToFetch.map((game) => {
     return {
-      address: masterChefAddress,
+      address: account,
       name: 'pendingCake',
-      params: [game.pid, userAddress],
+      params: [game.id, userAddress],
     }
   })
 
@@ -100,15 +87,4 @@ export const fetchGameUserEarnings = async (account: string, gamesToFetch: Seria
     return new BigNumber(earnings).toJSON()
   })
   return parsedEarnings
-}
-
-export const fetchCProxyAddress = async (address: string, chainId: number) => {
-  try {
-    const crossGamingAddress = getCrossFarmingReceiverContract(null, chainId)
-    const cProxyAddress = await crossGamingAddress.cProxy(address)
-    return cProxyAddress.toString()
-  } catch (error) {
-    console.error('Failed Fetch CProxy Address', error)
-    return address
-  }
 }

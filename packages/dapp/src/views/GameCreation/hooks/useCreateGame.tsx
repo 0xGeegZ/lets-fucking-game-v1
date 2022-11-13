@@ -12,7 +12,7 @@ export const useCreateGame = (game) => {
   const { t } = useTranslation()
   const { toastSuccess } = useToast()
   const contract = useGameFactoryV1Contract()
-  const { actions } = useGameContext()
+  const { actions, currentStep } = useGameContext()
 
   const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
 
@@ -70,7 +70,7 @@ export const useCreateGame = (game) => {
           {t('You have successfully claimed your prize.')}
         </ToastDescriptionWithTx>,
       )
-      actions.nextStep()
+      actions.nextStep(currentStep + 1)
     }
   }, [
     fetchWithCatchTxError,
@@ -87,6 +87,7 @@ export const useCreateGame = (game) => {
     toastSuccess,
     t,
     actions,
+    currentStep,
   ])
 
   return { isPending, handleCreateGame }

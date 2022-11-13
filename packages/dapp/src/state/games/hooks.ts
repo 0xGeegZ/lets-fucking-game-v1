@@ -7,46 +7,44 @@ import { useSelector } from 'react-redux'
 import { useAppDispatch } from 'state'
 import useSWRImmutable from 'swr/immutable'
 import { BIG_ZERO } from 'utils/bigNumber'
-import { useBCakeProxyContractAddress } from 'views/Games/hooks/useBCakeProxyContractAddress'
-import { getMasterchefContract } from 'utils/contractHelpers'
+
 import { useFastRefreshEffect } from 'hooks/useRefreshEffect'
 import { featureFarmApiAtom, useFeatureFlag } from 'hooks/useFeatureFlag'
-import { getFarmConfig } from '@pancakeswap/farms/constants'
 import { fetchGamesPublicDataAsync, fetchGameUserDataAsync, fetchInitialGamesData } from '.'
 import { DeserializedGame, DeserializedGamesState, DeserializedGameUserData, State } from '../types'
 import {
-  gameFromLpSymbolSelector,
+  // gameFromLpSymbolSelector,
   gameSelector,
-  // makeBusdPriceFromPidSelector,
-  makeGameFromPidSelector,
+  // makeBusdPriceFromIdSelector,
+  makeGameFromIdSelector,
   // makeLpTokenPriceFromLpSymbolSelector,
-  makeUserGameFromPidSelector,
+  makeUserGameFromIdSelector,
 } from './selectors'
 
 export function useGamesLength() {
   const { chainId } = useActiveWeb3React()
   return useSWRImmutable(chainId ? ['gamesLength', chainId] : null, async () => {
-    const mc = getMasterchefContract(undefined, chainId)
-    return (await mc.poolLength()).toNumber()
+    // TODO GUIGUI UPDATE GAMES LENGHT
+    // const mc = getMasterchefContract(undefined, chainId)
+    // return (await mc.poolLength()).toNumber()
+    return 1
   })
 }
 
 export const usePollGamesWithUserData = () => {
   const dispatch = useAppDispatch()
   const { account, chainId } = useActiveWeb3React()
-  const {
-    proxyAddress,
-    proxyCreated,
-    isLoading: isProxyContractLoading,
-  } = useBCakeProxyContractAddress(account, chainId)
+  // const {
+  //   proxyAddress,
+  //   proxyCreated,
+  //   isLoading: isProxyContractLoading,
+  // } = useBCakeProxyContractAddress(account, chainId)
+
   const gameFlag = useFeatureFlag(featureFarmApiAtom)
 
   useSWRImmutable(
     chainId ? ['publicGameData', chainId] : null,
     async () => {
-      const gamesConfig = await getFarmConfig(chainId)
-      const pids = gamesConfig.map((gameToFetch) => gameToFetch.pid)
-
       dispatch(fetchGamesPublicDataAsync({ chainId, flag: gameFlag }))
     },
     {
@@ -54,35 +52,18 @@ export const usePollGamesWithUserData = () => {
     },
   )
 
-  const name = proxyCreated
-    ? ['gamesWithUserData', account, proxyAddress, chainId]
-    : ['gamesWithUserData', account, chainId]
+  const name = ['gamesWithUserData', account, chainId]
 
   useSWRImmutable(
-    account && chainId && !isProxyContractLoading ? name : null,
+    account && chainId ? name : null,
     async () => {
-      const gamesConfig = await getFarmConfig(chainId)
-      const pids = gamesConfig.map((gameToFetch) => gameToFetch.pid)
-      const params = proxyCreated ? { account, pids, proxyAddress, chainId } : { account, pids, chainId }
-
+      const params = { account, chainId }
       dispatch(fetchGameUserDataAsync(params))
     },
     {
       refreshInterval: SLOW_INTERVAL,
     },
   )
-}
-
-/**
- * Fetches the "core" game data used globally
- * 2 = CAKE-BNB LP
- * 3 = BUSD-BNB LP
- */
-const coreGamePIDs = {
-  56: [2, 3],
-  97: [4, 10],
-  5: [13, 11],
-  1: [124, 125],
 }
 
 export const usePollCoreGameData = () => {
@@ -111,25 +92,20 @@ export const useGamesPoolLength = (): number => {
   return useSelector((state: State) => state.games.data.length)
 }
 
-export const useGameFromPid = (pid: number): DeserializedGame => {
-  const gameFromPid = useMemo(() => makeGameFromPidSelector(pid), [pid])
-  return useSelector(gameFromPid)
+export const useGameFromId = (id: number): DeserializedGame => {
+  const gameFromId = useMemo(() => makeGameFromIdSelector(id), [id])
+  return useSelector(gameFromId)
 }
 
-export const useGameFromLpSymbol = (lpSymbol: string): DeserializedGame => {
-  const gameFromLpSymbol = useMemo(() => gameFromLpSymbolSelector(lpSymbol), [lpSymbol])
-  return useSelector(gameFromLpSymbol)
+export const useGameUser = (id): DeserializedGameUserData => {
+  const gameFromIdUser = useMemo(() => makeUserGameFromIdSelector(id), [id])
+  return useSelector(gameFromIdUser)
 }
 
-export const useGameUser = (pid): DeserializedGameUserData => {
-  const gameFromPidUser = useMemo(() => makeUserGameFromPidSelector(pid), [pid])
-  return useSelector(gameFromPidUser)
-}
-
-// Return the base token price for a game, from a given pid
-// export const useBusdPriceFromPid = (pid: number): BigNumber => {
-//   const busdPriceFromPid = useMemo(() => makeBusdPriceFromPidSelector(pid), [pid])
-//   return useSelector(busdPriceFromPid)
+// Return the base token price for a game, from a given id
+// export const useBusdPriceFromId = (id: number): BigNumber => {
+//   const busdPriceFromId = useMemo(() => makeBusdPriceFromIdSelector(id), [id])
+//   return useSelector(busdPriceFromId)
 // }
 
 // export const useLpTokenPrice = (symbol: string) => {

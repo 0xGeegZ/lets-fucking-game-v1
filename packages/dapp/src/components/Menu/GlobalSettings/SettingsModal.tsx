@@ -10,7 +10,6 @@ import {
   useZapModeManager,
 } from 'state/user/hooks'
 import { SUPPORT_ZAP } from 'config/constants/supportChains'
-import { useSwapActionHandlers } from 'state/swap/useSwapActionHandlers'
 import { useActiveChainId } from 'hooks/useActiveChainId'
 import { useTranslation } from '@pancakeswap/localization'
 import useTheme from 'hooks/useTheme'
@@ -60,7 +59,6 @@ const SettingsModal: React.FC<React.PropsWithChildren<InjectedModalProps>> = ({ 
   const [audioPlay, toggleSetAudioMode] = useAudioModeManager()
   const [zapMode, toggleZapMode] = useZapModeManager()
   const [subgraphHealth, setSubgraphHealth] = useSubgraphHealthIndicatorManager()
-  const { onChangeRecipient } = useSwapActionHandlers()
   const { chainId } = useActiveChainId()
 
   const { t } = useTranslation()
@@ -74,18 +72,6 @@ const SettingsModal: React.FC<React.PropsWithChildren<InjectedModalProps>> = ({ 
         setShowExpertModeAcknowledgement={setShowExpertModeAcknowledgement}
       />
     )
-  }
-
-  const handleExpertModeToggle = () => {
-    if (expertMode) {
-      onChangeRecipient(null)
-      toggleExpertMode()
-    } else if (!showExpertModeAcknowledgement) {
-      onChangeRecipient(null)
-      toggleExpertMode()
-    } else {
-      setShowConfirmExpertModal(true)
-    }
   }
 
   return (
@@ -121,89 +107,6 @@ const SettingsModal: React.FC<React.PropsWithChildren<InjectedModalProps>> = ({ 
                   }}
                 />
               </Flex> */}
-            </Flex>
-          </>
-        )}
-        {mode === SettingsMode.SWAP_LIQUIDITY && (
-          <>
-            <Flex pt="3px" flexDirection="column">
-              <Text bold textTransform="uppercase" fontSize="18px" color="secondary" mb="24px">
-                {t('Swaps & Liquidity')}
-              </Text>
-              <TransactionSettings />
-            </Flex>
-            {SUPPORT_ZAP.includes(chainId) && (
-              <Flex justifyContent="space-between" alignItems="center" mb="24px">
-                <Flex alignItems="center">
-                  <Text>{t('Zap (Beta)')}</Text>
-                  <QuestionHelper
-                    text={
-                      <Box>
-                        <Text>
-                          {t(
-                            'Zap enables simple liquidity provision. Add liquidity with one token and one click, without manual swapping or token balancing.',
-                          )}
-                        </Text>
-                        <Text>
-                          {t(
-                            'If you experience any issue when adding or removing liquidity, please disable Zap and retry.',
-                          )}
-                        </Text>
-                      </Box>
-                    }
-                    placement="top-start"
-                    ml="4px"
-                  />
-                </Flex>
-                <Toggle
-                  checked={zapMode}
-                  scale="md"
-                  onChange={() => {
-                    toggleZapMode(!zapMode)
-                  }}
-                />
-              </Flex>
-            )}
-            <Flex justifyContent="space-between" alignItems="center" mb="24px">
-              <Flex alignItems="center">
-                <Text>{t('Expert Mode')}</Text>
-                <QuestionHelper
-                  text={t('Bypasses confirmation modals and allows high slippage trades. Use at your own risk.')}
-                  placement="top-start"
-                  ml="4px"
-                />
-              </Flex>
-              <Toggle
-                id="toggle-expert-mode-button"
-                scale="md"
-                checked={expertMode}
-                onChange={handleExpertModeToggle}
-              />
-            </Flex>
-            <Flex justifyContent="space-between" alignItems="center" mb="24px">
-              <Flex alignItems="center">
-                <Text>{t('Disable Multihops')}</Text>
-                <QuestionHelper text={t('Restricts swaps to direct pairs only.')} placement="top-start" ml="4px" />
-              </Flex>
-              <Toggle
-                id="toggle-disable-multihop-button"
-                checked={singleHopOnly}
-                scale="md"
-                onChange={() => {
-                  setSingleHopOnly(!singleHopOnly)
-                }}
-              />
-            </Flex>
-            <Flex justifyContent="space-between" alignItems="center" mb="24px">
-              <Flex alignItems="center">
-                <Text>{t('Flippy sounds')}</Text>
-                <QuestionHelper
-                  text={t('Fun sounds to make a truly immersive pancake-flipping trading experience')}
-                  placement="top-start"
-                  ml="4px"
-                />
-              </Flex>
-              <PancakeToggle checked={audioPlay} onChange={toggleSetAudioMode} scale="md" />
             </Flex>
           </>
         )}

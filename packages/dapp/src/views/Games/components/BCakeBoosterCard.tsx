@@ -18,10 +18,6 @@ import { useTranslation } from '@pancakeswap/localization'
 import Image from 'next/image'
 import NextLink from 'next/link'
 import styled, { useTheme } from 'styled-components'
-import CreateProxyButton from 'views/Farms/components/YieldBooster/components/CreateProxyButton'
-import { useBCakeProxyContractAddress } from '../hooks/useBCakeProxyContractAddress'
-import { useUserBoosterStatus } from '../hooks/useUserBoosterStatus'
-import { useUserLockedCakeStatus } from '../hooks/useUserLockedCakeStatus'
 import boosterCardImage from '../images/boosterCardImage.png'
 
 export const CardWrapper = styled.div`
@@ -124,24 +120,22 @@ export const BCakeBoosterCard = () => {
 const CardContent: React.FC = () => {
   const { t } = useTranslation()
   const { account, chainId } = useActiveWeb3React()
-  const { proxyCreated, refreshProxyAddress } = useBCakeProxyContractAddress(account, chainId)
-  const { maxBoostCounts, remainingCounts } = useUserBoosterStatus(account)
-  const { locked, lockedEnd } = useUserLockedCakeStatus()
+
   const theme = useTheme()
 
-  // if (!account)
-  //   return (
-  //     <Box>
-  //       <Text color="textSubtle" fontSize={12} bold>
-  //         {t('Connect wallet to view booster')}
-  //       </Text>
-  //       <Text color="textSubtle" fontSize={12} mb="16px">
-  //         {t('An active fixed-term CAKE staking position is required for activating game yield boosters.')}
-  //       </Text>
-  //       <ConnectWalletButton width="100%" style={{ backgroundColor: theme.colors.textSubtle }} />
-  //     </Box>
-  //   )
-  // if (!locked)
+  if (!account)
+    return (
+      <Box>
+        <Text color="textSubtle" fontSize={12} bold>
+          {t('Connect wallet to create a new game')}
+        </Text>
+        <Text color="textSubtle" fontSize={12} mb="16px">
+          {t('Game will be associated to your address as you can win some fee')}
+        </Text>
+        <ConnectWalletButton width="100%" style={{ backgroundColor: theme.colors.textSubtle }} />
+      </Box>
+    )
+
   return (
     <Box width="100%">
       <Text color="textSubtle" fontSize={12} bold>
@@ -157,68 +151,4 @@ const CardContent: React.FC = () => {
       </NextLink>
     </Box>
   )
-  // if (lockedEnd === '0' || new Date() > new Date(parseInt(lockedEnd) * 1000))
-  //   return (
-  //     <Box>
-  //       <Text color="textSubtle" fontSize={12} bold>
-  //         {t('Locked staking is ended')}
-  //       </Text>
-  //       <Text color="textSubtle" fontSize={12} mb="16px">
-  //         {t('An active fixed-term CAKE staking position is required for activating game yield boosters.')}
-  //       </Text>
-  //       <NextLink href="/pools" passHref>
-  //         <Button as="a" width="100%" style={{ backgroundColor: theme.colors.textSubtle }}>
-  //           {t('Go to Pool')}
-  //         </Button>
-  //       </NextLink>
-  //     </Box>
-  //   )
-  // if (!proxyCreated) {
-  //   return (
-  //     <Box>
-  //       <Text color="textSubtle" fontSize={12} bold>
-  //         {t('Available Yield Booster')}
-  //       </Text>
-  //       <Text color="textSubtle" fontSize={12} mb="16px">
-  //         {t('A one-time setup is required for enabling game yield boosters.')}
-  //       </Text>
-  //       <CreateProxyButton onDone={refreshProxyAddress} style={{ backgroundColor: theme.colors.textSubtle }} />
-  //     </Box>
-  //   )
-  // }
-  // if (remainingCounts > 0)
-  //   return (
-  //     <Box>
-  //       <Flex justifyContent="space-between" alignItems="center" mb="5px">
-  //         <Text color="secondary" fontSize={12} bold textTransform="uppercase">
-  //           {t('Available Yield Booster')}
-  //         </Text>
-  //         <Text color="secondary" fontSize={16} bold textTransform="uppercase">
-  //           {remainingCounts}/{maxBoostCounts}
-  //         </Text>
-  //       </Flex>
-
-  //       <Text color="textSubtle" fontSize={12}>
-  //         {t('You will be able to activate the yield booster on an additional %num% game(s).', {
-  //           num: remainingCounts,
-  //         })}
-  //       </Text>
-  //     </Box>
-  //   )
-  // return (
-  //   <Box>
-  //     <Flex justifyContent="space-between">
-  //       <Text color="secondary" fontSize={12} bold textTransform="uppercase">
-  //         {t('Available Yield Booster')}
-  //       </Text>
-  //       <Text color="secondary" fontSize={12} bold textTransform="uppercase">
-  //         0
-  //       </Text>
-  //     </Flex>
-
-  //     <Text color="textSubtle" fontSize={12}>
-  //       {t('To activate yield boosters on additional games, unset yield boosters on some currently boosted games.')}
-  //     </Text>
-  //   </Box>
-  // )
 }

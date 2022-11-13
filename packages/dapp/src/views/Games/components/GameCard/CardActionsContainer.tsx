@@ -3,17 +3,18 @@ import { Flex, Heading, Skeleton, Text } from '@pancakeswap/uikit'
 import cronstrue from 'cronstrue'
 
 import BigNumber from 'bignumber.js'
-import { BigNumber as EthersBigNumber } from '@ethersproject/bignumber'
 
 import ConnectWalletButton from 'components/ConnectWalletButton'
 import { useMemo, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import moment from 'moment'
-import ClaimButton from './ClaimButton'
-import PlayButton from './PlayButton'
-import RegisterButton from './RegisterButton'
-import VoteSplitButton from './VoteSplitButton'
+import ClaimButton from '../GameCardButtons/ClaimButton'
+import PlayButton from '../GameCardButtons/PlayButton'
+import RegisterButton from '../GameCardButtons/RegisterButton'
+import VoteSplitButton from '../GameCardButtons/VoteSplitButton'
+import PauseButton from '../GameCardButtons/PauseButton'
+import UnpauseButton from '../GameCardButtons/UnpauseButton'
 
 const Container = styled.div`
   margin-right: 4px;
@@ -43,7 +44,9 @@ export const ActionContent = styled.div`
 interface GameCardActionsProps {
   address: string
   roundId: BigNumber
-  isGameStarted: boolean
+  registrationAmount: BigNumber
+  gameCreationAmount: BigNumber
+  isInProgress: boolean
   wonAmount: BigNumber
   nextFromRange: BigNumber
   nextToRange: BigNumber
@@ -53,13 +56,17 @@ interface GameCardActionsProps {
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
   isReady: boolean
+  isPaused: boolean
+  isCreator: boolean
   account?: string
 }
 
 const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
   address,
   roundId,
-  isGameStarted,
+  registrationAmount,
+  gameCreationAmount,
+  isInProgress,
   wonAmount,
   nextFromRange,
   nextToRange,
@@ -69,17 +76,19 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
   isCanVoteSplitPot,
   isInTimeRange,
   isReady,
+  isPaused,
+  isCreator,
   account,
 }) => {
   const {
     t,
-    currentLanguage: { locale },
+    // currentLanguage: { locale },
   } = useTranslation()
 
-  const currentDate = useMemo(
-    () => new Date().toLocaleString(locale, { month: 'short', year: 'numeric', day: 'numeric' }),
-    [locale],
-  )
+  // const currentDate = useMemo(
+  //   () => new Date().toLocaleString(locale, { month: 'short', year: 'numeric', day: 'numeric' }),
+  //   [locale],
+  // )
 
   const [cronHumanRedeable, setCronHumanRedeable] = useState('')
 
@@ -120,7 +129,7 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
             <ActionTitles />
             <ActionContent>
               {isReady ? (
-                <ClaimButton ml="4px" address={address} roundId={roundId} />
+                <ClaimButton address={address} roundId={roundId} />
               ) : (
                 <Skeleton width={80} height={36} mb="4px" />
               )}
@@ -136,7 +145,7 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
             {isReady ? (
               <>
                 {nextFromRange && nextToRange && (
-                  <Text type="secondary" style={{ fontSize: '12px', marginTop: '1rem' }}>
+                  <Text>
                     {moment(nextFromRange).isSame(moment(), 'day') ? 'Today' : 'Tomorrow'} between{' '}
                     {moment(nextFromRange).format('hh:mm A')} and {moment(nextToRange).format('hh:mm A')}
                   </Text>
@@ -177,19 +186,19 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
         <ConnectWalletButton mt="8px" width="100%" />
       ) : (
         <>
-          {isGameStarted && isInTimeRange && <PlayButton address="0x86f13647f5b308e915a48b7e9dc15a216e3d8dbe" />}
+          {isInProgress && isInTimeRange && <PlayButton address={address} />}
 
-          {!isGameStarted && (
+          {!isInProgress && (
             <RegisterButton
-              address="0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE"
-              registrationAmount={EthersBigNumber.from(1)}
-              gameCreationAmount={EthersBigNumber.from(1)}
+              address={address}
+              registrationAmount={registrationAmount}
+              gameCreationAmount={gameCreationAmount}
             />
           )}
 
-          {isCanVoteSplitPot && (
-            <VoteSplitButton address="0x86f13647f5B308E915A48b7E9Dc15a216E3d8dbE" roundId={EthersBigNumber.from(1)} />
-          )}
+          {isCanVoteSplitPot && <VoteSplitButton address={address} />}
+          {isCreator && !isInProgress && isPaused && <UnpauseButton address={address} />}
+          {isCreator && !isInProgress && !isPaused && <PauseButton address={address} />}
         </>
       )}
       {/* TODO Remove after integration phase */}

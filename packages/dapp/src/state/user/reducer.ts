@@ -76,6 +76,7 @@ export interface UserState {
   userPoolStakedOnly: boolean
   userPoolsViewMode: ViewMode
   userFarmsViewMode: ViewMode
+  userGamesViewMode: ViewMode
   userPredictionAcceptedRisk: boolean
   userLimitOrderAcceptedWarning: boolean
   userPredictionChartDisclaimerShow: boolean
@@ -105,7 +106,8 @@ export const initialState: UserState = {
   userChartViewMode: ChartViewMode.BASIC,
   userFarmStakedOnly: FarmStakedOnly.ON_FINISHED,
   userPoolStakedOnly: false,
-  userPoolsViewMode: ViewMode.TABLE,
+  userPoolsViewMode: ViewMode.CARD,
+  userGamesViewMode: ViewMode.TABLE,
   userFarmsViewMode: ViewMode.TABLE,
   userPredictionAcceptedRisk: false,
   userLimitOrderAcceptedWarning: false,

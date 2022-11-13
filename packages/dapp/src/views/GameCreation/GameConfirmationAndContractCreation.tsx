@@ -3,7 +3,6 @@ import { Card, CardBody, Flex, Heading, Text } from '@pancakeswap/uikit'
 import { useTranslation } from '@pancakeswap/localization'
 import styled from 'styled-components'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
-import NextStepButton from './NextStepButton'
 
 import BackStepButton from './BackStepButton'
 import CreateGameButton from './CreateGameButton'
@@ -120,7 +119,7 @@ const RecapConfigGame = () => {
 }
 
 const GameConfirmationAndContractCreation: React.FC<React.PropsWithChildren> = () => {
-  const { actions, ...game } = useGameContext()
+  const { actions, currentStep, ...game } = useGameContext()
   const { t } = useTranslation()
 
   return (
@@ -140,7 +139,9 @@ const GameConfirmationAndContractCreation: React.FC<React.PropsWithChildren> = (
         mb="8px"
       >
         <BackStepButton
-          onClick={actions.previousStep} /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
+          onClick={() =>
+            actions.previousStep(currentStep - 1)
+          } /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
         >
           {t('Previous Step')}
         </BackStepButton>

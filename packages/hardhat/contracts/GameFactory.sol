@@ -40,6 +40,7 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
         uint256 versionId;
         address creator;
         address deployedAddress;
+        uint256 gameCreationAmount;
     }
 
     /**
@@ -146,7 +147,13 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
 
         usedAuthorizedAmounts[_registrationAmount].isUsed = true;
         deployedGames.push(
-            Game({ id: nextId, versionId: latestVersionId, creator: msg.sender, deployedAddress: newGameAddress })
+            Game({
+                id: nextId,
+                versionId: latestVersionId,
+                creator: msg.sender,
+                deployedAddress: newGameAddress,
+                gameCreationAmount: gameCreationAmount
+            })
         );
         emit GameCreated(nextId, newGameAddress, latestVersionId, msg.sender);
         nextId += 1;
@@ -212,9 +219,9 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
 
     /**
      * @notice Get the list of deployed games
-     * @return games the list of games
+     * @return allGames the list of games
      */
-    function getDeployedGames() external view returns (Game[] memory games) {
+    function getDeployedGames() external view returns (Game[] memory allGames) {
         return deployedGames;
     }
 

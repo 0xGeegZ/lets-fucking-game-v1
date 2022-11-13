@@ -367,11 +367,9 @@ const OtherOptionsSelection = () => {
 }
 
 const GameCreation: React.FC = () => {
-  const { actions } = useContext(GameCreationContext)
+  const { actions, currentStep } = useGameContext()
 
   const { t } = useTranslation()
-
-  const { currentStep } = useGameContext()
 
   return (
     <>
@@ -387,7 +385,10 @@ const GameCreation: React.FC = () => {
       <Flex justifyContent="end" alignItems="center" pr={[null, null, '4px']} pl={['4px', null, '0']} mb="8px">
         {/* TODO disable button if all fields are not populated */}
         <NextStepButton
-          onClick={actions.nextStep} /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
+          // onClick={actions.nextStep}
+          onClick={() => actions.nextStep(currentStep + 1)}
+
+          /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
         >
           {t('Next Step')}
         </NextStepButton>

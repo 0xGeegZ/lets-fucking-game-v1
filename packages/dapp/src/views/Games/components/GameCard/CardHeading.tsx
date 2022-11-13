@@ -2,11 +2,12 @@ import styled from 'styled-components'
 import { Tag, Flex, Heading, Skeleton } from '@pancakeswap/uikit'
 import { Token } from '@pancakeswap/sdk'
 import { CoreTag } from 'components/Tags'
-import BoostedTag from 'views/Farms/components/YieldBooster/components/BoostedTag'
+import BoostedTag from 'views/Games/components/YieldBooster/components/BoostedTag'
 import BigNumber from 'bignumber.js'
 import { CurrencyLogo } from 'components/Logo'
 
 export interface ExpandableSectionProps {
+  id: BigNumber
   name?: string
   token: Token
   prizepool: BigNumber
@@ -25,6 +26,7 @@ const MultiplierTag = styled(Tag)`
 `
 
 const CardHeading: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = ({
+  id,
   name,
   token,
   prizepool,
@@ -35,7 +37,7 @@ const CardHeading: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = (
     <Wrapper justifyContent="space-between" alignItems="center" mb="12px">
       {isReady ? (
         // <TokenPairImage variant="inverted" primaryToken={token} secondaryToken={quoteToken} width={64} height={64} />
-        <CurrencyLogo address={token.address} size="24px" />
+        <CurrencyLogo currency={token} size="24px" />
       ) : (
         <Skeleton mr="8px" width={63} height={63} variant="circle" />
       )}

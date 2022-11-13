@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import { LinkExternal, Skeleton } from '@pancakeswap/uikit'
-import ActionButton from 'views/Farms/components/YieldBooster/components/ActionButton'
+import ActionButton from 'views/Games/components/YieldBooster/components/ActionButton'
+import { useTranslation } from '@pancakeswap/localization'
 
 export interface ExpandableSectionProps {
   bscScanAddress?: string
@@ -23,6 +24,8 @@ const ActionContainer = styled.div`
 `
 
 const DetailsSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = ({ bscScanAddress, isReady }) => {
+  const { t } = useTranslation()
+
   return (
     <Wrapper>
       {isReady ? (

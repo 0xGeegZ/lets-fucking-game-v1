@@ -2,18 +2,13 @@ import { useTranslation } from '@pancakeswap/localization'
 import { Card, Flex, Skeleton, Text, RocketIcon, Heading } from '@pancakeswap/uikit'
 import BigNumber from 'bignumber.js'
 import ExpandableSectionButton from 'components/ExpandableSectionButton'
-import { BASE_ADD_LIQUIDITY_URL } from 'config'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { useCallback, useState } from 'react'
 import styled from 'styled-components'
 import { getBlockExploreLink } from 'utils'
-import getLiquidityUrlPathParts from 'utils/getLiquidityUrlPathParts'
-import { multiChainPaths } from 'state/info/constant'
-import BoostedApr from 'views/Farms/components/YieldBooster/components/BoostedApr'
 import { ChainId, WBNB } from '@pancakeswap/sdk'
-import { getMasterChefAddress } from 'utils/addressHelpers'
-import { GameWithStakedValue } from '../types'
-import ApyButton from './ApyButton'
+import { DeserializedGame } from 'state/types'
+import { formatEther } from '@ethersproject/units'
 import CardActionsContainer from './CardActionsContainer'
 import CardHeading from './CardHeading'
 import DetailsSection from './DetailsSection'
@@ -41,7 +36,7 @@ const ExpandingWrapper = styled.div`
 `
 
 interface GameCardProps {
-  game: GameWithStakedValue
+  game: DeserializedGame
   account?: string
 }
 
@@ -51,31 +46,61 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
 
   const [showExpandableSection, setShowExpandableSection] = useState(false)
 
-  //   const { name, roundId, id, isDeleted,isGameStarted, maxPlayers, playerAddressesCount, registrationAmount, address, prizepool,encodedCron,  playerData: {isPLaying, wonAmount, nextFromRange,nextToRange,isWonLastGames, isCanVoteSplitPot,isInTimeRange } } = game
+  const {
+    name,
+    roundId,
+    id,
+    isPaused,
+    isInProgress,
+    isDeleted,
+    maxPlayers,
+    playerAddressesCount,
+    registrationAmount,
+    gameCreationAmount,
+    address,
+    prizepool,
+    encodedCron,
+    creator,
+    userData: {
+      isPlaying,
+      isCreator,
+      isAdmin,
+      wonAmount,
+      nextFromRange,
+      nextToRange,
+      isWonLastGames,
+      isCanVoteSplitPot,
+      isInTimeRange,
+    },
+  } = game
 
-  const name = 'Cake Game'
-  const isDeleted = false
-  const isGameStarted = false
+  // const name = 'Cake Game'
+  // const isDeleted = false
+  // const isPaused = false
+  // const isInProgress = false
 
-  const roundId = new BigNumber('1')
-  const encodedCron = '0 18 * * *'
-  const id = new BigNumber('1')
+  // const roundId = new BigNumber('1')
+  // const encodedCron = '0 18 * * *'
+  // const id = new BigNumber('1')
 
-  const maxPlayers = new BigNumber('10')
-  const playerAddressesCount = new BigNumber('5')
-  const registrationAmount = new BigNumber('0.1')
-  const prizepool = registrationAmount.multipliedBy(maxPlayers)
-  const address = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+  // const maxPlayers = new BigNumber('10')
+  // const playerAddressesCount = new BigNumber('5')
+  // const gameCreationAmount = new BigNumber('0.1')
+  // const registrationAmount = new BigNumber('0.1')
+  // const prizepool = registrationAmount.multipliedBy(maxPlayers)
+  // const address = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
 
-  const isPlaying = false
-  const wonAmount = new BigNumber('1')
-  const nextFromRange = new Date().getTime()
-  const nextToRange = new Date().getTime()
-  const isWonLastGames = false
-  const isCanVoteSplitPot = false
-  const isInTimeRange = false
+  // const isCreator = true
+  // const isPlaying = false
+  // const wonAmount = new BigNumber('1')
+  // const nextFromRange = new BigNumber(new Date().getTime())
+  // const nextToRange = new BigNumber(new Date().getTime())
+  // const isWonLastGames = false
+  // const isCanVoteSplitPot = false
+  // const isInTimeRange = false
 
   const isPromotedGame = true
+
   const toggleExpandableSection = useCallback(() => {
     setShowExpandableSection((prev) => !prev)
   }, [])
@@ -85,7 +110,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
   return (
     <StyledCard isActive={isPromotedGame}>
       <GameCardInnerContainer>
-        <CardHeading name={name} token={WBNB[chainId]} prizepool={prizepool} isReady={isReady} boosted />
+        <CardHeading name={name} id={id} token={WBNB[chainId]} prizepool={prizepool} isReady={isReady} boosted />
 
         {!isDeleted && (
           <Flex justifyContent="space-between">
@@ -118,7 +143,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
         <CardActionsContainer
           address={address}
           roundId={roundId}
-          isGameStarted={isGameStarted}
+          isInProgress={isInProgress}
           wonAmount={wonAmount}
           nextFromRange={nextFromRange}
           nextToRange={nextToRange}
@@ -127,14 +152,20 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           isWonLastGames={isWonLastGames}
           isCanVoteSplitPot={isCanVoteSplitPot}
           isInTimeRange={isInTimeRange}
+          gameCreationAmount={gameCreationAmount}
+          registrationAmount={registrationAmount}
           isReady={isReady}
+          isPaused={isPaused}
+          isCreator={isCreator}
           account={account}
         />
       </GameCardInnerContainer>
 
       <ExpandingWrapper>
         <ExpandableSectionButton onClick={toggleExpandableSection} expanded={showExpandableSection} />
-        {showExpandableSection && <DetailsSection bscScanAddress={getBlockExploreLink(address, 'address', chainId)} />}
+        {showExpandableSection && (
+          <DetailsSection isReady={isReady} bscScanAddress={getBlockExploreLink(address, 'address', chainId)} />
+        )}
       </ExpandingWrapper>
     </StyledCard>
   )

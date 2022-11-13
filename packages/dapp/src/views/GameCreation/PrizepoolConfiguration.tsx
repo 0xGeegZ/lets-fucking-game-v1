@@ -111,7 +111,7 @@ const PrizeTypeSelection = () => {
 }
 
 const PrizepoolConfiguration: React.FC = () => {
-  const { actions } = useContext(GameCreationContext)
+  const { actions, currentStep } = useContext(GameCreationContext)
   const { t } = useTranslation()
 
   return (
@@ -133,12 +133,16 @@ const PrizepoolConfiguration: React.FC = () => {
         mb="8px"
       >
         <BackStepButton
-          onClick={actions.previousStep} /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
+          // onClick={actions.previousStep}
+          onClick={() => actions.previousStep(currentStep - 1)}
+          /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
         >
           {t('Previous Step')}
         </BackStepButton>
         <NextStepButton
-          onClick={actions.nextStep} /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
+          // onClick={actions.nextStep}
+          onClick={() => actions.nextStep(currentStep + 1)}
+          /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
         >
           {t('Next Step')}
         </NextStepButton>
