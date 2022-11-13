@@ -52,6 +52,7 @@ interface GameCardActionsProps {
   isWonLastGames: boolean
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
+  isReady: boolean
   account?: string
 }
 
@@ -67,6 +68,7 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
   isWonLastGames,
   isCanVoteSplitPot,
   isInTimeRange,
+  isReady,
   account,
 }) => {
   const {
@@ -78,8 +80,6 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
     () => new Date().toLocaleString(locale, { month: 'short', year: 'numeric', day: 'numeric' }),
     [locale],
   )
-
-  const isReady = address !== undefined
 
   const [cronHumanRedeable, setCronHumanRedeable] = useState('')
 

@@ -11,6 +11,7 @@ export interface ExpandableSectionProps {
   token: Token
   prizepool: BigNumber
   boosted?: boolean
+  isReady: boolean
 }
 
 const Wrapper = styled(Flex)`
@@ -28,9 +29,8 @@ const CardHeading: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = (
   token,
   prizepool,
   boosted,
+  isReady,
 }) => {
-  const isReady = prizepool !== undefined
-
   return (
     <Wrapper justifyContent="space-between" alignItems="center" mb="12px">
       {isReady ? (

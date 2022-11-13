@@ -85,7 +85,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
   return (
     <StyledCard isActive={isPromotedGame}>
       <GameCardInnerContainer>
-        <CardHeading name={name} token={WBNB[chainId]} prizepool={prizepool} boosted />
+        <CardHeading name={name} token={WBNB[chainId]} prizepool={prizepool} isReady={isReady} boosted />
 
         {!isDeleted && (
           <Flex justifyContent="space-between">
@@ -127,6 +127,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           isWonLastGames={isWonLastGames}
           isCanVoteSplitPot={isCanVoteSplitPot}
           isInTimeRange={isInTimeRange}
+          isReady={isReady}
           account={account}
         />
       </GameCardInnerContainer>

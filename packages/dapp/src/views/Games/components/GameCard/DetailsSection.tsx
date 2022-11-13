@@ -1,11 +1,10 @@
-import { useTranslation } from '@pancakeswap/localization'
 import styled from 'styled-components'
-import { Text, Flex, LinkExternal, Skeleton } from '@pancakeswap/uikit'
+import { LinkExternal, Skeleton } from '@pancakeswap/uikit'
 import ActionButton from 'views/Farms/components/YieldBooster/components/ActionButton'
 
 export interface ExpandableSectionProps {
   bscScanAddress?: string
-  infoAddress?: string
+  isReady: boolean
 }
 
 const Wrapper = styled.div`
@@ -23,35 +22,14 @@ const ActionContainer = styled.div`
   align-items: center;
 `
 
-const DetailsSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = ({ bscScanAddress }) => {
-  const {
-    t,
-    currentLanguage: { locale },
-  } = useTranslation()
-
+const DetailsSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = ({ bscScanAddress, isReady }) => {
   return (
     <Wrapper>
-      {/* {isCommunity && auctionHostingEndDate && (
-        <Flex justifyContent="space-between">
-          <Text>{t('Auction Hosting Ends')}:</Text>
-          <Text>
-            {new Date(auctionHostingEndDate).toLocaleString(locale, {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            })}
-          </Text>
-        </Flex>
-      )} */}
-      {/* <Flex justifyContent="space-between">
-        <Text>{t('Total Liquidity')}:</Text>
-        {totalValueFormatted ? <Text>{totalValueFormatted}</Text> : <Skeleton width={75} height={25} />}
-      </Flex>
-      {!removed && (
-        <StyledLinkExternal href={addLiquidityUrl}>{t('Get %symbol%', { symbol: lpLabel })}</StyledLinkExternal>
-      )} */}
-      <StyledLinkExternal href={bscScanAddress}>{t('View Contract')}</StyledLinkExternal>
-      {/* <StyledLinkExternal href={infoAddress}>{t('See Pair Info')}</StyledLinkExternal> */}
+      {isReady ? (
+        <StyledLinkExternal href={bscScanAddress}>{t('View Contract')}</StyledLinkExternal>
+      ) : (
+        <Skeleton ml="4px" width={42} height={28} />
+      )}
       <ActionContainer style={{ paddingTop: 16 }}>
         <ActionButton title={`${t('Game Rules')}`} description={t("More info about Let's Fucking Game")} />
       </ActionContainer>
