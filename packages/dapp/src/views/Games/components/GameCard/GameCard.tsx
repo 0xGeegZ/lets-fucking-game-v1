@@ -112,23 +112,52 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
   return (
     <StyledCard isActive={isPromotedGame}>
       <GameCardInnerContainer>
-        <CardHeading name={name} id={id} token={WBNB[chainId]} prizepool={prizepool} isReady={isReady} boosted />
+        <CardHeading
+          id={id}
+          name={name}
+          token={WBNB[chainId]}
+          prizepool={prizepool}
+          multiplier={maxPlayers}
+          isReady={isReady}
+          isFree={registrationAmount.toNumber() === 0}
+          boosted={false}
+        />
 
         {!isDeleted && (
-          <Flex justifyContent="space-between">
-            <Heading mr="4px">{t('To earn')}: </Heading>
-            {isReady ? (
-              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
-                <RocketIcon m="4px" color="success" />
-                <Text bold color="success" fontSize={16}>
-                  {t('Up to ')}
-                  {prizepool.toNumber()}BNB
+          <>
+            <Flex justifyContent="space-between">
+              <Heading mr="4px">{t('Earn')}: </Heading>
+              {isReady ? (
+                <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                  <RocketIcon m="4px" color="success" />
+                  <Text bold color="success" fontSize={16}>
+                    {t('Up to ')}
+                    {prizepool.toNumber()}
+                    {' BNB'}
+                  </Text>
                 </Text>
-              </Text>
-            ) : (
-              <Skeleton height={24} width={80} />
-            )}
-          </Flex>
+              ) : (
+                <Skeleton height={24} width={80} />
+              )}
+            </Flex>
+            <Flex justifyContent="space-between">
+              <Heading mr="4px">{t('Register')}: </Heading>
+              {isReady ? (
+                <>
+                  {gameCreationAmount && (
+                    <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                      <Text bold fontSize={16}>
+                        {gameCreationAmount.toNumber()}
+                        {' BNB'}
+                      </Text>
+                    </Text>
+                  )}
+                </>
+              ) : (
+                <Skeleton height={24} width={80} />
+              )}
+            </Flex>
+          </>
         )}
 
         <Flex justifyContent="space-between">

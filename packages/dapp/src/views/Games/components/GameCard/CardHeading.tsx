@@ -3,6 +3,7 @@ import { Tag, Flex, Heading, Skeleton } from '@pancakeswap/uikit'
 import { Token } from '@pancakeswap/sdk'
 import { CoreTag } from 'components/Tags'
 import BoostedTag from 'views/Games/components/YieldBooster/components/BoostedTag'
+import FreeTag from 'views/Games/components/YieldBooster/components/FreeTag'
 import BigNumber from 'bignumber.js'
 import { CurrencyLogo } from 'components/Logo'
 
@@ -10,9 +11,12 @@ export interface ExpandableSectionProps {
   id: BigNumber
   name?: string
   token: Token
+  gameCreationAmount: BigNumber
   prizepool: BigNumber
-  boosted?: boolean
+  multiplier: BigNumber
   isReady: boolean
+  isFree: boolean
+  boosted?: boolean
 }
 
 const Wrapper = styled(Flex)`
@@ -29,10 +33,14 @@ const CardHeading: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = (
   id,
   name,
   token,
+  gameCreationAmount,
   prizepool,
-  boosted,
+  multiplier,
   isReady,
+  isFree,
+  boosted,
 }) => {
+  // TODO GUIGUI DISPLAY gameCreationAmount
   return (
     <Wrapper justifyContent="space-between" alignItems="center" mb="12px">
       {isReady ? (
@@ -43,11 +51,12 @@ const CardHeading: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = (
       )}
       <Flex flexDirection="column" alignItems="flex-end">
         {isReady ? <Heading mb="4px">{name}</Heading> : <Skeleton mb="4px" width={60} height={18} />}
-        <Flex justifyContent="center">
+        <Flex justifyContent="center" mt="4px">
           {isReady ? <CoreTag mr="4px" /> : <Skeleton ml="4px" width={42} height={28} />}
-          {isReady && boosted ? <BoostedTag ml="4px" /> : <Skeleton ml="4px" width={42} height={28} />}
-          {isReady && prizepool ? (
-            <MultiplierTag variant="secondary">{`x${prizepool.toNumber()}`}</MultiplierTag>
+          {isReady ? <>{boosted && <BoostedTag ml="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />}
+          {isReady ? <>{isFree && <FreeTag ml="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />}
+          {isReady ? (
+            <>{multiplier && <MultiplierTag variant="secondary">{`x${multiplier.toNumber()}`}</MultiplierTag>}</>
           ) : (
             <Skeleton ml="4px" width={42} height={28} />
           )}

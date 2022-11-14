@@ -400,13 +400,13 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
         {/* )} */}
 
         {/* // TODO GUIGUI UPDATE CONDITION */}
-        {account && !userDataLoaded && isNotFullOnly && (
+        {account && !userDataLoaded && (
           <Flex justifyContent="center">
             <Loading />
+            {/* <StyledImage src="/images/decorations/3dpan.png" alt="Pancake illustration" width={120} height={103} /> */}
           </Flex>
         )}
         {userDataLoaded && <div ref={observerRef} />}
-        <StyledImage src="/images/decorations/3dpan.png" alt="Pancake illustration" width={120} height={103} />
       </Page>
       {createPortal(<ScrollToTopButton />, document.body)}
     </GamesContext.Provider>

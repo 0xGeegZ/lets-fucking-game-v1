@@ -38,6 +38,7 @@ const deserializeGame = (game: SerializedGame): DeserializedGame => {
     admin,
     treasuryFee,
     creatorFee,
+    playerAddresses,
   } = game
 
   return {
@@ -59,6 +60,7 @@ const deserializeGame = (game: SerializedGame): DeserializedGame => {
     admin,
     treasuryFee: treasuryFee ? new BigNumber(treasuryFee) : BIG_ZERO,
     creatorFee: creatorFee ? new BigNumber(creatorFee) : BIG_ZERO,
+    playerAddresses,
     userData: deserializeGameUserData(game),
   }
 }

@@ -29,8 +29,9 @@ const initialState: SerializedGamesState = {
 export const fetchInitialGamesData = createAsyncThunk<SerializedGame[], { chainId: number }>(
   'games/fetchInitialGamesData',
   async ({ chainId }) => {
+    console.log('fetchInitialGamesData')
+
     const games = await fetchGames(chainId)
-    console.log('🚀 ~ file: index.ts ~ line 33 ~ games', games)
     return games.map((game) => ({
       ...game,
       userData: {
@@ -59,6 +60,8 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
 >(
   'games/fetchGamesPublicDataAsync',
   async ({ chainId, flag = 'pkg' }) => {
+    console.log('fetchGamesPublicDataAsync')
+
     const chain = chains.find((c) => c.id === chainId)
 
     if (!chain) throw new Error('chain not supported')
@@ -95,6 +98,7 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
   },
 )
 
+// TODO UPDATE INTERFACE
 interface GameUserDataResponse {
   id: number
   allowance: string
@@ -108,26 +112,6 @@ interface GameUserDataResponse {
     earnings: string
   }
 }
-
-// async function getBoostedGamesStakeValue(games, account, chainId, proxyAddress) {
-//   const [
-//     userGameAllowances,
-//     userGameTokenBalances,
-//     userStakedBalances,
-//     userGameEarnings,
-//     proxyUserGameAllowances,
-//     proxyUserStakedBalances,
-//     proxyUserGameEarnings,
-//   ] = await Promise.all([
-//     fetchGameUserAllowances(account, games, chainId),
-//     fetchGameUserTokenBalances(account, games, chainId),
-//     fetchGameUserStakedBalances(account, games, chainId),
-//     fetchGameUserEarnings(account, games, chainId),
-//     // Proxy call
-//     fetchGameUserAllowances(account, games, chainId, proxyAddress),
-//     fetchGameUserStakedBalances(proxyAddress, games, chainId),
-//     fetchGameUserEarnings(proxyAddress, games, chainId),
-//   ])
 
 //   const gameAllowances = userGameAllowances.map((gameAllowance, index) => {
 //     return {
@@ -232,8 +216,6 @@ export const gamesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(resetUserState, (state) => {
-      console.log('🚀 ~ file: index.ts ~ line 252 ~ state.data=state.data.map ~ state.data', state.data)
-
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       state.data = state.data.map((game) => {
         return {
@@ -255,12 +237,15 @@ export const gamesSlice = createSlice({
     })
     // Init game data
     builder.addCase(fetchInitialGamesData.fulfilled, (state, action) => {
+      console.log('Init game data')
       const gameData = action.payload
       state.data = gameData
     })
 
     // Update games with live data
     builder.addCase(fetchGamesPublicDataAsync.fulfilled, (state, action) => {
+      console.log('Update games with live data')
+
       // TODO GUIGUI
       // const [gamePayload, poolLength, regularCakePerBlock] = action.payload
       // console.log('🚀 ~ file: index.ts ~ line 321 ~ builder.addCase ~ gamePayload', gamePayload)
@@ -275,6 +260,8 @@ export const gamesSlice = createSlice({
 
     // Update games with user data
     builder.addCase(fetchGameUserDataAsync.fulfilled, (state, action) => {
+      console.log('Update games with user data')
+
       // TODO GUIGUI
       // const userDataMap = fromPairs(action.payload.map((userDataEl) => [userDataEl.id, userDataEl]))
       // state.data = state.data.map((game) => {
