@@ -1,15 +1,4 @@
-import {
-  Cake,
-  CakeFlexibleSideVaultV2,
-  CakeVaultV2,
-  Erc20,
-  Erc20Bytes32,
-  Erc721collection,
-  Multicall,
-  Weth,
-  Zap,
-} from 'config/abi/types'
-import zapAbi from 'config/abi/zap.json'
+import { Cake, Erc20, Erc20Bytes32, Erc721collection, Multicall, Weth } from 'config/abi/types'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { useProviderOrSigner } from 'hooks/useProviderOrSigner'
 import { useMemo } from 'react'
