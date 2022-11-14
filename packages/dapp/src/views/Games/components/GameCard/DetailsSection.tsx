@@ -1,12 +1,20 @@
 import styled from 'styled-components'
-import { LinkExternal, Skeleton } from '@pancakeswap/uikit'
+import { Flex, Heading, Skeleton, Text, LinkExternal } from '@pancakeswap/uikit'
+
 import ActionButton from 'views/Games/components/YieldBooster/components/ActionButton'
 import { useTranslation } from '@pancakeswap/localization'
+import BigNumber from 'bignumber.js'
 
 export interface ExpandableSectionProps {
   bscScanAddress?: string
+  treasuryFee: BigNumber
+  creatorFee: BigNumber
   isReady: boolean
 }
+
+const Container = styled.div`
+  margin-right: 4px;
+`
 
 const Wrapper = styled.div`
   margin-top: 24px;
@@ -23,19 +31,47 @@ const ActionContainer = styled.div`
   align-items: center;
 `
 
-const DetailsSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = ({ bscScanAddress, isReady }) => {
+const DetailsSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = ({
+  bscScanAddress,
+  isReady,
+  treasuryFee,
+  creatorFee,
+}) => {
   const { t } = useTranslation()
 
   return (
     <Wrapper>
-      {isReady ? (
-        <StyledLinkExternal href={bscScanAddress}>{t('View Contract')}</StyledLinkExternal>
-      ) : (
-        <Skeleton ml="4px" width={42} height={28} />
-      )}
-      <ActionContainer style={{ paddingTop: 16 }}>
+      <ActionContainer>
         <ActionButton title={`${t('Game Rules')}`} description={t("More info about Let's Fucking Game")} />
       </ActionContainer>
+
+      <Container style={{ paddingTop: 8 }}>
+        <Flex>
+          {isReady ? (
+            <Text color="textSubtle" fontSize="12px">
+              {t(`Treasury fee : ${treasuryFee.toNumber() / 100}%`)}
+            </Text>
+          ) : (
+            <Skeleton ml="4px" width={42} height={28} />
+          )}
+        </Flex>
+        <Flex>
+          {isReady ? (
+            <Text color="textSubtle" fontSize="12px">
+              {t(`Creator fee : ${creatorFee.toNumber() / 100}%`)}
+            </Text>
+          ) : (
+            <Skeleton ml="4px" width={42} height={28} />
+          )}
+        </Flex>
+        <Flex style={{ paddingTop: 10 }}>
+          {isReady ? (
+            <StyledLinkExternal href={bscScanAddress}>{t('View Contract')}</StyledLinkExternal>
+          ) : (
+            <Skeleton ml="4px" width={42} height={28} />
+          )}
+        </Flex>
+      </Container>
     </Wrapper>
   )
 }

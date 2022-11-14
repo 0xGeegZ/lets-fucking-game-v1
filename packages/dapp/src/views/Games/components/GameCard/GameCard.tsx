@@ -61,6 +61,8 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     prizepool,
     encodedCron,
     creator,
+    treasuryFee,
+    creatorFee,
     userData: {
       isPlaying,
       isCreator,
@@ -164,7 +166,12 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
       <ExpandingWrapper>
         <ExpandableSectionButton onClick={toggleExpandableSection} expanded={showExpandableSection} />
         {showExpandableSection && (
-          <DetailsSection isReady={isReady} bscScanAddress={getBlockExploreLink(address, 'address', chainId)} />
+          <DetailsSection
+            isReady={isReady}
+            bscScanAddress={getBlockExploreLink(address, 'address', chainId)}
+            treasuryFee={treasuryFee}
+            creatorFee={creatorFee}
+          />
         )}
       </ExpandingWrapper>
     </StyledCard>
