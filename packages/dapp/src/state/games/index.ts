@@ -28,63 +28,47 @@ const initialState: SerializedGamesState = {
 // Async thunks
 export const fetchInitialGamesData = createAsyncThunk<SerializedGame[], { chainId: number }>(
   'games/fetchInitialGamesData',
-  async ({ chainId }) => {
+  async ({ chainId: number, account: string }) => {
     console.log('fetchInitialGamesData')
 
     const games = await fetchGames(chainId)
-    return games.map((game) => ({
-      ...game,
-      userData: {
-        isPlaying: false,
-        isCreator: false,
-        isAdmin: false,
-        wonAmount: 0,
-        nextFromRange: 0,
-        nextToRange: 0,
-        isWonLastGames: false,
-        isCanVoteSplitPot: false,
-        isInTimeRange: false,
-      },
-    }))
+
+    return games.map((game) => {
+      const isPlaying = game.playerAddresses.find(account)
+      return {
+        ...game,
+        userData: {
+          isPlaying: !!isPlaying,
+          isCreator: game.creator === account,
+          isAdmin: game.admin === account,
+          isCanVoteSplitPot: isPlaying && game.playerAddressesCount <= game.maxPlayers * 0.5,
+          wonAmount: 0,
+          nextFromRange: 0,
+          nextToRange: 0,
+          isWonLastGames: false,
+          isInTimeRange: false,
+        },
+      }
+    })
   },
 )
 
-let fallback = false
-
 export const fetchGamesPublicDataAsync = createAsyncThunk<
   SerializedGame[],
-  { chainId: number; flag: string },
+  { chainId: number; account: string; flag: string },
   {
     state: AppState
   }
 >(
   'games/fetchGamesPublicDataAsync',
-  async ({ chainId, flag = 'pkg' }) => {
+  async ({ chainId }) => {
     console.log('fetchGamesPublicDataAsync')
 
     const chain = chains.find((c) => c.id === chainId)
 
     if (!chain) throw new Error('chain not supported')
-    try {
-      if (flag === 'api' && !fallback) {
-        try {
-          const { updatedAt, data: gamesWithPrice, poolLength, regularCakePerBlock } = await gameApiFetch(chainId)
-          if (Date.now() - new Date(updatedAt).getTime() > 3 * 60 * 1000) {
-            fallback = true
-            throw new Error('Game Api out dated')
-          }
-          return [gamesWithPrice, poolLength, regularCakePerBlock]
-        } catch (error) {
-          console.error(error)
-          return fetchGamePublicDataPkg({ chainId })
-        }
-      }
 
-      return fetchGamePublicDataPkg({ chainId })
-    } catch (error) {
-      console.error(error)
-      throw error
-    }
+    return fetchGamePublicDataPkg({ chainId })
   },
   {
     condition: (arg, { getState }) => {

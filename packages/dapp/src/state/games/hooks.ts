@@ -9,46 +9,21 @@ import useSWRImmutable from 'swr/immutable'
 import { BIG_ZERO } from 'utils/bigNumber'
 
 import { useFastRefreshEffect } from 'hooks/useRefreshEffect'
-import { featureFarmApiAtom, useFeatureFlag } from 'hooks/useFeatureFlag'
 import { fetchGamesPublicDataAsync, fetchGamePlayerDataAsync, fetchInitialGamesData } from '.'
 import { DeserializedGame, DeserializedGamesState, DeserializedGameUserData, State } from '../types'
-import {
-  // gameFromLpSymbolSelector,
-  gameSelector,
-  // makeBusdPriceFromIdSelector,
-  makeGameFromIdSelector,
-  // makeLpTokenPriceFromLpSymbolSelector,
-  makeUserGameFromIdSelector,
-} from './selectors'
-
-export function useGamesLength() {
-  const { chainId } = useActiveWeb3React()
-  return useSWRImmutable(chainId ? ['gamesLength', chainId] : null, async () => {
-    // TODO GUIGUI UPDATE GAMES LENGHT
-    // const mc = getMasterchefContract(undefined, chainId)
-    // return (await mc.poolLength()).toNumber()
-    return 1
-  })
-}
+import { gameSelector, makeGameFromIdSelector, makeUserGameFromIdSelector } from './selectors'
 
 export const usePollGamesWithUserData = () => {
   const dispatch = useAppDispatch()
   const { account, chainId } = useActiveWeb3React()
-  // const {
-  //   proxyAddress,
-  //   proxyCreated,
-  //   isLoading: isProxyContractLoading,
-  // } = useBCakeProxyContractAddress(account, chainId)
-
-  const gameFlag = useFeatureFlag(featureFarmApiAtom)
 
   useSWRImmutable(
     chainId ? ['publicGameData', chainId] : null,
     async () => {
-      dispatch(fetchGamesPublicDataAsync({ chainId, flag: gameFlag }))
+      dispatch(fetchGamesPublicDataAsync({ chainId, account }))
     },
     {
-      refreshInterval: gameFlag === 'api' ? 50 * 1000 : SLOW_INTERVAL,
+      refreshInterval: SLOW_INTERVAL,
     },
   )
 
@@ -68,27 +43,26 @@ export const usePollGamesWithUserData = () => {
 
 export const usePollCoreGameData = () => {
   const dispatch = useAppDispatch()
-  const { chainId } = useActiveWeb3React()
-  const gameFlag = useFeatureFlag(featureFarmApiAtom)
+  const { account, chainId } = useActiveWeb3React()
 
   useEffect(() => {
     if (chainId) {
-      dispatch(fetchInitialGamesData({ chainId }))
+      dispatch(fetchInitialGamesData({ chainId, account }))
     }
-  }, [chainId, dispatch])
+  }, [account, chainId, dispatch])
 
   useFastRefreshEffect(() => {
-    if (chainId && gameFlag !== 'api') {
-      dispatch(fetchGamesPublicDataAsync({ chainId, flag: gameFlag }))
+    if (chainId) {
+      dispatch(fetchGamesPublicDataAsync({ chainId, account }))
     }
-  }, [dispatch, chainId, gameFlag])
+  }, [dispatch, chainId, account])
 }
 
 export const useGames = (): DeserializedGamesState => {
   return useSelector(useMemo(() => gameSelector(), []))
 }
 
-export const useGamesPoolLength = (): number => {
+export const useGamesLength = (): number => {
   return useSelector((state: State) => state.games.data.length)
 }
 
@@ -101,17 +75,6 @@ export const useGameUser = (id): DeserializedGameUserData => {
   const gameFromIdUser = useMemo(() => makeUserGameFromIdSelector(id), [id])
   return useSelector(gameFromIdUser)
 }
-
-// Return the base token price for a game, from a given id
-// export const useBusdPriceFromId = (id: number): BigNumber => {
-//   const busdPriceFromId = useMemo(() => makeBusdPriceFromIdSelector(id), [id])
-//   return useSelector(busdPriceFromId)
-// }
-
-// export const useLpTokenPrice = (symbol: string) => {
-//   const lpTokenPriceFromLpSymbol = useMemo(() => makeLpTokenPriceFromLpSymbolSelector(symbol), [symbol])
-//   return useSelector(lpTokenPriceFromLpSymbol)
-// }
 
 /**
  * @deprecated use the BUSD hook in /hooks

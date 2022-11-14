@@ -162,8 +162,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const isInactive = pathname.includes('history')
   const isActive = !isInactive && !isDeleted
 
-  // useCakeVaultUserData()
-
+  // TODO GUIGUI get used Data
   usePollGamesWithUserData()
 
   // Users with no wallet connected should see 0 as Earned amount

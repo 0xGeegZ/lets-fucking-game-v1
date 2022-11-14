@@ -58,8 +58,8 @@ function gameBaseTransformer(gameData, gamePlayers) {
       maxPlayers: maxPlayers.toNumber(),
       playerAddressesCount: playerAddressesCount.toNumber(),
       playTimeRange: playTimeRange.toNumber(),
-      registrationAmount: parseFloat(formatEther(`${+registrationAmount}`)),
-      gameCreationAmount: parseFloat(formatEther(`${+gameCreationAmount}`)),
+      registrationAmount: parseFloat(formatEther(`${registrationAmount}`)),
+      gameCreationAmount: parseFloat(formatEther(`${gameCreationAmount}`)),
       creatorFee: creatorFee.toNumber(),
       treasuryFee: treasuryFee.toNumber(),
       isInProgress,
@@ -70,8 +70,8 @@ function gameBaseTransformer(gameData, gamePlayers) {
       admin,
       prizepool: 0,
       // TODO MANGE CRON
-      // encodedCron: encodedCron.toString(),
-      encodedCron: parseStringOrBytes32('', encodedCron, ''),
+      encodedCron: encodedCron.toString(),
+      // encodedCron: parseStringOrBytes32('', encodedCron, ''),
       playerAddresses,
       prizes: [],
     }
