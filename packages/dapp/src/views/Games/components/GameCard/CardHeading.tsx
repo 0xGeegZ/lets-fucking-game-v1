@@ -11,7 +11,6 @@ export interface ExpandableSectionProps {
   id: BigNumber
   name?: string
   token: Token
-  gameCreationAmount: BigNumber
   prizepool: BigNumber
   multiplier: BigNumber
   isReady: boolean
@@ -33,7 +32,6 @@ const CardHeading: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = (
   id,
   name,
   token,
-  gameCreationAmount,
   prizepool,
   multiplier,
   isReady,

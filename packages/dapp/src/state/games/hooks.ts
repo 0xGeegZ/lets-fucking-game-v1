@@ -10,7 +10,7 @@ import { BIG_ZERO } from 'utils/bigNumber'
 
 import { useFastRefreshEffect } from 'hooks/useRefreshEffect'
 import { featureFarmApiAtom, useFeatureFlag } from 'hooks/useFeatureFlag'
-import { fetchGamesPublicDataAsync, fetchGameUserDataAsync, fetchInitialGamesData } from '.'
+import { fetchGamesPublicDataAsync, fetchGamePlayerDataAsync, fetchInitialGamesData } from '.'
 import { DeserializedGame, DeserializedGamesState, DeserializedGameUserData, State } from '../types'
 import {
   // gameFromLpSymbolSelector,
@@ -58,7 +58,7 @@ export const usePollGamesWithUserData = () => {
     account && chainId ? name : null,
     async () => {
       const params = { account, chainId }
-      dispatch(fetchGameUserDataAsync(params))
+      dispatch(fetchGamePlayerDataAsync(params))
     },
     {
       refreshInterval: SLOW_INTERVAL,

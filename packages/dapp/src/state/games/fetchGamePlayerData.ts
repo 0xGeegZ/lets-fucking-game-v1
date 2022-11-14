@@ -6,9 +6,30 @@ import nonBscVault from 'config/abi/nonBscVault.json'
 import multicall, { multicallv2 } from 'utils/multicall'
 import { verifyBscNetwork } from 'utils/verifyBscNetwork'
 import { isChainTestnet } from 'utils/wagmi'
+import internal from 'config/internal/internal.json'
+import chunk from 'lodash/chunk'
 import { SerializedGame } from '../types'
 
-export const fetchGameUserAllowances = async (
+export const fetchGamePlayersData = async (game: any, chainId = ChainId.BSC): Promise<any[]> => {
+  const gameCalls = game.playerAddresses.map((playerAddress) => {
+    return {
+      address: game.address,
+      name: 'getPlayer',
+      params: [playerAddress],
+    }
+  })
+  const chunkSize = gameCalls.length / game.playerAddresses.length
+
+  const gameMultiCallResult = await multicallv2({
+    abi: internal[chainId || ChainId.BSC].GameV1.abi,
+    calls: gameCalls,
+    chainId,
+  })
+
+  return chunk(gameMultiCallResult, chunkSize)
+}
+
+export const fetchGamePlayerAllowances = async (
   account: string,
   gamesToFetch: SerializedGame[],
   chainId: number,
@@ -29,7 +50,11 @@ export const fetchGameUserAllowances = async (
   return parsedLpAllowances
 }
 
-export const fetchGameUserTokenBalances = async (account: string, gamesToFetch: SerializedGame[], chainId: number) => {
+export const fetchGamePlayerTokenBalances = async (
+  account: string,
+  gamesToFetch: SerializedGame[],
+  chainId: number,
+) => {
   const calls = gamesToFetch.map((game) => {
     const contractAddress = game.address
     return {
@@ -46,7 +71,11 @@ export const fetchGameUserTokenBalances = async (account: string, gamesToFetch: 
   return parsedTokenBalances
 }
 
-export const fetchGameUserStakedBalances = async (account: string, gamesToFetch: SerializedGame[], chainId: number) => {
+export const fetchGamePlayerStakedBalances = async (
+  account: string,
+  gamesToFetch: SerializedGame[],
+  chainId: number,
+) => {
   const isBscNetwork = verifyBscNetwork(chainId)
 
   const calls = gamesToFetch.map((game) => {
@@ -69,7 +98,7 @@ export const fetchGameUserStakedBalances = async (account: string, gamesToFetch:
   return parsedStakedBalances
 }
 
-export const fetchGameUserEarnings = async (account: string, gamesToFetch: SerializedGame[], chainId: number) => {
+export const fetchGamePlayerEarnings = async (account: string, gamesToFetch: SerializedGame[], chainId: number) => {
   const isBscNetwork = verifyBscNetwork(chainId)
   const multiCallChainId = isChainTestnet(chainId) ? ChainId.BSC_TESTNET : ChainId.BSC
   const userAddress = account

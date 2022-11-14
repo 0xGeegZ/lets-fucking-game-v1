@@ -117,7 +117,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           name={name}
           token={WBNB[chainId]}
           prizepool={prizepool}
-          multiplier={maxPlayers}
+          multiplier={registrationAmount.toNumber() !== 0 ? prizepool.dividedBy(registrationAmount) : null}
           isReady={isReady}
           isFree={registrationAmount.toNumber() === 0}
           boosted={false}
@@ -144,12 +144,18 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
               <Heading mr="4px">{t('Register')}: </Heading>
               {isReady ? (
                 <>
-                  {gameCreationAmount && (
+                  {registrationAmount && (
                     <Text bold style={{ display: 'flex', alignItems: 'center' }}>
-                      <Text bold fontSize={16}>
-                        {gameCreationAmount.toNumber()}
-                        {' BNB'}
-                      </Text>
+                      {registrationAmount.toNumber() === 0 ? (
+                        <Text bold fontSize={16} /* color="success" */>
+                          FREE
+                        </Text>
+                      ) : (
+                        <Text bold fontSize={16}>
+                          {registrationAmount.toNumber()}
+                          {' BNB'}{' '}
+                        </Text>
+                      )}
                     </Text>
                   )}
                 </>

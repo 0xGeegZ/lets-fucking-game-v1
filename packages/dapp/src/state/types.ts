@@ -24,7 +24,17 @@ export type SerializedBigNumber = string
 
 // Games
 
-interface SerializedGameUserData {
+export interface SerializedPrizeData {
+  amount: number
+  position: number
+}
+
+export interface DeserializedPrizeData {
+  amount: BigNumber
+  position: BigNumber
+}
+
+export interface SerializedGameUserData {
   isCreator: boolean
   isAdmin: boolean
   isPlaying: boolean
@@ -40,13 +50,13 @@ export interface DeserializedGameUserData {
   isCreator: boolean
   isAdmin: boolean
   isPlaying: boolean
-  // TODO add isLoosed ?
   wonAmount: BigNumber
   nextFromRange: BigNumber
   nextToRange: BigNumber
   isWonLastGames: boolean
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
+  // TODO add isLoosed ?
 }
 
 export interface SerializedGame {
@@ -69,6 +79,7 @@ export interface SerializedGame {
   treasuryFee: number
   creatorFee: number
   playerAddresses: string[]
+  prizes: SerializedPrizeData[]
   userData?: SerializedGameUserData
 }
 
@@ -92,6 +103,7 @@ export interface DeserializedGame {
   treasuryFee: BigNumber
   creatorFee: BigNumber
   playerAddresses: string[]
+  prizes: DeserializedPrizeData[]
   userData?: DeserializedGameUserData
 }
 

@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { BIG_ZERO } from 'utils/bigNumber'
 import { createSelector } from '@reduxjs/toolkit'
 import _isEmpty from 'lodash/isEmpty'
-import { State, SerializedGame, DeserializedGame, DeserializedGameUserData } from '../types'
+import { State, SerializedGame, DeserializedGame, DeserializedGameUserData, DeserializedPrizeData } from '../types'
 
 const deserializeGameUserData = (game: SerializedGame): DeserializedGameUserData => {
   return {
@@ -16,6 +16,15 @@ const deserializeGameUserData = (game: SerializedGame): DeserializedGameUserData
     isCanVoteSplitPot: game?.userData ? game.userData.isCanVoteSplitPot : false,
     isInTimeRange: game?.userData ? game.userData.isInTimeRange : false,
   }
+}
+
+const deserializeGamePrize = (game: SerializedGame): DeserializedPrizeData[] => {
+  return game.prizes.map((prize) => {
+    return {
+      amount: prize?.amount ? new BigNumber(prize.amount) : BIG_ZERO,
+      position: prize?.position ? new BigNumber(prize.position) : BIG_ZERO,
+    }
+  })
 }
 
 const deserializeGame = (game: SerializedGame): DeserializedGame => {
@@ -61,11 +70,11 @@ const deserializeGame = (game: SerializedGame): DeserializedGame => {
     treasuryFee: treasuryFee ? new BigNumber(treasuryFee) : BIG_ZERO,
     creatorFee: creatorFee ? new BigNumber(creatorFee) : BIG_ZERO,
     playerAddresses,
+    prizes: deserializeGamePrize(game),
     userData: deserializeGameUserData(game),
   }
 }
 
-const selectCakeGame = (state: State) => state.games.data.find((g) => g.roundId === 2)
 const selectGameByKey = (key: string, value: string | number) => (state: State) =>
   state.games.data.find((f) => f[key] === value)
 

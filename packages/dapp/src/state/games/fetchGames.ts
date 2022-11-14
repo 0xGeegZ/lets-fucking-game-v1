@@ -1,14 +1,16 @@
 import { getGameFactoryV1Contract } from 'utils/contractHelpers'
 import { GameFactory } from 'config/types/typechain'
-// import { GameFactory } from 'config/types/typechain'
 import { formatEther } from '@ethersproject/units'
 import { parseBytes32String } from '@ethersproject/strings'
 import { arrayify } from '@ethersproject/bytes'
 
-import { fetchGamesPlayersData } from './fetchGamesPlayersData'
-import { fetchGamesPrizes } from './fetchGamesPrizes'
-import { fetchGamesPlayersAddresses } from './fetchGamesPlayersAddresses'
-import { fetchPublicGamesData } from './fetchPublicGameData'
+import BigNumber from 'bignumber.js'
+import {
+  fetchPublicGamesData,
+  fetchGamesPlayersAddresses,
+  fetchGamesPrizes,
+  fetchGamesPlayersData,
+} from './fetchGameData'
 import { State, SerializedGame, DeserializedGame, DeserializedGameUserData } from '../types'
 
 // parse a name or symbol from a token response
@@ -66,43 +68,57 @@ function gameBaseTransformer(gameData, gamePlayers) {
       address,
       creator,
       admin,
-      // TODO MANGE PRIZES
-      prizepool: parseFloat(formatEther(maxPlayers.toNumber() * registrationAmount.toNumber())),
+      prizepool: 0,
       // TODO MANGE CRON
-      encodedCron: encodedCron.toString(),
-      // encodedCron: parseStringOrBytes32('', encodedCron, ''),
+      // encodedCron: encodedCron.toString(),
+      encodedCron: parseStringOrBytes32('', encodedCron, ''),
       playerAddresses,
+      prizes: [],
     }
   }
 }
 
 function gameExtendedTransformer(gamePrizes, gamePlayersData) {
   return (game, index): SerializedGame => {
-    const [
-      [
-        {
-          id,
-          name,
-          roundId,
-          maxPlayers,
-          playTimeRange,
-          playerAddressesCount,
-          registrationAmount,
-          encodedCron,
-          isInProgress,
-          isPaused,
-          creator,
-          admin,
-          creatorFee,
-          treasuryFee,
-        },
-      ],
-    ] = gamePrizes[index]
+    const [[rawPrizes]] = gamePrizes[index]
+    const prizes = rawPrizes.map((prize) => {
+      const { amount, position } = prize
+      return {
+        amount,
+        position,
+      }
+    })
+    const prizepool = prizes.reduce((acc, prize) => acc + +prize.amount, 0)
 
-    const [[playerAddresses]] = gamePlayersData[index]
+    const [[{ gamePlayer: rawPlayers }]] = gamePlayersData[index]
+    const players = rawPlayers.map((player) => {
+      const {
+        hasLost,
+        hasPlayedRound,
+        isSplitOk,
+        playerAddress: address,
+        position,
+        roundCount,
+        roundRangeLowerLimit,
+        roundRangeUpperLimit,
+      } = player
+      return {
+        hasLost,
+        hasPlayedRound,
+        isSplitOk,
+        address,
+        position,
+        roundCount,
+        roundRangeLowerLimit,
+        roundRangeUpperLimit,
+      }
+    })
 
     return {
       ...game,
+      prizepool: parseFloat(formatEther(`${prizepool}`)),
+      prizes,
+      players,
     }
   }
 }
@@ -122,20 +138,8 @@ const fetchGames = async (chainId: number): Promise<SerializedGame[]> => {
     fetchGamesPrizes(transformedGames, chainId),
     fetchGamesPlayersData(transformedGames, chainId),
   ])
-  console.log('🚀 ~ file: fetchGames.ts ~ line 125 ~ fetchGames ~ gamePlayersData', gamePlayersData)
-  console.log('🚀 ~ file: fetchGames.ts ~ line 125 ~ fetchGames ~ gamePrizes', gamePrizes)
 
-  return transformedGames
-
-  // return transformedGames.map(gameExtendedTransformer(gamePrizes, gamePlayersData))
-
-  // // TODO GUIGUI ADD other function call if needed
-  // // load other data from getPrizes(uint256 _roundId)
-  // // load data from getPlayer(playerAdress)
-  // const [gameResult] = await Promise.all([fetchPublicGamesData(gamesToFetch, chainId)])
-
-  // // TODO GUIGUI ADD other function called results if needed
-  // return gamesToFetch.map(gameTransformer(gameResult))
+  return transformedGames.map(gameExtendedTransformer(gamePrizes, gamePlayersData))
 }
 
 export default fetchGames

@@ -99,7 +99,7 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
 )
 
 // TODO UPDATE INTERFACE
-interface GameUserDataResponse {
+interface GamePlayerDataResponse {
   id: number
   allowance: string
   tokenBalance: string
@@ -135,10 +135,10 @@ interface GameUserDataResponse {
 
 // async function getNormalGamesStakeValue(games, account, chainId) {
 //   const [userGameAllowances, userGameTokenBalances, userStakedBalances, userGameEarnings] = await Promise.all([
-//     fetchGameUserAllowances(account, games, chainId),
-//     fetchGameUserTokenBalances(account, games, chainId),
-//     fetchGameUserStakedBalances(account, games, chainId),
-//     fetchGameUserEarnings(account, games, chainId),
+//     fetchGamePlayerAllowances(account, games, chainId),
+//     fetchGamePlayerTokenBalances(account, games, chainId),
+//     fetchGamePlayerStakedBalances(account, games, chainId),
+//     fetchGamePlayerEarnings(account, games, chainId),
 //   ])
 
 //   const normalGameAllowances = userGameAllowances.map((_, index) => {
@@ -154,17 +154,17 @@ interface GameUserDataResponse {
 //   return normalGameAllowances
 // }
 
-export const fetchGameUserDataAsync = createAsyncThunk<
-  GameUserDataResponse[],
+export const fetchGamePlayerDataAsync = createAsyncThunk<
+  GamePlayerDataResponse[],
   { account: string; chainId: number },
   {
     state: AppState
   }
 >(
-  'games/fetchGameUserDataAsync',
+  'games/fetchGamePlayerDataAsync',
   async ({ account, chainId }, config) => {
     // TODO Guigui load user data if needed
-    console.log('fetchGameUserDataAsync')
+    console.log('fetchGamePlayerDataAsync')
     // const poolLength = config.getState().games.poolLength ?? (await fetchMasterChefGamePoolLength(ChainId.BSC))
     // const gamesConfig = await getFarmConfig(chainId)
     // const gamesCanFetch = gamesConfig.filter((gameConfig) => ids.includes(gameConfig.id))
@@ -185,7 +185,7 @@ export const fetchGameUserDataAsync = createAsyncThunk<
   {
     condition: (arg, { getState }) => {
       const { games } = getState()
-      if (games.loadingKeys[stringify({ type: fetchGameUserDataAsync.typePrefix, arg })]) {
+      if (games.loadingKeys[stringify({ type: fetchGamePlayerDataAsync.typePrefix, arg })]) {
         console.debug('games user action is fetching, skipping here')
         return false
       }
@@ -245,21 +245,12 @@ export const gamesSlice = createSlice({
     // Update games with live data
     builder.addCase(fetchGamesPublicDataAsync.fulfilled, (state, action) => {
       console.log('Update games with live data')
-
-      // TODO GUIGUI
-      // const [gamePayload, poolLength, regularCakePerBlock] = action.payload
-      // console.log('🚀 ~ file: index.ts ~ line 321 ~ builder.addCase ~ gamePayload', gamePayload)
-      // const gamePayloadPidMap = fromPairs(gamePayload.map((gameData) => [gameData.id, gameData]))
-      // state.data = state.data.map((game) => {
-      //   const liveGameData = gamePayloadPidMap[game.id]
-      //   return { ...game, ...liveGameData }
-      // })
-      // state.poolLength = poolLength
-      // state.regularCakePerBlock = regularCakePerBlock
+      const gameData = action.payload
+      state.data = gameData
     })
 
     // Update games with user data
-    builder.addCase(fetchGameUserDataAsync.fulfilled, (state, action) => {
+    builder.addCase(fetchGamePlayerDataAsync.fulfilled, (state, action) => {
       console.log('Update games with user data')
 
       // TODO GUIGUI
@@ -274,17 +265,20 @@ export const gamesSlice = createSlice({
       state.userDataLoaded = true
     })
 
-    builder.addMatcher(isAnyOf(fetchGameUserDataAsync.pending, fetchGamesPublicDataAsync.pending), (state, action) => {
-      state.loadingKeys[serializeLoadingKey(action, 'pending')] = true
-    })
     builder.addMatcher(
-      isAnyOf(fetchGameUserDataAsync.fulfilled, fetchGamesPublicDataAsync.fulfilled),
+      isAnyOf(fetchGamePlayerDataAsync.pending, fetchGamesPublicDataAsync.pending),
+      (state, action) => {
+        state.loadingKeys[serializeLoadingKey(action, 'pending')] = true
+      },
+    )
+    builder.addMatcher(
+      isAnyOf(fetchGamePlayerDataAsync.fulfilled, fetchGamesPublicDataAsync.fulfilled),
       (state, action) => {
         state.loadingKeys[serializeLoadingKey(action, 'fulfilled')] = false
       },
     )
     builder.addMatcher(
-      isAnyOf(fetchGamesPublicDataAsync.rejected, fetchGameUserDataAsync.rejected),
+      isAnyOf(fetchGamesPublicDataAsync.rejected, fetchGamePlayerDataAsync.rejected),
       (state, action) => {
         state.loadingKeys[serializeLoadingKey(action, 'rejected')] = false
       },

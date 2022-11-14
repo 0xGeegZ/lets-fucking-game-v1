@@ -7,17 +7,12 @@ import BigNumber from 'bignumber.js'
 interface RegisterButtonProps {
   address: string
   registrationAmount: BigNumber
-  gameCreationAmount: BigNumber
 }
 
-const RegisterButton: React.FC<React.PropsWithChildren<RegisterButtonProps>> = ({
-  address,
-  registrationAmount,
-  gameCreationAmount,
-}) => {
+const RegisterButton: React.FC<React.PropsWithChildren<RegisterButtonProps>> = ({ address, registrationAmount }) => {
   const { t } = useTranslation()
 
-  const { isPending, handleRegister } = useRegisterForGame(address, registrationAmount, gameCreationAmount)
+  const { isPending, handleRegister } = useRegisterForGame(address, registrationAmount)
 
   const isDisabledButton = useMemo(() => !address || isPending, [address, isPending])
 

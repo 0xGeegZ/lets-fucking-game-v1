@@ -188,13 +188,7 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
         <>
           {isInProgress && isInTimeRange && <PlayButton address={address} />}
 
-          {!isInProgress && (
-            <RegisterButton
-              address={address}
-              registrationAmount={registrationAmount}
-              gameCreationAmount={gameCreationAmount}
-            />
-          )}
+          {!isInProgress && <RegisterButton address={address} registrationAmount={registrationAmount} />}
 
           {isCanVoteSplitPot && <VoteSplitButton address={address} />}
           {isCreator && !isInProgress && isPaused && <UnpauseButton address={address} />}

@@ -1,1 +1,1 @@
-export { fetchGamesPublicDataAsync, fetchGameUserDataAsync } from './games'
+export { fetchGamesPublicDataAsync, fetchGamePlayerDataAsync } from './games'
