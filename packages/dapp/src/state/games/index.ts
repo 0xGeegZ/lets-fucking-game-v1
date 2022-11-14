@@ -5,7 +5,6 @@ import type {
   UnknownAsyncThunkRejectedAction,
 } from '@reduxjs/toolkit/dist/matchers'
 
-import { FARM_API } from 'config/constants/endpoints'
 import stringify from 'fast-json-stable-stringify'
 import type { AppState } from 'state'
 import { chains } from 'utils/wagmi'
@@ -16,8 +15,6 @@ import fetchGames from './fetchGames'
 
 const fetchGamePublicDataPkg = async ({ chainId }): Promise<SerializedGame[]> => fetchGames(chainId)
 
-const gameApiFetch = (chainId: number) => fetch(`${FARM_API}/${chainId}`).then((res) => res.json())
-
 const initialState: SerializedGamesState = {
   data: [],
   loadArchivedGamesData: false,
@@ -26,15 +23,17 @@ const initialState: SerializedGamesState = {
 }
 
 // Async thunks
-export const fetchInitialGamesData = createAsyncThunk<SerializedGame[], { chainId: number }>(
+export const fetchInitialGamesData = createAsyncThunk<SerializedGame[], { chainId: number; account: string }>(
   'games/fetchInitialGamesData',
-  async ({ chainId: number, account: string }) => {
+  async ({ chainId, account }) => {
     console.log('fetchInitialGamesData')
 
     const games = await fetchGames(chainId)
 
     return games.map((game) => {
-      const isPlaying = game.playerAddresses.find(account)
+      // TODO GUIGUI FIXME
+      const isPlaying = false
+      // const isPlaying = game.playerAddresses.find(account)
       return {
         ...game,
         userData: {
@@ -55,13 +54,13 @@ export const fetchInitialGamesData = createAsyncThunk<SerializedGame[], { chainI
 
 export const fetchGamesPublicDataAsync = createAsyncThunk<
   SerializedGame[],
-  { chainId: number; account: string; flag: string },
+  { chainId: number; account: string },
   {
     state: AppState
   }
 >(
   'games/fetchGamesPublicDataAsync',
-  async ({ chainId }) => {
+  async ({ chainId, account }) => {
     console.log('fetchGamesPublicDataAsync')
 
     const chain = chains.find((c) => c.id === chainId)
