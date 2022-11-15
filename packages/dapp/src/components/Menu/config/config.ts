@@ -29,7 +29,7 @@ const config: (
   [
     {
       label: t('Games '),
-      href: '/games',
+      href: '/games?chainId=97',
       icon: EarnIcon,
       fillIcon: EarnFillIcon,
       image: '/images/decorations/pe2.png',
