@@ -68,6 +68,7 @@ export const coinbaseConnector = new CoinbaseWalletConnector({
   chains,
   options: {
     appName: "Let's Fucking Game",
+    // TODO GUIGUI UPDATE APP LOGO
     appLogoUrl: 'https://pancakeswap.com/logo.png',
   },
 })

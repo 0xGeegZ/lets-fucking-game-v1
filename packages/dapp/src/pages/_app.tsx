@@ -76,7 +76,7 @@ function MyApp(props: AppProps<{ initialReduxState: any }>) {
           content="Let's Fucking Game allows you to create 'one button games' to engage your community in order to provide them with a fun way to engage with your content.  Once the game starts. players have to log in everyday during a random time slot. If you forget, you lose. The last players share the prizes according to the prizepool distribution."
         />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="🥞 Let's Fucking Game - Be the last to win the prize." />
+        <meta name="twitter:title" content="Let's Fucking Game - Be the last to win the prize" />
         <title>Let&apos;s Fucking Game</title>
         {(Component as NextPageWithLayout).mp && (
           // eslint-disable-next-line @next/next/no-sync-scripts

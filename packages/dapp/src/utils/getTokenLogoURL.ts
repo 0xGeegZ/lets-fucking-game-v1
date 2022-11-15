@@ -2,6 +2,8 @@ import { ChainId, Token } from '@pancakeswap/sdk'
 
 const mapping = {
   [ChainId.BSC]: 'smartchain',
+  [ChainId.BSC_TESTNET]: 'smartchain',
+  [ChainId.HARDHAT]: 'smartchain',
   [ChainId.ETHEREUM]: 'ethereum',
 }
 

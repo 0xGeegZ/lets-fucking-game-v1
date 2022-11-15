@@ -17,6 +17,7 @@ import Image from 'next/image'
 import NextLink from 'next/link'
 import styled, { useTheme } from 'styled-components'
 import boosterCardImage from '../images/boosterCardImage.png'
+import createGameCardImage from '../images/createGameCardImage.png'
 
 export const CardWrapper = styled.div`
   position: relative;
@@ -38,8 +39,8 @@ export const ImageWrapper = styled.div`
   ${({ theme }) => theme.mediaQueries.sm} {
     right: auto;
     top: 50%;
-    left: -70px;
-    transform: translateY(-50%);
+    left: -90px;
+    transform: translateY(-45%);
   }
   z-index: 2;
 `
@@ -92,7 +93,7 @@ export const BCakeBoosterCard = () => {
   return (
     <CardWrapper>
       <ImageWrapper>
-        <Image src={boosterCardImage} alt="boosterCardImage" width={99} height={191} placeholder="blur" />
+        <Image src={createGameCardImage} alt="createGameCardImage" width={150} height={150} placeholder="blur" />
       </ImageWrapper>
       <Card p="0px" style={{ zIndex: 1 }}>
         <StyledCardBody style={{ padding: '15px 24px' }}>
