@@ -206,7 +206,6 @@ export interface GameV1InterfaceInterface extends utils.Interface {
     "claimCreatorFee()": FunctionFragment;
     "claimPrize(uint256)": FunctionFragment;
     "claimTreasuryFee()": FunctionFragment;
-    "claimTreasuryFeeToFactory()": FunctionFragment;
     "getGameData()": FunctionFragment;
     "getPlayer(address)": FunctionFragment;
     "getPlayerAddresses()": FunctionFragment;
@@ -242,7 +241,6 @@ export interface GameV1InterfaceInterface extends utils.Interface {
       | "claimCreatorFee"
       | "claimPrize"
       | "claimTreasuryFee"
-      | "claimTreasuryFeeToFactory"
       | "getGameData"
       | "getPlayer"
       | "getPlayerAddresses"
@@ -286,10 +284,6 @@ export interface GameV1InterfaceInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "claimTreasuryFee",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "claimTreasuryFeeToFactory",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -397,10 +391,6 @@ export interface GameV1InterfaceInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "claimPrize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "claimTreasuryFee",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "claimTreasuryFeeToFactory",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -813,10 +803,6 @@ export interface GameV1Interface extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    claimTreasuryFeeToFactory(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     getGameData(
       overrides?: CallOverrides
     ): Promise<
@@ -974,10 +960,6 @@ export interface GameV1Interface extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  claimTreasuryFeeToFactory(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   getGameData(
     overrides?: CallOverrides
   ): Promise<GameV1Interface.GameDataStructOutput>;
@@ -1104,8 +1086,6 @@ export interface GameV1Interface extends BaseContract {
     ): Promise<void>;
 
     claimTreasuryFee(overrides?: CallOverrides): Promise<void>;
-
-    claimTreasuryFeeToFactory(overrides?: CallOverrides): Promise<void>;
 
     getGameData(
       overrides?: CallOverrides
@@ -1393,10 +1373,6 @@ export interface GameV1Interface extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    claimTreasuryFeeToFactory(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     getGameData(overrides?: CallOverrides): Promise<BigNumber>;
 
     getPlayer(
@@ -1524,10 +1500,6 @@ export interface GameV1Interface extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     claimTreasuryFee(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    claimTreasuryFeeToFactory(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

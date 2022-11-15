@@ -25,7 +25,7 @@ And in retrospect, it can be. But the fact is the original goal was just to find
 
 ## What it does
 
-Let's Fucking Game allows you to create "one button games" and offer them to your twitter community in order to provide them with a fun way to engage with your content.
+Let's Fucking Game allows you to create "one button games" to engage your community in order to provide them with a fun way to engage with your content.
 
 The games can be free (the creator deposits the total prizepool of the game) or paid for by the players (the prizepool is composed of the players' registration fees).
 

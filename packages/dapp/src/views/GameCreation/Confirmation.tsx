@@ -1,33 +1,10 @@
-import { Heading, Text, Button, Flex, Card, CardBody } from '@pancakeswap/uikit'
-
+import { Heading, Text, Flex, Card, CardBody } from '@pancakeswap/uikit'
 import { useTranslation } from '@pancakeswap/localization'
-import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
-import NextStepButton from './NextStepButton'
-import BackStepButton from './BackStepButton'
 
 const Confirmation: React.FC<React.PropsWithChildren> = () => {
   const { t } = useTranslation()
-  const { actions } = useGameContext()
 
   const ConfirmationsCards = () => {
-    const {
-      isInitialized,
-      currentStep,
-      treasuryFee,
-      creatorFee,
-      registrationAmount,
-      maxPlayers,
-      playTimeRange,
-      encodedCron,
-      numberPlayersAllowedToWin,
-      prizeType,
-      successMessage,
-      errorMessage,
-    } = useGameContext()
-
-    // TODO: improve style
-    // TODO: add validation form
-    // TODO: add state redux verification & handle status to update & display them
     return (
       <>
         <Flex
@@ -41,13 +18,13 @@ const Confirmation: React.FC<React.PropsWithChildren> = () => {
             <Card mb="24px">
               <CardBody>
                 <Heading as="h4" scale="lg" mb="16px">
-                  Your game is ready
+                  {t('Your game is ready')}
                 </Heading>
                 <Text as="p" color="textSubtle" mb="8px">
-                  Your game was successfully created.
+                  {t('Your game was successfully created and is waiting for players.')}
                 </Text>
                 <Text as="p" color="textSubtle" mb="16px">
-                  Let&lsquo;s find some player to start the game :)
+                  {t('Let&lsquo;s find some player by publishing the new on Twitter :)')}
                 </Text>
                 {/* // TODO GUIGUI ADD A LINK TO CREATED SMART CONTRACT on explorer */}
                 {/* // TODO GUIGUI ADD A button to share a tweet */}

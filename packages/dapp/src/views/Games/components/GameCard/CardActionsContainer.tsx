@@ -5,7 +5,7 @@ import cronstrue from 'cronstrue'
 import BigNumber from 'bignumber.js'
 
 import ConnectWalletButton from 'components/ConnectWalletButton'
-import { useMemo, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import moment from 'moment'
@@ -90,7 +90,7 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
   //   [locale],
   // )
 
-  const [cronHumanRedeable, setCronHumanRedeable] = useState('')
+  const [cronHumanReadable, setCronHumanReadable] = useState('')
 
   useEffect(() => {
     if (!encodedCron) return
@@ -99,9 +99,9 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
       const transform = cronstrue.toString(encodedCron, {
         use24HourTimeFormat: false,
       })
-      setCronHumanRedeable(transform.toLowerCase())
+      setCronHumanReadable(transform.toLowerCase())
     } catch (e) {
-      setCronHumanRedeable('')
+      setCronHumanReadable('')
     }
   }, [encodedCron])
 
@@ -146,7 +146,7 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
               <>
                 {nextFromRange && nextToRange && (
                   <Text>
-                    {moment(nextFromRange).isSame(moment(), 'day') ? 'Today' : 'Tomorrow'} between{' '}
+                    {moment(nextFromRange).isSame(moment(), 'day') ? 'Today' : 'Tomorrow'} {' between '}
                     {moment(nextFromRange).format('hh:mm A')} and {moment(nextToRange).format('hh:mm A')}
                   </Text>
                 )}
@@ -163,11 +163,11 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
         </Container>
       )}
 
-      {cronHumanRedeable && (
+      {cronHumanReadable && (
         <Container>
           <Flex justifyContent="space-between">
             <Heading mr="4px">{t('Next game draw')}</Heading>
-            {isReady ? <Text>{t(`${cronHumanRedeable}`)}</Text> : <Skeleton width="100%" height={18} mb="4px" />}
+            {isReady ? <Text>{t(`${cronHumanReadable}`)}</Text> : <Skeleton width="100%" height={18} mb="4px" />}
           </Flex>
         </Container>
       )}

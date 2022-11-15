@@ -1,5 +1,4 @@
 import { useTranslation } from '@pancakeswap/localization'
-import { ChainId } from '@pancakeswap/sdk'
 import {
   Box,
   Flex,
@@ -15,18 +14,16 @@ import ConnectWalletButton from 'components/ConnectWalletButton'
 import Trans from 'components/Trans'
 import { useActiveChainId } from 'hooks/useActiveChainId'
 import useAuth from 'hooks/useAuth'
-import NextLink from 'next/link'
 import { useEffect, useState } from 'react'
 import { usePendingTransactions } from 'state/transactions/hooks'
 import { useAccount } from 'wagmi'
-import ProfileUserMenuItem from './ProfileUserMenuItem'
 import WalletModal, { WalletView } from './WalletModal'
 import WalletUserMenuItem from './WalletUserMenuItem'
 
 const UserMenu = () => {
   const { t } = useTranslation()
   const { address: account } = useAccount()
-  const { chainId, isWrongNetwork } = useActiveChainId()
+  const { isWrongNetwork } = useActiveChainId()
   const { logout } = useAuth()
   const { hasPendingTransactions, pendingNumber } = usePendingTransactions()
   const [onPresentWalletModal] = useModal(<WalletModal initialView={WalletView.WALLET_INFO} />)
@@ -63,16 +60,6 @@ const UserMenu = () => {
           {hasPendingTransactions && <RefreshIcon spin />}
         </UserMenuItem>
         <UserMenuDivider />
-        {/* <NextLink href={`/profile/${account?.toLowerCase()}`} passHref>
-          <UserMenuItem as="a" disabled={isWrongNetwork || chainId !== ChainId.BSC}>
-            {t('Your NFTs')}
-          </UserMenuItem>
-        </NextLink> */}
-        {/* <ProfileUserMenuItem
-          isLoading={isLoading}
-          hasProfile={hasProfile}
-          disabled={isWrongNetwork || chainId !== ChainId.BSC}
-        /> */}
         <UserMenuDivider />
         <UserMenuItem as="button" onClick={logout}>
           <Flex alignItems="center" justifyContent="space-between" width="100%">

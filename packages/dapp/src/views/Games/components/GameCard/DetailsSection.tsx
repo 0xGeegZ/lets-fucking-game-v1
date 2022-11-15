@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Flex, Heading, Skeleton, Text, LinkExternal } from '@pancakeswap/uikit'
+import { Flex, Skeleton, Text, LinkExternal } from '@pancakeswap/uikit'
 
 import ActionButton from 'views/Games/components/YieldBooster/components/ActionButton'
 import { useTranslation } from '@pancakeswap/localization'

@@ -4,9 +4,7 @@ import {
   Card,
   CardBody,
   CardFooter,
-  Flex,
   HelpIcon,
-  Link,
   RocketIcon,
   Text,
   useTooltip,
@@ -66,17 +64,15 @@ export const useBCakeTooltipContent = () => {
   const { t } = useTranslation()
   const tooltipContent = (
     <>
-      <Box mb="20px">
-        {t(
-          'Yield Boosters allow you to boost your gaming yields by locking CAKE in the fixed-term staking CAKE pool. The more CAKE you lock, and the longer you lock them, the higher the boost you will receive.',
-        )}
-      </Box>
-      <Box>
+      <Box>{t('More infos on game creation soon')}</Box>
+      {/* TODO GUIGUI WRITE GAME CREATION RULES */}
+      {/* <Box mb="20px">{t('More infos on game creation soon')}</Box> */}
+      {/* <Box>
         {t('To learn more, check out the')}
         <Link target="_blank" href="https://medium.com/pancakeswap/introducing-bcake-game-yield-boosters-b27b7a6f0f84">
           {t('Medium Article')}
         </Link>
-      </Box>
+      </Box> */}
     </>
   )
   return tooltipContent
@@ -119,7 +115,7 @@ export const BCakeBoosterCard = () => {
 
 const CardContent: React.FC = () => {
   const { t } = useTranslation()
-  const { account, chainId } = useActiveWeb3React()
+  const { account } = useActiveWeb3React()
 
   const theme = useTheme()
 

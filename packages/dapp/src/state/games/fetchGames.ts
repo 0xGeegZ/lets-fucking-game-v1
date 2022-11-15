@@ -52,7 +52,7 @@ function gameBaseTransformer(gameData, gamePlayers) {
     const [[playerAddresses]] = gamePlayers[index]
 
     return {
-      id,
+      id: id.toNumber(),
       name: parseStringOrBytes32('', name, 'Game'),
       roundId: roundId.toNumber(),
       maxPlayers: maxPlayers.toNumber(),
@@ -78,68 +78,80 @@ function gameBaseTransformer(gameData, gamePlayers) {
   }
 }
 
-function gameExtendedTransformer(gamePrizes, gamePlayersData) {
+function gameExtendedTransformer(gamePrizes /* , gamePlayersData */) {
   return (game, index): SerializedGame => {
     const [[rawPrizes]] = gamePrizes[index]
     const prizes = rawPrizes.map((prize) => {
       const { amount, position } = prize
       return {
+        // TODO GUIGUI FIRST HANDLE AMOUNT MANAGEMENT WITH STRING
+        // amount: formatEther(`${amount}`),
         amount,
-        position,
+        position: position.toNumber(),
       }
     })
     const prizepool = prizes.reduce((acc, prize) => acc + +prize.amount, 0)
 
-    const [[{ gamePlayer: rawPlayers }]] = gamePlayersData[index]
-    const players = rawPlayers.map((player) => {
-      const {
-        hasLost,
-        hasPlayedRound,
-        isSplitOk,
-        playerAddress: address,
-        position,
-        roundCount,
-        roundRangeLowerLimit,
-        roundRangeUpperLimit,
-      } = player
-      return {
-        hasLost,
-        hasPlayedRound,
-        isSplitOk,
-        address,
-        position,
-        roundCount,
-        roundRangeLowerLimit,
-        roundRangeUpperLimit,
-      }
-    })
+    // const [[{ gamePlayer: rawPlayers }]] = gamePlayersData[index]
+    // const players = rawPlayers.map((player) => {
+    //   const {
+    //     hasLost,
+    //     hasPlayedRound,
+    //     isSplitOk,
+    //     playerAddress: address,
+    //     position,
+    //     roundCount,
+    //     roundRangeLowerLimit,
+    //     roundRangeUpperLimit,
+    //   } = player
+    //   return {
+    //     hasLost,
+    //     hasPlayedRound,
+    //     isSplitOk,
+    //     address,
+    //     position,
+    //     roundCount,
+    //     roundRangeLowerLimit,
+    //     roundRangeUpperLimit,
+    //   }
+    // })
 
     return {
       ...game,
       prizepool: parseFloat(formatEther(`${prizepool}`)),
       prizes,
-      players,
+      // players,
     }
   }
 }
 
 const fetchGames = async (chainId: number): Promise<SerializedGame[]> => {
-  const gameFactoryContract: GameFactory = getGameFactoryV1Contract(chainId)
-  const gamesToFetch: GameFactory.GameStructOutput[] = await gameFactoryContract.getDeployedGames()
+  try {
+    const gameFactoryContract: GameFactory = getGameFactoryV1Contract(chainId)
+    const gamesToFetch: GameFactory.GameStructOutput[] = await gameFactoryContract.getDeployedGames()
 
-  const [gameData, gamePlayers] = await Promise.all([
-    fetchPublicGamesData(gamesToFetch, chainId),
-    fetchGamesPlayersAddresses(gamesToFetch, chainId),
-  ])
+    const [gameData, gamePlayers] = await Promise.all([
+      fetchPublicGamesData(gamesToFetch, chainId),
+      fetchGamesPlayersAddresses(gamesToFetch, chainId),
+    ])
+    console.log('🚀 ~ file: fetchGames.ts ~ line 137 ~ fetchGames ~ gamePlayers', gamePlayers)
+    console.log('🚀 ~ file: fetchGames.ts ~ line 137 ~ fetchGames ~ gameData', gameData)
 
-  const transformedGames = gamesToFetch.map(gameBaseTransformer(gameData, gamePlayers))
+    const transformedGames = gamesToFetch.map(gameBaseTransformer(gameData, gamePlayers))
+    console.log('🚀 ~ file: fetchGames.ts ~ line 139 ~ fetchGames ~ transformedGames', transformedGames)
 
-  const [gamePrizes, gamePlayersData] = await Promise.all([
-    fetchGamesPrizes(transformedGames, chainId),
-    fetchGamesPlayersData(transformedGames, chainId),
-  ])
+    // TODO GUIGUI HANDLE gamePlayersData
+    const [gamePrizes /* , gamePlayersData */] = await Promise.all([
+      fetchGamesPrizes(transformedGames, chainId),
+      // fetchGamesPlayersData(transformedGames, chainId),
+    ])
 
-  return transformedGames.map(gameExtendedTransformer(gamePrizes, gamePlayersData))
+    const completeGames = transformedGames.map(gameExtendedTransformer(gamePrizes /* , gamePlayersData */))
+    return completeGames
+  } catch (error) {
+    console.error(error)
+  }
+  return []
 }
 
 export default fetchGames

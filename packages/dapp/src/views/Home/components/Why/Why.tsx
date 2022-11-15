@@ -18,19 +18,19 @@ const Why: React.FC<React.PropsWithChildren> = () => {
       </Flex>
       <GappedFlex flexDirection={['column', 'column', 'column', 'row']}>
         <Flex flex="2" flexDirection="column">
-          <Heading mb="24px" scale="md">
+          <Heading mt="24px" scale="md">
             {t('Have fun')}
           </Heading>
           <Text mb="16px" color="textSubtle">
             {t('This project was created to have fun and help people starting to interact with web3 easily.')}
           </Text>
-          <Heading mb="24px" scale="md">
+          <Heading mt="24px" scale="md">
             {t('Discover Web3')}
           </Heading>
           <Text mb="16px" color="textSubtle">
             {t('As a developper team, we want to learn web3 and ttry new technologies like keepers or EPNS.')}
           </Text>
-          <Heading mb="24px" scale="md">
+          <Heading mt="24px" scale="md">
             {t('Bring a new way to activate community')}
           </Heading>
           <Text mb="16px" color="textSubtle">

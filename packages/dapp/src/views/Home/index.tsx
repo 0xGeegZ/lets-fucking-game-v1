@@ -1,7 +1,5 @@
 import styled from 'styled-components'
 import PageSection from 'components/PageSection'
-import useTheme from 'hooks/useTheme'
-import Container from 'components/Layout/Container'
 import { PageMeta } from 'components/Layout/Page'
 import Hero from './components/Hero'
 import MetricsSection from './components/MetricsSection'
@@ -22,39 +20,25 @@ const StyledHeroSection = styled(PageSection)`
   }
 `
 
-const UserBannerWrapper = styled(Container)`
-  z-index: 1;
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 50%;
-  transform: translate(-50%, 0);
-  padding-left: 0px;
-  padding-right: 0px;
-
-  ${({ theme }) => theme.mediaQueries.lg} {
-    padding-left: 24px;
-    padding-right: 24px;
-  }
+const StyledGameSection = styled(PageSection)`
+  padding: 0;
 `
 
 const Home: React.FC<React.PropsWithChildren> = () => {
-  const { theme } = useTheme()
-
   return (
     <>
       <PageMeta />
       <style jsx global>{`
-        #home-1 .page-bg {
+        #hero .page-bg {
           background: linear-gradient(139.73deg, #e6fdff 0%, #f3efff 100%);
         }
-        [data-theme='dark'] #home-1 .page-bg {
+        [data-theme='dark'] #hero .page-bg {
           background: radial-gradient(103.12% 50% at 50% 50%, #21193a 0%, #191326 100%);
         }
-        #home-2 .page-bg {
+        #metrics .page-bg {
           background: linear-gradient(180deg, #ffffff 22%, #d7caec 100%);
         }
-        [data-theme='dark'] #home-2 .page-bg {
+        [data-theme='dark'] #metrics .page-bg {
           background: linear-gradient(180deg, #09070c 22%, #201335 100%);
         }
         #home-3 .page-bg {
@@ -63,17 +47,17 @@ const Home: React.FC<React.PropsWithChildren> = () => {
         [data-theme='dark'] #home-3 .page-bg {
           background: linear-gradient(180deg, #0b4576 0%, #091115 100%);
         }
-        #home-4 .inner-wedge svg {
+        #why .inner-wedge svg {
           fill: #d8cbed;
         }
-        [data-theme='dark'] #home-4 .inner-wedge svg {
+        [data-theme='dark'] #why .inner-wedge svg {
           fill: #201335;
         }
       `}</style>
       <StyledHeroSection
         innerProps={{ style: { margin: '0', width: '100%' } }}
         containerProps={{
-          id: 'home-1',
+          id: 'hero',
         }}
         index={2}
         hasCurvedDivider={false}
@@ -83,7 +67,7 @@ const Home: React.FC<React.PropsWithChildren> = () => {
       <PageSection
         innerProps={{ style: { margin: '0', width: '100%' } }}
         containerProps={{
-          id: 'home-2',
+          id: 'metrics',
         }}
         index={2}
         hasCurvedDivider={false}
@@ -92,42 +76,45 @@ const Home: React.FC<React.PropsWithChildren> = () => {
       </PageSection>
 
       <PageSection
-        // dividerPosition="top"
-        // dividerFill={{ light: theme.colors.background }}
-        // clipFill={{ light: '#9A9FD0', dark: '#66578D' }}
         index={2}
+        dividerPosition="top"
+        containerProps={{
+          id: 'how-to-play',
+        }}
       >
         <HowToPlay />
       </PageSection>
 
-      <PageSection index={2}>
+      <StyledGameSection
+        innerProps={{ style: { padding: '24px 0 0', width: '100%' } }}
+        index={2}
+        hasCurvedDivider={false}
+      >
         <Games />
+      </StyledGameSection>
+
+      <PageSection index={2} dividerPosition="bottom">
+        <Rules />
+        <FAQ />
       </PageSection>
 
       <PageSection
-        dividerPosition="top"
-        dividerFill={{ light: theme.colors.background }}
-        clipFill={{ light: '#9A9FD0', dark: '#66578D' }}
-        index={2}
-      >
-        <Rules />
-      </PageSection>
-      {/* <PageSection
-        innerProps={{ style: HomeSectionContainerStyles }}
-        background={theme.colors.background}
-        index={2}
+        background={CHECK_PRIZES_BG}
         hasCurvedDivider={false}
-      > */}
-      <FAQ />
-      {/* </PageSection> */}
-      <PageSection background={CHECK_PRIZES_BG} hasCurvedDivider={false} index={2}>
+        index={2}
+        containerProps={{
+          id: 'prizes',
+        }}
+      >
         <CheckPrizesSection />
       </PageSection>
       <PageSection
-        dividerPosition="top"
-        dividerFill={{ light: theme.colors.background }}
-        clipFill={{ light: '#9A9FD0', dark: '#66578D' }}
+        innerProps={{ style: { margin: '0', width: '100%' } }}
+        containerProps={{
+          id: 'why',
+        }}
         index={2}
+        hasCurvedDivider={false}
       >
         <Why />
       </PageSection>

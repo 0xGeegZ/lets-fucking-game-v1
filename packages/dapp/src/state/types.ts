@@ -25,7 +25,7 @@ export type SerializedBigNumber = string
 // Games
 
 export interface SerializedPrizeData {
-  amount: number
+  amount: string
   position: number
 }
 

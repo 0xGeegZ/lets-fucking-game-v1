@@ -1,25 +1,12 @@
-import { Heading, Flex, Text, Skeleton, ChartIcon, CommunityIcon, SwapIcon } from '@pancakeswap/uikit'
+import { Heading, Flex, Text, ChartIcon, CommunityIcon, SwapIcon } from '@pancakeswap/uikit'
 import { useTranslation } from '@pancakeswap/localization'
 import useTheme from 'hooks/useTheme'
-import { formatLocalisedCompactNumber } from 'utils/formatBalance'
-import useSWRImmutable from 'swr/immutable'
 import IconCard, { IconCardData } from '../IconCard'
 import StatCardContent from './StatCardContent'
-import GradientLogo from '../GradientLogoSvg'
 
 const Stats = () => {
   const { t } = useTranslation()
   const { theme } = useTheme()
-
-  const { data: tvl } = useSWRImmutable('tvl')
-  const { data: txCount } = useSWRImmutable('totalTx30Days')
-  const { data: addressCount } = useSWRImmutable('addressCount30Days')
-  const trades = formatLocalisedCompactNumber(txCount)
-  const users = formatLocalisedCompactNumber(addressCount)
-  const tvlString = tvl ? formatLocalisedCompactNumber(tvl) : '-'
-
-  const tvlText = t('Sign up to current MVP game and won up to $1000 for a $10 bet', { tvl: tvlString })
-  const [entrusting, inFunds] = tvlText.split(tvlString)
 
   const UsersCardData: IconCardData = {
     icon: <CommunityIcon color="secondary" width="36px" />,
@@ -35,7 +22,7 @@ const Stats = () => {
 
   return (
     <Flex justifyContent="center" alignItems="center" flexDirection="column">
-      <GradientLogo height="48px" width="48px" mb="24px" />
+      {/* <GradientLogo height="48px" width="48px" mb="24px" /> */}
       <Heading textAlign="center" scale="xl">
         {t('Be the last player')}
       </Heading>
@@ -47,9 +34,7 @@ const Stats = () => {
       </Text>
       <Flex flexWrap="wrap">
         <Text display="inline" textAlign="center" color="textSubtle" mb="20px">
-          {entrusting}
-          <>{tvl ? <>{tvlString}</> : <Skeleton display="inline-block" height={16} width={70} mt="2px" />}</>
-          {inFunds}
+          {t('Sign up to current MVP game and won up to x100 your bet')}
         </Text>
       </Flex>
 
@@ -60,22 +45,22 @@ const Stats = () => {
       <Flex flexDirection={['column', null, null, 'row']}>
         <IconCard {...UsersCardData} mr={[null, null, null, '16px']} mb={['16px', null, null, '0']}>
           <StatCardContent
-            headingText={t('100 players' /* { users } */)} // check if we need to put the number static or not
+            headingText={t('100 players')}
             bodyText={t('can register for current game')}
             highlightColor={theme.colors.secondary}
           />
         </IconCard>
         <IconCard {...TradesCardData} mr={[null, null, null, '16px']} mb={['16px', null, null, '0']}>
           <StatCardContent
-            headingText={t('1 action a day' /* { trades } */)} // check if we need to put the number static or not
-            bodyText={t('during random range of 4 hours')}
+            headingText={t('1 action a day')}
+            bodyText={t('during random range from 2 to 8 hours')}
             highlightColor={theme.colors.primary}
           />
         </IconCard>
         <IconCard {...StakedCardData} mr={[null, null, null, '16px']} mb={['16px', null, null, '0']}>
           <StatCardContent
-            headingText={t('x100 ROI for winner' /* { tvl: tvlString } */)} // check if we need to put the number static or not
-            bodyText={t('for the last player')}
+            headingText={t('Up to x100 ROI')}
+            bodyText={t('for the winner')}
             highlightColor={theme.colors.failure}
           />
         </IconCard>

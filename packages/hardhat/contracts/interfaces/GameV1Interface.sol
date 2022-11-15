@@ -382,12 +382,6 @@ interface GameV1Interface {
     function claimTreasuryFee() external;
 
     /**
-     * @notice Withdraw Treasury fee and send it to factory
-     * @dev Callable by factory
-     */
-    function claimTreasuryFeeToFactory() external;
-
-    /**
      * @notice Set the treasury fee for the game
      * @param _treasuryFee the new treasury fee in %
      * @dev Callable by admin

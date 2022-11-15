@@ -1,7 +1,5 @@
 import { useEffect, useCallback, useState, useMemo, useRef, createContext } from 'react'
 import { createPortal } from 'react-dom'
-import BigNumber from 'bignumber.js'
-import { ChainId } from '@pancakeswap/sdk'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { useWeb3React } from '@pancakeswap/wagmi'
 import { Image, Heading, Toggle, Text, Button, ArrowForwardIcon, Flex, Link, Box } from '@pancakeswap/uikit'
@@ -14,16 +12,14 @@ import useIntersectionObserver from 'hooks/useIntersectionObserver'
 import { DeserializedGame } from 'state/types'
 import { useTranslation } from '@pancakeswap/localization'
 import orderBy from 'lodash/orderBy'
-import { latinise } from 'utils/latinise'
 import { useUserGamesViewMode } from 'state/user/hooks'
-import { ViewMode } from 'state/user/actions'
 import { useRouter } from 'next/router'
 import PageHeader from 'components/PageHeader'
 import SearchInput from 'components/SearchInput'
 import Select, { OptionProps } from 'components/Select/Select'
 import Loading from 'components/Loading'
-import ToggleView from 'components/ToggleView/ToggleView'
 import ScrollToTopButton from 'components/ScrollToTopButton/ScrollToTopButtonV2'
+import { latinise } from 'utils/latinise'
 import GameTabButtons from './components/GameTabButtons'
 import { BCakeBoosterCard } from './components/BCakeBoosterCard'
 
@@ -116,43 +112,21 @@ const ViewControls = styled.div`
   }
 `
 
-const StyledImage = styled(Image)`
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 58px;
-`
-
-const FinishedTextContainer = styled(Flex)`
-  padding-bottom: 32px;
-  flex-direction: column;
-  ${({ theme }) => theme.mediaQueries.md} {
-    flex-direction: row;
-  }
-`
-
-const FinishedTextLink = styled(Link)`
-  font-weight: 400;
-  white-space: nowrap;
-  text-decoration: underline;
-`
-
 const NUMBER_OF_FARMS_VISIBLE = 12
 
 const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { pathname, query: urlQuery } = useRouter()
   const { t } = useTranslation()
-  const { chainId } = useActiveWeb3React()
   // TODO GUIGUI update hook
   const { data: games, userDataLoaded } = useGames()
-
-  const cakePrice = usePriceCakeBusd()
 
   const [_query, setQuery] = useState('')
   const normalizedUrlSearch = useMemo(() => (typeof urlQuery?.search === 'string' ? urlQuery.search : ''), [urlQuery])
   const query = normalizedUrlSearch && !_query ? normalizedUrlSearch : _query
 
-  const [viewMode, setViewMode] = useUserGamesViewMode()
-  const { account } = useWeb3React()
+  //   const [viewMode, setViewMode] = useUserGamesViewMode()
+
+  //   const { account } = useWeb3React()
   const [sortOption, setSortOption] = useState('hot')
   const { observerRef, isIntersecting } = useIntersectionObserver()
   const chosenGamesLength = useRef(0)
@@ -167,7 +141,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   // Users with no wallet connected should see 0 as Earned amount
   // Connected users should see loading indicator until first userData has loaded
-  const userDataReady = !account || (!!account && userDataLoaded)
+  //   const userDataReady = !account || (!!account && userDataLoaded)
 
   const [isNotFullOnly, setStakedOnly] = useState(isActive)
   const [boostedOnly, setBoostedOnly] = useState(false)
@@ -399,12 +373,14 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
         {/* )} */}
 
         {/* // TODO GUIGUI UPDATE CONDITION */}
-        {account && !userDataLoaded && (
+        {/* {account && !userDataLoaded && ( */}
+        {!games && (
           <Flex justifyContent="center">
             <Loading />
             {/* <StyledImage src="/images/decorations/3dpan.png" alt="Pancake illustration" width={120} height={103} /> */}
           </Flex>
         )}
+
         {userDataLoaded && <div ref={observerRef} />}
       </Page>
       {createPortal(<ScrollToTopButton />, document.body)}

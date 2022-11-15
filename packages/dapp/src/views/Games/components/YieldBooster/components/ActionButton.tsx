@@ -7,7 +7,6 @@ import {
   Flex,
   TooltipText,
   useTooltip,
-  LinkExternal,
   useMatchBreakpoints,
 } from '@pancakeswap/uikit'
 import _isEmpty from 'lodash/isEmpty'
@@ -30,7 +29,9 @@ const BoosterTooltip = () => {
 
   return (
     <>
-      {t(
+      {t('More infos on game rules soon')}
+      {/* TODO GUIGUI WRITE GAME RULES */}
+      {/* {t(
         `Boost multiplier is calculated based on the staking conditions from both Farms and fixed-term CAKE syrup pool and will be automatically updated upon user actions.`,
       )}
       <LinkExternal
@@ -38,7 +39,7 @@ const BoosterTooltip = () => {
         external
       >
         {t('Learn More')}
-      </LinkExternal>
+      </LinkExternal> */}
     </>
   )
 }

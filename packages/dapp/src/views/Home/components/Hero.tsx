@@ -126,14 +126,14 @@ const Hero = () => {
       >
         <Flex flex="1" flexDirection="column">
           <Heading scale="xxl" color="secondary" mb="24px">
-            {t("Let's Fucking Game.")}
+            {t("Let's F*#@$* Game.")}
           </Heading>
           <Heading scale="md" mb="24px">
-            {t('Interact with our smart contract once a day and be the last to won the prizepool..')}
+            {t('Play to our "One Button Game" once a day. Be one of the last to share the prizepool.')}
           </Heading>
           <Flex>
             {!account && <ConnectWalletButton mr="8px" />}
-            <NextLinkFromReactRouter to="/swap">
+            <NextLinkFromReactRouter to="#metrics">
               <Button variant={!account ? 'secondary' : 'primary'}>{t('More infos')}</Button>
             </NextLinkFromReactRouter>
           </Flex>
@@ -146,7 +146,7 @@ const Hero = () => {
           position="relative"
         >
           <BunnyWrapper>
-            <Image src={bunnyImage} priority placeholder="blur" alt={t('Lunar bunny')} />
+            <Image src={bunnyImage} priority placeholder="blur" alt={t('LFG Hero Image')} />
           </BunnyWrapper>
           <StarsWrapper>
             <CompositeImage {...starsImage} />

@@ -5,7 +5,6 @@ import useCatchTxError from 'hooks/useCatchTxError'
 import { ToastDescriptionWithTx } from 'components/Toast'
 import { useGameV1Contract } from 'hooks/useContract'
 import BigNumber from 'bignumber.js'
-import { BigNumber as EthersBigNumber } from '@ethersproject/bignumber'
 import { parseEther } from '@ethersproject/units'
 
 export const useRegisterForGame = (gameAddress: string, registrationAmount: BigNumber) => {

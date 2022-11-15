@@ -1,8 +1,6 @@
 import styled from 'styled-components'
-import { Box, Flex, Text, Heading, Link, Image, useMatchBreakpoints } from '@pancakeswap/uikit'
+import { Box, Flex, Text, Heading, Image } from '@pancakeswap/uikit'
 import { useTranslation } from '@pancakeswap/localization'
-import useTheme from 'hooks/useTheme'
-import { BallWithNumber } from '../../svgs'
 
 const Divider = styled.div`
   background-color: ${({ theme }) => theme.colors.cardBorder};
@@ -44,8 +42,6 @@ const StepCardInner = styled(Box)`
   background: ${({ theme }) => theme.card.background};
   border-radius: ${({ theme }) => theme.radii.card};
 `
-
-type Step = { title: string; subtitle: string; label: string }
 
 const WinningCriteriaDrawing = () => {
   return <Image src="/images/Saly-6.png" alt="drawing of winning criteria" width={212} height={212} />
@@ -125,23 +121,6 @@ const GappedFlex = styled(Flex)`
 const Rules: React.FC<React.PropsWithChildren> = () => {
   const { t } = useTranslation()
 
-  const steps: Step[] = [
-    {
-      label: t('Step %number%', { number: 1 }),
-      title: t('Buy Tickets'),
-      subtitle: t('Prices are set when the round starts, equal to 5 USD in CAKE per ticket.'),
-    },
-    {
-      label: t('Step %number%', { number: 2 }),
-      title: t('Wait for the Draw'),
-      subtitle: t('There is one draw every day alternating between 0 AM UTC and 12 PM UTC.'),
-    },
-    {
-      label: t('Step %number%', { number: 3 }),
-      title: t('Check for Prizes'),
-      subtitle: t('Once the round’s over, come back to the page and check to see if you’ve won!'),
-    },
-  ]
   return (
     <Box width="100%">
       <Flex mb="40px" alignItems="center" flexDirection="column">
@@ -179,7 +158,7 @@ const Rules: React.FC<React.PropsWithChildren> = () => {
           </BulletList>
           <Text mt="16px" color="textSubtle">
             {t(
-              'More options will be added after the MVP test. Players would be able to launch their own game and all rules will be configurables.',
+              'More options will be added after the MVP test. Players would be able to launch their own game and all rules will be configurable.',
             )}
           </Text>
         </Flex>

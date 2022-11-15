@@ -801,23 +801,6 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
     }
 
     /**
-     * @notice Withdraw Treasury fee and send it to factory
-     * @dev Callable by factory
-     */
-    function claimTreasuryFeeToFactory()
-        external
-        override
-        onlyAdminOrFactory
-        onlyIfClaimableAmount(treasuryAmount)
-        onlyIfEnoughtBalance(treasuryAmount)
-    {
-        uint256 currentTreasuryAmount = treasuryAmount;
-        treasuryAmount = 0;
-        emit TreasuryFeeClaimedByFactory(currentTreasuryAmount);
-        _safeTransfert(factory, currentTreasuryAmount);
-    }
-
-    /**
      * @notice Set the treasury fee for the game
      * @param _treasuryFee the new treasury fee in %
      * @dev Callable by admin

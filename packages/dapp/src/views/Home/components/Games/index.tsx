@@ -19,10 +19,10 @@ const GamesPage = () => {
 
   const { account } = useWeb3React()
 
-  const { data: gamesLP, userDataLoaded } = useGames()
+  const { data: games } = useGames()
   const [numberOfGamesVisible] = useState(NUMBER_OF_GAMES_VISIBLE)
 
-  const activeGames = gamesLP.filter((game) => !game.isDeleted)
+  const activeGames = games.filter((game) => !game.isDeleted)
 
   const chosenGamesMemoized = useMemo(() => {
     return activeGames.slice(0, numberOfGamesVisible)
@@ -32,20 +32,17 @@ const GamesPage = () => {
     <Box width="100%">
       <Flex mb="40px" alignItems="center" flexDirection="column">
         <Heading mb="24px" scale="xl" color="secondary">
-          {t('Games')}
+          {t('Choose your Game')}
         </Heading>
         <Text textAlign="center">
-          {t(
-            'If the digits on your tickets match the winning numbers in the correct order, you win a portion of the prize pool.',
-          )}
+          {t('Register for the game and wait until the total number of players is reached')}
         </Text>
-        <Text>{t('Simple as it!')}</Text>
       </Flex>
       <FlexLayout>
         {chosenGamesMemoized.map((game) => (
           <GameCard key={game.id.toNumber()} game={game} account={account} />
         ))}
-        {account && !userDataLoaded && (
+        {!chosenGamesMemoized && (
           <Flex justifyContent="center">
             <Loading />
           </Flex>

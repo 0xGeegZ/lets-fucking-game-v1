@@ -24,6 +24,7 @@ import { SentryErrorBoundary } from '../components/ErrorBoundary'
 import Menu from '../components/Menu'
 import Providers from '../Providers'
 import GlobalStyle from '../style/Global'
+import bunnyImage from '../../public/images/home/lunar-bunny/astronaut-bunny.png'
 
 const EasterEgg = dynamic(() => import('components/EasterEgg'), { ssr: false })
 
@@ -66,19 +67,16 @@ function MyApp(props: AppProps<{ initialReduxState: any }>) {
         />
         <meta
           name="description"
-          content="Cheaper and faster than Uniswap? Discover Let's Fucking Game, the leading DEX on BNB Smart Chain (BSC) with the best farms in DeFi and a lottery for CAKE."
+          content="Let's Fucking Game allows you to create 'one button games' to engage your community in order to provide them with a fun way to engage with your content.  Once the game starts. players have to log in everyday during a random time slot. If you forget, you lose. The last players share the prizes according to the prizepool distribution."
         />
         <meta name="theme-color" content="#1FC7D4" />
-        <meta name="twitter:image" content="https://pancakeswap.finance/images/hero.png" />
+        <meta name="twitter:image" content={bunnyImage.src} />
         <meta
           name="twitter:description"
-          content="The most popular AMM on BSC! Earn CAKE through yield farming or win it in the Lottery, then stake it in Syrup Pools to earn more tokens! Initial Farm Offerings (new token launch model pioneered by Let's Fucking Game), NFTs, and more, on a platform you can trust."
+          content="Let's Fucking Game allows you to create 'one button games' to engage your community in order to provide them with a fun way to engage with your content.  Once the game starts. players have to log in everyday during a random time slot. If you forget, you lose. The last players share the prizes according to the prizepool distribution."
         />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          name="twitter:title"
-          content="🥞 Let's Fucking Game - A next evolution DeFi exchange on BNB Smart Chain (BSC)"
-        />
+        <meta name="twitter:title" content="🥞 Let's Fucking Game - Be the last to win the prize." />
         <title>Let&apos;s Fucking Game</title>
         {(Component as NextPageWithLayout).mp && (
           // eslint-disable-next-line @next/next/no-sync-scripts

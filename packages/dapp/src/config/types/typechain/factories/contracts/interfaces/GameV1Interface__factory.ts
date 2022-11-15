@@ -493,13 +493,6 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "claimTreasuryFeeToFactory",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "getGameData",
     outputs: [
       {

@@ -35,7 +35,11 @@ const NetworkSelect = ({ switchNetwork, chainId }) => {
       </Box>
       <UserMenuDivider />
       {chains
-        .filter((chain) => (process.env.NODE_ENV === 'development' ? true : !chain.testnet || chain.id === chainId))
+        .filter((chain) =>
+          process.env.NODE_ENV === 'development'
+            ? true
+            : !chain.testnet || ChainId.BSC_TESTNET === chain.id || chain.id === chainId,
+        )
         .map((chain) => (
           <UserMenuItem
             key={chain.id}
