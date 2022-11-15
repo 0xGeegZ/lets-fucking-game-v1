@@ -171,9 +171,14 @@ export const fetchGamePlayerDataAsync = createAsyncThunk<
 
     const games = data.length ? data : await fetchGamePublicDataPkg({ chainId })
 
+    // if (data.length) {
+    // const games = data.length ? data : await fetchGamePublicDataPkg({ chainId })
+    // const games = data
     const playerData = await fetchGamesPlayerData(games, account, chainId)
 
     return games.map(gamePlayerDataTransformer(playerData, account))
+    // }
+    // return []
   },
   {
     condition: (arg, { getState }) => {
