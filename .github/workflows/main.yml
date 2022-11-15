@@ -30,3 +30,8 @@ jobs:
 
       - name: Coverage
         run: yarn coverage:contracts
+
+      # - name: Coveralls
+      #   uses: codecov/codecov-action@v2
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}

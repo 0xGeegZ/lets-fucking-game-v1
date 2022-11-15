@@ -178,7 +178,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
             hasPlayedRound: false,
             hasLost: false,
             isSplitOk: false,
-            position: maxPlayers,
+            position: playerAddresses.length + 1,
             roundRangeUpperLimit: 0,
             roundRangeLowerLimit: 0
         });
@@ -622,7 +622,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
     function getGameData() external view override returns (GameData memory gameData) {
         return
             GameData({
-                creator: creator,
+                id: id,
                 roundId: roundId,
                 name: name,
                 playerAddressesCount: playerAddresses.length,
@@ -632,7 +632,10 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
                 treasuryFee: treasuryFee,
                 creatorFee: creatorFee,
                 isPaused: paused(),
-                isInProgress: isInProgress
+                isInProgress: isInProgress,
+                creator: creator,
+                admin: owner,
+                encodedCron: encodedCron
             });
     }
 
@@ -795,23 +798,6 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         treasuryAmount = 0;
         emit TreasuryFeeClaimed(currentTreasuryAmount);
         _safeTransfert(owner, currentTreasuryAmount);
-    }
-
-    /**
-     * @notice Withdraw Treasury fee and send it to factory
-     * @dev Callable by factory
-     */
-    function claimTreasuryFeeToFactory()
-        external
-        override
-        onlyAdminOrFactory
-        onlyIfClaimableAmount(treasuryAmount)
-        onlyIfEnoughtBalance(treasuryAmount)
-    {
-        uint256 currentTreasuryAmount = treasuryAmount;
-        treasuryAmount = 0;
-        emit TreasuryFeeClaimedByFactory(currentTreasuryAmount);
-        _safeTransfert(factory, currentTreasuryAmount);
     }
 
     /**

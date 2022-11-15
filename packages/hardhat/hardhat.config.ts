@@ -114,7 +114,8 @@ const config: HardhatUserConfig = {
     },
   },
   typechain: {
-    outDir: '../types/typechain',
+    // outDir: '../types/typechain',
+    outDir: '../dapp/src/config/types/typechain',
   },
   contractSizer: {
     runOnCompile: false,

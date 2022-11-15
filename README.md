@@ -25,7 +25,7 @@ And in retrospect, it can be. But the fact is the original goal was just to find
 
 ## What it does
 
-Let's Fucking Game allows you to create "One button games" and propose them to your twitter community.
+Let's Fucking Game allows you to create "one button games" to engage your community in order to provide them with a fun way to engage with your content.
 
 The games can be free (the creator deposits the total prizepool of the game) or paid for by the players (the prizepool is composed of the players' registration fees).
 
@@ -33,7 +33,7 @@ Once the total number of players is reached, the game starts.
 
 ## How it works
 
-Each day, as a player you have a random time slot during which you have to log in and validate your presence. If you forget, you lose.
+As a player, you will have to log in during a random time slot that change everyday. If you forget, you lose.
 
 The last remaining players share the prizes according to the prizepool repartition.
 
@@ -57,17 +57,19 @@ Front end : Used Nextjs and Etherjs to develop a cross chain dapp
 
 ## Challenges we ran into
 
-Our biggest challenge is to create one keeper that manage all games. We used ChainLink V8 upKeep contract base and update it to allow management for multiple delegators.
+Our biggest challenge was to control contract size.
 
-We also have create a Game Factory to manage all games and facilitate games administration management.
+We also handle some difficulties is to create one keeper that manage all games. We used ChainLink V8 upKeep contract base and update it to allow management for multiple delegators (each game manage his keeper job Id).
 
-Finally, we encountered some challenges in the multi-chain administration of the project.
+We also have create a Game Factory to manage all games and facilitate games administration.
+
+Finally, we encountered some challenges in the cross-chain administration of the project.
 
 ## Accomplishments that we're proud of
 
 The smart contracts are more than 80% covered in tests and this is probably our biggest pride.
 
-We have also created an interface for the games and a genericity system that will allow us to easily evolve the game contract to offer games with ERC20 tokens or NFTS.
+We have also created an interface for the games and a generic system that will allow us to easily evolve the game contract to offer games with ERC20 tokens or NFTS.
 
 Finally, the boilerplate we used offers a very quick analysis of our smart contracts with Slither and Mythril which allowed us to respect the best design pattern and the main security standards.
 
@@ -75,27 +77,27 @@ Finally, the boilerplate we used offers a very quick analysis of our smart contr
 
 First of all, it is important to know that 4 of the 5 team members had never been initiated to web3 before this project. It was therefore an opportunity for them to discover all these technologies.
 
-We learned a lot about web3, both in terms of smart contracts and interfacing with etherJs.
+We learned a lot about web3, both in terms of smart contracts, Hardhat and interfacing with etherJs.
 
 It's also the first cross-chain project I've worked on and I've learned a lot about how to architect a project for that.
 
-Finally, I manipulated for the first time the hardhat deploy plugin which facilitates enormously the management of deployments as well as the tests thanks to fixtures.
+Finally, I manipulated for the first time the hardhat deploy plugin which make easier management of deployments as well as the tests thanks to fixtures.
 
 I plan to create a boilerplate based on this project for all my future web3 developments.
 
 ## What's next for LFG
 
-In the short term, we intend to launch the project on the NBB Chain and on Polygon at least.
+In the short term, we intend to launch the project on the BNB Chain and on Polygon at least.
 
 We would then like to add the possibility of depositing NFTs in the prizepool as this is the use case that made us want to embark on this adventure.
 
-Rather than organizing draws on twitter to win an NFT, why not offer several people in the community the opportunity to sign up for a game and be the actor of their victory? That would be much more fun.
+Rather than organizing Twitter contests to win an NFT, why not offer several people in the community the opportunity to sign up for a game and be the actor of their victory? That would be much more fun.
 
 Then, we would like to interface with the chainlink Data Feed service to allow the creator of the game to ask for an action on Twitter (like, share, comment) and a proof in order to register to the game.
 
 Lfg would thus become a real social engagement tool for its web3 community, especially for influencer or NFTs projects.
 
-It will also be necessary to improve the architecture of the smart contracts, in particular to optimize them and optimize the gas costs.
+It will also be necessary to improve the architecture of the smart contracts, in particular to optimize them and optimize gas costs.
 
 Last, we would like to use Ethereum Push Notification to improve user experience and why not add Chainlink VRF to randomize in a better way the daily time range generation.
 
