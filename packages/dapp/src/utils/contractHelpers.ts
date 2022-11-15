@@ -46,6 +46,7 @@ export const getErc721Contract = (address: string, signer?: Signer | Provider) =
 
 // TODO GUIGUI getGameFactoryV1Contract
 export const getGameFactoryV1Contract = (chainId?: number, signer?: Signer | Provider) => {
+  if (!internal[chainId || ChainId.BSC]) throw new Error('No GameFactory found for this chain')
   return getContract({
     abi: internal[chainId || ChainId.BSC].GameFactory.abi,
     address: getGameFactoryV1Address(chainId),
@@ -55,6 +56,8 @@ export const getGameFactoryV1Contract = (chainId?: number, signer?: Signer | Pro
 }
 // TODO GUIGUI getGameV1Contract
 export const getGameV1Contract = (address: string, chainId?: number, signer?: Signer | Provider) => {
+  if (!internal[chainId || ChainId.BSC]) throw new Error('No GameV1 found for this chain')
+
   return getContract({
     abi: internal[chainId || ChainId.BSC].GameV1.abi,
     address,

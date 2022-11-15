@@ -58,6 +58,7 @@ interface GameCardActionsProps {
   isReady: boolean
   isPaused: boolean
   isCreator: boolean
+  isAdmin: boolean
   account?: string
 }
 
@@ -78,6 +79,7 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
   isReady,
   isPaused,
   isCreator,
+  isAdmin,
   account,
 }) => {
   const {
@@ -138,7 +140,7 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
         </>
       )}
 
-      {isPlaying && (
+      {isInProgress && isPlaying && (
         <Container>
           <Flex justifyContent="space-between">
             <Heading mr="4px">{t('Next play time')}: </Heading>
@@ -155,9 +157,9 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
               <Skeleton width="100%" height={18} mb="4px" />
             )}
           </Flex>
-          {!isInTimeRange && moment().isAfter(moment(nextToRange)) && (
+          {isInProgress && isPlaying && !isInTimeRange && moment().isAfter(moment(nextToRange)) && (
             <Flex justifyContent="space-arround">
-              <Heading mr="4px">{t('You Loos')}</Heading>
+              <Heading mr="4px">{t('You Loose')}</Heading>
             </Flex>
           )}
         </Container>
@@ -186,13 +188,27 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
         <ConnectWalletButton mt="8px" width="100%" />
       ) : (
         <>
-          {isInProgress && isInTimeRange && <PlayButton address={address} />}
-
-          {!isInProgress && <RegisterButton address={address} registrationAmount={registrationAmount} />}
-
+          {isInProgress && (
+            <PlayButton
+              address={address}
+              isInTimeRange={isInTimeRange}
+              isDisabled={isPlaying || isCreator || isAdmin || isPaused}
+            />
+          )}
+          {!isInProgress && (
+            <RegisterButton
+              address={address}
+              registrationAmount={registrationAmount}
+              isDisabled={isPlaying || isCreator || isAdmin || isPaused}
+            />
+          )}
           {isCanVoteSplitPot && <VoteSplitButton address={address} />}
-          {isCreator && !isInProgress && isPaused && <UnpauseButton address={address} />}
-          {isCreator && !isInProgress && !isPaused && <PauseButton address={address} />}
+          {(isCreator || isAdmin) && (
+            <>
+              {isPaused && <UnpauseButton address={address} isInProgress={isInProgress} />}
+              {!isPaused && <PauseButton address={address} isInProgress={isInProgress} />}
+            </>
+          )}
         </>
       )}
       {/* TODO Remove after integration phase */}

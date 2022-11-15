@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react'
-import { SUPPORT_FARMS } from 'config/constants/supportChains'
 import { GamesPageLayout } from 'views/Games'
 import { useWeb3React } from '@pancakeswap/wagmi'
 import GameCard from 'views/Games/components/GameCard/GameCard'
@@ -53,7 +52,5 @@ const GamesPage = () => {
 }
 
 GamesPage.Layout = GamesPageLayout
-
-GamesPage.chains = SUPPORT_FARMS
 
 export default GamesPage

@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { SLOW_INTERVAL } from 'config/constants'
+import { FAST_INTERVAL, SLOW_INTERVAL } from 'config/constants'
 import { useCakeBusdPrice } from 'hooks/useBUSDPrice'
 import { useEffect, useMemo } from 'react'
 import { useSelector } from 'react-redux'
@@ -11,7 +11,12 @@ import { BIG_ZERO } from 'utils/bigNumber'
 import { useFastRefreshEffect } from 'hooks/useRefreshEffect'
 import { fetchGamesPublicDataAsync, fetchGamePlayerDataAsync, fetchInitialGamesData } from '.'
 import { DeserializedGame, DeserializedGamesState, DeserializedGameUserData, State } from '../types'
-import { gameSelector, makeGameFromIdSelector, makeUserGameFromIdSelector } from './selectors'
+import {
+  gameSelector,
+  makeGameFromIdSelector,
+  makeUserGameFromIdSelector,
+  makePlayerGameFromIdSelector,
+} from './selectors'
 
 export const usePollGamesWithUserData = () => {
   const dispatch = useAppDispatch()
@@ -36,7 +41,7 @@ export const usePollGamesWithUserData = () => {
       dispatch(fetchGamePlayerDataAsync(params))
     },
     {
-      refreshInterval: SLOW_INTERVAL,
+      refreshInterval: FAST_INTERVAL,
     },
   )
 }
@@ -76,6 +81,10 @@ export const useGameUser = (id): DeserializedGameUserData => {
   return useSelector(gameFromIdUser)
 }
 
+export const useGamePlayer = (id): DeserializedGameUserData => {
+  const gameFromIdUser = useMemo(() => makePlayerGameFromIdSelector(id), [id])
+  return useSelector(gameFromIdUser)
+}
 /**
  * @deprecated use the BUSD hook in /hooks
  */

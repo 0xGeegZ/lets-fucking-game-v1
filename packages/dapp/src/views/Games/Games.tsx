@@ -112,7 +112,7 @@ const ViewControls = styled.div`
   }
 `
 
-const NUMBER_OF_FARMS_VISIBLE = 12
+const NUMBER_OF_GAMES_VISIBLE = 12
 
 const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { pathname, query: urlQuery } = useRouter()
@@ -179,7 +179,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
     setQuery(event.target.value)
   }
 
-  const [numberOfGamesVisible, setNumberOfGamesVisible] = useState(NUMBER_OF_FARMS_VISIBLE)
+  const [numberOfGamesVisible, setNumberOfGamesVisible] = useState(NUMBER_OF_GAMES_VISIBLE)
 
   const chosenGames = useMemo(() => {
     let chosenFs = []
@@ -250,7 +250,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
     if (isIntersecting) {
       setNumberOfGamesVisible((gamesCurrentlyVisible) => {
         if (gamesCurrentlyVisible <= chosenGamesLength.current) {
-          return gamesCurrentlyVisible + NUMBER_OF_FARMS_VISIBLE
+          return gamesCurrentlyVisible + NUMBER_OF_GAMES_VISIBLE
         }
         return gamesCurrentlyVisible
       })

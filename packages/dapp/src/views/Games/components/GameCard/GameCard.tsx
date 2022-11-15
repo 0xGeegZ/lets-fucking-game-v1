@@ -62,15 +62,25 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     treasuryFee,
     creatorFee,
     userData: {
-      isPlaying,
       isCreator,
       isAdmin,
+      isPlaying,
       wonAmount,
       nextFromRange,
       nextToRange,
       isWonLastGames,
       isCanVoteSplitPot,
       isInTimeRange,
+    },
+    playerData: {
+      playerAddress,
+      roundRangeLowerLimit,
+      roundRangeUpperLimit,
+      hasPlayedRound,
+      roundCount,
+      position,
+      hasLost,
+      isSplitOk,
     },
   } = game
 
@@ -192,6 +202,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           isReady={isReady}
           isPaused={isPaused}
           isCreator={isCreator}
+          isAdmin={isAdmin}
           account={account}
         />
       </GameCardInnerContainer>

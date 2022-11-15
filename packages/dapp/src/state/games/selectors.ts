@@ -2,7 +2,14 @@ import BigNumber from 'bignumber.js'
 import { BIG_ZERO } from 'utils/bigNumber'
 import { createSelector } from '@reduxjs/toolkit'
 import _isEmpty from 'lodash/isEmpty'
-import { State, SerializedGame, DeserializedGame, DeserializedGameUserData, DeserializedPrizeData } from '../types'
+import {
+  State,
+  SerializedGame,
+  DeserializedGame,
+  DeserializedGameUserData,
+  DeserializedPrizeData,
+  DeserializedGamePlayerData,
+} from '../types'
 
 const deserializeGameUserData = (game: SerializedGame): DeserializedGameUserData => {
   return {
@@ -15,6 +22,19 @@ const deserializeGameUserData = (game: SerializedGame): DeserializedGameUserData
     isWonLastGames: game?.userData ? game.userData.isWonLastGames : false,
     isCanVoteSplitPot: game?.userData ? game.userData.isCanVoteSplitPot : false,
     isInTimeRange: game?.userData ? game.userData.isInTimeRange : false,
+  }
+}
+
+const deserializeGamePlayerData = (game: SerializedGame): DeserializedGamePlayerData => {
+  return {
+    playerAddress: game?.playerData ? game.playerData.playerAddress : '',
+    roundRangeLowerLimit: game?.playerData ? new BigNumber(game.playerData.roundRangeLowerLimit) : BIG_ZERO,
+    roundRangeUpperLimit: game?.playerData ? new BigNumber(game.playerData.roundRangeUpperLimit) : BIG_ZERO,
+    hasPlayedRound: game?.playerData ? game.playerData.hasPlayedRound : false,
+    roundCount: game?.playerData ? new BigNumber(game.playerData.roundCount) : BIG_ZERO,
+    position: game?.playerData ? new BigNumber(game.playerData.position) : BIG_ZERO,
+    hasLost: game?.playerData ? game.playerData.hasLost : false,
+    isSplitOk: game?.playerData ? game.playerData.isSplitOk : false,
   }
 }
 
@@ -72,6 +92,7 @@ const deserializeGame = (game: SerializedGame): DeserializedGame => {
     playerAddresses,
     prizes: deserializeGamePrize(game),
     userData: deserializeGameUserData(game),
+    playerData: deserializeGamePlayerData(game),
   }
 }
 
@@ -82,31 +103,10 @@ export const makeGameFromIdSelector = (id: number) =>
   createSelector([selectGameByKey('id', id)], (game) => deserializeGame(game))
 
 export const makeUserGameFromIdSelector = (id: number) =>
-  createSelector([selectGameByKey('id', id)], (game) => {
-    const {
-      isPlaying,
-      isCreator,
-      isAdmin,
-      wonAmount,
-      nextFromRange,
-      nextToRange,
-      isWonLastGames,
-      isCanVoteSplitPot,
-      isInTimeRange,
-    } = deserializeGameUserData(game)
+  createSelector([selectGameByKey('id', id)], (game) => deserializeGameUserData(game))
 
-    return {
-      isPlaying,
-      isCreator,
-      isAdmin,
-      wonAmount,
-      nextFromRange,
-      nextToRange,
-      isWonLastGames,
-      isCanVoteSplitPot,
-      isInTimeRange,
-    }
-  })
+export const makePlayerGameFromIdSelector = (id: number) =>
+  createSelector([selectGameByKey('id', id)], (game) => deserializeGameUserData(game))
 
 export const gameSelector = () =>
   createSelector(

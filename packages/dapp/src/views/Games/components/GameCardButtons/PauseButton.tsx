@@ -5,13 +5,14 @@ import { usePauseGame } from 'views/Games/hooks/usePauseGame'
 
 interface PauseButtonProps {
   address: string
+  isInProgress: boolean
 }
 
-const PauseButton: React.FC<React.PropsWithChildren<PauseButtonProps>> = ({ address }) => {
+const PauseButton: React.FC<React.PropsWithChildren<PauseButtonProps>> = ({ address, isInProgress }) => {
   const { t } = useTranslation()
   const { isPending, handlePause } = usePauseGame(address)
 
-  const isDisabledButton = useMemo(() => !address || isPending, [address, isPending])
+  const isDisabledButton = useMemo(() => !address || isPending || isInProgress, [address, isInProgress, isPending])
 
   return (
     <Button

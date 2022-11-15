@@ -34,16 +34,41 @@ export interface DeserializedPrizeData {
   position: BigNumber
 }
 
+export interface SerializedGamePlayerData {
+  playerAddress: string
+  roundRangeLowerLimit: number
+  roundRangeUpperLimit: number
+  hasPlayedRound: boolean
+  roundCount: number
+  position: number
+  hasLost: boolean
+  isSplitOk: boolean
+}
+
+export interface DeserializedGamePlayerData {
+  playerAddress: string
+  roundRangeLowerLimit: BigNumber
+  roundRangeUpperLimit: BigNumber
+  hasPlayedRound: boolean
+  roundCount: BigNumber
+  position: BigNumber
+  hasLost: boolean
+  isSplitOk: boolean
+}
+
 export interface SerializedGameUserData {
   isCreator: boolean
   isAdmin: boolean
   isPlaying: boolean
-  wonAmount: number
+  wonAmount: string
+  // TODO delete this var ??
   nextFromRange: number
+  // TODO delete this var ??
   nextToRange: number
   isWonLastGames: boolean
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
+  // TODO add isLoosed ?
 }
 
 export interface DeserializedGameUserData {
@@ -51,7 +76,9 @@ export interface DeserializedGameUserData {
   isAdmin: boolean
   isPlaying: boolean
   wonAmount: BigNumber
+  // TODO delete this var ??
   nextFromRange: BigNumber
+  // TODO delete this var ??
   nextToRange: BigNumber
   isWonLastGames: boolean
   isCanVoteSplitPot: boolean
@@ -69,18 +96,19 @@ export interface SerializedGame {
   maxPlayers: number
   playTimeRange: number
   playerAddressesCount: number
-  gameCreationAmount: number
-  registrationAmount: number
+  gameCreationAmount: string
+  registrationAmount: string
   address: string
-  prizepool: number
+  prizepool: string
   encodedCron: string
   creator: string
   admin: string
-  treasuryFee: number
-  creatorFee: number
+  treasuryFee: string
+  creatorFee: string
   playerAddresses: string[]
   prizes: SerializedPrizeData[]
   userData?: SerializedGameUserData
+  playerData?: SerializedGamePlayerData
 }
 
 export interface DeserializedGame {
@@ -105,6 +133,7 @@ export interface DeserializedGame {
   playerAddresses: string[]
   prizes: DeserializedPrizeData[]
   userData?: DeserializedGameUserData
+  playerData?: DeserializedGamePlayerData
 }
 
 // Slices states

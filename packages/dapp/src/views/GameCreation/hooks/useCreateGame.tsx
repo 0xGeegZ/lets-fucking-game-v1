@@ -7,6 +7,7 @@ import { useGameFactoryV1Contract } from 'hooks/useContract'
 import { parseEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
+import { ZERO_ADDRESS } from 'config/constants'
 
 export const useCreateGame = (game) => {
   const { t } = useTranslation()
@@ -34,7 +35,7 @@ export const useCreateGame = (game) => {
       amount: parseEther(`${(registrationAmount * maxPlayers) / totalWinners}`),
       // TODO use prizeType
       standard: 0,
-      contractAddress: '0x0000000000000000000000000000000000000000',
+      contractAddress: ZERO_ADDRESS,
       tokenId: 1,
     }
   }

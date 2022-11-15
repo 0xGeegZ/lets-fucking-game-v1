@@ -10,8 +10,10 @@ import type { AppState } from 'state'
 import { chains } from 'utils/wagmi'
 
 import { resetUserState } from '../global/actions'
-import { SerializedGame, SerializedGamesState } from '../types'
+import { SerializedGame, SerializedGamesState, SerializedGamePlayerData } from '../types'
 import fetchGames from './fetchGames'
+import { fetchGamesPlayerData } from './fetchGamePlayerData'
+import { gamePlayerDataTransformer } from './transformers'
 
 const fetchGamePublicDataPkg = async ({ chainId }): Promise<SerializedGame[]> => fetchGames(chainId)
 
@@ -27,25 +29,35 @@ export const fetchInitialGamesData = createAsyncThunk<SerializedGame[], { chainI
   'games/fetchInitialGamesData',
   async ({ chainId, account }) => {
     console.log('fetchInitialGamesData')
+    const chain = chains.find((c) => c.id === chainId)
 
-    const games = await fetchGames(chainId)
+    if (!chain) throw new Error('chain not supported')
+
+    const games = await fetchGamePublicDataPkg({ chainId })
 
     return games.map((game) => {
-      // TODO GUIGUI FIXME
-      const isPlaying = false
-      // const isPlaying = game.playerAddresses.find(account)
       return {
         ...game,
         userData: {
-          isPlaying: !!isPlaying,
-          isCreator: game.creator === account,
-          isAdmin: game.admin === account,
-          isCanVoteSplitPot: isPlaying && game.playerAddressesCount <= game.maxPlayers * 0.5,
-          wonAmount: 0,
+          isPlaying: false,
+          isCreator: false,
+          isAdmin: false,
+          wonAmount: '0',
           nextFromRange: 0,
           nextToRange: 0,
           isWonLastGames: false,
+          isCanVoteSplitPot: false,
           isInTimeRange: false,
+        },
+        playerData: {
+          playerAddress: '',
+          roundRangeLowerLimit: 0,
+          roundRangeUpperLimit: 0,
+          hasPlayedRound: false,
+          roundCount: 0,
+          position: 0,
+          hasLost: false,
+          isSplitOk: false,
         },
       }
     })
@@ -62,6 +74,14 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
   'games/fetchGamesPublicDataAsync',
   async ({ chainId, account }) => {
     console.log('fetchGamesPublicDataAsync')
+
+    // TODO GUIGUI add chain id to reload games if we change blockchain
+    // github.com/pancakeswap/pancake-frontend/blob/develop/apps/web/src/state/farms/index.ts
+
+    // const state = getState()
+    // if (state.farms.chainId !== chainId) {
+    //   await dispatch(fetchInitialFarmsData({ chainId }))
+    // }
 
     const chain = chains.find((c) => c.id === chainId)
 
@@ -80,21 +100,6 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
     },
   },
 )
-
-// TODO UPDATE INTERFACE
-interface GamePlayerDataResponse {
-  id: number
-  allowance: string
-  tokenBalance: string
-  stakedBalance: string
-  earnings: string
-  proxy?: {
-    allowance: string
-    tokenBalance: string
-    stakedBalance: string
-    earnings: string
-  }
-}
 
 //   const gameAllowances = userGameAllowances.map((gameAllowance, index) => {
 //     return {
@@ -138,32 +143,37 @@ interface GamePlayerDataResponse {
 // }
 
 export const fetchGamePlayerDataAsync = createAsyncThunk<
-  GamePlayerDataResponse[],
+  SerializedGame[],
   { account: string; chainId: number },
   {
     state: AppState
   }
 >(
   'games/fetchGamePlayerDataAsync',
-  async ({ account, chainId }, config) => {
-    // TODO Guigui load user data if needed
-    console.log('fetchGamePlayerDataAsync')
-    // const poolLength = config.getState().games.poolLength ?? (await fetchMasterChefGamePoolLength(ChainId.BSC))
-    // const gamesConfig = await getFarmConfig(chainId)
-    // const gamesCanFetch = gamesConfig.filter((gameConfig) => ids.includes(gameConfig.id))
-    // if (proxyAddress && gamesCanFetch?.length && verifyBscNetwork(chainId)) {
-    //   const { normalFarms, farmsWithProxy } = splitProxyFarms(gamesCanFetch)
+  async ({ account, chainId }, { getState }) => {
+    // TODO GUIGUI add chain id to reload games if we change blockchain
+    // github.com/pancakeswap/pancake-frontend/blob/develop/apps/web/src/state/farms/index.ts
 
-    //   const [proxyAllowances, normalAllowances] = await Promise.all([
-    //     getBoostedGamesStakeValue(farmsWithProxy, account, chainId, proxyAddress),
-    //     getNormalGamesStakeValue(normalFarms, account, chainId),
-    //   ])
-
-    //   return [...proxyAllowances, ...normalAllowances]
+    // const state = getState()
+    // if (state.farms.chainId !== chainId) {
+    //   await dispatch(fetchInitialFarmsData({ chainId }))
     // }
 
-    // return getNormalGamesStakeValue(gamesCanFetch, account, chainId)
-    return []
+    console.log('fetchGamePlayerDataAsync')
+
+    const chain = chains.find((c) => c.id === chainId)
+
+    if (!chain) throw new Error('chain not supported')
+
+    const {
+      games: { data },
+    } = getState()
+
+    const games = data.length ? data : await fetchGamePublicDataPkg({ chainId })
+
+    const playerData = await fetchGamesPlayerData(games, account, chainId)
+
+    return games.map(gamePlayerDataTransformer(playerData, account))
   },
   {
     condition: (arg, { getState }) => {
@@ -207,12 +217,22 @@ export const gamesSlice = createSlice({
             isPlaying: false,
             isCreator: false,
             isAdmin: false,
-            wonAmount: 0,
+            wonAmount: '0',
             nextFromRange: 0,
             nextToRange: 0,
             isWonLastGames: false,
             isCanVoteSplitPot: false,
             isInTimeRange: false,
+          },
+          playerData: {
+            playerAddress: '',
+            roundRangeLowerLimit: 0,
+            roundRangeUpperLimit: 0,
+            hasPlayedRound: false,
+            roundCount: 0,
+            position: 0,
+            hasLost: false,
+            isSplitOk: false,
           },
         }
       })
@@ -222,29 +242,35 @@ export const gamesSlice = createSlice({
     builder.addCase(fetchInitialGamesData.fulfilled, (state, action) => {
       console.log('Init game data')
       const gameData = action.payload
-      state.data = gameData
+      if (gameData.length) state.data = gameData
     })
 
     // Update games with live data
     builder.addCase(fetchGamesPublicDataAsync.fulfilled, (state, action) => {
       console.log('Update games with live data')
       const gameData = action.payload
-      state.data = gameData
+      if (!gameData.length) return
+
+      // state.data = gameData
+
+      state.data = state.data.map((game, index) => {
+        // const { userData: oldUsedData, playerData: oldPlayerData, ...rest } = game
+        // const { userData, playerData } = gameData[index]
+        const { userData, playerData } = game
+
+        return {
+          ...gameData[index],
+          userData,
+          playerData,
+        }
+      })
     })
 
     // Update games with user data
     builder.addCase(fetchGamePlayerDataAsync.fulfilled, (state, action) => {
       console.log('Update games with user data')
-
-      // TODO GUIGUI
-      // const userDataMap = fromPairs(action.payload.map((userDataEl) => [userDataEl.id, userDataEl]))
-      // state.data = state.data.map((game) => {
-      //   const userDataEl = userDataMap[game.roundId]
-      //   if (userDataEl) {
-      //     return { ...game, userData: userDataEl }
-      //   }
-      //   return game
-      // })
+      const gameData = action.payload
+      if (gameData.length) state.data = gameData
       state.userDataLoaded = true
     })
 

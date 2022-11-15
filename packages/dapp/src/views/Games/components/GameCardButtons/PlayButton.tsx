@@ -5,13 +5,18 @@ import { usePlayRound } from 'views/Games/hooks/usePlayRound'
 
 interface PlayButtonProps {
   address: string
+  isInTimeRange: boolean
+  isDisabled: boolean
 }
 
-const PlayButton: React.FC<React.PropsWithChildren<PlayButtonProps>> = ({ address }) => {
+const PlayButton: React.FC<React.PropsWithChildren<PlayButtonProps>> = ({ address, isInTimeRange, isDisabled }) => {
   const { t } = useTranslation()
   const { isPending, handlePlay } = usePlayRound(address)
 
-  const isDisabledButton = useMemo(() => !address || isPending, [address, isPending])
+  const isDisabledButton = useMemo(
+    () => !address || !isInTimeRange || isPending || isDisabled,
+    [address, isInTimeRange, isPending, isDisabled],
+  )
 
   return (
     <Button

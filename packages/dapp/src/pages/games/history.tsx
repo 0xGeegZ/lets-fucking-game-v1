@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { SUPPORT_GAMES } from 'config/constants/supportChains'
+import { SUPPORT_GAMES_TEST } from 'config/constants/supportChains'
 import { GamesPageLayout, GamesContext } from 'views/Games'
 import GameCard from 'views/Games/components/GameCard/GameCard'
 import { useWeb3React } from '@pancakeswap/wagmi'
@@ -18,6 +18,6 @@ const GamesHistoryPage = () => {
 }
 
 GamesHistoryPage.Layout = GamesPageLayout
-GamesHistoryPage.chains = SUPPORT_GAMES
+GamesHistoryPage.chains = SUPPORT_GAMES_TEST
 
 export default GamesHistoryPage

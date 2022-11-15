@@ -5,13 +5,14 @@ import { useUnpauseGame } from 'views/Games/hooks/useUnpauseGame'
 
 interface UnpauseButtonProps {
   address: string
+  isInProgress: boolean
 }
 
-const UnpauseButton: React.FC<React.PropsWithChildren<UnpauseButtonProps>> = ({ address }) => {
+const UnpauseButton: React.FC<React.PropsWithChildren<UnpauseButtonProps>> = ({ address, isInProgress }) => {
   const { t } = useTranslation()
   const { isPending, handleUnpause } = useUnpauseGame(address)
 
-  const isDisabledButton = useMemo(() => !address || isPending, [address, isPending])
+  const isDisabledButton = useMemo(() => !address || isPending || isInProgress, [address, isInProgress, isPending])
 
   return (
     <Button
