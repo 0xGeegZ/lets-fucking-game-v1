@@ -61,6 +61,8 @@ export const usePollCoreGameData = () => {
       dispatch(fetchGamesPublicDataAsync({ chainId, account }))
     }
   }, [dispatch, chainId, account])
+
+  // TODO GUIGUI LOAD PLAYER DATA
 }
 
 export const useGames = (): DeserializedGamesState => {

@@ -143,10 +143,11 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   // Connected users should see loading indicator until first userData has loaded
   //   const userDataReady = !account || (!!account && userDataLoaded)
 
+  // TODO GUIGUI FIRST HANDLE FILTERS
   const [isNotFullOnly, setStakedOnly] = useState(isActive)
   const [boostedOnly, setBoostedOnly] = useState(false)
 
-  const activeGames = games.filter((game) => !game.isDeleted)
+  const activeGames = games.filter((game) => !game.isDeleted /* && game.isInProgress */)
   const inactiveGames = games.filter((game) => !game.isInProgress)
 
   const playingOnlyGames = games.filter((game) => game.userData && game.userData.isPlaying)
