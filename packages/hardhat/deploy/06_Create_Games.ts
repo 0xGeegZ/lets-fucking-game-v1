@@ -20,10 +20,10 @@ const func: DeployFunction = async function ({
   const registrationAmount = ethers.utils.parseEther('0.0001')
   const zeroRegistrationAmount = ethers.utils.parseEther('0')
 
-  // const freeGamePrizepool = 0.1
-  // const freeGamePrizepoolAmount = ethers.utils.parseEther('0.1')
-  const freeGamePrizepool = 1
-  const freeGamePrizepoolAmount = ethers.utils.parseEther('1')
+  const freeGamePrizepool = 0.1
+  const freeGamePrizepoolAmount = ethers.utils.parseEther('0.1')
+  // const freeGamePrizepool = 1
+  // const freeGamePrizepoolAmount = ethers.utils.parseEther('1')
   const treasuryFee = 500 // 5%
   const creatorFee = 500 // 5%
 

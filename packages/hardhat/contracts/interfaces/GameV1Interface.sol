@@ -82,7 +82,7 @@ interface GameV1Interface {
     }
 
     struct GameData {
-        address creator;
+        uint256 id;
         uint256 roundId;
         bytes32 name;
         uint256 playerAddressesCount;
@@ -93,6 +93,9 @@ interface GameV1Interface {
         uint256 creatorFee;
         bool isPaused;
         bool isInProgress;
+        address creator;
+        address admin;
+        bytes encodedCron;
     }
 
     ///
@@ -377,12 +380,6 @@ interface GameV1Interface {
      * @dev Callable by admin
      */
     function claimTreasuryFee() external;
-
-    /**
-     * @notice Withdraw Treasury fee and send it to factory
-     * @dev Callable by factory
-     */
-    function claimTreasuryFeeToFactory() external;
 
     /**
      * @notice Set the treasury fee for the game

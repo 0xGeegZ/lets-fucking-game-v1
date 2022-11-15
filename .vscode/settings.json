@@ -28,17 +28,17 @@
   "typescript.format.enable": false,
   "typescript.validate.enable": false,
   "typescript.surveys.enabled": false,
-  // "eslint.validate": ["typescript"],
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact",
-    "html",
-    "vue",
-    "markdown"
-  ],
-  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "eslint.validate": ["typescript"],
+  // "eslint.validate": [
+  //   "javascript",
+  //   "javascriptreact",
+  //   "typescript",
+  //   "typescriptreact",
+  //   "html",
+  //   "vue",
+  //   "markdown"
+  // ],
+  // "eslint.workingDirectories": [{ "mode": "auto" }],
   // "eslint.workingDirectories": [{ "directory": ".", "changeProcessCWD": true }],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   // Controls whether the editor should automatically format the pasted content. A formatter must be available and the formatter should be able to format a range in a document.

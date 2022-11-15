@@ -26,12 +26,12 @@ jobs:
         run: yarn compile
 
       - name: Run tests
-        run: yarn test:contracts --network hardhat
+        run: yarn test:contracts
 
       - name: Coverage
         run: yarn coverage:contracts
 
-      - name: Coveralls
-        uses: codecov/codecov-action@v2
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+      # - name: Coveralls
+      #   uses: codecov/codecov-action@v2
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}

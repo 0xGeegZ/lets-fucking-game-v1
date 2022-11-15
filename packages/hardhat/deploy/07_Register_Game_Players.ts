@@ -8,7 +8,7 @@ const func: DeployFunction = async function ({
   const { log } = deployments
 
   const { deployer: deployerAddress } = await getNamedAccounts()
-  const [...players] = (await ethers.getSigners()).slice(1, 11)
+  const [...players] = (await ethers.getSigners()).slice(1, 10)
 
   const deployer = await ethers.getSigner(deployerAddress)
 
@@ -73,7 +73,6 @@ const func: DeployFunction = async function ({
 }
 
 func.tags = ['all', 'dev', 'staging', 'register-game-players']
-func.dependencies = ['game-factory']
-// func.dependencies = ['create-games']
+func.dependencies = ['create-games']
 
 export default func

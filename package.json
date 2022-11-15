@@ -3,14 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "prepare": "husky install",
     "dev": "yarn workspace lets-fucking-game-dapp dev",
     "build": "yarn build:hardhat && yarn build:dapp",
     "build:hardhat": "yarn workspace lets-fucking-game-hardhat build",
     "build:dapp": "yarn workspace lets-fucking-game-dapp build",
     "export": "yarn workspace lets-fucking-game-dapp export",
     "start": "yarn workspace lets-fucking-game-dapp start",
-    "chain": "yarn workspace lets-fucking-game-hardhat chain",
+    "chain": "yarn workspace lets-fucking-game-hardhat chain:force",
     "deploy": "yarn workspace lets-fucking-game-hardhat deploy",
     "compile": "yarn workspace lets-fucking-game-hardhat compile",
     "test:contracts": "yarn workspace lets-fucking-game-hardhat test",
@@ -19,6 +18,8 @@
     "lint:dapp": "yarn workspace lets-fucking-game-dapp lint",
     "format:dapp": "yarn workspace lets-fucking-game-dapp format",
     "format:contracts": "yarn workspace lets-fucking-game-hardhat format",
+    "prepare": "husky install",
+    "postinstall": "cd packages/dapp && yarn install",
     "hook:pre-push": "cd packages/hardhat && tsc --noEmit && shellcheck bin/* && cspell lint --dot --gitignore '**/{*,''}{.,''}*' && prettier '**/{*,''}.{json,js,ts,sol}' --check && solhint 'contracts/*.sol' && eslint '**/{*,''}.{json,js,ts}'"
   },
   "husky": {
