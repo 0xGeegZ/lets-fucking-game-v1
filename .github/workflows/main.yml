@@ -26,7 +26,7 @@ jobs:
         run: yarn compile
 
       - name: Run tests
-        run: yarn test:contracts --network hardhat
+        run: yarn test:contracts
 
       - name: Coverage
         run: yarn coverage:contracts
