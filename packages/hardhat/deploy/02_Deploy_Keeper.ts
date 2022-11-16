@@ -74,6 +74,7 @@ const func: DeployFunction = async function ({
 
   if (isLocalDeployment) return
 
+  await delay(30 * 1000)
   try {
     log(`✅ Verifying contract CronExternal`)
     await hre.run('verify:verify', {

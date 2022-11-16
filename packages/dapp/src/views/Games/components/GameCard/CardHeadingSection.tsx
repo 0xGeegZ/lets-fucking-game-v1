@@ -7,11 +7,18 @@ import FreeTag from 'views/Games/components/YieldBooster/components/FreeTag'
 import BigNumber from 'bignumber.js'
 import { CurrencyLogo, DoubleCurrencyLogo } from 'components/Logo'
 import Dots from 'components/Loader/Dots'
+import Logo from 'components/Logo/Logo'
+
+const StyledLogo = styled(Logo)<{ size: string }>`
+  width: ${({ size }) => size};
+  height: ${({ size }) => size};
+  border-radius: 50%;
+`
 
 export interface ExpandableSectionProps {
   id: BigNumber
   name?: string
-  token: Token
+  chainId: number
   prizepool: BigNumber
   multiplier: BigNumber
   isReady: boolean
@@ -32,7 +39,7 @@ const MultiplierTag = styled(Tag)`
 const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = ({
   id,
   name,
-  token,
+  chainId,
   prizepool,
   multiplier,
   isReady,
@@ -45,7 +52,8 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
       {isReady ? (
         <>
           {/* <TokenPairImage variant="inverted" primaryToken={token} secondaryToken={quoteToken} width={64} height={64} /> */}
-          <CurrencyLogo currency={token} size="56px" />
+          {/* <CurrencyLogo currency={token} size="48px" /> */}
+          <StyledLogo size="40px" srcs={[`/images/chains/${chainId}.png`]} width="48px" />
           {/* <DoubleCurrencyLogo currency0={token} currency1={token} size={20} />
           <Text bold ml="8px">
             {!token ? <Dots>{t('Loading')}</Dots> : `${token.symbol}`}
