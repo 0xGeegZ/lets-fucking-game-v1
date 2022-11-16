@@ -38,7 +38,11 @@ const NetworkSelect = ({ switchNetwork, chainId }) => {
         .filter((chain) =>
           process.env.NODE_ENV === 'development'
             ? true
-            : !chain.testnet || ChainId.BSC_TESTNET === chain.id || chain.id === chainId,
+            : !chain.testnet ||
+              ChainId.MUMBAI === chain.id ||
+              ChainId.GOERLI === chain.id ||
+              ChainId.BSC_TESTNET === chain.id ||
+              chain.id === chainId,
         )
         .map((chain) => (
           <UserMenuItem
