@@ -1,5 +1,5 @@
 import { useTranslation } from '@pancakeswap/localization'
-import { Flex, Heading, Skeleton, Text } from '@pancakeswap/uikit'
+import { Flex, Heading, Skeleton, Text, WarningIcon } from '@pancakeswap/uikit'
 import cronstrue from 'cronstrue'
 
 import BigNumber from 'bignumber.js'
@@ -48,8 +48,8 @@ interface GameCardPlayerSectionProps {
   gameCreationAmount: BigNumber
   isInProgress: boolean
   wonAmount: BigNumber
-  nextFromRange: BigNumber
-  nextToRange: BigNumber
+  nextFromRange: string
+  nextToRange: string
   encodedCron: string
   isPlaying: boolean
   isWonLastGames: boolean
@@ -125,23 +125,30 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
       {isInProgress && isPlaying && (
         <Container>
           <Flex justifyContent="space-between">
-            <Heading mr="4px">{t('Next play time')}: </Heading>
+            <Heading mr="4px">
+              {`${t('Next play time')} is ${moment(nextFromRange).isSame(moment(), 'day') ? 'today' : 'tomorrow'}:`}
+            </Heading>
             {isReady ? (
-              <>
+              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
                 {nextFromRange && nextToRange && (
-                  <Text>
-                    {moment(nextFromRange).isSame(moment(), 'day') ? 'Today' : 'Tomorrow'} {' between '}
+                  <>
+                    {'Between '}
                     {moment(nextFromRange).format('hh:mm A')} and {moment(nextToRange).format('hh:mm A')}
-                  </Text>
+                  </>
                 )}
-              </>
+              </Text>
             ) : (
               <Skeleton width="100%" height={18} mb="4px" />
             )}
           </Flex>
+
           {isInProgress && isPlaying && !isInTimeRange && moment().isAfter(moment(nextToRange)) && (
-            <Flex justifyContent="space-arround">
-              <Heading mr="4px">{t('You Loose')}</Heading>
+            <Flex justifyContent="center" m="10px">
+              <WarningIcon width="16px" color="failure" style={{ verticalAlign: 'middle' }} />
+              <Heading mr="4px" color="failure">
+                {t('You Loose')}
+              </Heading>
+              <WarningIcon width="16px" color="failure" style={{ verticalAlign: 'middle' }} />
             </Flex>
           )}
         </Container>

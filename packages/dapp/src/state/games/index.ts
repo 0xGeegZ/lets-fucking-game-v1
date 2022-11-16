@@ -43,8 +43,8 @@ export const fetchInitialGamesData = createAsyncThunk<SerializedGame[], { chainI
           isCreator: false,
           isAdmin: false,
           wonAmount: '0',
-          nextFromRange: 0,
-          nextToRange: 0,
+          nextFromRange: '0',
+          nextToRange: '0',
           isWonLastGames: false,
           isCanVoteSplitPot: false,
           isInTimeRange: false,
@@ -171,14 +171,9 @@ export const fetchGamePlayerDataAsync = createAsyncThunk<
 
     const games = data.length ? data : await fetchGamePublicDataPkg({ chainId })
 
-    // if (data.length) {
-    // const games = data.length ? data : await fetchGamePublicDataPkg({ chainId })
-    // const games = data
     const playerData = await fetchGamesPlayerData(games, account, chainId)
 
     return games.map(gamePlayerDataTransformer(playerData, account))
-    // }
-    // return []
   },
   {
     condition: (arg, { getState }) => {
@@ -223,8 +218,8 @@ export const gamesSlice = createSlice({
             isCreator: false,
             isAdmin: false,
             wonAmount: '0',
-            nextFromRange: 0,
-            nextToRange: 0,
+            nextFromRange: '0',
+            nextToRange: '0',
             isWonLastGames: false,
             isCanVoteSplitPot: false,
             isInTimeRange: false,

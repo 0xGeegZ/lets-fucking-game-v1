@@ -99,6 +99,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
       isCanVoteSplitPot,
       isInTimeRange,
     },
+    // TODO GUIGUI USE playerData
     playerData: {
       playerAddress,
       roundRangeLowerLimit,
@@ -133,6 +134,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
   // TODO GUIGUI isReady is when userData are loaded ??
   const isReady = game !== undefined
 
+  // TODO GUIGUI use RoundProgress to display a progressBar if i
   return (
     <StyledCard isActive={isPromotedGame}>
       <GameCardInnerContainer>
