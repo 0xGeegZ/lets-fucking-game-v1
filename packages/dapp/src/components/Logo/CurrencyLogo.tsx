@@ -40,12 +40,14 @@ export default function CurrencyLogo({
     return []
   }, [currency, uriLocations])
 
-  if (currency?.isNative) {
-    if (currency.chainId === ChainId.BSC || currency.chainId === ChainId.BSC_TESTNET) {
-      return <BinanceIcon width={size} style={style} />
-    }
-    return <StyledLogo size={size} srcs={[`/images/chains/${currency.chainId}.png`]} width={size} style={style} />
-  }
+  // //   return <StyledLogo size={size} srcs={[`/images/1/tokens/${currency.address}.png`]} width={size} style={style} />
 
-  return <StyledLogo size={size} srcs={srcs} alt={`${currency?.symbol ?? 'token'} logo`} style={style} />
+  //   if (currency?.isNative) {
+  //     if (currency.chainId === ChainId.BSC || currency.chainId === ChainId.BSC_TESTNET) {
+  //       return <BinanceIcon width={size} style={style} />
+  //     }
+  return <StyledLogo size={size} srcs={[`/images/chains/${currency.chainId}.png`]} width={size} style={style} />
+  //   }
+
+  //   return <StyledLogo size={size} srcs={srcs} alt={`${currency?.symbol ?? 'token'} logo`} style={style} />
 }

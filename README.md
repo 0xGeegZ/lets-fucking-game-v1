@@ -33,7 +33,7 @@ Once the total number of players is reached, the game starts.
 
 ## How it works
 
-As a player, you will have to log in during a random time slot that change everyday. If you forget, you lose.
+As a player, you'll have to interact with the game smart contract each day during a random time slot. This time slot change everyday and could be during the day or during the night. If you forget just once, you lose.
 
 The last remaining players share the prizes according to the prizepool repartition.
 
@@ -45,13 +45,13 @@ The game creator can also manage the winners structure to allow more or less pla
 
 ## How we built it
 
-Mono Repo boilerplate crafted from multiple other boileplates. This help us to bootstrap this project in the best conditions :
+Mono Repo boilerplate crafted from multiple other boilerplates. This help us to bootstrap this project in the best conditions :
 
 - [https://github.com/hackbg/chainlink-fullstack/](https://github.com/hackbg/chainlink-fullstack/) : For the monorepo configuration
 - [https://github.com/emretepedev/solidity-hardhat-typescript-boilerplate](https://github.com/emretepedev/solidity-hardhat-typescript-boilerplate) : For the Smart Contract Project configuration
 - [https://github.com/pancakeswap/pancake-frontend](https://github.com/pancakeswap/pancake-frontend) : For the front end project configuration
 
-Smart contract : Solidity, Hardhat and Chainlink Keeper
+Smart contract : Solidity, Hardhat and ChainLink Keeper
 
 Front end : Used Nextjs and Etherjs to develop a cross chain dapp
 
@@ -93,13 +93,13 @@ We would then like to add the possibility of depositing NFTs in the prizepool as
 
 Rather than organizing Twitter contests to win an NFT, why not offer several people in the community the opportunity to sign up for a game and be the actor of their victory? That would be much more fun.
 
-Then, we would like to interface with the chainlink Data Feed service to allow the creator of the game to ask for an action on Twitter (like, share, comment) and a proof in order to register to the game.
+Then, we would like to interface with the ChainLink Data Feed service to allow the creator of the game to ask for an action on Twitter (like, share, comment) and a proof in order to register to the game.
 
 Lfg would thus become a real social engagement tool for its web3 community, especially for influencer or NFTs projects.
 
 It will also be necessary to improve the architecture of the smart contracts, in particular to optimize them and optimize gas costs.
 
-Last, we would like to use Ethereum Push Notification to improve user experience and why not add Chainlink VRF to randomize in a better way the daily time range generation.
+Last, we would like to use Ethereum Push Notification to improve user experience and why not add ChainLink VRF to randomize in a better way the daily time range generation.
 
 ## Built with
 
