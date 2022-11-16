@@ -17,8 +17,8 @@ const deserializeGameUserData = (game: SerializedGame): DeserializedGameUserData
     isCreator: game?.userData ? game.userData.isCreator : false,
     isAdmin: game?.userData ? game.userData.isAdmin : false,
     wonAmount: game?.userData ? new BigNumber(game.userData.wonAmount) : BIG_ZERO,
-    nextFromRange: game?.userData ? new BigNumber(game.userData.nextFromRange) : BIG_ZERO,
-    nextToRange: game?.userData ? new BigNumber(game.userData.nextToRange) : BIG_ZERO,
+    nextFromRange: game?.userData ? game.userData.nextFromRange : '',
+    nextToRange: game?.userData ? game.userData.nextToRange : '',
     isWonLastGames: game?.userData ? game.userData.isWonLastGames : false,
     isCanVoteSplitPot: game?.userData ? game.userData.isCanVoteSplitPot : false,
     isInTimeRange: game?.userData ? game.userData.isInTimeRange : false,
@@ -39,7 +39,7 @@ const deserializeGamePlayerData = (game: SerializedGame): DeserializedGamePlayer
 }
 
 const deserializeGamePrize = (game: SerializedGame): DeserializedPrizeData[] => {
-  return game.prizes.map((prize) => {
+  return game?.prizes?.map((prize) => {
     return {
       amount: prize?.amount ? new BigNumber(prize.amount) : BIG_ZERO,
       position: prize?.position ? new BigNumber(prize.position) : BIG_ZERO,

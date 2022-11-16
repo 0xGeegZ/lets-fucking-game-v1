@@ -65,7 +65,7 @@ export declare namespace GameV1Interface {
     isInProgress: PromiseOrValue<boolean>;
     creator: PromiseOrValue<string>;
     admin: PromiseOrValue<string>;
-    encodedCron: PromiseOrValue<BytesLike>;
+    encodedCron: PromiseOrValue<string>;
   };
 
   export type GameDataStructOutput = [

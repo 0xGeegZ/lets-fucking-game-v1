@@ -166,8 +166,10 @@ export const fetchGamePlayerEarnings = async (account: string, gamesToFetch: Ser
   })
 
   const rawEarnings = await multicallv2({ abi: masterchefABI, calls, chainId: multiCallChainId })
+
   const parsedEarnings = rawEarnings.map((earnings) => {
     return new BigNumber(earnings).toJSON()
   })
+
   return parsedEarnings
 }

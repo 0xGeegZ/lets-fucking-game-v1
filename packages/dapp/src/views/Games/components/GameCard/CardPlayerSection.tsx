@@ -1,5 +1,5 @@
 import { useTranslation } from '@pancakeswap/localization'
-import { Flex, Heading, Skeleton, Text } from '@pancakeswap/uikit'
+import { Flex, Heading, Skeleton, Text, WarningIcon } from '@pancakeswap/uikit'
 import cronstrue from 'cronstrue'
 
 import BigNumber from 'bignumber.js'
@@ -17,39 +17,18 @@ import PauseButton from '../GameCardButtons/PauseButton'
 import UnpauseButton from '../GameCardButtons/UnpauseButton'
 
 const Container = styled.div`
-  margin-right: 4px;
-`
-
-const Action = styled.div`
   padding-top: 16px;
 `
 
-const ActionContainer = styled.div`
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`
-
-export const ActionTitles = styled.div`
-  display: flex;
-  margin-bottom: 8px;
-`
-
-export const ActionContent = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`
-interface GameCardActionsProps {
+interface GameCardPlayerSectionProps {
   address: string
   roundId: BigNumber
   registrationAmount: BigNumber
   gameCreationAmount: BigNumber
   isInProgress: boolean
   wonAmount: BigNumber
-  nextFromRange: BigNumber
-  nextToRange: BigNumber
+  nextFromRange: string
+  nextToRange: string
   encodedCron: string
   isPlaying: boolean
   isWonLastGames: boolean
@@ -62,7 +41,7 @@ interface GameCardActionsProps {
   account?: string
 }
 
-const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
+const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionProps>> = ({
   address,
   roundId,
   registrationAmount,
@@ -88,36 +67,15 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
   } = useTranslation()
 
   // const currentDate = useMemo(
-  //   () => new Date().toLocaleString(locale, { month: 'short', year: 'numeric', day: 'numeric' }),
-  //   [locale],
-  // )
-
-  const [cronHumanReadable, setCronHumanReadable] = useState('')
-
-  useEffect(() => {
-    if (!encodedCron) return
-
-    try {
-      const transform = cronstrue.toString(encodedCron, {
-        use24HourTimeFormat: false,
-      })
-      setCronHumanReadable(transform.toLowerCase())
-    } catch (e) {
-      setCronHumanReadable('')
-    }
-  }, [encodedCron])
 
   return (
-    <Action>
+    <Container>
       {isWonLastGames && (
         <>
-          <ActionContainer>
-            <ActionTitles>
-              <Text bold textTransform="uppercase" color="secondary" pr="4px">
-                {t('Earned')}
-              </Text>
-            </ActionTitles>
-            <ActionContent>
+          <Flex justifyContent="space-between">
+            <Heading mr="4px">{t('Earned')}: </Heading>
+
+            <Text bold style={{ display: 'flex', alignItems: 'center' }}>
               {isReady ? (
                 <Text bold color="success" fontSize={16}>
                   {wonAmount.toNumber()} BNB
@@ -125,63 +83,52 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
               ) : (
                 <Skeleton width={80} height={18} mb="4px" />
               )}
-            </ActionContent>
-          </ActionContainer>
-          <ActionContainer>
-            <ActionTitles />
-            <ActionContent>
+            </Text>
+          </Flex>
+          <Flex justifyContent="space-between">
+            <Heading mr="4px" />
+            <Text bold style={{ display: 'flex', alignItems: 'center' }}>
               {isReady ? (
                 <ClaimButton address={address} roundId={roundId} />
               ) : (
                 <Skeleton width={80} height={36} mb="4px" />
               )}
-            </ActionContent>
-          </ActionContainer>
+            </Text>
+          </Flex>
         </>
       )}
 
       {isInProgress && isPlaying && (
-        <Container>
+        <>
           <Flex justifyContent="space-between">
-            <Heading mr="4px">{t('Next play time')}: </Heading>
+            <Heading mr="4px">
+              {`${t('Next play time')} is ${moment(nextFromRange).isSame(moment(), 'day') ? 'today' : 'tomorrow'}:`}
+            </Heading>
             {isReady ? (
-              <>
+              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
                 {nextFromRange && nextToRange && (
-                  <Text>
-                    {moment(nextFromRange).isSame(moment(), 'day') ? 'Today' : 'Tomorrow'} {' between '}
+                  <>
+                    {'Between '}
                     {moment(nextFromRange).format('hh:mm A')} and {moment(nextToRange).format('hh:mm A')}
-                  </Text>
+                  </>
                 )}
-              </>
+              </Text>
             ) : (
               <Skeleton width="100%" height={18} mb="4px" />
             )}
           </Flex>
+
           {isInProgress && isPlaying && !isInTimeRange && moment().isAfter(moment(nextToRange)) && (
-            <Flex justifyContent="space-arround">
-              <Heading mr="4px">{t('You Loose')}</Heading>
+            <Flex justifyContent="center" m="10px">
+              <WarningIcon width="16px" color="failure" style={{ verticalAlign: 'middle' }} />
+              <Heading mr="4px" color="failure">
+                {t('You Loose')}
+              </Heading>
+              <WarningIcon width="16px" color="failure" style={{ verticalAlign: 'middle' }} />
             </Flex>
           )}
-        </Container>
+        </>
       )}
-
-      {cronHumanReadable && (
-        <Container>
-          <Flex justifyContent="space-between">
-            <Heading mr="4px">{t('Next game draw')}</Heading>
-            {isReady ? <Text>{t(`${cronHumanReadable}`)}</Text> : <Skeleton width="100%" height={18} mb="4px" />}
-          </Flex>
-        </Container>
-      )}
-
-      {/* TODO ADD TIMESTAMP WHEN GAME START */}
-      {/* <Container>
-        <Flex>
-          <Text color="textSubtle" fontSize="12px">
-            {t('Started')} {' 5 '} {t('days ago')}
-          </Text>
-        </Flex>
-      </Container> */}
 
       {/* TODO ADD CONDITION IF ACCOUNT IS GAME CREATOR. If true, display play and pause button */}
       {!account ? (
@@ -217,8 +164,8 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
           {t('Show Game Details')}
         </Button>
       </Link> */}
-    </Action>
+    </Container>
   )
 }
 
-export default CardActions
+export default CardPlayerSection

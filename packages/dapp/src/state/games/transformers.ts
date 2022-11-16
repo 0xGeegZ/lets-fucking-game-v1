@@ -3,7 +3,9 @@ import { formatEther } from '@ethersproject/units'
 import { parseBytes32String } from '@ethersproject/strings'
 import { arrayify } from '@ethersproject/bytes'
 import { ZERO_ADDRESS } from 'config/constants'
-import { SerializedGame } from '../types'
+import moment from 'moment'
+import { SerializedGame, SerializedPrizeData } from '../types'
+
 // parse a name or symbol from a token response
 const BYTES32_REGEX = /^0x[a-fA-F0-9]{64}$/
 
@@ -60,9 +62,7 @@ export const gameBaseTransformer = (gameData, gamePlayers) => {
       creator,
       admin,
       prizepool: '0',
-      // TODO MANGE CRON
       encodedCron: encodedCron.toString(),
-      // encodedCron: parseStringOrBytes32('', encodedCron, ''),
       playerAddresses,
       prizes: [],
     }
@@ -72,12 +72,10 @@ export const gameBaseTransformer = (gameData, gamePlayers) => {
 export const gameExtendedTransformer = (gamePrizes /* , gamePlayersData */) => {
   return (game, index): SerializedGame => {
     const [[rawPrizes]] = gamePrizes[index]
-    const prizes = rawPrizes.map((prize) => {
+    const prizes: SerializedPrizeData[] = rawPrizes.map((prize) => {
       const { amount, position } = prize
       return {
-        // TODO GUIGUI FORMAT AMOUNT TO ETHER
-        // amount: formatEther(`${amount}`),
-        amount: amount.toString(),
+        amount: formatEther(`${amount}`),
         position: position.toNumber(),
       }
     })
@@ -109,7 +107,7 @@ export const gameExtendedTransformer = (gamePrizes /* , gamePlayersData */) => {
 
     return {
       ...game,
-      prizepool: parseFloat(formatEther(`${prizepool}`)),
+      prizepool: `${prizepool}`,
       prizes,
       // players,
     }
@@ -121,6 +119,11 @@ export const gamePlayerDataTransformer = (gamesPlayerData, account) => {
     const playerData = gamesPlayerData[index]
 
     const isPlaying = playerData.address !== ZERO_ADDRESS
+
+    const fromRange = moment.unix(+playerData.roundRangeLowerLimit)
+    const toRange = moment.unix(+playerData.roundRangeUpperLimit)
+    const isInRange = moment().isBetween(fromRange, toRange)
+
     return {
       ...game,
       playerData,
@@ -128,13 +131,13 @@ export const gamePlayerDataTransformer = (gamesPlayerData, account) => {
         isPlaying,
         isCreator: game.creator === account,
         isAdmin: game.admin === account,
-        // TODO GUIGUI MANAGE TIME RANGE
-        isInTimeRange: false,
-        nextFromRange: 0,
-        nextToRange: 0,
+        isInTimeRange: isInRange,
+        nextFromRange: fromRange.toString(),
+        nextToRange: toRange.toString(),
+        isCanVoteSplitPot: game.isInProgress && game.playerAddressesCount <= game.maxPlayers * 0.5,
+        // TODO GUIGUI NEXT HANDLE WON CLAIM
         isWonLastGames: false,
         wonAmount: '0',
-        isCanVoteSplitPot: game.isInProgress && game.playerAddressesCount <= game.maxPlayers * 0.5,
       },
     }
   }
