@@ -2,12 +2,14 @@
 
 This application was done during the [Chainlink Hackathon Fall 2022](https://chainlinkfall2022.devpost.com/)
 
-Contracts deployed on POLYGON CHAIN TESTNET MUMBAI :
+**Contracts deployed on POLYGON CHAIN TESTNET MUMBAI :**
+
+**PRIMARY :**
 
 - GameFactory contract [0x94e542B2A3c847a61E8E3F96477388CDCf8Ac791](https://mumbai.polygonscan.com/address/0x94e542B2A3c847a61E8E3F96477388CDCf8Ac791#code)
 - GameV1 BASE contract [0x8693F834CC37eCdCDEa510C091D0Fe1F9827694A](https://mumbai.polygonscan.com/address/0x8693F834CC37eCdCDEa510C091D0Fe1F9827694A#code)
 
-SECONDARY :
+**SECONDARY :**
 
 - CronUpkeep contract [0x34d04395Eb98642Cf51b7F8c226e522573a2a6B5](https://mumbai.polygonscan.com/address/0x34d04395Eb98642Cf51b7F8c226e522573a2a6B5#code)
 - CronUpkeepDelegate contract [0x787b9B77803eD99bA20CF4A9663Acd4c2EFFa8E5](https://mumbai.polygonscan.com/address/0x787b9B77803eD99bA20CF4A9663Acd4c2EFFa8E5#code)
@@ -15,14 +17,14 @@ SECONDARY :
 - Multicall contracts [0x96b639eD2eD0C4aB6EEe378BBD37B5D9C0c65C0C](https://mumbai.polygonscan.com/address/0x96b639eD2eD0C4aB6EEe378BBD37B5D9C0c65C0C#code)
 - MulticallV3 contracts [0x7858258c475BDE1b07451A9e76C65dc078584b60](https://mumbai.polygonscan.com/address/0x7858258c475BDE1b07451A9e76C65dc078584b60#code)
 
-Contracts deployed on ETHEREUM CHAIN TESTNET GOERLI :
+**Contracts deployed on ETHEREUM CHAIN TESTNET GOERLI :**
 
-PRIMARY :
+**PRIMARY :**
 
 - GameFactory contract [0x96b639eD2eD0C4aB6EEe378BBD37B5D9C0c65C0C](https://goerli.etherscan.io/address/0x96b639eD2eD0C4aB6EEe378BBD37B5D9C0c65C0C#code)
 - GameV1 BASE contract [0x8079005dB2A42404B16ec2B8c71839d4cc585Ff9](https://goerli.etherscan.io/address/0x8079005dB2A42404B16ec2B8c71839d4cc585Ff9#code)
 
-SECONDARY :
+**SECONDARY :**
 
 - CronUpkeep contract [0xBD6daa3c74eC8C014B5E04Af28289a28c66D7B25](https://goerli.etherscan.io/address/0xBD6daa3c74eC8C014B5E04Af28289a28c66D7B25#code)
 - CronUpkeepDelegate contract [0x8473CC5B8E3169be0C6761298EFE484d0EA0E920](https://goerli.etherscan.io/address/0x8473CC5B8E3169be0C6761298EFE484d0EA0E920#code)
@@ -30,14 +32,14 @@ SECONDARY :
 - Multicall contracts [0xddebb58F0EA0411cF433a00D7d7A2e1f2E860ACB](https://goerli.etherscan.io/address/0xddebb58F0EA0411cF433a00D7d7A2e1f2E860ACB#code)
 - MulticallV3 contracts [0x3cB1f308f9cDF098968Cb805339936FaB72ECD72](https://goerli.etherscan.io/address/0x3cB1f308f9cDF098968Cb805339936FaB72ECD72#code)
 
-Contracts deployed on BNB CHAIN TESTNET :
+**Contracts deployed on BNB CHAIN TESTNET :**
 
-PRIMARY :
+**PRIMARY :**
 
 - GameFactory contract [0xD9B4aBdF273017619b67fbDd8c6a56b71E48672a](https://testnet.bscscan.com/address/0xD9B4aBdF273017619b67fbDd8c6a56b71E48672a#code)
 - GameV1 BASE contract [0x6CDF1b48b20d07B314B8438961aF9eBe9e70F19E](https://testnet.bscscan.com/address/0x6CDF1b48b20d07B314B8438961aF9eBe9e70F19E#code)
 
-SECONDARY :
+**SECONDARY :**
 
 - CronUpkeep contract [0xa3b902268F15C12C1A8f814F30D608D9AdBDa517](https://testnet.bscscan.com/address/0xa3b902268F15C12C1A8f814F30D608D9AdBDa517#code)
 - CronUpkeepDelegate contract [0x997f23C4c593934EA25499b5866adcF30Bd7cc66](https://testnet.bscscan.com/address/0x997f23C4c593934EA25499b5866adcF30Bd7cc66#code)
