@@ -46,7 +46,7 @@ const Stats = () => {
         <IconCard {...UsersCardData} mr={[null, null, null, '16px']} mb={['16px', null, null, '0']}>
           <StatCardContent
             headingText={t('100 players')}
-            bodyText={t('can register for current game')}
+            bodyText={t('can register on one game')}
             highlightColor={theme.colors.secondary}
           />
         </IconCard>
