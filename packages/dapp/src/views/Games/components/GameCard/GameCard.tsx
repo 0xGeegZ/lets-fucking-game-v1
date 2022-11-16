@@ -2,14 +2,18 @@ import { useTranslation } from '@pancakeswap/localization'
 import { Card, Flex, Skeleton, Text, RocketIcon, Heading } from '@pancakeswap/uikit'
 import ExpandableSectionButton from 'components/ExpandableSectionButton'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { getBlockExploreLink } from 'utils'
 import { WBNB } from '@pancakeswap/sdk'
 import { DeserializedGame } from 'state/types'
-import CardActionsContainer from './CardActionsContainer'
-import CardHeading from './CardHeading'
+import cronstrue from 'cronstrue'
+import Tooltip from '../GameCardButtons/Tooltip'
+import CardPlayerSection from './CardPlayerSection'
+import CardHeadingSection from './CardHeadingSection'
+
 import DetailsSection from './DetailsSection'
+import CardContentSection from './CardContentSection'
 
 const StyledCard = styled(Card)`
   align-self: baseline;
@@ -33,16 +37,38 @@ const ExpandingWrapper = styled.div`
   overflow: hidden;
 `
 
+const BulletList = styled.ul`
+  list-style-type: none;
+  margin-left: 8px;
+  padding: 0;
+  li {
+    margin: 0;
+    padding: 0;
+  }
+  li::before {
+    content: '•';
+    margin-right: 4px;
+    color: ${({ theme }) => theme.colors.textSubtle};
+  }
+  li::marker {
+    font-size: 12px;
+  }
+`
+
+const Container = styled.div`
+  margin-right: 4px;
+`
+
 interface GameCardProps {
   game: DeserializedGame
   account?: string
 }
 
 const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, account }) => {
-  const { t } = useTranslation()
   const { chainId } = useActiveWeb3React()
 
   const [showExpandableSection, setShowExpandableSection] = useState(false)
+  const [cronHumanReadable, setCronHumanReadable] = useState('')
 
   const {
     name,
@@ -61,6 +87,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     creator,
     treasuryFee,
     creatorFee,
+    prizes,
     userData: {
       isCreator,
       isAdmin,
@@ -84,43 +111,33 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     },
   } = game
 
-  // const name = 'Cake Game'
-  // const isDeleted = false
-  // const isPaused = false
-  // const isInProgress = false
-
-  // const roundId = new BigNumber('1')
-  // const encodedCron = '0 18 * * *'
-  // const id = new BigNumber('1')
-
-  // const maxPlayers = new BigNumber('10')
-  // const playerAddressesCount = new BigNumber('5')
-  // const gameCreationAmount = new BigNumber('0.1')
-  // const registrationAmount = new BigNumber('0.1')
-  // const prizepool = registrationAmount.multipliedBy(maxPlayers)
-  // const address = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
-
-  // const isCreator = true
-  // const isPlaying = false
-  // const wonAmount = new BigNumber('1')
-  // const nextFromRange = new BigNumber(new Date().getTime())
-  // const nextToRange = new BigNumber(new Date().getTime())
-  // const isWonLastGames = false
-  // const isCanVoteSplitPot = false
-  // const isInTimeRange = false
-
   const isPromotedGame = true
 
   const toggleExpandableSection = useCallback(() => {
     setShowExpandableSection((prev) => !prev)
   }, [])
 
+  useEffect(() => {
+    if (!encodedCron) return
+    console.log('🚀 ~ file: GameCard.tsx ~ line 141 ~ useEffect ~ encodedCron', encodedCron)
+
+    try {
+      const transform = cronstrue.toString(encodedCron, {
+        use24HourTimeFormat: false,
+      })
+      setCronHumanReadable(transform)
+    } catch (e) {
+      setCronHumanReadable('')
+    }
+  }, [encodedCron])
+
+  // TODO GUIGUI isReady is when userData are loaded ??
   const isReady = game !== undefined
 
   return (
     <StyledCard isActive={isPromotedGame}>
       <GameCardInnerContainer>
-        <CardHeading
+        <CardHeadingSection
           id={id}
           name={name}
           token={WBNB[chainId]}
@@ -131,61 +148,18 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           boosted={false}
         />
 
-        {!isDeleted && (
-          <>
-            <Flex justifyContent="space-between">
-              <Heading mr="4px">{t('Earn')}: </Heading>
-              {isReady ? (
-                <Text bold style={{ display: 'flex', alignItems: 'center' }}>
-                  <RocketIcon m="4px" color="success" />
-                  <Text bold color="success" fontSize={16}>
-                    {t('Up to ')}
-                    {prizepool.toNumber()}
-                    {' BNB'}
-                  </Text>
-                </Text>
-              ) : (
-                <Skeleton height={24} width={80} />
-              )}
-            </Flex>
-            <Flex justifyContent="space-between">
-              <Heading mr="4px">{t('Register')}: </Heading>
-              {isReady ? (
-                <>
-                  {registrationAmount && (
-                    <Text bold style={{ display: 'flex', alignItems: 'center' }}>
-                      {registrationAmount.toNumber() === 0 ? (
-                        <Text bold fontSize={16} /* color="success" */>
-                          FREE
-                        </Text>
-                      ) : (
-                        <Text bold fontSize={16}>
-                          {registrationAmount.toNumber()}
-                          {' BNB'}{' '}
-                        </Text>
-                      )}
-                    </Text>
-                  )}
-                </>
-              ) : (
-                <Skeleton height={24} width={80} />
-              )}
-            </Flex>
-          </>
-        )}
+        <CardContentSection
+          registrationAmount={registrationAmount}
+          prizepool={prizepool}
+          maxPlayers={maxPlayers}
+          playerAddressesCount={playerAddressesCount}
+          cronHumanReadable={cronHumanReadable}
+          isInProgress={isInProgress}
+          isReady={isReady}
+          prizes={prizes}
+        />
 
-        <Flex justifyContent="space-between">
-          <Heading mr="4px">{t('Players')}: </Heading>
-          {isReady ? (
-            <Text bold>
-              {playerAddressesCount.toNumber()}/{maxPlayers.toNumber()}
-            </Text>
-          ) : (
-            <Skeleton height={24} width={80} />
-          )}
-        </Flex>
-
-        <CardActionsContainer
+        <CardPlayerSection
           address={address}
           roundId={roundId}
           isInProgress={isInProgress}

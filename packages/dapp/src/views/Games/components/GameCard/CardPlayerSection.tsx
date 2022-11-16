@@ -41,7 +41,7 @@ export const ActionContent = styled.div`
   justify-content: space-between;
   align-items: center;
 `
-interface GameCardActionsProps {
+interface GameCardPlayerSectionProps {
   address: string
   roundId: BigNumber
   registrationAmount: BigNumber
@@ -62,7 +62,7 @@ interface GameCardActionsProps {
   account?: string
 }
 
-const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
+const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionProps>> = ({
   address,
   roundId,
   registrationAmount,
@@ -88,24 +88,6 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
   } = useTranslation()
 
   // const currentDate = useMemo(
-  //   () => new Date().toLocaleString(locale, { month: 'short', year: 'numeric', day: 'numeric' }),
-  //   [locale],
-  // )
-
-  const [cronHumanReadable, setCronHumanReadable] = useState('')
-
-  useEffect(() => {
-    if (!encodedCron) return
-
-    try {
-      const transform = cronstrue.toString(encodedCron, {
-        use24HourTimeFormat: false,
-      })
-      setCronHumanReadable(transform.toLowerCase())
-    } catch (e) {
-      setCronHumanReadable('')
-    }
-  }, [encodedCron])
 
   return (
     <Action>
@@ -165,24 +147,6 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
         </Container>
       )}
 
-      {cronHumanReadable && (
-        <Container>
-          <Flex justifyContent="space-between">
-            <Heading mr="4px">{t('Next game draw')}</Heading>
-            {isReady ? <Text>{t(`${cronHumanReadable}`)}</Text> : <Skeleton width="100%" height={18} mb="4px" />}
-          </Flex>
-        </Container>
-      )}
-
-      {/* TODO ADD TIMESTAMP WHEN GAME START */}
-      {/* <Container>
-        <Flex>
-          <Text color="textSubtle" fontSize="12px">
-            {t('Started')} {' 5 '} {t('days ago')}
-          </Text>
-        </Flex>
-      </Container> */}
-
       {/* TODO ADD CONDITION IF ACCOUNT IS GAME CREATOR. If true, display play and pause button */}
       {!account ? (
         <ConnectWalletButton mt="8px" width="100%" />
@@ -221,4 +185,4 @@ const CardActions: React.FC<React.PropsWithChildren<GameCardActionsProps>> = ({
   )
 }
 
-export default CardActions
+export default CardPlayerSection

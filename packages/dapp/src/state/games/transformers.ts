@@ -3,7 +3,7 @@ import { formatEther } from '@ethersproject/units'
 import { parseBytes32String } from '@ethersproject/strings'
 import { arrayify } from '@ethersproject/bytes'
 import { ZERO_ADDRESS } from 'config/constants'
-import { SerializedGame } from '../types'
+import { SerializedGame, SerializedPrizeData } from '../types'
 // parse a name or symbol from a token response
 const BYTES32_REGEX = /^0x[a-fA-F0-9]{64}$/
 
@@ -61,8 +61,8 @@ export const gameBaseTransformer = (gameData, gamePlayers) => {
       admin,
       prizepool: '0',
       // TODO MANGE CRON
-      encodedCron: encodedCron.toString(),
-      // encodedCron: parseStringOrBytes32('', encodedCron, ''),
+      // encodedCron: encodedCron.toString(),
+      encodedCron: parseStringOrBytes32('', encodedCron, '0 18 * * *'),
       playerAddresses,
       prizes: [],
     }
@@ -72,12 +72,10 @@ export const gameBaseTransformer = (gameData, gamePlayers) => {
 export const gameExtendedTransformer = (gamePrizes /* , gamePlayersData */) => {
   return (game, index): SerializedGame => {
     const [[rawPrizes]] = gamePrizes[index]
-    const prizes = rawPrizes.map((prize) => {
+    const prizes: SerializedPrizeData[] = rawPrizes.map((prize) => {
       const { amount, position } = prize
       return {
-        // TODO GUIGUI FORMAT AMOUNT TO ETHER
-        // amount: formatEther(`${amount}`),
-        amount: amount.toString(),
+        amount: formatEther(`${amount}`),
         position: position.toNumber(),
       }
     })
@@ -109,7 +107,7 @@ export const gameExtendedTransformer = (gamePrizes /* , gamePlayersData */) => {
 
     return {
       ...game,
-      prizepool: parseFloat(formatEther(`${prizepool}`)),
+      prizepool: `${prizepool}`,
       prizes,
       // players,
     }
