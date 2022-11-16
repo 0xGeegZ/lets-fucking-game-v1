@@ -95,7 +95,7 @@ interface GameV1Interface {
         bool isInProgress;
         address creator;
         address admin;
-        bytes encodedCron;
+        string encodedCron;
     }
 
     ///

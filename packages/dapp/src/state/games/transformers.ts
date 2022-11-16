@@ -60,9 +60,7 @@ export const gameBaseTransformer = (gameData, gamePlayers) => {
       creator,
       admin,
       prizepool: '0',
-      // TODO MANGE CRON
-      // encodedCron: encodedCron.toString(),
-      encodedCron: parseStringOrBytes32('', encodedCron, '0 18 * * *'),
+      encodedCron: encodedCron.toString(),
       playerAddresses,
       prizes: [],
     }
@@ -119,6 +117,7 @@ export const gamePlayerDataTransformer = (gamesPlayerData, account) => {
     const playerData = gamesPlayerData[index]
 
     const isPlaying = playerData.address !== ZERO_ADDRESS
+
     return {
       ...game,
       playerData,
@@ -126,7 +125,7 @@ export const gamePlayerDataTransformer = (gamesPlayerData, account) => {
         isPlaying,
         isCreator: game.creator === account,
         isAdmin: game.admin === account,
-        // TODO GUIGUI MANAGE TIME RANGE
+        // TODO GUIGUI NEXT MANAGE TIME RANGE
         isInTimeRange: false,
         nextFromRange: 0,
         nextToRange: 0,

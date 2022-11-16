@@ -24,6 +24,7 @@ const func: DeployFunction = async function ({
   const freeGamePrizepoolAmount = ethers.utils.parseEther('0.1')
   // const freeGamePrizepool = 1
   // const freeGamePrizepoolAmount = ethers.utils.parseEther('1')
+
   const treasuryFee = 500 // 5%
   const creatorFee = 500 // 5%
 

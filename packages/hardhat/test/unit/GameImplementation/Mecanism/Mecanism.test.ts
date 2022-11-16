@@ -1259,7 +1259,7 @@ describe('GameV1Contract - Mecanism', function () {
         )
       })
 
-      it('should revert if remaining player are less than 50 % of total players', async function () {
+      it.skip('should revert if remaining player are less than 50 % of total players', async function () {
         // TODO Implement this Test
         // setup game ready to play (use setUpGameReadyToPlay), play for 6 player and lose for 4
         // Then call triggerDailyCheckpoint function and try calling voteToSplitPot with one player, this should throw an exception.

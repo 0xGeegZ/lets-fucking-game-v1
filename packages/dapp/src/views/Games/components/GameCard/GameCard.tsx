@@ -119,7 +119,6 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
 
   useEffect(() => {
     if (!encodedCron) return
-    console.log('🚀 ~ file: GameCard.tsx ~ line 141 ~ useEffect ~ encodedCron', encodedCron)
 
     try {
       const transform = cronstrue.toString(encodedCron, {
