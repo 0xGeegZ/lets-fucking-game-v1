@@ -1,20 +1,20 @@
 import { createContext, useEffect, useMemo, useReducer } from 'react'
 
 import { useWeb3React } from '@pancakeswap/wagmi'
-import { CREATOR_EDGE_MAX, CREATOR_EDGE_MIN, HOUSE_EDGE_MAX, HOUSE_EDGE_MIN } from '../config'
+import { parseEther } from '@ethersproject/units'
+import { TREASURY_FEE_DEFAULT, CREATOR_FEE_DEFAULT } from '../config'
 import { Actions, BNB, ContextType, NFT, State } from './types'
 
 const initialState: State = {
   isInitialized: false,
   currentStep: 0,
-  treasuryFee: HOUSE_EDGE_MIN,
-  creatorFee: CREATOR_EDGE_MIN,
-  registrationAmount: 0,
-  maxPlayers: 0,
+  treasuryFee: TREASURY_FEE_DEFAULT,
+  creatorFee: CREATOR_FEE_DEFAULT,
+  registrationAmount: parseEther(`0.05`).toString(),
+  maxPlayers: 5,
   playTimeRange: 2,
-  encodedCron: '',
-
-  numberPlayersAllowedToWin: 0,
+  encodedCron: '0 18 * * *',
+  numberPlayersAllowedToWin: 2,
   prizeType: 'STANDARD',
   successMessage: null,
   errorMessage: null,
@@ -114,7 +114,7 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         currentStep: number,
         treasuryFee: number,
         creatorFee: number,
-        registrationAmount: number,
+        registrationAmount: string,
         maxPlayers: number,
         playTimeRange: number,
         encodedCron: string,
@@ -154,7 +154,7 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
           errorMessage,
         }),
     }),
-    [dispatch, state.currentStep],
+    [state],
   )
 
   return <GameCreationContext.Provider value={{ ...state, actions }}>{children}</GameCreationContext.Provider>
