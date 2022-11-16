@@ -17,30 +17,9 @@ import PauseButton from '../GameCardButtons/PauseButton'
 import UnpauseButton from '../GameCardButtons/UnpauseButton'
 
 const Container = styled.div`
-  margin-right: 4px;
-`
-
-const Action = styled.div`
   padding-top: 16px;
 `
 
-const ActionContainer = styled.div`
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`
-
-export const ActionTitles = styled.div`
-  display: flex;
-  margin-bottom: 8px;
-`
-
-export const ActionContent = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`
 interface GameCardPlayerSectionProps {
   address: string
   roundId: BigNumber
@@ -90,16 +69,13 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   // const currentDate = useMemo(
 
   return (
-    <Action>
+    <Container>
       {isWonLastGames && (
         <>
-          <ActionContainer>
-            <ActionTitles>
-              <Text bold textTransform="uppercase" color="secondary" pr="4px">
-                {t('Earned')}
-              </Text>
-            </ActionTitles>
-            <ActionContent>
+          <Flex justifyContent="space-between">
+            <Heading mr="4px">{t('Earned')}: </Heading>
+
+            <Text bold style={{ display: 'flex', alignItems: 'center' }}>
               {isReady ? (
                 <Text bold color="success" fontSize={16}>
                   {wonAmount.toNumber()} BNB
@@ -107,23 +83,23 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               ) : (
                 <Skeleton width={80} height={18} mb="4px" />
               )}
-            </ActionContent>
-          </ActionContainer>
-          <ActionContainer>
-            <ActionTitles />
-            <ActionContent>
+            </Text>
+          </Flex>
+          <Flex justifyContent="space-between">
+            <Heading mr="4px" />
+            <Text bold style={{ display: 'flex', alignItems: 'center' }}>
               {isReady ? (
                 <ClaimButton address={address} roundId={roundId} />
               ) : (
                 <Skeleton width={80} height={36} mb="4px" />
               )}
-            </ActionContent>
-          </ActionContainer>
+            </Text>
+          </Flex>
         </>
       )}
 
       {isInProgress && isPlaying && (
-        <Container>
+        <>
           <Flex justifyContent="space-between">
             <Heading mr="4px">
               {`${t('Next play time')} is ${moment(nextFromRange).isSame(moment(), 'day') ? 'today' : 'tomorrow'}:`}
@@ -151,7 +127,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               <WarningIcon width="16px" color="failure" style={{ verticalAlign: 'middle' }} />
             </Flex>
           )}
-        </Container>
+        </>
       )}
 
       {/* TODO ADD CONDITION IF ACCOUNT IS GAME CREATOR. If true, display play and pause button */}
@@ -188,7 +164,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
           {t('Show Game Details')}
         </Button>
       </Link> */}
-    </Action>
+    </Container>
   )
 }
 

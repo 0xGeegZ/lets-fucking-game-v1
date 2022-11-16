@@ -39,7 +39,7 @@ const deserializeGamePlayerData = (game: SerializedGame): DeserializedGamePlayer
 }
 
 const deserializeGamePrize = (game: SerializedGame): DeserializedPrizeData[] => {
-  return game.prizes.map((prize) => {
+  return game?.prizes?.map((prize) => {
     return {
       amount: prize?.amount ? new BigNumber(prize.amount) : BIG_ZERO,
       position: prize?.position ? new BigNumber(prize.position) : BIG_ZERO,

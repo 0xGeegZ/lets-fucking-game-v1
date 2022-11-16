@@ -12,7 +12,7 @@ interface ClaimButtonProps {
 
 const ClaimButton: React.FC<React.PropsWithChildren<ClaimButtonProps>> = ({ address, roundId }) => {
   const { t } = useTranslation()
-  const { isPending, handleClaim } = useClaimPrize(address, EthersBigNumber.from(roundId))
+  const { isPending, handleClaim } = useClaimPrize(address, +roundId ? EthersBigNumber.from(roundId) : 0)
   const isDisabledButton = useMemo(() => !address || isPending, [address, isPending])
 
   return (

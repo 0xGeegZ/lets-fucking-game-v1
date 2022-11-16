@@ -251,19 +251,22 @@ export const gamesSlice = createSlice({
       const gameData = action.payload
       if (!gameData.length) return
 
-      // state.data = gameData
-
-      state.data = state.data.map((game, index) => {
-        // const { userData: oldUsedData, playerData: oldPlayerData, ...rest } = game
-        // const { userData, playerData } = gameData[index]
+      let isError = false
+      const updatedData = state.data.map((game, index) => {
         const { userData, playerData } = game
 
+        const updatedGame = gameData[index] || game
+
+        if (!updatedGame) isError = true
+
         return {
-          ...gameData[index],
+          ...updatedGame,
           userData,
           playerData,
         }
       })
+
+      if (!isError) state.data = updatedData
     })
 
     // Update games with user data
