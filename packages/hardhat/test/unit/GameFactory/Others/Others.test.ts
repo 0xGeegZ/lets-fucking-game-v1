@@ -142,7 +142,7 @@ describe('GameFactoryContract', function () {
     })
 
     describe('when called by admin', function () {
-      it('should update keeper address for the factory and all games and associated keeper job', async function () {
+      it.skip('should update keeper address for the factory and all games and associated keeper job', async function () {
         // TODO deploy a new keeper to update keeper data
         // this.gameFactory.connect(this.owner).updateCronUpkeep(this.owner.address)
         expect(true).to.be.false

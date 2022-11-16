@@ -563,9 +563,9 @@ const _abi = [
             type: "address",
           },
           {
-            internalType: "bytes",
+            internalType: "string",
             name: "encodedCron",
-            type: "bytes",
+            type: "string",
           },
         ],
         internalType: "struct GameV1Interface.GameData",

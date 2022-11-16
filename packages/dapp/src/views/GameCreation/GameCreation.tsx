@@ -325,7 +325,7 @@ const EncodedCronSelection = () => {
             <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
               {'Encoded cron selection'}
             </Text>
-            <Input onChange={handleChange} placeholder={'0 8 * * *'} value={encodedCron} />
+            <Input onChange={handleChange} placeholder={'0 18 * * *'} value={encodedCron} />
           </Flex>
         </>
       }

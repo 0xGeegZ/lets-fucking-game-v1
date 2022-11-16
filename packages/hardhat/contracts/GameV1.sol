@@ -22,7 +22,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
     address public factory;
 
     address public cronUpkeep;
-    bytes public encodedCron;
+    string public encodedCron;
     uint256 private cronUpkeepJobId;
 
     uint256 public registrationAmount;
@@ -118,7 +118,9 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         playTimeRange = _initialization.playTimeRange;
         maxPlayers = _initialization.maxPlayers;
 
-        encodedCron = CronExternal.toEncodedSpec(_initialization.encodedCron);
+        encodedCron = _initialization.encodedCron;
+        bytes memory encodedCronBytes = CronExternal.toEncodedSpec(encodedCron);
+
         cronUpkeep = _initialization.cronUpkeep;
 
         // Setup prizes structure
@@ -140,7 +142,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
             address(this),
             bytes("triggerDailyCheckpoint()"),
-            encodedCron
+            encodedCronBytes
         );
     }
 
@@ -219,7 +221,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
     /**
      * @notice Function that is called by the keeper based on the keeper cron
      * @dev Callable by admin or keeper
-     * @dev TODO NEXT VERSION Update triggerDailyCheckpoint to mae it only callable by keeper
+     * @dev TODO NEXT VERSION Update triggerDailyCheckpoint to make it only callable by keeper
      */
     function triggerDailyCheckpoint() external override onlyAdminOrKeeper whenNotPaused {
         if (isInProgress) {
@@ -593,10 +595,12 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
         cronUpkeepJobId = nextCronJobIDs;
 
+        bytes memory encodedCronBytes = CronExternal.toEncodedSpec(encodedCron);
+
         CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
             address(this),
             bytes("triggerDailyCheckpoint()"),
-            encodedCron
+            encodedCronBytes
         );
     }
 
@@ -828,10 +832,12 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
         cronUpkeepJobId = nextCronJobIDs;
 
+        bytes memory encodedCronBytes = CronExternal.toEncodedSpec(encodedCron);
+
         CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
             address(this),
             bytes("triggerDailyCheckpoint()"),
-            encodedCron
+            encodedCronBytes
         );
     }
 
@@ -843,15 +849,16 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
     function setEncodedCron(string memory _encodedCron) external override onlyAdminOrCreator {
         require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
 
-        encodedCron = CronExternal.toEncodedSpec(_encodedCron);
+        encodedCron = _encodedCron;
+        bytes memory encodedCronBytes = CronExternal.toEncodedSpec(encodedCron);
 
-        emit EncodedCronUpdated(cronUpkeepJobId, _encodedCron);
+        emit EncodedCronUpdated(cronUpkeepJobId, encodedCron);
 
         CronUpkeepInterface(cronUpkeep).updateCronJob(
             cronUpkeepJobId,
             address(this),
             bytes("triggerDailyCheckpoint()"),
-            encodedCron
+            encodedCronBytes
         );
     }
 

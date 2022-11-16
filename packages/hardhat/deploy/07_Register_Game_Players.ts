@@ -10,6 +10,8 @@ const func: DeployFunction = async function ({
   const { deployer: deployerAddress } = await getNamedAccounts()
   const [...players] = (await ethers.getSigners()).slice(1, 10)
 
+  if (!players.length) return log('No players finded from signers')
+
   const deployer = await ethers.getSigner(deployerAddress)
 
   const registrationAmount = ethers.utils.parseEther('0.0001')
@@ -38,8 +40,24 @@ const func: DeployFunction = async function ({
     deployer
   )
 
-  log('Register 9 players to payable game')
+  log('Register 9 players to free game')
+  const { deployedAddress: freeGameDeployedAddress } =
+    await gameFactory.deployedGames('1')
 
+  const freeGame = new ethers.Contract(
+    freeGameDeployedAddress,
+    gameInterface,
+    deployer
+  )
+
+  await Promise.all(
+    players.map((player) => {
+      return freeGame.connect(player).registerForGame()
+    })
+  )
+  log(`✅ 9 players registered to free game`)
+
+  log('Register 9 players to payable game')
   const { deployedAddress: payableGameDeployedAddress } =
     await gameFactory.deployedGames('0')
 
@@ -55,21 +73,6 @@ const func: DeployFunction = async function ({
     )
   )
   log(`✅ 9 players registered to payable game`)
-
-  log('Register 9 players to free game')
-  const { deployedAddress: freeGameDeployedAddress } =
-    await gameFactory.deployedGames('1')
-
-  const freeGame = new ethers.Contract(
-    freeGameDeployedAddress,
-    gameInterface,
-    deployer
-  )
-
-  await Promise.all(
-    players.map((player) => freeGame.connect(player).registerForGame())
-  )
-  log(`✅ 9 players registered to free game`)
 }
 
 func.tags = ['all', 'dev', 'staging', 'register-game-players']

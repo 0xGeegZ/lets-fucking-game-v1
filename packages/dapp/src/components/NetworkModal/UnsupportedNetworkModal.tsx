@@ -32,7 +32,8 @@ export function UnsupportedNetworkModal({ pageSupportedChains }: { pageSupported
   }, [menuItems, pathname])
 
   const supportedMainnetChains = useMemo(
-    () => chains.filter((chain) => !chain.testnet && pageSupportedChains?.includes(chain.id)),
+    () => chains.filter((chain) => pageSupportedChains?.includes(chain.id)),
+    // () => chains.filter((chain) => !chain.testnet && pageSupportedChains?.includes(chain.id)),
     [chains, pageSupportedChains],
   )
 
@@ -43,7 +44,8 @@ export function UnsupportedNetworkModal({ pageSupportedChains }: { pageSupported
           {t('Currently %feature% only supported in', { feature: typeof title === 'string' ? title : 'this page' })}{' '}
           {supportedMainnetChains?.map((c) => c.name).join(', ')}
         </Text>
-        <div style={{ textAlign: 'center' }}>
+        {/* // TODO GUIGUI UPDATE IMAGE */}
+        {/* <div style={{ textAlign: 'center' }}>
           <Image
             layout="fixed"
             width="194px"
@@ -51,7 +53,7 @@ export function UnsupportedNetworkModal({ pageSupportedChains }: { pageSupported
             src="/images/check-your-network.png"
             alt="check your network"
           />
-        </div>
+        </div> */}
         <Message variant="warning">
           <MessageText>{t('Please switch your network to continue.')}</MessageText>
         </Message>
@@ -62,7 +64,9 @@ export function UnsupportedNetworkModal({ pageSupportedChains }: { pageSupported
               if (supportedMainnetChains.map((c) => c.id).includes(chainId)) {
                 switchNetworkAsync(chainId)
               } else {
-                switchNetworkAsync(ChainId.BSC)
+                // TODO GUIGUI UPDATE DEFAULT CHAIN
+                // switchNetworkAsync(ChainId.BSC)
+                switchNetworkAsync(ChainId.BSC_TESTNET)
               }
             }}
           >

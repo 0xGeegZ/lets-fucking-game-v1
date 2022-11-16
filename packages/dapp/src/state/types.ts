@@ -62,9 +62,9 @@ export interface SerializedGameUserData {
   isPlaying: boolean
   wonAmount: string
   // TODO delete this var ??
-  nextFromRange: number
+  nextFromRange: string
   // TODO delete this var ??
-  nextToRange: number
+  nextToRange: string
   isWonLastGames: boolean
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
@@ -77,9 +77,9 @@ export interface DeserializedGameUserData {
   isPlaying: boolean
   wonAmount: BigNumber
   // TODO delete this var ??
-  nextFromRange: BigNumber
+  nextFromRange: string
   // TODO delete this var ??
-  nextToRange: BigNumber
+  nextToRange: string
   isWonLastGames: boolean
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean

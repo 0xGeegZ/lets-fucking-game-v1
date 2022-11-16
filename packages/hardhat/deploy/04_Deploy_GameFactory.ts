@@ -64,17 +64,30 @@ const func: DeployFunction = async function ({
   )
 
   log('Adding GameFactory to Keeper delegators')
-  const { interface: cronUpkeepInterface } = await ethers.getContractFactory(
-    'CronUpkeep',
-    libraries
-  )
+  try {
+    const { interface: cronUpkeepInterface } = await ethers.getContractFactory(
+      'CronUpkeep',
+      libraries
+    )
 
-  const cronUpkeep = new ethers.Contract(
-    cronUpkeepAddress,
-    cronUpkeepInterface,
-    deployer
-  )
-  cronUpkeep.addDelegator(gameFactoryAddress)
+    const cronUpkeep = new ethers.Contract(
+      cronUpkeepAddress,
+      cronUpkeepInterface,
+      deployer
+    )
+    cronUpkeep.addDelegator(gameFactoryAddress)
+  } catch (error) {
+    const { interface: cronUpkeepInterface } = await ethers.getContractFactory(
+      'CronUpkeep'
+    )
+
+    const cronUpkeep = new ethers.Contract(
+      cronUpkeepAddress,
+      cronUpkeepInterface,
+      deployer
+    )
+    cronUpkeep.addDelegator(gameFactoryAddress)
+  }
 
   if (isLocalDeployment) return
 

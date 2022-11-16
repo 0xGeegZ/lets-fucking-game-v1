@@ -16,6 +16,7 @@ import 'hardhat-storage-layout'
 import '@appliedblockchain/chainlink-plugins-fund-link'
 import './tasks/accounts'
 import './tasks/storage-layout'
+import './tasks/trigger-daily-checkpoint'
 import './tasks/withdraw-link'
 
 import * as dotenv from 'dotenv'
@@ -27,6 +28,14 @@ function getWallet(): Array<string> {
   return process.env.DEPLOYER_WALLET_PRIVATE_KEY !== undefined
     ? [process.env.DEPLOYER_WALLET_PRIVATE_KEY]
     : []
+  // TODO GUIGUI DERIVATE ACCOUNTS FROM MNEMONIC (TO REGISTER PLAYERS FOR GAME)
+  //  accounts: {
+  //     mnemonic: "test test test test test test test test test test test junk",
+  //     path: "m/44'/60'/0'/0",
+  //     initialIndex: 0,
+  //     count: 20,
+  //     passphrase: "",
+  //   },
 }
 
 // You need to export an object to set up your config

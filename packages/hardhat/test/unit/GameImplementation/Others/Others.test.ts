@@ -270,7 +270,7 @@ describe('GameV1Contract - Others', function () {
     })
     describe('claimTreasuryFeeToFactory', function () {
       describe('when caller is the game factory', function () {
-        it('should withdraw the treasury fee to factory', async function () {
+        it.skip('should withdraw the treasury fee to factory', async function () {
           // TODO GUIGUI FIXME gameFactory contract can't call game function
           expect(true).to.be.false
           // const winnerIndex = 4
@@ -316,7 +316,7 @@ describe('GameV1Contract - Others', function () {
           // expect(updatedTreasuryAmount).to.be.equal(0)
         })
 
-        it('should revert with correct error message if factory claim fee twice', async function () {
+        it.skip('should revert with correct error message if factory claim fee twice', async function () {
           // TODO FIXME factory contract can't call game function
           expect(true).to.be.false
           // const winnerIndex = 4
@@ -383,7 +383,7 @@ describe('GameV1Contract - Others', function () {
       })
 
       describe('when called by admin', function () {
-        it('should update keeper address for the game and associated keeper job', async function () {
+        it.skip('should update keeper address for the game and associated keeper job', async function () {
           // TODO deploy a new keeper to update keeper data
           // this.gameFactory.connect(this.owner).updateCronUpkeep(this.owner.address)
           expect(true).to.be.false
@@ -425,7 +425,7 @@ describe('GameV1Contract - Others', function () {
       })
 
       describe('when called by admin', function () {
-        it('should update keeper cron for the game and associated keeper job', async function () {
+        it.skip('should update keeper cron for the game and associated keeper job', async function () {
           // TODO FIXME call toEncodedSpec from externalCron
           expect(true).to.be.false
 
@@ -497,7 +497,7 @@ describe('GameV1Contract - Others', function () {
             initialReceiverBalance.add(initialContractBalance)
           )
         })
-        it('should withdraw all the contract funds and transfer them to the factory address', async function () {
+        it.skip('should withdraw all the contract funds and transfer them to the factory address', async function () {
           // TODO  GUIGUI FIXME gameFactory contract can't call game function (invalid signer or provider)
           expect(true).to.be.false
           // const fundReceiverAddress = this.players[5].address
@@ -627,7 +627,7 @@ describe('GameV1Contract - Others', function () {
       })
 
       describe('when called by admin', function () {
-        it('should transfer the factory to given address', async function () {
+        it.skip('should transfer the factory to given address', async function () {
           // TODO GUIGUI FIXME gameFactory contract can't call game function (invalid signer or provider)
           expect(true).to.be.false
           // await this.deployedPayableGame
