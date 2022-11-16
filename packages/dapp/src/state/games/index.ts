@@ -84,7 +84,6 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
     console.log('fetchGamesPublicDataAsync')
     const state = getState()
     if (state.games.chainId && state.games.chainId !== chainId) {
-      console.log('fetchGamesPublicDataAsync > fetchInitialGamesData')
       await dispatch(fetchInitialGamesData({ chainId, account }))
     }
 
@@ -160,7 +159,6 @@ export const fetchGamePlayerDataAsync = createAsyncThunk<
 
     let state = getState()
     if (state.games.chainId && state.games.chainId !== chainId) {
-      console.log('fetchGamePlayerDataAsync > fetchInitialGamesData')
       await dispatch(fetchInitialGamesData({ chainId, account }))
     }
     state = getState()
