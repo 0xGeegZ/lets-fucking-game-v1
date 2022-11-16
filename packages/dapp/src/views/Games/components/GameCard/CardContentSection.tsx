@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 
 import styled from 'styled-components'
 import { DeserializedPrizeData } from 'state/types'
+import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import Tooltip from '../GameCardButtons/Tooltip'
 
 const BulletList = styled.ul`
@@ -55,7 +56,9 @@ const CardContentSection: React.FC<React.PropsWithChildren<GameCardContentSectio
   isReady,
 }) => {
   const { t } = useTranslation()
+  const { chain } = useActiveWeb3React()
 
+  const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
   return (
     <Container>
       <Flex justifyContent="space-between">
@@ -64,8 +67,7 @@ const CardContentSection: React.FC<React.PropsWithChildren<GameCardContentSectio
           <Text bold style={{ display: 'flex', alignItems: 'center' }}>
             <RocketIcon m="4px" color="success" />
             <Text bold color="success" fontSize={16}>
-              {prizepool.toNumber()}
-              {' BNB'}
+              {prizepool.toNumber()} {chainSymbol}
             </Text>
             <Tooltip
               additionalStyle={{ color: 'success' }}
@@ -79,7 +81,7 @@ const CardContentSection: React.FC<React.PropsWithChildren<GameCardContentSectio
                           <Text
                             display="inline"
                             color="textSubtle"
-                          >{`Position ${prize.position.toNumber()} will win ${prize.amount.toNumber()} BNB`}</Text>
+                          >{`Position ${prize.position.toNumber()} will win ${prize.amount.toNumber()} ${chainSymbol}`}</Text>
                         </li>
                       )
                     })}
@@ -105,8 +107,7 @@ const CardContentSection: React.FC<React.PropsWithChildren<GameCardContentSectio
                   </Text>
                 ) : (
                   <Text bold fontSize={16}>
-                    {registrationAmount.toNumber()}
-                    {' BNB'}{' '}
+                    {registrationAmount.toNumber()} {chainSymbol}
                   </Text>
                 )}
                 <Tooltip

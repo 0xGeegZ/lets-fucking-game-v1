@@ -3,7 +3,10 @@ import { Card, CardBody, Flex, Heading, Text } from '@pancakeswap/uikit'
 import { useTranslation } from '@pancakeswap/localization'
 import styled from 'styled-components'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
+import { BigNumber as EthersBigNumber } from '@ethersproject/bignumber'
+import { formatEther, parseEther } from '@ethersproject/units'
 
+import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import BackStepButton from './BackStepButton'
 import CreateGameButton from './CreateGameButton'
 
@@ -37,6 +40,10 @@ const RecapConfigGame = () => {
     prizeType,
   } = useGameContext()
 
+  const { chain } = useActiveWeb3React()
+
+  const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
+
   return (
     <>
       <Card mb="24px">
@@ -58,7 +65,8 @@ const RecapConfigGame = () => {
               <BulletList>
                 <li>
                   <Text textAlign="center" color="textSubtle" display="inline">
-                    Registration amount : {registrationAmount.toString()} BNB
+                    Registration amount :{' '}
+                    {registrationAmount ? parseFloat(formatEther(registrationAmount.toString())) : '0'} {chainSymbol}
                   </Text>
                 </li>
                 <li>
@@ -92,7 +100,8 @@ const RecapConfigGame = () => {
                 </li>
                 <li>
                   <Text textAlign="center" color="textSubtle" display="inline">
-                    Prize type : {prizeType}
+                    Prize type : {chainSymbol}
+                    {/* {prizeType} */}
                   </Text>
                 </li>
               </BulletList>
@@ -138,13 +147,7 @@ const GameConfirmationAndContractCreation: React.FC<React.PropsWithChildren> = (
         pl={['4px', null, '0']}
         mb="8px"
       >
-        <BackStepButton
-          onClick={() =>
-            actions.previousStep(currentStep - 1)
-          } /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
-        >
-          {t('Previous Step')}
-        </BackStepButton>
+        <BackStepButton onClick={() => actions.previousStep(currentStep - 1)}>{t('Previous Step')}</BackStepButton>
         <CreateGameButton game={game} />
       </Flex>
     </>

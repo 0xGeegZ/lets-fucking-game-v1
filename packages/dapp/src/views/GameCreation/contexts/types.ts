@@ -11,7 +11,7 @@ export type Actions =
       currentStep: number
       treasuryFee: number
       creatorFee: number
-      registrationAmount: number
+      registrationAmount: string
       maxPlayers: number
       playTimeRange: number
       encodedCron: string
@@ -27,7 +27,7 @@ export type Actions =
       currentStep: number
       treasuryFee: number
       creatorFee: number
-      registrationAmount: number
+      registrationAmount: string
       maxPlayers: number
       playTimeRange: number
       encodedCron: string
@@ -46,7 +46,7 @@ export interface State {
   currentStep: number
   treasuryFee: number
   creatorFee: number
-  registrationAmount: number
+  registrationAmount: string
   maxPlayers: number
   playTimeRange: number
   encodedCron: string
@@ -65,7 +65,7 @@ export interface ContextType extends State {
       currentStep: number,
       treasuryFee: number,
       creatorFee: number,
-      registrationAmount: number,
+      registrationAmount: string,
       maxPlayers: number,
       playTimeRange: number,
       encodedCron: string,
@@ -79,7 +79,7 @@ export interface ContextType extends State {
       currentStep: number,
       treasuryFee: number,
       creatorFee: number,
-      registrationAmount: number,
+      registrationAmount: string,
       maxPlayers: number,
       playTimeRange: number,
       encodedCron: string,
