@@ -19,52 +19,59 @@ const fetchGamePublicDataPkg = async ({ chainId }): Promise<SerializedGame[]> =>
 
 const initialState: SerializedGamesState = {
   data: [],
+  chainId: null,
   loadArchivedGamesData: false,
   userDataLoaded: false,
   loadingKeys: {},
 }
 
 // Async thunks
-export const fetchInitialGamesData = createAsyncThunk<SerializedGame[], { chainId: number; account: string }>(
-  'games/fetchInitialGamesData',
-  async ({ chainId, account }) => {
-    console.log('fetchInitialGamesData')
-    const chain = chains.find((c) => c.id === chainId)
+export const fetchInitialGamesData = createAsyncThunk<
+  { data: SerializedGame[]; chainId: number },
+  { chainId: number; account: string }
+>('games/fetchInitialGamesData', async ({ chainId, account }) => {
+  console.log('fetchInitialGamesData')
+  const chain = chains.find((c) => c.id === chainId)
 
-    if (!chain) throw new Error('chain not supported')
+  if (!chain) throw new Error('chain not supported')
 
-    const games = await fetchGamePublicDataPkg({ chainId })
+  const games = await fetchGamePublicDataPkg({ chainId })
 
-    return games.map((game) => {
-      return {
-        ...game,
-        userData: {
-          isPlaying: false,
-          isCreator: false,
-          isAdmin: false,
-          wonAmount: '0',
-          nextFromRange: '0',
-          nextToRange: '0',
-          isWonLastGames: false,
-          isCanVoteSplitPot: false,
-          isInTimeRange: false,
-        },
-        playerData: {
-          playerAddress: '',
-          roundRangeLowerLimit: 0,
-          roundRangeUpperLimit: 0,
-          hasPlayedRound: false,
-          roundCount: 0,
-          position: 0,
-          hasLost: false,
-          isSplitOk: false,
-        },
-      }
-    })
-  },
-)
+  const initialGames = games.map((game) => {
+    return {
+      ...game,
+      userData: {
+        isPlaying: false,
+        isCreator: false,
+        isAdmin: false,
+        wonAmount: '0',
+        nextFromRange: '0',
+        nextToRange: '0',
+        isWonLastGames: false,
+        isCanVoteSplitPot: false,
+        isInTimeRange: false,
+      },
+      playerData: {
+        playerAddress: '',
+        roundRangeLowerLimit: 0,
+        roundRangeUpperLimit: 0,
+        hasPlayedRound: false,
+        roundCount: 0,
+        position: 0,
+        hasLost: false,
+        isSplitOk: false,
+      },
+    }
+  })
+
+  return {
+    data: initialGames,
+    chainId,
+  }
+})
 
 export const fetchGamesPublicDataAsync = createAsyncThunk<
+  // { data: SerializedGame[]; chainId: number },
   SerializedGame[],
   { chainId: number; account: string },
   {
@@ -75,24 +82,16 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
   // eslint-disable-next-line consistent-return
   async ({ chainId, account }, { dispatch, getState }) => {
     console.log('fetchGamesPublicDataAsync')
-
-    // TODO GUIGUI add chain id to reload games if we change blockchain
-    // github.com/pancakeswap/pancake-frontend/blob/develop/apps/web/src/state/farms/index.ts
-
     const state = getState()
-    // if (state.farms.chainId !== chainId) {
-    //   await dispatch(fetchInitialFarmsData({ chainId }))
-    // }
+    if (state.games.chainId && state.games.chainId !== chainId) {
+      await dispatch(fetchInitialGamesData({ chainId, account }))
+    }
 
     const chain = chains.find((c) => c.id === chainId)
 
     if (!chain) throw new Error('chain not supported')
 
-    const updatedData = await fetchGamePublicDataPkg({ chainId })
-
-    if (state.games.data.length === updatedData.length || !state.games.data.length) return updatedData
-
-    await dispatch(fetchInitialGamesData({ chainId, account }))
+    return fetchGamePublicDataPkg({ chainId })
   },
   {
     condition: (arg, { getState }) => {
@@ -155,26 +154,20 @@ export const fetchGamePlayerDataAsync = createAsyncThunk<
   }
 >(
   'games/fetchGamePlayerDataAsync',
-  async ({ account, chainId }, { getState }) => {
-    // TODO GUIGUI add chain id to reload games if we change blockchain
-    // github.com/pancakeswap/pancake-frontend/blob/develop/apps/web/src/state/farms/index.ts
-
-    // const state = getState()
-    // if (state.farms.chainId !== chainId) {
-    //   await dispatch(fetchInitialFarmsData({ chainId }))
-    // }
-
+  async ({ chainId, account }, { dispatch, getState }) => {
     console.log('fetchGamePlayerDataAsync')
+
+    let state = getState()
+    if (state.games.chainId && state.games.chainId !== chainId) {
+      await dispatch(fetchInitialGamesData({ chainId, account }))
+    }
+    state = getState()
 
     const chain = chains.find((c) => c.id === chainId)
 
     if (!chain) throw new Error('chain not supported')
 
-    const {
-      games: { data },
-    } = getState()
-
-    const games = data.length ? data : await fetchGamePublicDataPkg({ chainId })
+    const games = state.games.data.length ? state.games.data : await fetchGamePublicDataPkg({ chainId })
 
     const playerData = await fetchGamesPlayerData(games, account, chainId)
 
@@ -246,8 +239,9 @@ export const gamesSlice = createSlice({
     // Init game data
     builder.addCase(fetchInitialGamesData.fulfilled, (state, action) => {
       console.log('Init game data')
-      const gameData = action.payload
-      if (gameData.length) state.data = gameData
+      const { data, chainId } = action.payload
+      state.data = data
+      state.chainId = chainId
     })
 
     // Update games with live data
@@ -279,11 +273,12 @@ export const gamesSlice = createSlice({
     builder.addCase(fetchGamePlayerDataAsync.fulfilled, (state, action) => {
       console.log('Update games with user data')
       const gameData = action.payload
-      if (gameData.length) state.data = gameData
+      state.data = gameData
       state.userDataLoaded = true
     })
 
     builder.addMatcher(
+      // TODO MAKE IT WORKS
       isAnyOf(fetchGamePlayerDataAsync.pending, fetchGamesPublicDataAsync.pending),
       (state, action) => {
         state.loadingKeys[serializeLoadingKey(action, 'pending')] = true
