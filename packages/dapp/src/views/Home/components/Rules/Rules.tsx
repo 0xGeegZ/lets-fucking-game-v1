@@ -170,7 +170,7 @@ const Rules: React.FC<React.PropsWithChildren> = () => {
           <Text mt="24px" color="textSubtle">
             {t('The prizes for each game come from two sources:')}
           </Text>
-          <Text fontSize="18px" bold my="16px" scale="md">
+          <Text fontSize="18px" bold my="16px">
             {t('Player registration')}
           </Text>
           <BulletList>
@@ -182,7 +182,7 @@ const Rules: React.FC<React.PropsWithChildren> = () => {
               </Text>
             </li>
           </BulletList>
-          <Text bold fontSize="18px" my="16px" scale="md">
+          <Text bold fontSize="18px" my="16px">
             {t('Creator Prizes')}
           </Text>
           <BulletList>
