@@ -35,7 +35,7 @@ export const fetchInitialGamesData = createAsyncThunk<SerializedGame[], { chainI
 
     const games = await fetchGamePublicDataPkg({ chainId })
 
-    return games.map((game) => {
+    const initialGames = games.map((game) => {
       return {
         ...game,
         userData: {
@@ -61,6 +61,11 @@ export const fetchInitialGamesData = createAsyncThunk<SerializedGame[], { chainI
         },
       }
     })
+
+    return {
+      data: initialGames,
+      chainId,
+    }
   },
 )
 
@@ -80,9 +85,10 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
     // github.com/pancakeswap/pancake-frontend/blob/develop/apps/web/src/state/farms/index.ts
 
     const state = getState()
-    // if (state.farms.chainId !== chainId) {
-    //   await dispatch(fetchInitialFarmsData({ chainId }))
-    // }
+    if (state.games.chainId && state.games.chainId !== chainId) {
+      console.log('fetchGamesPublicDataAsync > chainId > reloading initial data')
+      await dispatch(fetchInitialGamesData({ chainId }))
+    }
 
     const chain = chains.find((c) => c.id === chainId)
 
@@ -90,9 +96,12 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
 
     const updatedData = await fetchGamePublicDataPkg({ chainId })
 
-    if (state.games.data.length === updatedData.length || !state.games.data.length) return updatedData
+    return updatedData
+    // if (state.games.data.length === updatedData.length || !state.games.data.length) return updatedData
 
-    await dispatch(fetchInitialGamesData({ chainId, account }))
+    // console.log('fetchGamesPublicDataAsync > end > reloading initial data')
+    // await dispatch(fetchInitialGamesData({ chainId, account }))
+    // await fetchGamesPublicDataAsync({ chainId, account }, { dispatch, getState })
   },
   {
     condition: (arg, { getState }) => {
@@ -155,16 +164,18 @@ export const fetchGamePlayerDataAsync = createAsyncThunk<
   }
 >(
   'games/fetchGamePlayerDataAsync',
-  async ({ account, chainId }, { getState }) => {
+  async ({ account, chainId }, { dispatch, getState }) => {
+    console.log('fetchGamePlayerDataAsync')
+
     // TODO GUIGUI add chain id to reload games if we change blockchain
     // github.com/pancakeswap/pancake-frontend/blob/develop/apps/web/src/state/farms/index.ts
 
-    // const state = getState()
-    // if (state.farms.chainId !== chainId) {
-    //   await dispatch(fetchInitialFarmsData({ chainId }))
-    // }
-
-    console.log('fetchGamePlayerDataAsync')
+    const state = getState()
+    console.log('🚀  ~ state.games.chainId', state.games.chainId, ' chainId', chainId)
+    if (state.games.chainId && state.games.chainId !== chainId) {
+      console.log('fetchGamePlayerDataAsync > chainId > reloading initial data')
+      await dispatch(fetchInitialGamesData({ chainId }))
+    }
 
     const chain = chains.find((c) => c.id === chainId)
 
@@ -246,8 +257,12 @@ export const gamesSlice = createSlice({
     // Init game data
     builder.addCase(fetchInitialGamesData.fulfilled, (state, action) => {
       console.log('Init game data')
-      const gameData = action.payload
-      if (gameData.length) state.data = gameData
+      // const gameData = action.payload
+      // if (gameData.length) state.data = gameData
+      const { data, chainId } = action.payload
+      console.log('🚀 ~ file: index.ts ~ line 261 ~ builder.addCase ~ action.payload', action.payload)
+      state.data = data
+      state.chainId = chainId
     })
 
     // Update games with live data
@@ -279,11 +294,13 @@ export const gamesSlice = createSlice({
     builder.addCase(fetchGamePlayerDataAsync.fulfilled, (state, action) => {
       console.log('Update games with user data')
       const gameData = action.payload
-      if (gameData.length) state.data = gameData
+      console.log('🚀 ~ file: index.ts ~ line 293 ~ builder.addCase ~ gameData', gameData)
+      state.data = gameData
       state.userDataLoaded = true
     })
 
     builder.addMatcher(
+      // TODO MAKE IT WORKS
       isAnyOf(fetchGamePlayerDataAsync.pending, fetchGamesPublicDataAsync.pending),
       (state, action) => {
         state.loadingKeys[serializeLoadingKey(action, 'pending')] = true
