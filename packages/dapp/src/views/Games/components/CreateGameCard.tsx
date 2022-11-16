@@ -79,7 +79,7 @@ export const useBCakeTooltipContent = () => {
   return tooltipContent
 }
 
-export const BCakeBoosterCard = () => {
+export const CreateGameCard = () => {
   const { t } = useTranslation()
   const theme = useTheme()
   const { isMobile } = useMatchBreakpoints()

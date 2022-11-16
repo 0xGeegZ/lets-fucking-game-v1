@@ -140,6 +140,7 @@ export interface DeserializedGame {
 
 export interface SerializedGamesState {
   data: SerializedGame[]
+  chainId?: number
   loadArchivedGamesData: boolean
   userDataLoaded: boolean
   loadingKeys: Record<string, boolean>

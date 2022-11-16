@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { Flex, Skeleton, Text, LinkExternal } from '@pancakeswap/uikit'
 
-import ActionButton from 'views/Games/components/YieldBooster/components/ActionButton'
+import ActionButton from 'views/Games/components/GameTags/ActionButton'
 import { useTranslation } from '@pancakeswap/localization'
 import BigNumber from 'bignumber.js'
 

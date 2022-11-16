@@ -21,7 +21,7 @@ import Loading from 'components/Loading'
 import ScrollToTopButton from 'components/ScrollToTopButton/ScrollToTopButtonV2'
 import { latinise } from 'utils/latinise'
 import GameTabButtons from './components/GameTabButtons'
-import { BCakeBoosterCard } from './components/BCakeBoosterCard'
+import { CreateGameCard } from './components/CreateGameCard'
 
 const ControlContainer = styled.div`
   display: flex;
@@ -273,7 +273,8 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
             <GameH2 scale="lg" color="text">
               {t('Register to a game to start playing.')}
             </GameH2>
-            <NextLinkFromReactRouter to="/games/auction" prefetch={false}>
+            {/* <NextLinkFromReactRouter to="/games/my-games" prefetch={false}> */}
+            <NextLinkFromReactRouter to="#" prefetch={false}>
               <Button variant="text" disabled>
                 <Text color="primary" bold fontSize="16px" mr="4px">
                   {t('My Games')}
@@ -284,7 +285,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
           </Box>
           {/* {chainId === ChainId.BSC && ( */}
           <Box>
-            <BCakeBoosterCard />
+            <CreateGameCard />
           </Box>
           {/* )} */}
         </GameFlexWrapper>

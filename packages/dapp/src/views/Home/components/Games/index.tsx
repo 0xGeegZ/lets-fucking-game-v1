@@ -11,7 +11,7 @@ import { useTranslation } from '@pancakeswap/localization'
 import { Heading, Flex, Box, Text } from '@pancakeswap/uikit'
 import FlexLayout from 'components/Layout/Flex'
 
-const NUMBER_OF_GAMES_VISIBLE = 6
+const NUMBER_OF_GAMES_VISIBLE = 3
 
 const GamesPage = () => {
   const { t } = useTranslation()
@@ -21,7 +21,7 @@ const GamesPage = () => {
   const { data: games } = useGames()
   const [numberOfGamesVisible] = useState(NUMBER_OF_GAMES_VISIBLE)
 
-  const activeGames = games.filter((game) => !game.isDeleted)
+  const activeGames = games.filter((game) => !game.isDeleted && !game.isInProgress)
 
   const chosenGamesMemoized = useMemo(() => {
     return activeGames.slice(0, numberOfGamesVisible)

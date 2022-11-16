@@ -17,7 +17,8 @@ export function UnsupportedNetworkModal({ pageSupportedChains }: { pageSupported
   const { switchNetworkAsync, isLoading, canSwitch } = useSwitchNetwork()
   const switchNetworkLocal = useSwitchNetworkLocal()
   const { chains } = useNetwork()
-  const chainId = useLocalNetworkChain() || ChainId.BSC
+  //   const chainId = useLocalNetworkChain() || ChainId.BSC
+  const chainId = useLocalNetworkChain() || ChainId.MUMBAI
   const { isConnected } = useAccount()
   const { logout } = useAuth()
   const { t } = useTranslation()
@@ -66,7 +67,7 @@ export function UnsupportedNetworkModal({ pageSupportedChains }: { pageSupported
               } else {
                 // TODO GUIGUI UPDATE DEFAULT CHAIN
                 // switchNetworkAsync(ChainId.BSC)
-                switchNetworkAsync(ChainId.BSC_TESTNET)
+                switchNetworkAsync(ChainId.MUMBAI)
               }
             }}
           >
@@ -82,7 +83,8 @@ export function UnsupportedNetworkModal({ pageSupportedChains }: { pageSupported
             variant="secondary"
             onClick={() =>
               logout().then(() => {
-                switchNetworkLocal(ChainId.BSC)
+                // switchNetworkLocal(ChainId.BSC)
+                switchNetworkLocal(ChainId.MUMBAI)
               })
             }
           >

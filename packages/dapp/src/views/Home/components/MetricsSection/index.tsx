@@ -24,7 +24,7 @@ const Stats = () => {
     <Flex justifyContent="center" alignItems="center" flexDirection="column">
       {/* <GradientLogo height="48px" width="48px" mb="24px" /> */}
       <Heading textAlign="center" scale="xl">
-        {t('Be the last player')}
+        {t('Be one of the last players')}
       </Heading>
       <Heading textAlign="center" scale="xl" mb="32px">
         {t('Won up to 100x your bet')}
