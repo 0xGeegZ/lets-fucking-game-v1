@@ -19,57 +19,59 @@ const fetchGamePublicDataPkg = async ({ chainId }): Promise<SerializedGame[]> =>
 
 const initialState: SerializedGamesState = {
   data: [],
+  chainId: null,
   loadArchivedGamesData: false,
   userDataLoaded: false,
   loadingKeys: {},
 }
 
 // Async thunks
-export const fetchInitialGamesData = createAsyncThunk<SerializedGame[], { chainId: number; account: string }>(
-  'games/fetchInitialGamesData',
-  async ({ chainId, account }) => {
-    console.log('fetchInitialGamesData')
-    const chain = chains.find((c) => c.id === chainId)
+export const fetchInitialGamesData = createAsyncThunk<
+  { data: SerializedGame[]; chainId: number },
+  { chainId: number; account: string }
+>('games/fetchInitialGamesData', async ({ chainId, account }) => {
+  console.log('fetchInitialGamesData')
+  const chain = chains.find((c) => c.id === chainId)
 
-    if (!chain) throw new Error('chain not supported')
+  if (!chain) throw new Error('chain not supported')
 
-    const games = await fetchGamePublicDataPkg({ chainId })
+  const games = await fetchGamePublicDataPkg({ chainId })
 
-    const initialGames = games.map((game) => {
-      return {
-        ...game,
-        userData: {
-          isPlaying: false,
-          isCreator: false,
-          isAdmin: false,
-          wonAmount: '0',
-          nextFromRange: '0',
-          nextToRange: '0',
-          isWonLastGames: false,
-          isCanVoteSplitPot: false,
-          isInTimeRange: false,
-        },
-        playerData: {
-          playerAddress: '',
-          roundRangeLowerLimit: 0,
-          roundRangeUpperLimit: 0,
-          hasPlayedRound: false,
-          roundCount: 0,
-          position: 0,
-          hasLost: false,
-          isSplitOk: false,
-        },
-      }
-    })
-
+  const initialGames = games.map((game) => {
     return {
-      data: initialGames,
-      chainId,
+      ...game,
+      userData: {
+        isPlaying: false,
+        isCreator: false,
+        isAdmin: false,
+        wonAmount: '0',
+        nextFromRange: '0',
+        nextToRange: '0',
+        isWonLastGames: false,
+        isCanVoteSplitPot: false,
+        isInTimeRange: false,
+      },
+      playerData: {
+        playerAddress: '',
+        roundRangeLowerLimit: 0,
+        roundRangeUpperLimit: 0,
+        hasPlayedRound: false,
+        roundCount: 0,
+        position: 0,
+        hasLost: false,
+        isSplitOk: false,
+      },
     }
-  },
-)
+  })
+
+  return {
+    data: initialGames,
+    chainId,
+  }
+})
 
 export const fetchGamesPublicDataAsync = createAsyncThunk<
+  // { data: SerializedGame[]; chainId: number },
   SerializedGame[],
   { chainId: number; account: string },
   {
@@ -81,7 +83,8 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
   async ({ chainId, account }, { dispatch, getState }) => {
     console.log('fetchGamesPublicDataAsync')
     const state = getState()
-    if (state.games.chainId && state.games.chainId !== chainId) await dispatch(fetchInitialGamesData({ chainId }))
+    if (state.games.chainId && state.games.chainId !== chainId)
+      await dispatch(fetchInitialGamesData({ chainId, account }))
 
     const chain = chains.find((c) => c.id === chainId)
 
@@ -150,19 +153,18 @@ export const fetchGamePlayerDataAsync = createAsyncThunk<
   }
 >(
   'games/fetchGamePlayerDataAsync',
-  async ({ account, chainId }, { dispatch, getState }) => {
+  async ({ chainId, account }, { dispatch, getState }) => {
     console.log('fetchGamePlayerDataAsync')
 
     const state = getState()
-    if (state.games.chainId && state.games.chainId !== chainId) await dispatch(fetchInitialGamesData({ chainId }))
+    if (state.games.chainId && state.games.chainId !== chainId)
+      await dispatch(fetchInitialGamesData({ chainId, account }))
 
     const chain = chains.find((c) => c.id === chainId)
 
     if (!chain) throw new Error('chain not supported')
 
-    const { games } = getState()
-
-    const games = games.data.length ? data : await fetchGamePublicDataPkg({ chainId })
+    const games = state.games.data.length ? state.games.data : await fetchGamePublicDataPkg({ chainId })
 
     const playerData = await fetchGamesPlayerData(games, account, chainId)
 
