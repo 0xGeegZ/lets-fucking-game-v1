@@ -179,6 +179,8 @@ function combineMaps(map1: TokenAddressMap, map2: TokenAddressMap): TokenAddress
     [ChainId.ETHEREUM]: { ...map1[ChainId.ETHEREUM], ...map2[ChainId.ETHEREUM] },
     [ChainId.RINKEBY]: { ...map1[ChainId.RINKEBY], ...map2[ChainId.RINKEBY] },
     [ChainId.GOERLI]: { ...map1[ChainId.GOERLI], ...map2[ChainId.GOERLI] },
+    [ChainId.POLYGON]: { ...map1[ChainId.POLYGON], ...map2[ChainId.POLYGON] },
+    [ChainId.MUMBAI]: { ...map1[ChainId.MUMBAI], ...map2[ChainId.MUMBAI] },
     [ChainId.BSC]: { ...map1[ChainId.BSC], ...map2[ChainId.BSC] },
     [ChainId.BSC_TESTNET]: { ...map1[ChainId.BSC_TESTNET], ...map2[ChainId.BSC_TESTNET] },
     [ChainId.HARDHAT]: { ...map1[ChainId.HARDHAT], ...map2[ChainId.HARDHAT] },

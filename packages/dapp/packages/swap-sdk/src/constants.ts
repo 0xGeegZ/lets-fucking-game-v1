@@ -11,6 +11,8 @@ export enum ChainId {
   BSC = 56,
   BSC_TESTNET = 97,
   HARDHAT = 31337,
+  POLYGON = 137,
+  MUMBAI = 80001,
 }
 
 export enum TradeType {
@@ -34,6 +36,8 @@ export const FACTORY_ADDRESS_MAP: Record<number, string> = {
   [ChainId.GOERLI]: FACTORY_ADDRESS_ETH,
   [ChainId.BSC]: FACTORY_ADDRESS,
   [ChainId.BSC_TESTNET]: '0x6725f303b657a9451d8ba641348b6761a6cc7a17',
+  [ChainId.POLYGON]: '0x6725f303b657a9451d8ba641348b6761a6cc7a17',
+  [ChainId.MUMBAI]: '0x6725f303b657a9451d8ba641348b6761a6cc7a17',
 }
 export const INIT_CODE_HASH = '0x00fb7f630766e6a796048ea87d01acd3068e8ff67d078148a3fa3f4a84f69bd5'
 
@@ -44,6 +48,8 @@ export const INIT_CODE_HASH_MAP: Record<number, string> = {
   [ChainId.GOERLI]: INIT_CODE_HASH_ETH,
   [ChainId.BSC]: INIT_CODE_HASH,
   [ChainId.BSC_TESTNET]: '0xd0d4c4cd0848c93cb4fd1f498d7013ee6bfb25783ea21593d5834f5d250ece66',
+  [ChainId.POLYGON]: '0xd0d4c4cd0848c93cb4fd1f498d7013ee6bfb25783ea21593d5834f5d250ece66',
+  [ChainId.MUMBAI]: '0xd0d4c4cd0848c93cb4fd1f498d7013ee6bfb25783ea21593d5834f5d250ece66',
 }
 
 export const MINIMUM_LIQUIDITY = JSBI.BigInt(1000)
@@ -133,6 +139,25 @@ export const WBNB = {
   ),
 }
 
+export const WMATIC = {
+  [ChainId.POLYGON]: new Token(
+    ChainId.POLYGON,
+    '0x418D75f65a02b3D53B2418FB8E1fe493759c7605',
+    18,
+    'WMATIC',
+    'Wrapped MATIC',
+    'https://polygon.technology/'
+  ),
+  [ChainId.MUMBAI]: new Token(
+    ChainId.POLYGON,
+    '0x418D75f65a02b3D53B2418FB8E1fe493759c7605',
+    18,
+    'WMATIC',
+    'Wrapped MATIC',
+    'https://polygon.technology/'
+  ),
+}
+
 export const WNATIVE: Record<number, Token> = {
   [ChainId.ETHEREUM]: WETH9[ChainId.ETHEREUM],
   [ChainId.RINKEBY]: WETH9[ChainId.RINKEBY],
@@ -140,6 +165,8 @@ export const WNATIVE: Record<number, Token> = {
   [ChainId.BSC]: WBNB[ChainId.BSC],
   [ChainId.BSC_TESTNET]: WBNB[ChainId.BSC_TESTNET],
   [ChainId.HARDHAT]: WBNB[ChainId.HARDHAT],
+  [ChainId.POLYGON]: WMATIC[ChainId.POLYGON],
+  [ChainId.MUMBAI]: WMATIC[ChainId.MUMBAI],
 }
 
 export const NATIVE: Record<
@@ -160,12 +187,22 @@ export const NATIVE: Record<
   },
   [ChainId.BSC_TESTNET]: {
     name: 'Binance Chain Native Token',
-    symbol: 'tBNB',
+    symbol: 'TBNB',
     decimals: 18,
   },
   [ChainId.HARDHAT]: {
     name: 'Hardhat Chain Native Token',
-    symbol: 'tETH',
+    symbol: 'TETH',
+    decimals: 18,
+  },
+  [ChainId.POLYGON]: {
+    name: 'Matic Chain Native Token',
+    symbol: 'MATIC',
+    decimals: 18,
+  },
+  [ChainId.MUMBAI]: {
+    name: 'Matic Chain Native Token',
+    symbol: 'TMATIC',
     decimals: 18,
   },
 }

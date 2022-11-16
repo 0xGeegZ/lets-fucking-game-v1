@@ -50,6 +50,7 @@ const func: DeployFunction = async function ({
   if (isLocalDeployment || !multicallNewlyDeployed || !multicall3NewlyDeployed)
     return
 
+  await delay(30 * 1000)
   try {
     log(`✅ Verifying contract Multicall`)
     await hre.run('verify:verify', {
@@ -62,7 +63,6 @@ const func: DeployFunction = async function ({
     await hre.run('verify:verify', {
       address: multicall3Address,
       constructorArguments: [],
-      // constructorArguments: [[Treasury], [20], 20, WETH],
     })
     await delay(10 * 1000)
   } catch (error) {

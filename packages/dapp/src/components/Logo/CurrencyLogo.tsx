@@ -46,7 +46,9 @@ export default function CurrencyLogo({
   //     if (currency.chainId === ChainId.BSC || currency.chainId === ChainId.BSC_TESTNET) {
   //       return <BinanceIcon width={size} style={style} />
   //     }
-  return <StyledLogo size={size} srcs={[`/images/chains/${currency.chainId}.png`]} width={size} style={style} />
+
+  if (currency?.chainId)
+    return <StyledLogo size={size} srcs={[`/images/chains/${currency.chainId}.png`]} width={size} style={style} />
   //   }
 
   //   return <StyledLogo size={size} srcs={srcs} alt={`${currency?.symbol ?? 'token'} logo`} style={style} />

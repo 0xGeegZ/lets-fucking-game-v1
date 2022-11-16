@@ -1,5 +1,5 @@
 import { BinanceWalletConnector } from '@pancakeswap/wagmi/connectors/binanceWallet'
-import { bsc, bscTest, goerli, mainnet, hardhat } from '@pancakeswap/wagmi/chains'
+import { bsc, bscTest, goerli, mainnet, hardhat, polygon, mumbai } from '@pancakeswap/wagmi/chains'
 import { configureChains, createClient } from 'wagmi'
 import memoize from 'lodash/memoize'
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
@@ -9,7 +9,7 @@ import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { SafeConnector } from '@gnosis.pm/safe-apps-wagmi'
 
-const CHAINS = [bsc, mainnet, bscTest, goerli, hardhat]
+const CHAINS = [bsc, polygon, mainnet, bscTest, mumbai, goerli, hardhat]
 
 const getNodeRealUrl = (networkName: string) => {
   let host = null
@@ -68,8 +68,7 @@ export const coinbaseConnector = new CoinbaseWalletConnector({
   chains,
   options: {
     appName: "Let's Fucking Game",
-    // TODO GUIGUI UPDATE APP LOGO
-    appLogoUrl: 'https://pancakeswap.com/logo.png',
+    appLogoUrl: 'https://lfgames.xyz/logo.png',
   },
 })
 

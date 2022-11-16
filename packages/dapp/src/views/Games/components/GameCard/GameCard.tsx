@@ -5,7 +5,7 @@ import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { useCallback, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { getBlockExploreLink } from 'utils'
-import { WBNB } from '@pancakeswap/sdk'
+import { NATIVE } from '@pancakeswap/sdk'
 import { DeserializedGame } from 'state/types'
 import cronstrue from 'cronstrue'
 import Tooltip from '../GameCardButtons/Tooltip'
@@ -141,7 +141,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
         <CardHeadingSection
           id={id}
           name={name}
-          token={WBNB[chainId]}
+          chainId={chainId}
           prizepool={prizepool}
           multiplier={registrationAmount.toNumber() !== 0 ? prizepool.dividedBy(registrationAmount) : null}
           isReady={isReady}

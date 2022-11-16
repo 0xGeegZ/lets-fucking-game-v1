@@ -1,5 +1,43 @@
-import { rinkeby, mainnet, goerli } from 'wagmi/chains'
+// import { rinkeby, mainnet, goerli, polygon, polygonMumbai } from 'wagmi/chains'
+import { rinkeby, polygon, polygonMumbai } from 'wagmi/chains'
 import { Chain } from 'wagmi'
+
+export const mainnet: Chain = {
+  id: 1,
+  name: 'ETHEREUM Testnet',
+  network: 'ethereum-testnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Ethereum',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    public: process.env.NEXT_PUBLIC_RPC_PROVIDER_ETHEREUM,
+    default: process.env.NEXT_PUBLIC_RPC_PROVIDER_ETHEREUM,
+  },
+  blockExplorers: {
+    default: { name: 'EtherScan', url: 'https://etherscan.io' },
+  },
+}
+
+export const goerli: Chain = {
+  id: 5,
+  name: 'GOERLI Testnet',
+  network: 'goerli-testnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Ethereum',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    public: process.env.NEXT_PUBLIC_RPC_PROVIDER_GOERLI,
+    default: process.env.NEXT_PUBLIC_RPC_PROVIDER_GOERLI,
+  },
+  blockExplorers: {
+    default: { name: 'EtherScan', url: 'https://goerli.etherscan.io' },
+  },
+  testnet: true,
+}
 
 export const avalandche: Chain = {
   id: 43114,
@@ -82,7 +120,7 @@ export const bsc: Chain = {
     etherscan: bscExplorer,
   },
   nativeCurrency: {
-    name: 'Binance Chain Native Token',
+    name: 'Binance Chain',
     symbol: 'BNB',
     decimals: 18,
   },
@@ -98,8 +136,8 @@ export const bscTest: Chain = {
   network: 'bsc-testnet',
   nativeCurrency: {
     decimals: 18,
-    name: 'Binance Chain Native Token',
-    symbol: 'tBNB',
+    name: 'Binance Chain',
+    symbol: 'BNB',
   },
   rpcUrls: {
     // TODO GUIGUI Better RPC MANAGEMENT
@@ -137,4 +175,5 @@ export const hardhat: Chain = {
   testnet: true,
 }
 
-export { rinkeby, mainnet, goerli }
+export { rinkeby, polygon, polygonMumbai as mumbai }
+// export { rinkeby, mainnet, goerli, polygon, polygonMumbai as mumbai }

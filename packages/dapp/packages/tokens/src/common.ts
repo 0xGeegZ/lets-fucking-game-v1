@@ -140,6 +140,8 @@ export const BUSD: Record<ChainId, Token> = {
   [ChainId.GOERLI]: BUSD_GOERLI,
   [ChainId.BSC]: BUSD_BSC,
   [ChainId.BSC_TESTNET]: BUSD_TESTNET,
+  [ChainId.POLYGON]: BUSD_BSC,
+  [ChainId.MUMBAI]: BUSD_TESTNET,
   [ChainId.HARDHAT]: BUSD_HARDHAT,
 }
 
