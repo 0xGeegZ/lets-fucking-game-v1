@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction } from 'hardhat-deploy/types'
 
 import { delay } from '../helpers/delay'
 
@@ -58,6 +58,7 @@ const func: DeployFunction = async function ({
 
   if (isLocalDeployment) return
 
+  await delay(30 * 1000)
   try {
     log(`✅ Verifying contract GameV1`)
     await hre.run('verify:verify', {
