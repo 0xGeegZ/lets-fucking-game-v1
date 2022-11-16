@@ -7,6 +7,7 @@ import BigNumber from 'bignumber.js'
 import ConnectWalletButton from 'components/ConnectWalletButton'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
+import useActiveWeb3React from 'hooks/useActiveWeb3React'
 
 import moment from 'moment'
 import ClaimButton from '../GameCardButtons/ClaimButton'
@@ -65,8 +66,9 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
     t,
     // currentLanguage: { locale },
   } = useTranslation()
+  const { chain } = useActiveWeb3React()
 
-  // const currentDate = useMemo(
+  const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
 
   return (
     <Container>
@@ -78,7 +80,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             <Text bold style={{ display: 'flex', alignItems: 'center' }}>
               {isReady ? (
                 <Text bold color="success" fontSize={16}>
-                  {wonAmount.toNumber()} BNB
+                  {wonAmount.toNumber()} {chainSymbol}
                 </Text>
               ) : (
                 <Skeleton width={80} height={18} mb="4px" />

@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { Flex, Heading, Text, Input } from '@pancakeswap/uikit'
+import { Flex, Heading, Text, Input, useToast } from '@pancakeswap/uikit'
 import { ChangeEvent, useCallback, useContext, useState } from 'react'
 
 import { RowBetween } from 'components/Layout/Row'
@@ -11,11 +11,14 @@ import imageTest from '../../../public/images/chains/1.png'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import Select, { OptionProps } from 'components/Select/Select'
 import { parseEther } from '@ethersproject/units'
+import useActiveWeb3React from 'hooks/useActiveWeb3React'
+import { TREASURY_FEE_DEFAULT, CREATOR_FEE_DEFAULT } from './config'
+import { isValidCron } from 'cron-validator'
 
 import BackStepButton from './BackStepButton'
 
 // TODO: Refacto by split components
-// TODO: Fix persist selection -> step 3 is wrong...
+// TODO: Fix persist -> step 3 is wrong...
 const FeeSelection = () => {
   const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
     useGameContext()
@@ -108,7 +111,7 @@ const FeeSelection = () => {
 
   return (
     <>
-      <Text as="h2" color="textSubtle" mb="8px">
+      <Text as="h2" mb="8px" mt="24px">
         Creator & Treasury fee
       </Text>
 
@@ -122,17 +125,25 @@ const FeeSelection = () => {
             pl={['4px', null, '0']}
             mb="8px"
           >
-            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
+            <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
               <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
                 {'Treasury fee (for us)'}
               </Text>
-              <Select options={allowedValuesTreasuryFee} onOptionChange={handleTreasuryFeeOptionChange}></Select>
+              <Select
+                defaultOptionIndex={0}
+                options={allowedValuesTreasuryFee}
+                onOptionChange={handleTreasuryFeeOptionChange}
+              ></Select>
             </Flex>
-            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
+            <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
               <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
                 {'Creator fee (for you)'}
               </Text>
-              <Select options={allowedValuesCreatorFee} onOptionChange={handleCreatorFeeOptionChange}></Select>
+              <Select
+                defaultOptionIndex={2}
+                options={allowedValuesCreatorFee}
+                onOptionChange={handleCreatorFeeOptionChange}
+              ></Select>
             </Flex>
           </Flex>
         </>
@@ -149,13 +160,17 @@ const RegistrationAmountSelection = () => {
     actions.setGameCreation(currentStep, treasuryFee, creatorFee, option.value, maxPlayers, playTimeRange, encodedCron)
   }
 
+  const { chain } = useActiveWeb3React()
+
+  const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
+
   // TODO GUIGUI HANDLE FREE GAMES AND LOAD AUTHORIZED AMOUNTS FROM CONFIG
   // const AUTHORIZED_AMOUNTS = [0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10]
   const AUTHORIZED_AMOUNTS = [0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10]
   const authorizedAmounts = AUTHORIZED_AMOUNTS.map((amount) => {
     return {
-      label: amount + ' BNB',
-      value: parseEther(`${amount}`),
+      label: `${amount} ${chainSymbol}`,
+      value: parseEther(`${amount}`).toString(),
     }
   })
 
@@ -164,12 +179,14 @@ const RegistrationAmountSelection = () => {
       {authorizedAmounts && (
         <>
           {/* //TODO: implement dynamic height to dropdown */}
-          <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
-            <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-              {'Registration amount selection'}
-            </Text>
-            <Select options={authorizedAmounts} onOptionChange={handleRegistrationAmountOptionChange}></Select>
-          </Flex>
+          <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
+            {'Registration amount'}
+          </Text>
+          <Select
+            defaultOptionIndex={2}
+            options={authorizedAmounts}
+            onOptionChange={handleRegistrationAmountOptionChange}
+          ></Select>
         </>
       )}
     </>
@@ -236,12 +253,14 @@ const MaximumPlayersSelection = () => {
       {allowedValuesMaximumPlayers && (
         <>
           {/* //TODO: implement dynamic height to dropdown */}
-          <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
-            <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-              {'Maximum players selection'}
-            </Text>
-            <Select options={allowedValuesMaximumPlayers} onOptionChange={handleMaximumPlayersOptionChange}></Select>
-          </Flex>
+          <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
+            {'Maximum players'}
+          </Text>
+          <Select
+            defaultOptionIndex={4}
+            options={allowedValuesMaximumPlayers}
+            onOptionChange={handleMaximumPlayersOptionChange}
+          ></Select>
         </>
       )}
     </>
@@ -292,12 +311,14 @@ const PlayTimeRangeSelection = () => {
       {allowedValuesPlayTimeRange && (
         <>
           {/* //TODO: implement dynamic height to dropdown */}
-          <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
-            <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-              {'Play time range selection'}
-            </Text>
-            <Select options={allowedValuesPlayTimeRange} onOptionChange={handlePlayTimeRangeOptionChange}></Select>
-          </Flex>
+          <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
+            {'Play time range'}
+          </Text>
+          <Select
+            defaultOptionIndex={2}
+            options={allowedValuesPlayTimeRange}
+            onOptionChange={handlePlayTimeRangeOptionChange}
+          ></Select>
         </>
       )}
     </>
@@ -305,14 +326,20 @@ const PlayTimeRangeSelection = () => {
 }
 
 const EncodedCronSelection = () => {
-  const [encodedCron, setEncodedCron] = useState('0 8 * * *')
+  const { toastError, toastSuccess } = useToast()
+  const { t } = useTranslation()
+
+  const [encodedCron, setEncodedCron] = useState('0 18 * * *')
 
   const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, currentStep, actions } =
     useGameContext()
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
-    setEncodedCron(value)
+
+    if (isValidCron(value)) setEncodedCron(value)
+    else toastError(t('Error'), t('This is not a cron string'))
+
     actions.setGameCreation(currentStep, treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, value)
   }
 
@@ -321,12 +348,10 @@ const EncodedCronSelection = () => {
       {
         <>
           {/* //TODO: implement dynamic height to dropdown */}
-          <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
-            <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-              {'Encoded cron selection'}
-            </Text>
-            <Input onChange={handleChange} placeholder={'0 18 * * *'} value={encodedCron} />
-          </Flex>
+          <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
+            {'Encoded cron'}
+          </Text>
+          <Input onChange={handleChange} placeholder={'0 18 * * *'} value={encodedCron} />
         </>
       }
     </>
@@ -336,7 +361,7 @@ const EncodedCronSelection = () => {
 const OtherOptionsSelection = () => {
   return (
     <>
-      <Text as="h2" color="textSubtle" mb="8px">
+      <Text as="h2" mb="8px">
         Main game configuration
       </Text>
       <Flex
@@ -344,21 +369,28 @@ const OtherOptionsSelection = () => {
         alignItems="center"
         pr={[null, null, '4px']}
         pl={['4px', null, '0']}
-        mb="8px"
+        mb="16px"
       >
-        <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
+        <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
           <RegistrationAmountSelection />
         </Flex>
 
-        <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
+        <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
           <MaximumPlayersSelection />
         </Flex>
-
-        <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
+      </Flex>
+      <Flex
+        justifyContent="space-between"
+        alignItems="center"
+        pr={[null, null, '4px']}
+        pl={['4px', null, '0']}
+        mb="8px"
+      >
+        <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
           <PlayTimeRangeSelection />
         </Flex>
 
-        <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
+        <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
           <EncodedCronSelection />
         </Flex>
       </Flex>
@@ -367,7 +399,8 @@ const OtherOptionsSelection = () => {
 }
 
 const GameCreation: React.FC = () => {
-  const { actions, currentStep } = useGameContext()
+  const { actions, currentStep, treasuryFee, registrationAmount, maxPlayers, playTimeRange, encodedCron } =
+    useGameContext()
 
   const { t } = useTranslation()
 
@@ -382,13 +415,10 @@ const GameCreation: React.FC = () => {
       <OtherOptionsSelection />
       <FeeSelection />
       {/* //TODO: implement fields validation */}
-      <Flex justifyContent="end" alignItems="center" pr={[null, null, '4px']} pl={['4px', null, '0']} mb="8px">
-        {/* TODO disable button if all fields are not populated */}
+      <Flex justifyContent="end" alignItems="center" pr={[null, null, '4px']} pl={['4px', null, '0']} mt="24px">
         <NextStepButton
-          // onClick={actions.nextStep}
           onClick={() => actions.nextStep(currentStep + 1)}
-
-          /* disabled={selectedNft.tokenId === null || !isApproved || isApproving} */
+          disabled={!treasuryFee || !registrationAmount || !maxPlayers || !playTimeRange || !encodedCron}
         >
           {t('Next Step')}
         </NextStepButton>

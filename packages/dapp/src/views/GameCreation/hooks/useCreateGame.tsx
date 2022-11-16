@@ -4,10 +4,11 @@ import { useToast } from '@pancakeswap/uikit'
 import useCatchTxError from 'hooks/useCatchTxError'
 import { ToastDescriptionWithTx } from 'components/Toast'
 import { useGameFactoryV1Contract } from 'hooks/useContract'
-import { parseEther } from '@ethersproject/units'
+import { parseEther, formatEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import { ZERO_ADDRESS } from 'config/constants'
+import { GAME_CREATION_AMOUNT } from '../config'
 
 export const useCreateGame = (game) => {
   const { t } = useTranslation()
@@ -29,10 +30,14 @@ export const useCreateGame = (game) => {
     // prizeType,
   } = game
 
+  const parsedRegistrationAmount: number = registrationAmount
+    ? parseFloat(formatEther(registrationAmount.toString()))
+    : 0
+
   const createPrize = (index, totalWinners) => {
     return {
       position: index,
-      amount: parseEther(`${(registrationAmount * maxPlayers) / totalWinners}`),
+      amount: parseEther(`${(parsedRegistrationAmount * maxPlayers) / totalWinners}`),
       // TODO use prizeType
       standard: 0,
       contractAddress: ZERO_ADDRESS,
@@ -44,10 +49,15 @@ export const useCreateGame = (game) => {
   const prizes = mapper.map((index) => createPrize(index, numberPlayersAllowedToWin))
 
   // TODO GUIGUI Load gameCreationAmount directly from smart contract
-  const gameCreationAmountEther = parseEther('0.1')
-  const registrationAmountEther = parseEther(`${registrationAmount}`)
+  const gameCreationAmountEther = GAME_CREATION_AMOUNT
 
-  const name = formatBytes32String("Let's Fucking Game VMP")
+  const registrationAmountEther = parseEther(parsedRegistrationAmount.toString())
+
+  const randomNumber = () => {
+    return Math.floor(Math.random() * (10000 - 1) + 1)
+  }
+
+  const name = formatBytes32String(`LFG ${randomNumber()}`)
 
   const handleCreateGame = useCallback(async () => {
     const receipt = await fetchWithCatchTxError(() =>
