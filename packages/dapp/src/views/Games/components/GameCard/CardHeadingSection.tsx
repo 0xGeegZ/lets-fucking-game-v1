@@ -45,7 +45,7 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
       {isReady ? (
         <>
           {/* <TokenPairImage variant="inverted" primaryToken={token} secondaryToken={quoteToken} width={64} height={64} /> */}
-          <CurrencyLogo currency={token} size="24px" />
+          <CurrencyLogo currency={token} size="56px" />
           {/* <DoubleCurrencyLogo currency0={token} currency1={token} size={20} />
           <Text bold ml="8px">
             {!token ? <Dots>{t('Loading')}</Dots> : `${token.symbol}`}
