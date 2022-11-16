@@ -84,28 +84,28 @@ const PoolAllocations = () => {
           <RulesDrawing />
         </Flex>
         <Flex justifyContent="space-between">
-          <Text fontSize="12px" color="secondary" bold textTransform="uppercase">
+          <Text fontSize="12px" pb="16px" color="secondary" bold textTransform="uppercase">
             {t('Player bank')}
           </Text>
-          <Text fontSize="12px" color="secondary" bold textAlign="right" textTransform="uppercase">
+          <Text fontSize="12px" pb="16px" color="secondary" bold textAlign="right" textTransform="uppercase">
             {t('Prize pool allocation')}
           </Text>
         </Flex>
         <AllocationGrid>
           <AllocationMatch color="#FFE362" text={t('First player')} />
-          <Text textAlign="right" bold>
+          <Text pb="8px" textAlign="right" bold>
             80%
           </Text>
           <AllocationMatch color="#85C54E" text={t('Second player')} />
-          <Text textAlign="right" bold>
+          <Text pb="8px" textAlign="right" bold>
             10%
           </Text>
           <AllocationMatch color="#028E75" text={t('Third player')} />
-          <Text textAlign="right" bold>
+          <Text pb="8px" textAlign="right" bold>
             5%
           </Text>
           <AllocationMatch color="#BDC2C4" text={t('Bank')} />
-          <Text textAlign="right" bold>
+          <Text pb="8px" textAlign="right" bold>
             10%
           </Text>
         </AllocationGrid>
@@ -137,29 +137,19 @@ const Rules: React.FC<React.PropsWithChildren> = () => {
             {t('Winning Criteria')}
           </Heading>
           <Heading mb="24px" scale="md">
-            {t('The last player won the game')}
+            {t('The last remaining players share the prizepool')}
           </Heading>
           <Text mb="16px" color="textSubtle">
-            {t('But you can also vote to split pot with remaining players.')}
+            {t('But you can also vote to split pot when there are less than 50% of remaining players.')}
           </Text>
-          <BulletList>
-            <li>
-              <Text display="inline" color="textSubtle">
-                {t('If the game takes too long, players can vote to split pot between remaining players.')}
-              </Text>
-            </li>
-            <li>
-              <Text display="inline" color="textSubtle">
-                {t(
-                  'If all players vote to split, the smart contract will stop the game and split prizepool to remaining players',
-                )}
-              </Text>
-            </li>
-          </BulletList>
-          <Text mt="16px" color="textSubtle">
+          <Text mb="16px" color="textSubtle">
             {t(
-              'More options will be added after the MVP test. Players would be able to launch their own game and all rules will be configurable.',
+              ' This could be useful if the game takes too long. If all players vote to split, the smart contract will stop the game and split prizepool to remaining players.',
             )}
+          </Text>
+
+          <Text mt="16px" color="textSubtle">
+            {t('More options will be added after the MVP test.')}
           </Text>
         </Flex>
         <Flex flex="1" justifyContent="center">
@@ -172,26 +162,33 @@ const Rules: React.FC<React.PropsWithChildren> = () => {
           <Heading mb="24px" scale="lg" color="secondary">
             {t('Prize Funds')}
           </Heading>
-          <Text color="textSubtle">{t('The prizes for each game come from two sources:')}</Text>
-          <Heading my="16px" scale="md">
-            {t('Player bet')}
-          </Heading>
-          <BulletList>
-            <li>
-              <Text display="inline" color="textSubtle">
-                {t('100% of the CAKE paid by people buying tickets that round goes back into the prize pools.')}
-              </Text>
-            </li>
-          </BulletList>
-          <Heading my="16px" scale="md">
-            {t('Rollover Prizes')}
-          </Heading>
+          <Text color="textSubtle">
+            {t(
+              'Here are the default game prize allocation. Game creators can update those parameters so check data for each game before register.',
+            )}
+          </Text>
+          <Text mt="24px" color="textSubtle">
+            {t('The prizes for each game come from two sources:')}
+          </Text>
+          <Text fontSize="18px" bold my="16px" scale="md">
+            {t('Player registration')}
+          </Text>
           <BulletList>
             <li>
               <Text display="inline" color="textSubtle">
                 {t(
-                  'After every round, if nobody wins in one of the prize brackets, the unclaimed CAKE for that bracket rolls over into the next round and are redistributed among the prize pools.',
+                  'Registration amount paid by people goes back into the prize pools, minus creator and treasury fees.',
                 )}
+              </Text>
+            </li>
+          </BulletList>
+          <Text bold fontSize="18px" my="16px" scale="md">
+            {t('Creator Prizes')}
+          </Text>
+          <BulletList>
+            <li>
+              <Text display="inline" color="textSubtle">
+                {t('Creator can create a free game and set the prize pool on game creation.')}
               </Text>
             </li>
           </BulletList>
