@@ -80,28 +80,14 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
   // eslint-disable-next-line consistent-return
   async ({ chainId, account }, { dispatch, getState }) => {
     console.log('fetchGamesPublicDataAsync')
-
-    // TODO GUIGUI add chain id to reload games if we change blockchain
-    // github.com/pancakeswap/pancake-frontend/blob/develop/apps/web/src/state/farms/index.ts
-
     const state = getState()
-    if (state.games.chainId && state.games.chainId !== chainId) {
-      console.log('fetchGamesPublicDataAsync > chainId > reloading initial data')
-      await dispatch(fetchInitialGamesData({ chainId }))
-    }
+    if (state.games.chainId && state.games.chainId !== chainId) await dispatch(fetchInitialGamesData({ chainId }))
 
     const chain = chains.find((c) => c.id === chainId)
 
     if (!chain) throw new Error('chain not supported')
 
-    const updatedData = await fetchGamePublicDataPkg({ chainId })
-
-    return updatedData
-    // if (state.games.data.length === updatedData.length || !state.games.data.length) return updatedData
-
-    // console.log('fetchGamesPublicDataAsync > end > reloading initial data')
-    // await dispatch(fetchInitialGamesData({ chainId, account }))
-    // await fetchGamesPublicDataAsync({ chainId, account }, { dispatch, getState })
+    return fetchGamePublicDataPkg({ chainId })
   },
   {
     condition: (arg, { getState }) => {
@@ -171,11 +157,7 @@ export const fetchGamePlayerDataAsync = createAsyncThunk<
     // github.com/pancakeswap/pancake-frontend/blob/develop/apps/web/src/state/farms/index.ts
 
     const state = getState()
-    console.log('🚀  ~ state.games.chainId', state.games.chainId, ' chainId', chainId)
-    if (state.games.chainId && state.games.chainId !== chainId) {
-      console.log('fetchGamePlayerDataAsync > chainId > reloading initial data')
-      await dispatch(fetchInitialGamesData({ chainId }))
-    }
+    if (state.games.chainId && state.games.chainId !== chainId) await dispatch(fetchInitialGamesData({ chainId }))
 
     const chain = chains.find((c) => c.id === chainId)
 
@@ -257,10 +239,7 @@ export const gamesSlice = createSlice({
     // Init game data
     builder.addCase(fetchInitialGamesData.fulfilled, (state, action) => {
       console.log('Init game data')
-      // const gameData = action.payload
-      // if (gameData.length) state.data = gameData
       const { data, chainId } = action.payload
-      console.log('🚀 ~ file: index.ts ~ line 261 ~ builder.addCase ~ action.payload', action.payload)
       state.data = data
       state.chainId = chainId
     })
@@ -294,7 +273,6 @@ export const gamesSlice = createSlice({
     builder.addCase(fetchGamePlayerDataAsync.fulfilled, (state, action) => {
       console.log('Update games with user data')
       const gameData = action.payload
-      console.log('🚀 ~ file: index.ts ~ line 293 ~ builder.addCase ~ gameData', gameData)
       state.data = gameData
       state.userDataLoaded = true
     })
