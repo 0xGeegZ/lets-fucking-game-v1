@@ -19,7 +19,7 @@ This application was done during the [Chainlink Hackathon Fall 2022](https://cha
 - Multicall contracts [0x96b639eD2eD0C4aB6EEe378BBD37B5D9C0c65C0C](https://mumbai.polygonscan.com/address/0x96b639eD2eD0C4aB6EEe378BBD37B5D9C0c65C0C#code)
 - MulticallV3 contracts [0x7858258c475BDE1b07451A9e76C65dc078584b60](https://mumbai.polygonscan.com/address/0x7858258c475BDE1b07451A9e76C65dc078584b60#code)
 
-## Contracts deployed on ETHEREUM CHAIN TESTNET GOERLI :\*\*
+## Contracts deployed on ETHEREUM CHAIN TESTNET GOERLI :
 
 **PRIMARY :**
 
@@ -34,7 +34,7 @@ This application was done during the [Chainlink Hackathon Fall 2022](https://cha
 - Multicall contracts [0xddebb58F0EA0411cF433a00D7d7A2e1f2E860ACB](https://goerli.etherscan.io/address/0xddebb58F0EA0411cF433a00D7d7A2e1f2E860ACB#code)
 - MulticallV3 contracts [0x3cB1f308f9cDF098968Cb805339936FaB72ECD72](https://goerli.etherscan.io/address/0x3cB1f308f9cDF098968Cb805339936FaB72ECD72#code)
 
-## Contracts deployed on BNB CHAIN TESTNET :\*\*
+## Contracts deployed on BNB CHAIN TESTNET :
 
 **PRIMARY :**
 
