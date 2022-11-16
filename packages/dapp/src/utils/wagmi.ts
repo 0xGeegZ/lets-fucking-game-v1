@@ -11,7 +11,7 @@ import { SafeConnector } from '@gnosis.pm/safe-apps-wagmi'
 
 // TODO GUIGUI UPDATE CHAINS
 // const CHAINS = [bsc, polygon, mainnet, bscTest, mumbai, goerli, hardhat]
-const CHAINS = [bsc, bscTest, mumbai, goerli, hardhat]
+const CHAINS = [polygon, bscTest, mumbai, goerli, hardhat]
 
 const getNodeRealUrl = (networkName: string) => {
   let host = null
