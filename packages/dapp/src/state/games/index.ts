@@ -72,13 +72,14 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
   }
 >(
   'games/fetchGamesPublicDataAsync',
-  async ({ chainId, account }) => {
+  // eslint-disable-next-line consistent-return
+  async ({ chainId, account }, { dispatch, getState }) => {
     console.log('fetchGamesPublicDataAsync')
 
     // TODO GUIGUI add chain id to reload games if we change blockchain
     // github.com/pancakeswap/pancake-frontend/blob/develop/apps/web/src/state/farms/index.ts
 
-    // const state = getState()
+    const state = getState()
     // if (state.farms.chainId !== chainId) {
     //   await dispatch(fetchInitialFarmsData({ chainId }))
     // }
@@ -87,7 +88,11 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
 
     if (!chain) throw new Error('chain not supported')
 
-    return fetchGamePublicDataPkg({ chainId })
+    const updatedData = await fetchGamePublicDataPkg({ chainId })
+
+    if (state.games.data.length === updatedData.length || !state.games.data.length) return updatedData
+
+    await dispatch(fetchInitialGamesData({ chainId, account }))
   },
   {
     condition: (arg, { getState }) => {
@@ -252,6 +257,7 @@ export const gamesSlice = createSlice({
       if (!gameData.length) return
 
       let isError = false
+
       const updatedData = state.data.map((game, index) => {
         const { userData, playerData } = game
 
