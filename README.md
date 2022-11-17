@@ -4,7 +4,7 @@
 
 # Description
 
-This application was done during the [Chainlink Hackathon Fall 2022](https://chainlinkfall2022.devpost.com/)
+This application was done during the [ChainLink Hackathon Fall 2022](https://devpost.com/software/let-s-fucking-game-be-the-last-to-win-the-prize)
 
 ## Contracts deployed on ETHEREUM CHAIN TESTNET GOERLI :
 
