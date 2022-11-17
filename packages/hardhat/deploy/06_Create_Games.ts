@@ -11,7 +11,7 @@ const func: DeployFunction = async function ({
 
   const deployer = await ethers.getSigner(deployerAddress)
 
-  const name = ethers.utils.formatBytes32String("Let's Fucking Game VMP")
+  const name = ethers.utils.formatBytes32String("Let's Fucking Game MVP")
   const gameCreationAmount = ethers.utils.parseEther('0.1')
 
   const maxPlayers = 10

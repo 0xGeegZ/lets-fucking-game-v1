@@ -225,18 +225,12 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const chosenGamesMemoized = useMemo(() => {
     const sortGames = (gamesToSort: DeserializedGame[]): DeserializedGame[] => {
       switch (sortOption) {
-        case 'hot':
+        case 'players':
           return orderBy(gamesToSort, (game: DeserializedGame) => game.playerAddressesCount, 'desc')
-        case 'amount':
+        case 'prize':
           return orderBy(
             gamesToSort,
             (game: DeserializedGame) => (game.registrationAmount ? Number(game.registrationAmount) : 0),
-            'desc',
-          )
-        case 'earned':
-          return orderBy(
-            gamesToSort,
-            (game: DeserializedGame) => (game.userData ? Number(game.userData.wonAmount) : 0),
             'desc',
           )
         case 'playing':
@@ -302,21 +296,21 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
             {/* <ToggleView idPrefix="clickGame" viewMode={viewMode} onToggle={setViewMode} /> */}
             <ToggleWrapper>
               <Toggle
-                id="not-full-games"
-                checked={isNotFullOnly}
-                onChange={() => setNotFullOnly(!isNotFullOnly)}
-                scale="sm"
-              />
-              <Text> {t('Not full only')}</Text>
-            </ToggleWrapper>
-            <ToggleWrapper>
-              <Toggle
                 id="my-games-only"
                 checked={myGamesOnly}
                 onChange={() => setMyGamesOnly((prev) => !prev)}
                 scale="sm"
               />
               <Text> {t('My Games')}</Text>
+            </ToggleWrapper>
+            <ToggleWrapper>
+              <Toggle
+                id="not-full-games"
+                checked={isNotFullOnly}
+                onChange={() => setNotFullOnly(!isNotFullOnly)}
+                scale="sm"
+              />
+              <Text> {t('Not full only')}</Text>
             </ToggleWrapper>
             <GameTabButtons hasStakeInFinishedGames={deletedGames.length > 0} />
           </ViewControls>
@@ -326,16 +320,16 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
               <Select
                 options={[
                   {
-                    label: t('Hot'),
-                    value: 'hot',
+                    label: t('Players'),
+                    value: 'players',
                   },
                   {
                     label: t('Prize'),
                     value: 'prize',
                   },
                   {
-                    label: t('Players'),
-                    value: 'players',
+                    label: t('Playing'),
+                    value: 'playing',
                   },
                   {
                     label: t('Latest'),
