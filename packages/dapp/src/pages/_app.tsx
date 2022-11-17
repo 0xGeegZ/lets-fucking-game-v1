@@ -67,17 +67,17 @@ function MyApp(props: AppProps<{ initialReduxState: any }>) {
         />
         <meta
           name="description"
-          content="Let's Fucking Game allows you to create 'one button games' to engage your community in order to provide them with a fun way to engage with your content.  Once the game starts. players have to log in everyday during a random time slot. If you forget, you lose. The last players share the prizes according to the prizepool distribution."
+          content="LFG allows you to create 'one button games' to engage your community in order to provide them with a fun way to engage with your content.  Once the game starts. players have to log in everyday during a random time slot. If you forget, you lose. The last players share the prizes according to the prizepool distribution."
         />
         <meta name="theme-color" content="#1FC7D4" />
         <meta name="twitter:image" content={bunnyImage.src} />
         <meta
           name="twitter:description"
-          content="Let's Fucking Game allows you to create 'one button games' to engage your community in order to provide them with a fun way to engage with your content.  Once the game starts. players have to log in everyday during a random time slot. If you forget, you lose. The last players share the prizes according to the prizepool distribution."
+          content="LFG allows you to create 'one button games' to engage your community in order to provide them with a fun way to engage with your content.  Once the game starts. players have to log in everyday during a random time slot. If you forget, you lose. The last players share the prizes according to the prizepool distribution."
         />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Let's Fucking Game - Be the last to win the prize" />
-        <title>Let&apos;s Fucking Game</title>
+        <meta name="twitter:title" content="Let's F*#@$* Game - Be the last to win the prize" />
+        <title>Let&apos;s F*#@$* Game</title>
         {(Component as NextPageWithLayout).mp && (
           // eslint-disable-next-line @next/next/no-sync-scripts
           <script src="https://public.bnbstatic.com/static/js/mp-webview-sdk/webview-v1.0.0.min.js" id="mp-webview" />

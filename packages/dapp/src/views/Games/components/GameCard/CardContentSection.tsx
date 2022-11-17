@@ -42,6 +42,7 @@ interface GameCardContentSectionProps {
   playerAddressesCount: BigNumber
   maxPlayers: BigNumber
   isInProgress: boolean
+  isRegistering: boolean
   isReady: boolean
 }
 
@@ -53,6 +54,7 @@ const CardContentSection: React.FC<React.PropsWithChildren<GameCardContentSectio
   playerAddressesCount,
   maxPlayers,
   isInProgress,
+  isRegistering,
   isReady,
 }) => {
   const { t } = useTranslation()
@@ -145,12 +147,13 @@ const CardContentSection: React.FC<React.PropsWithChildren<GameCardContentSectio
         )}
       </Flex>
 
-      {isInProgress && (
-        <Flex justifyContent="space-between">
-          <Heading mr="4px">{t('Next Game Draw')}: </Heading>
-          {isReady ? (
-            <Text style={{ display: 'flex', alignItems: 'center' }}>
-              <Text bold>{t(`${cronHumanReadable}`)}</Text>
+      <Flex justifyContent="space-between">
+        {isRegistering && <Heading mr="4px">{t('Daily Draw')}: </Heading>}
+        {(isInProgress || !isRegistering) && <Heading mr="4px">{t('Game will start')}: </Heading>}
+        {isReady ? (
+          <Text style={{ display: 'flex', alignItems: 'center' }}>
+            <Text bold>{t(`${cronHumanReadable}`)}</Text>
+            {isRegistering && (
               <Tooltip
                 content={
                   <Text display="inline" color="textSubtle">
@@ -158,12 +161,12 @@ const CardContentSection: React.FC<React.PropsWithChildren<GameCardContentSectio
                   </Text>
                 }
               />
-            </Text>
-          ) : (
-            <Skeleton height={24} width={80} />
-          )}
-        </Flex>
-      )}
+            )}
+          </Text>
+        ) : (
+          <Skeleton height={24} width={80} />
+        )}
+      </Flex>
 
       {/* TODO ADD TIMESTAMP WHEN GAME START */}
       {/* <Details>

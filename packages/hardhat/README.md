@@ -18,9 +18,8 @@ Don't forget to copy the .env.example file to a file named .env, and then edit i
 # Running all the tests
 
 ```shell
-yarn run test             # run tests on hardhat network
+yarn run test             # run tests on hardhat network with fresh config
 yarn run test:trace       # shows logs + calls
-yarn run test:fresh       # force compile and then run tests
 yarn run test:coverage    # run tests on ganache with coverage reports
 ```
 
@@ -47,9 +46,9 @@ You can use the below tools,
 - [Mythril](https://github.com/ConsenSys/mythril)
 
 ```shell
-yarn run analyze:static path/to/contract
-yarn run analyze:security path/to/contract
-yarn run analyze:all path/to/contract
+yarn run analyze:static <PATH_TO_CONTRACT>
+yarn run analyze:security <PATH_TO_CONTRACT>
+yarn run analyze:all <PATH_TO_CONTRACT>
 ```
 
 # Deploy Contract & Verification
@@ -96,10 +95,10 @@ yarn run generate:docs    # generate docs according to the contracts/ folder
 ```
 
 ```shell
-yarn run generate:flatten ./path/to/contract     # generate the flatten file (path must be "./" prefixed)
-yarn run generate:abi ./path/to/contract         # generate the ABI file (path must be "./" prefixed)
-yarn run generate:bin ./path/to/contract         # generate the binary in a hex (path must be "./" prefixed)
-yarn run generate:metadata ./path/to/contract    # generate the metadata (path must be "./" prefixed)
+yarn run generate:flatten <PATH_TO_CONTRACT>     # generate the flatten file (path must be "./" prefixed)
+yarn run generate:abi <PATH_TO_CONTRACT>         # generate the ABI file (path must be "./" prefixed)
+yarn run generate:bin <PATH_TO_CONTRACT>         # generate the binary in a hex (path must be "./" prefixed)
+yarn run generate:metadata <PATH_TO_CONTRACT>    # generate the metadata (path must be "./" prefixed)
 yarn run generate:all-abi
 yarn run generate:all-bin
 yarn run generate:all-metadata

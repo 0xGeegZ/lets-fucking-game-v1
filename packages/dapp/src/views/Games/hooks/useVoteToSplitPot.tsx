@@ -19,7 +19,7 @@ export const useVoteToSplitPot = (gameAddress: string) => {
       toastSuccess(
         t('Success!'),
         <ToastDescriptionWithTx txHash={receipt.transactionHash}>
-          {t('You have successfully played this round.')}
+          {t('You have successfully vote to split pot.')}
         </ToastDescriptionWithTx>,
       )
     }

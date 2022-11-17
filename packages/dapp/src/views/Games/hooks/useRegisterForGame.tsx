@@ -23,7 +23,7 @@ export const useRegisterForGame = (gameAddress: string, registrationAmount: BigN
       toastSuccess(
         t('Success!'),
         <ToastDescriptionWithTx txHash={receipt.transactionHash}>
-          {t('You have successfully played this round.')}
+          {t('You have successfully registered for this game.')}
         </ToastDescriptionWithTx>,
       )
     }
