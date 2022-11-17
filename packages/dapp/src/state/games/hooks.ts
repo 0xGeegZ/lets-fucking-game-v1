@@ -23,7 +23,7 @@ export const usePollGamesWithUserData = () => {
   const { account, chainId } = useActiveWeb3React()
 
   useSWRImmutable(
-    chainId ? ['publicGameData', chainId] : null,
+    account && chainId ? ['publicGameData', account, chainId] : null,
     async () => {
       dispatch(fetchGamesPublicDataAsync({ chainId, account }))
     },
@@ -32,13 +32,10 @@ export const usePollGamesWithUserData = () => {
     },
   )
 
-  const name = ['gamesWithUserData', account, chainId]
-
   useSWRImmutable(
-    account && chainId ? name : null,
+    account && chainId ? ['gamesWithUserData', account, chainId] : null,
     async () => {
-      const params = { account, chainId }
-      dispatch(fetchGamePlayerDataAsync(params))
+      dispatch(fetchGamePlayerDataAsync({ account, chainId }))
     },
     {
       refreshInterval: FAST_INTERVAL,
@@ -63,6 +60,11 @@ export const usePollCoreGameData = () => {
   }, [dispatch, chainId, account])
 
   // TODO GUIGUI LOAD PLAYER DATA
+  // useFastRefreshEffect(() => {
+  //   if (chainId) {
+  //     dispatch(fetchGamePlayerDataAsync({ chainId, account }))
+  //   }
+  // }, [dispatch, chainId, account])
 }
 
 export const useGames = (): DeserializedGamesState => {
