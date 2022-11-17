@@ -2,7 +2,8 @@ import styled from 'styled-components'
 import { Tag, Flex, Heading, Skeleton, Text } from '@pancakeswap/uikit'
 import { Token } from '@pancakeswap/sdk'
 import { CoreTag } from 'components/Tags'
-import BoostedTag from 'views/Games/components/GameTags/BoostedTag'
+import RegistrationTag from 'views/Games/components/GameTags/RegistrationTag'
+import ProgressTag from 'views/Games/components/GameTags/ProgressTag'
 import FreeTag from 'views/Games/components/GameTags/FreeTag'
 import BigNumber from 'bignumber.js'
 import { CurrencyLogo, DoubleCurrencyLogo } from 'components/Logo'
@@ -23,7 +24,8 @@ export interface ExpandableSectionProps {
   multiplier: BigNumber
   isReady: boolean
   isFree: boolean
-  boosted?: boolean
+  isInProgress: boolean
+  isRegistering: boolean
 }
 
 const Wrapper = styled(Flex)`
@@ -44,7 +46,8 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
   multiplier,
   isReady,
   isFree,
-  boosted,
+  isInProgress,
+  isRegistering,
 }) => {
   // TODO GUIGUI DISPLAY gameCreationAmount
   return (
@@ -65,8 +68,17 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
       <Flex flexDirection="column" alignItems="flex-end">
         {isReady ? <Heading mb="4px">{name}</Heading> : <Skeleton mb="4px" width={60} height={18} />}
         <Flex justifyContent="center" mt="4px">
-          {isReady ? <CoreTag mr="4px" /> : <Skeleton ml="4px" width={42} height={28} />}
-          {isReady ? <>{boosted && <BoostedTag ml="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />}
+          {isReady ? (
+            <>{(isInProgress || !isRegistering) && <ProgressTag mr="4px" />}</>
+          ) : (
+            <Skeleton ml="4px" width={42} height={28} />
+          )}
+          {/* {isReady ? <>{isInProgress && <CoreTag mr="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />} */}
+          {isReady ? (
+            <>{isRegistering && <RegistrationTag ml="4px" />}</>
+          ) : (
+            <Skeleton ml="4px" width={42} height={28} />
+          )}
           {isReady ? <>{isFree && <FreeTag ml="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />}
           {isReady ? (
             <>{multiplier && <MultiplierTag variant="secondary">{`x${multiplier.toNumber()}`}</MultiplierTag>}</>

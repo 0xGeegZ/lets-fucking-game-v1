@@ -146,7 +146,8 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           multiplier={registrationAmount.toNumber() !== 0 ? prizepool.dividedBy(registrationAmount) : null}
           isReady={isReady}
           isFree={registrationAmount.toNumber() === 0}
-          boosted={false}
+          isInProgress={isInProgress}
+          isRegistering={!isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber()}
         />
 
         <CardContentSection
@@ -155,15 +156,17 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           maxPlayers={maxPlayers}
           playerAddressesCount={playerAddressesCount}
           cronHumanReadable={cronHumanReadable}
-          isInProgress={isInProgress}
           isReady={isReady}
           prizes={prizes}
+          isInProgress={isInProgress}
+          isRegistering={!isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber()}
         />
 
         <CardPlayerSection
           address={address}
           roundId={roundId}
           isInProgress={isInProgress}
+          isRegistering={!isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber()}
           wonAmount={wonAmount}
           nextFromRange={nextFromRange}
           nextToRange={nextToRange}

@@ -27,6 +27,7 @@ interface GameCardPlayerSectionProps {
   registrationAmount: BigNumber
   gameCreationAmount: BigNumber
   isInProgress: boolean
+  isRegistering: boolean
   wonAmount: BigNumber
   nextFromRange: string
   nextToRange: string
@@ -48,6 +49,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   registrationAmount,
   gameCreationAmount,
   isInProgress,
+  isRegistering,
   wonAmount,
   nextFromRange,
   nextToRange,
@@ -137,14 +139,14 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
         <ConnectWalletButton mt="8px" width="100%" />
       ) : (
         <>
-          {isInProgress && (
+          {(isInProgress || !isRegistering) && (
             <PlayButton
               address={address}
               isInTimeRange={isInTimeRange}
               isDisabled={isPlaying || isCreator || isAdmin || isPaused}
             />
           )}
-          {!isInProgress && (
+          {isRegistering && (
             <RegisterButton
               address={address}
               registrationAmount={registrationAmount}

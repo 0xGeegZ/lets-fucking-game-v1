@@ -131,10 +131,12 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { observerRef, isIntersecting } = useIntersectionObserver()
   const chosenGamesLength = useRef(0)
 
-  const isDeleted = pathname.includes('archived')
-  const isPlayingOnly = pathname.includes('history')
-  const isInactive = pathname.includes('history')
-  const isActive = !isInactive && !isDeleted
+  // TODO GUIGUI INVERSE WHEN UPDATING /path
+  //   const isDeleted = pathname.includes('archived')
+  //   const isPlayingOnly = pathname.includes('history')
+  const isPlayingOnly = pathname.includes('archived')
+  const isDeleted = pathname.includes('history')
+  const isActive = !isPlayingOnly && !isDeleted
 
   // TODO GUIGUI get used Data
   usePollGamesWithUserData()
@@ -144,11 +146,13 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   //   const userDataReady = !account || (!!account && userDataLoaded)
 
   // TODO GUIGUI FIRST HANDLE FILTERS
-  const [isNotFullOnly, setStakedOnly] = useState(isActive)
-  const [boostedOnly, setBoostedOnly] = useState(false)
+  const [isNotFullOnly, setNotFullOnly] = useState(!isActive)
+  const [myGamesOnly, setMyGamesOnly] = useState(!isActive)
 
-  const activeGames = games.filter((game) => !game.isDeleted /* && game.isInProgress */)
-  const inactiveGames = games.filter((game) => !game.isInProgress)
+  const activeGames = games.filter((game) => !game.isDeleted)
+  const notFullGames = games.filter(
+    (game) => !game.isInProgress && game.maxPlayers.toNumber() !== game.playerAddressesCount.toNumber(),
+  )
 
   const playingOnlyGames = games.filter((game) => game.userData && game.userData.isPlaying)
 
@@ -185,34 +189,46 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const chosenGames = useMemo(() => {
     let chosenFs = []
 
+    console.log(
+      '🚀 ~ chosenGames ~ isActive',
+      isActive,
+      'isDeleted',
+      isDeleted,
+      'isNotFullOnly',
+      isNotFullOnly,
+      'myGamesOnly',
+      myGamesOnly,
+      'isPlayingOnly',
+      isPlayingOnly,
+    )
+
     if (isActive) {
       chosenFs = gamesList(activeGames)
     }
-    if (isInactive) {
-      chosenFs = gamesList(inactiveGames)
-    }
+
     if (isDeleted) {
       chosenFs = gamesList(deletedGames)
     }
-    if (isPlayingOnly) {
-      chosenFs = gamesList(playingOnlyGames)
+
+    if (isNotFullOnly) {
+      chosenFs = gamesList(notFullGames)
     }
 
-    if (boostedOnly) {
-      chosenFs = chosenFs.filter((f) => f.boosted)
+    if (myGamesOnly || isPlayingOnly) {
+      chosenFs = gamesList(playingOnlyGames)
     }
 
     return chosenFs
   }, [
     isActive,
-    isInactive,
     isDeleted,
+    isNotFullOnly,
+    myGamesOnly,
     isPlayingOnly,
-    boostedOnly,
     gamesList,
     activeGames,
-    inactiveGames,
     deletedGames,
+    notFullGames,
     playingOnlyGames,
   ])
 
@@ -277,7 +293,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
             <NextLinkFromReactRouter to="#" prefetch={false}>
               <Button variant="text" disabled>
                 <Text color="primary" bold fontSize="16px" mr="4px">
-                  {t('My Games')}
+                  {t('My Created Games')}
                 </Text>
                 <ArrowForwardIcon color="primary" />
               </Button>
@@ -296,21 +312,21 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
             {/* <ToggleView idPrefix="clickGame" viewMode={viewMode} onToggle={setViewMode} /> */}
             <ToggleWrapper>
               <Toggle
-                id="staked-only-games"
+                id="not-full-games"
                 checked={isNotFullOnly}
-                onChange={() => setStakedOnly(!isNotFullOnly)}
+                onChange={() => setNotFullOnly(!isNotFullOnly)}
                 scale="sm"
               />
               <Text> {t('Not full only')}</Text>
             </ToggleWrapper>
             <ToggleWrapper>
               <Toggle
-                id="staked-only-games"
-                checked={boostedOnly}
-                onChange={() => setBoostedOnly((prev) => !prev)}
+                id="my-games-only"
+                checked={myGamesOnly}
+                onChange={() => setMyGamesOnly((prev) => !prev)}
                 scale="sm"
               />
-              <Text> {t('Booster Available')}</Text>
+              <Text> {t('My Games')}</Text>
             </ToggleWrapper>
             <GameTabButtons hasStakeInFinishedGames={deletedGames.length > 0} />
           </ViewControls>

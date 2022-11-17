@@ -19,7 +19,7 @@ export const useUnpauseGame = (gameAddress: string) => {
       toastSuccess(
         t('Success!'),
         <ToastDescriptionWithTx txHash={receipt.transactionHash}>
-          {t('You have successfully Unpauseed the game.')}
+          {t('You have successfully unpaused the game.')}
         </ToastDescriptionWithTx>,
       )
     }
