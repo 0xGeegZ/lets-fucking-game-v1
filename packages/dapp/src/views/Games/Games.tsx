@@ -134,9 +134,9 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   // TODO GUIGUI INVERSE WHEN UPDATING /path
   //   const isDeleted = pathname.includes('archived')
   //   const isPlayingOnly = pathname.includes('history')
-  const isPlayingOnly = pathname.includes('archived')
+  const isArchived = pathname.includes('archived')
   const isDeleted = pathname.includes('history')
-  const isActive = !isPlayingOnly && !isDeleted
+  const isActive = !isArchived && !isDeleted
 
   // TODO GUIGUI get used Data
   usePollGamesWithUserData()
@@ -189,19 +189,6 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const chosenGames = useMemo(() => {
     let chosenFs = []
 
-    console.log(
-      '🚀 ~ chosenGames ~ isActive',
-      isActive,
-      'isDeleted',
-      isDeleted,
-      'isNotFullOnly',
-      isNotFullOnly,
-      'myGamesOnly',
-      myGamesOnly,
-      'isPlayingOnly',
-      isPlayingOnly,
-    )
-
     if (isActive) {
       chosenFs = gamesList(activeGames)
     }
@@ -214,7 +201,10 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
       chosenFs = gamesList(notFullGames)
     }
 
-    if (myGamesOnly || isPlayingOnly) {
+    if (myGamesOnly) {
+      chosenFs = gamesList(playingOnlyGames)
+    }
+    if (isArchived) {
       chosenFs = gamesList(playingOnlyGames)
     }
 
@@ -224,7 +214,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
     isDeleted,
     isNotFullOnly,
     myGamesOnly,
-    isPlayingOnly,
+    isArchived,
     gamesList,
     activeGames,
     deletedGames,
