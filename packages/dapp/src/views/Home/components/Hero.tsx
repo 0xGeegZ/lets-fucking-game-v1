@@ -126,7 +126,7 @@ const Hero = () => {
       >
         <Flex flex="1" flexDirection="column">
           <Heading scale="xxl" color="secondary" mb="24px">
-            {t("Let's F*#@$* Game.")}
+            {t("Let's F*#@$* Game")}
           </Heading>
           <Heading scale="md" mb="24px">
             {t('Play to our "One Button Game" once a day. Be one of the last to share the prizepool.')}

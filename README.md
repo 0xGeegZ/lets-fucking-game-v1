@@ -1,5 +1,7 @@
 # Let's Fucking Game
 
+[![Let's Fucking Game Presentation](http://img.youtube.com/vi/vdYPN0rT-SM/0.jpg)](https://youtu.be/vdYPN0rT-SM "Let's Fucking Game Presentation")
+
 # Description
 
 This application was done during the [Chainlink Hackathon Fall 2022](https://chainlinkfall2022.devpost.com/)
