@@ -39,7 +39,7 @@ const GameTabButtons: React.FC<React.PropsWithChildren<GameTabButtonsProps>> = (
         </ButtonMenuItem>
         <NotificationDot show={hasStakeInFinishedGames}>
           <ButtonMenuItem as={NextLinkFromReactRouter} to="/games/history" id="finished-games-button">
-            {t('Deleted')}
+            {t('History')}
           </ButtonMenuItem>
         </NotificationDot>
       </ButtonMenu>
