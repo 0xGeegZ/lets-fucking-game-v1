@@ -134,13 +134,15 @@ const CardContentSection: React.FC<React.PropsWithChildren<GameCardContentSectio
             <Text bold>
               {playerAddressesCount.toNumber()}/{maxPlayers.toNumber()}
             </Text>
-            <Tooltip
-              content={
-                <Text display="inline" color="textSubtle">
-                  {`Game will start when ${maxPlayers.toNumber()} players have joined this game`}
-                </Text>
-              }
-            />
+            {isRegistering && (
+              <Tooltip
+                content={
+                  <Text display="inline" color="textSubtle">
+                    {`Game will start when ${maxPlayers.toNumber()} players have joined this game`}
+                  </Text>
+                }
+              />
+            )}
           </Text>
         ) : (
           <Skeleton height={24} width={80} />
