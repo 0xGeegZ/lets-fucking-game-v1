@@ -336,9 +336,7 @@ const EncodedCronSelection = () => {
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
-
-    if (isValidCron(value)) setEncodedCron(value)
-    else toastError(t('Error'), t('This is not a cron string'))
+    setEncodedCron(value)
 
     actions.setGameCreation(currentStep, treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, value)
   }
@@ -401,6 +399,13 @@ const OtherOptionsSelection = () => {
 const GameCreation: React.FC = () => {
   const { actions, currentStep, treasuryFee, registrationAmount, maxPlayers, playTimeRange, encodedCron } =
     useGameContext()
+  const { toastError, toastSuccess } = useToast()
+
+  const checkFieldsAndValidate = () => {
+    if (!isValidCron(encodedCron)) return toastError(t('Error'), t('Wrong entered Cron'))
+
+    actions.nextStep(currentStep + 1)
+  }
 
   const { t } = useTranslation()
 
@@ -417,7 +422,7 @@ const GameCreation: React.FC = () => {
       {/* //TODO: implement fields validation */}
       <Flex justifyContent="end" alignItems="center" pr={[null, null, '4px']} pl={['4px', null, '0']} mt="24px">
         <NextStepButton
-          onClick={() => actions.nextStep(currentStep + 1)}
+          onClick={checkFieldsAndValidate}
           disabled={!treasuryFee || !registrationAmount || !maxPlayers || !playTimeRange || !encodedCron}
         >
           {t('Next Step')}

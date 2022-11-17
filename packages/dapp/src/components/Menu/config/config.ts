@@ -1,6 +1,7 @@
 import { MenuItemsType, EarnFillIcon, EarnIcon } from '@pancakeswap/uikit'
 import { ContextApi } from '@pancakeswap/localization'
 import { DropdownMenuItems } from '@pancakeswap/uikit/src/components/DropdownMenu/types'
+import { SUPPORT_ONLY_BSC } from 'config/constants/supportChains'
 
 export type ConfigMenuDropDownItemsType = DropdownMenuItems & { hideSubNav?: boolean }
 export type ConfigMenuItemsType = Omit<MenuItemsType, 'items'> & { hideSubNav?: boolean; image?: string } & {
@@ -28,23 +29,25 @@ const config: (
 ) => ConfigMenuItemsType[] = (t, isDark, languageCode, chainId) =>
   [
     {
-      label: t('Games '),
+      label: t('Games'),
       href: '/games',
       icon: EarnIcon,
       fillIcon: EarnFillIcon,
       image: '/images/decorations/pe2.png',
-      items: [],
-      // items: [
-      //   {
-      //     label: t('All Games'),
-      //     href: '/games',
-      //   },
-      //   {
-      //     label: t('My Games'),
-      //     href: '/my-games',
-      //     supportChainIds: SUPPORT_ONLY_BSC,
-      //   },
-      // ].map((item) => addMenuItemSupported(item, chainId)),
+
+      // items: [],
+      items: [
+        {
+          label: t('All Games'),
+          href: '/games',
+          supportChainIds: SUPPORT_ONLY_BSC,
+        },
+        // {
+        //   label: t('My Games'),
+        //   href: '/my-games',
+        //   supportChainIds: SUPPORT_ONLY_BSC,
+        // },
+      ].map((item) => addMenuItemSupported(item, chainId)),
     },
   ].map((item) => addMenuItemSupported(item, chainId))
 
