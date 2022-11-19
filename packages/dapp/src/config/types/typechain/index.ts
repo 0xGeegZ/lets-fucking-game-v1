@@ -58,3 +58,5 @@ export type { Multicall3 } from "./contracts/multicall/Multicall3";
 export { Multicall3__factory } from "./factories/contracts/multicall/Multicall3__factory";
 export type { CronUpkeep } from "./contracts/upkeeps/CronUpkeep";
 export { CronUpkeep__factory } from "./factories/contracts/upkeeps/CronUpkeep__factory";
+export type { CronUpkeepDelegate } from "./contracts/upkeeps/CronUpkeepDelegate";
+export { CronUpkeepDelegate__factory } from "./factories/contracts/upkeeps/CronUpkeepDelegate__factory";

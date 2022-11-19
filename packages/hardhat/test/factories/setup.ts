@@ -54,6 +54,10 @@ const setupTest = deployments.createFixture(
     const gameContract = await deployments.get('GameV1', libraries)
 
     const cronUpkeepContract = await deployments.get('CronUpkeep', libraries)
+    const cronUpkeepSecondaryContract = await deployments.get(
+      'CronUpkeepSecondary',
+      libraries
+    )
 
     const secondGameV1Contract = await deploy('GameV1', {
       ...options,
@@ -75,6 +79,12 @@ const setupTest = deployments.createFixture(
 
     const cronUpkeep = new ethers.Contract(
       cronUpkeepContract.address,
+      cronUpkeepInterface.interface,
+      deployer
+    )
+
+    const cronUpkeepSecondary = new ethers.Contract(
+      cronUpkeepSecondaryContract.address,
       cronUpkeepInterface.interface,
       deployer
     )
@@ -121,6 +131,7 @@ const setupTest = deployments.createFixture(
       gameFactory,
       game,
       cronUpkeep,
+      cronUpkeepSecondary,
       secondGameV1,
       deployedPayableGame,
       deployedFreeGame,
@@ -212,6 +223,7 @@ const initialiseTestData = async function () {
     gameFactory,
     game,
     cronUpkeep,
+    cronUpkeepSecondary,
     secondGameV1,
     deployedPayableGame,
     deployedFreeGame,
@@ -224,6 +236,8 @@ const initialiseTestData = async function () {
   // this.cronExternal = cronExternal
 
   this.cronUpkeep = cronUpkeep
+  this.cronUpkeepSecondary = cronUpkeepSecondary
+
   this.gameFactory = gameFactory
   this.game = game
   this.secondGameV1 = secondGameV1

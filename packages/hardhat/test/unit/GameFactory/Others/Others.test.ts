@@ -142,10 +142,19 @@ describe('GameFactoryContract', function () {
     })
 
     describe('when called by admin', function () {
-      it.skip('should update keeper address for the factory and all games and associated keeper job', async function () {
-        // TODO deploy a new keeper to update keeper data
-        // this.gameFactory.connect(this.owner).updateCronUpkeep(this.owner.address)
-        expect(true).to.be.false
+      it('should update keeper address for the factory and all games and associated keeper job', async function () {
+        const newCronUpkeep = this.cronUpkeepSecondary.address
+        this.cronUpkeepSecondary.addDelegator(this.gameFactory.address)
+        await expect(
+          this.gameFactory.connect(this.owner).updateCronUpkeep(newCronUpkeep)
+        )
+          .to.emit(this.gameFactory, 'CronUpkeepUpdated')
+          .withArgs(newCronUpkeep)
+        const updatedFactoryCronUpkeep = await this.gameFactory.cronUpkeep()
+        const updatedGameCronUpkeep =
+          await this.deployedPayableGame.cronUpkeep()
+        expect(updatedFactoryCronUpkeep).to.be.equal(newCronUpkeep)
+        expect(updatedGameCronUpkeep).to.be.equal(newCronUpkeep)
       })
 
       it('should revert if keeper address is not a contract address', async function () {
