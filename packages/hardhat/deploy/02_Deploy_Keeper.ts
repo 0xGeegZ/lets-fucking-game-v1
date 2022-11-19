@@ -22,9 +22,19 @@ const func: DeployFunction = async function ({
   }
 
   log('Deploying CronUpkeepDelegate contract')
-  const cronUpkeepDelegate = await deploy('CronUpkeepDelegate', {
+  const {
+    address: cronUpkeepDelegateAddress,
+    newlyDeployed: cronUpkeepDelegateNewlyDeployed,
+    receipt: { gasUsed: cronUpkeepDelegateGasUsed },
+  } = await deploy('CronUpkeepDelegate', {
     ...options,
   })
+
+  if (cronUpkeepDelegateNewlyDeployed) {
+    log(
+      `✅ Contract CronUpkeepDelegate deployed at ${cronUpkeepDelegateAddress} using ${cronUpkeepDelegateGasUsed} gas`
+    )
+  }
 
   log('Deploying CronExternal contract')
   const {
@@ -51,7 +61,7 @@ const func: DeployFunction = async function ({
   log('Deploying CronUpkeep contract')
   const cronUpkeepArgs = [
     deployer,
-    cronUpkeepDelegate.address,
+    cronUpkeepDelegateAddress,
     CRON_MAX_JOBS,
     ethers.utils.toUtf8Bytes(''),
   ]
@@ -65,11 +75,10 @@ const func: DeployFunction = async function ({
     args: cronUpkeepArgs,
   })
 
-  if (!cronUpkeepNewlyDeployed) return
-
-  log(
-    `✅ Contract CronUpkeep deployed at ${cronUpkeepAddress} using ${cronUpkeepGasUsed} gas`
-  )
+  if (cronUpkeepNewlyDeployed)
+    log(
+      `✅ Contract CronUpkeep deployed at ${cronUpkeepAddress} using ${cronUpkeepGasUsed} gas`
+    )
 
   if (isLocalDeployment) {
     log('Deploying a Second CronUpkeep contract for test case')
@@ -85,14 +94,13 @@ const func: DeployFunction = async function ({
       args: cronUpkeepArgs,
     })
 
-    if (!cronUpkeepSecondaryNewlyDeployed) return
-
-    log(
-      `✅ Contract CronUpkeep deployed at ${cronUpkeepSecondaryAddress} using ${cronUpkeepSecondaryGasUsed} gas`
-    )
+    if (cronUpkeepSecondaryNewlyDeployed)
+      log(
+        `✅ Contract CronUpkeep secondary deployed at ${cronUpkeepSecondaryAddress} using ${cronUpkeepSecondaryGasUsed} gas`
+      )
   }
 
-  if (isLocalDeployment) return
+  if (isLocalDeployment || !cronUpkeepNewlyDeployed) return
 
   await delay(30 * 1000)
   try {
@@ -102,7 +110,11 @@ const func: DeployFunction = async function ({
       constructorArguments: [],
     })
     await delay(10 * 1000)
+  } catch (error) {
+    console.error('Error during contract verification', error.message)
+  }
 
+  try {
     log(`✅ Verifying contract CronUpkeep`)
     await hre.run('verify:verify', {
       address: cronUpkeepAddress,

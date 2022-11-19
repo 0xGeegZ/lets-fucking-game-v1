@@ -360,8 +360,8 @@ export interface CronUpkeep extends BaseContract {
 
     checkUpkeep(
       arg0: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+      overrides?: CallOverrides
+    ): Promise<[boolean, string]>;
 
     createCronJobFromEncodedSpec(
       target: PromiseOrValue<string>,
@@ -442,8 +442,8 @@ export interface CronUpkeep extends BaseContract {
 
   checkUpkeep(
     arg0: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+    overrides?: CallOverrides
+  ): Promise<[boolean, string]>;
 
   createCronJobFromEncodedSpec(
     target: PromiseOrValue<string>,
@@ -671,7 +671,7 @@ export interface CronUpkeep extends BaseContract {
 
     checkUpkeep(
       arg0: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     createCronJobFromEncodedSpec(
@@ -747,7 +747,7 @@ export interface CronUpkeep extends BaseContract {
 
     checkUpkeep(
       arg0: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     createCronJobFromEncodedSpec(

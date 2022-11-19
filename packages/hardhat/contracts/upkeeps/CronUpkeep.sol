@@ -40,6 +40,8 @@ import { getRevertMsg } from "@chainlink/contracts/src/v0.8/utils/utils.sol";
 contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pausable, Proxy {
     using EnumerableSet for EnumerableSet.UintSet;
 
+    using CronInternal for Spec;
+
     event CronJobExecuted(uint256 indexed id, uint256 timestamp);
     event CronJobCreated(uint256 indexed id, address target, bytes handler);
     event CronJobUpdated(uint256 indexed id, address target, bytes handler);
@@ -55,6 +57,7 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
     error TickTooOld();
     error TickDoesntMatchSpec();
 
+    // TODO GUIGUI TO REMOVE
     address immutable s_delegate;
     uint256 public immutable s_maxJobs;
     address[] s_delegators;
@@ -97,6 +100,7 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
             performData,
             (uint256, uint256, address, bytes)
         );
+
         validate(id, tickTime, target, handler);
         s_lastRuns[id] = block.timestamp;
         (bool success, bytes memory payload) = target.call(handler);
@@ -204,10 +208,37 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
     /**
      * @notice Get the id of an eligible cron job
      * @return upkeepNeeded signals if upkeep is needed, performData is an abi encoding
-     * of the id and "next tick" of the elligible cron job
+     * of the id and "next tick" of the eligible cron job
      */
-    function checkUpkeep(bytes calldata) external override whenNotPaused cannotExecute returns (bool, bytes memory) {
-        _delegate(s_delegate);
+    function checkUpkeep(bytes calldata) external view override whenNotPaused returns (bool, bytes memory) {
+        // function checkUpkeep(bytes calldata)
+        //     external
+        //     view
+        //     override
+        //     whenNotPaused
+        //     cannotExecute
+        //     returns (bool, bytes memory)
+        // {
+        // _delegate(s_delegate);
+        // DEV: start at a random spot in the list so that checks are
+        // spread evenly among cron jobs
+        uint256 numCrons = s_activeCronJobIDs.length();
+
+        if (numCrons == 0) {
+            return (false, bytes(""));
+        }
+        uint256 startIdx = block.number % numCrons;
+        bool result;
+        bytes memory payload;
+        (result, payload) = checkInRange(startIdx, numCrons);
+        if (result) {
+            return (result, payload);
+        }
+        (result, payload) = checkInRange(0, startIdx);
+        if (result) {
+            return (result, payload);
+        }
+        return (false, bytes(""));
     }
 
     /**
@@ -309,7 +340,7 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
         uint256 tickTime,
         address target,
         bytes memory handler
-    ) private {
+    ) private view {
         tickTime = tickTime - (tickTime % 60); // remove seconds from tick time
         if (block.timestamp < tickTime) {
             revert TickInFuture();
@@ -333,6 +364,25 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
      */
     function handlerSig(address target, bytes memory handler) private pure returns (bytes32) {
         return keccak256(abi.encodePacked(target, handler));
+    }
+
+    /**
+     * @notice checks the cron jobs in a given range
+     * @param start the starting id to check (inclusive)
+     * @param end the ending id to check (exclusive)
+     * @return upkeepNeeded signals if upkeep is needed, performData is an abi encoding
+     * of the id and "next tick" of the eligible cron job
+     */
+    function checkInRange(uint256 start, uint256 end) private view returns (bool, bytes memory) {
+        uint256 id;
+        uint256 lastTick;
+        for (uint256 idx = start; idx < end; idx++) {
+            id = s_activeCronJobIDs.at(idx);
+            lastTick = s_specs[id].lastTick();
+            if (lastTick > s_lastRuns[id]) {
+                return (true, abi.encode(id, lastTick, s_targets[id], s_handlers[id]));
+            }
+        }
     }
 
     modifier onlyValidCronID(uint256 id) {

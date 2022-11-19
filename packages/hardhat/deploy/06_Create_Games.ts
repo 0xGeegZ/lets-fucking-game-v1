@@ -20,8 +20,8 @@ const func: DeployFunction = async function ({
   const registrationAmount = ethers.utils.parseEther('0.0001')
   const zeroRegistrationAmount = ethers.utils.parseEther('0')
 
-  const freeGamePrizepool = 0.1
-  const freeGamePrizepoolAmount = ethers.utils.parseEther('0.1')
+  const freeGamePrizepool = 0.01
+  const freeGamePrizepoolAmount = ethers.utils.parseEther('0.01')
   // const freeGamePrizepool = 1
   // const freeGamePrizepoolAmount = ethers.utils.parseEther('1')
 
@@ -93,6 +93,21 @@ const func: DeployFunction = async function ({
     { value: gameCreationAmount.add(freeGamePrizepoolAmount) }
   )
   log(`✅ New free game created`)
+
+  // log('Creating new free game for 2 players')
+  // await gameFactory.createNewGame(
+  //   name,
+  //   2,
+  //   playTimeRange,
+  //   zeroRegistrationAmount,
+  //   treasuryFee,
+  //   creatorFee,
+  //   '*/10 * * * *',
+  //   freeGamePrizes,
+  //   { value: gameCreationAmount.add(freeGamePrizepoolAmount) }
+  // )
+
+  // log(`✅ New free game for 2 players created`)
 }
 
 func.tags = ['all', 'test', 'dev', 'staging', 'create-games']

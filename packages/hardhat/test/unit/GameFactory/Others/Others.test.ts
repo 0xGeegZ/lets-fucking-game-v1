@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { expectRevert } from '@openzeppelin/test-helpers'
 import { expect } from 'chai'
 import { ethers } from 'hardhat'

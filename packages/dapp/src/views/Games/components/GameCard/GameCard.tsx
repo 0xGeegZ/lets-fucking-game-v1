@@ -8,6 +8,9 @@ import { getBlockExploreLink } from 'utils'
 import { NATIVE } from '@pancakeswap/sdk'
 import { DeserializedGame } from 'state/types'
 import cronstrue from 'cronstrue'
+import parser from 'cron-parser'
+import moment from 'moment'
+import momentTz from 'moment-timezone'
 import Tooltip from '../GameCardButtons/Tooltip'
 import CardPlayerSection from './CardPlayerSection'
 import CardHeadingSection from './CardHeadingSection'
@@ -67,6 +70,11 @@ interface GameCardProps {
 const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, account }) => {
   const { chainId } = useActiveWeb3React()
 
+  const {
+    t,
+    currentLanguage: { locale },
+  } = useTranslation()
+
   const [showExpandableSection, setShowExpandableSection] = useState(false)
   const [cronHumanReadable, setCronHumanReadable] = useState('')
 
@@ -122,10 +130,31 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     if (!encodedCron) return
 
     try {
-      const transform = cronstrue.toString(encodedCron, {
-        use24HourTimeFormat: false,
-      })
-      setCronHumanReadable(transform)
+      //   const transform = cronstrue.toString(encodedCron, {
+      //     use24HourTimeFormat: false,
+      //     locale,
+      //   })
+      //   setCronHumanReadable(`${transform} UTC`)
+
+      const interval = parser.parseExpression(encodedCron, { tz: 'Etc/UTC' })
+      setCronHumanReadable(moment(interval.next().toString()).format('hh:mm A'))
+
+      //   const timezone = 'Etc/UTC'
+      //   try {
+      //     timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      //   } catch (e) {
+      //     // noop
+      //   }
+      //   console.log('🚀 ~ file: GameCard.tsx ~ line 136 ~ useEffect ~ locale', locale)
+      //   console.log('🚀 ~ file: GameCard.tsx ~ line 142 ~ useEffect ~ timezone', timezone)
+
+      //   const interval = parser.parseExpression(encodedCron, { tz: 'Etc/UTC' })
+      //   const interval = parser.parseExpression(encodedCron, { tz: timezone })
+      //   const interval = parser.parseExpression(encodedCron)
+
+      //   console.log('🚀 ~  moment ', moment(interval.next().toString()).format('hh:mm A'))
+      //   console.log('🚀 ~  momentTz ', momentTz(interval.next().toString()).format('hh:mm A'))
+      //   setCronHumanReadable(momentTz(interval.next().toString()).format('hh:mm A'))
     } catch (e) {
       setCronHumanReadable('')
     }
