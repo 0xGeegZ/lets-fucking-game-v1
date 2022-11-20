@@ -1,6 +1,19 @@
 /* eslint-disable */
-import { Flex, Heading, Text, Input, useToast } from '@pancakeswap/uikit'
+import { Flex, Heading, Text, Input, useToast, CheckmarkIcon, WarningIcon } from '@pancakeswap/uikit'
 import { ChangeEvent, useCallback, useContext, useState } from 'react'
+import styled, { css } from 'styled-components'
+import cronstrue from 'cronstrue'
+import momentTz from 'moment-timezone'
+import parser from 'cron-parser'
+import {
+  PLAYERS_MAX_LENGTH,
+  PLAYERS_MIN_LENGTH,
+  AUTHORIZED_CRONS,
+  AUTHORIZED_PLAY_TIME_RANGE,
+  AUTHORIZED_CREATOR_FEE,
+  AUTHORIZED_TREASURY_FEE,
+  AUTHORIZED_AMOUNTS,
+} from './config'
 
 import { RowBetween } from 'components/Layout/Row'
 import { useTranslation } from '@pancakeswap/localization'
@@ -14,11 +27,26 @@ import { parseEther } from '@ethersproject/units'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { TREASURY_FEE_DEFAULT, CREATOR_FEE_DEFAULT } from './config'
 import { isValidCron } from 'cron-validator'
+import { Input as NumericalInput } from 'components/NumericalInput'
+import Tooltip from 'views/Games/components/GameCardButtons/Tooltip'
 
 import BackStepButton from './BackStepButton'
 
-// TODO: Refacto by split components
-// TODO: Fix persist -> step 3 is wrong...
+const InputWrap = styled.div`
+  position: relative;
+`
+
+const Indicator = styled(Flex)`
+  align-items: center;
+  height: 24px;
+  justify-content: center;
+  margin-top: -12px;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 24px;
+`
+
 const FeeSelection = () => {
   const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
     useGameContext()
@@ -47,67 +75,19 @@ const FeeSelection = () => {
     )
   }
 
-  const allowedValuesTreasuryFee = [
-    {
-      label: '3%',
-      value: 300,
-    },
-    {
-      label: '4%',
-      value: 400,
-    },
-    {
-      label: '5%',
-      value: 500,
-    },
-    {
-      label: '6%',
-      value: 600,
-    },
-    {
-      label: '7%',
-      value: 700,
-    },
-    {
-      label: '8%',
-      value: 800,
-    },
-    {
-      label: '9%',
-      value: 900,
-    },
-    {
-      label: '10%',
-      value: 1000,
-    },
-  ]
+  const allowedValuesTreasuryFee = AUTHORIZED_TREASURY_FEE.map((fee) => {
+    return {
+      label: `${fee}%`,
+      value: fee * 100,
+    }
+  })
 
-  const allowedValuesCreatorFee = [
-    {
-      label: '0%',
-      value: 0,
-    },
-    {
-      label: '1%',
-      value: 100,
-    },
-    {
-      label: '2%',
-      value: 200,
-    },
-    {
-      label: '3%',
-      value: 300,
-    },
-    {
-      label: '4%',
-      value: 400,
-    },
-    {
-      label: '5%',
-      value: 500,
-    },
-  ]
+  const allowedValuesCreatorFee = AUTHORIZED_CREATOR_FEE.map((fee) => {
+    return {
+      label: `${fee}%`,
+      value: fee * 100,
+    }
+  })
 
   return (
     <>
@@ -117,7 +97,6 @@ const FeeSelection = () => {
 
       {allowedValuesTreasuryFee && (
         <>
-          {/* //TODO: implement dynamic height to dropdown */}
           <Flex
             justifyContent="space-between"
             alignItems="center"
@@ -164,9 +143,6 @@ const RegistrationAmountSelection = () => {
 
   const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
 
-  // TODO GUIGUI HANDLE FREE GAMES AND LOAD AUTHORIZED AMOUNTS FROM CONFIG
-  // const AUTHORIZED_AMOUNTS = [0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10]
-  const AUTHORIZED_AMOUNTS = [0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10]
   const authorizedAmounts = AUTHORIZED_AMOUNTS.map((amount) => {
     return {
       label: `${amount} ${chainSymbol}`,
@@ -178,7 +154,6 @@ const RegistrationAmountSelection = () => {
     <>
       {authorizedAmounts && (
         <>
-          {/* //TODO: implement dynamic height to dropdown */}
           <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
             {'Registration amount'}
           </Text>
@@ -197,73 +172,47 @@ const MaximumPlayersSelection = () => {
   const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
     useGameContext()
 
-  const handleMaximumPlayersOptionChange = (option: OptionProps) => {
-    actions.setGameCreation(
-      currentStep,
-      treasuryFee,
-      creatorFee,
-      registrationAmount,
-      option.value,
-      playTimeRange,
-      encodedCron,
-    )
-  }
+  const [isValid, setIsValid] = useState(true)
+  const [message, setMessage] = useState('')
 
-  // TODO GUIGUI REPLACE WITH INPUT
-  const allowedValuesMaximumPlayers = [
-    {
-      label: '2 players',
-      value: 2,
-    },
-    {
-      label: '3 players',
-      value: 3,
-    },
-    {
-      label: '4 players',
-      value: 4,
-    },
-    {
-      label: '5 players',
-      value: 5,
-    },
-    {
-      label: '6 players',
-      value: 6,
-    },
-    {
-      label: '7 players',
-      value: 7,
-    },
-    {
-      label: '8 players',
-      value: 8,
-    },
-    {
-      label: '9 players',
-      value: 9,
-    },
-    {
-      label: '10 players',
-      value: 10,
-    },
-  ]
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target
+    const errorMessage = 'Number of players should be between 2 and 100.'
+
+    if (value < PLAYERS_MIN_LENGTH || value > PLAYERS_MAX_LENGTH) {
+      setIsValid(false)
+      setMessage(errorMessage)
+    } else {
+      setIsValid(true)
+      setMessage('')
+    }
+
+    actions.setGameCreation(currentStep, treasuryFee, creatorFee, registrationAmount, value, playTimeRange, encodedCron)
+  }
 
   return (
     <>
-      {allowedValuesMaximumPlayers && (
-        <>
-          {/* //TODO: implement dynamic height to dropdown */}
-          <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-            {'Maximum players'}
-          </Text>
-          <Select
-            defaultOptionIndex={4}
-            options={allowedValuesMaximumPlayers}
-            onOptionChange={handleMaximumPlayersOptionChange}
-          ></Select>
-        </>
-      )}
+      <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
+        {'Number of players'}
+      </Text>
+      <InputWrap>
+        <Input
+          onChange={handleChange}
+          isWarning={maxPlayers && !isValid}
+          isSuccess={maxPlayers && isValid}
+          pattern="^[1-9][0-9]?$|^100$"
+          min="1"
+          max="100"
+          value={maxPlayers}
+        />
+        <Indicator>
+          {isValid && maxPlayers && <CheckmarkIcon color="success" />}
+          {!isValid && maxPlayers && <WarningIcon color="failure" />}
+        </Indicator>
+      </InputWrap>
+      <Text color="failure" fontSize="14px" py="4px" mb="16px" style={{ minHeight: '30px' }}>
+        {message}
+      </Text>
     </>
   )
 }
@@ -284,36 +233,19 @@ const PlayTimeRangeSelection = () => {
     )
   }
 
-  const allowedValuesPlayTimeRange = [
-    {
-      label: '1 hour',
-      value: 1,
-    },
-    {
-      label: '2 hours',
-      value: 2,
-    },
-    {
-      label: '3 hours',
-      value: 3,
-    },
-    {
-      label: '4 hours',
-      value: 4,
-    },
-    {
-      label: '5 hours',
-      value: 5,
-    },
-  ]
+  const allowedValuesPlayTimeRange = AUTHORIZED_PLAY_TIME_RANGE.map((time) => {
+    return {
+      label: `${time} hour${time > 1 ? 's' : ''}`,
+      value: time,
+    }
+  })
 
   return (
     <>
       {allowedValuesPlayTimeRange && (
         <>
-          {/* //TODO: implement dynamic height to dropdown */}
           <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-            {'Play time range'}
+            {'Daily play time range'}
           </Text>
           <Select
             defaultOptionIndex={2}
@@ -330,7 +262,38 @@ const EncodedCronSelection = () => {
   const { toastError, toastSuccess } = useToast()
   const { t } = useTranslation()
 
-  const [encodedCron, setEncodedCron] = useState('0 18 * * *')
+  const defaultTimezone = 'Etc/UTC'
+  let timezone
+  try {
+    timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  } catch (e) {
+    timezone = defaultTimezone
+  }
+
+  const allowedValuesCron = AUTHORIZED_CRONS.map((cronHour) => {
+    const cron = `0 ${cronHour} * * *`
+    let label = ''
+    try {
+      //   const transform = cronstrue.toString(cron, {
+      //     use24HourTimeFormat: false,
+      //   })
+      //   label = `${transform} ${timezone}`
+
+      const interval = parser.parseExpression(cron, { tz: timezone })
+      //   const transform = moment(interval.next().toString()).format('hh:mm A')
+      const transform = momentTz.tz(interval.next().toString(), timezone).format('hh:mm A')
+
+      label = `${transform} ${timezone}`
+    } catch (e) {
+      label = `${cronHour}H ${timezone}`
+    }
+    return {
+      label,
+      value: cron,
+    }
+  })
+
+  const [encodedCron, setEncodedCron] = useState(allowedValuesCron[17].value)
 
   const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, currentStep, actions } =
     useGameContext()
@@ -342,15 +305,29 @@ const EncodedCronSelection = () => {
     actions.setGameCreation(currentStep, treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, value)
   }
 
+  const handleCronOptionChange = (option: OptionProps) => {
+    actions.setGameCreation(
+      currentStep,
+      treasuryFee,
+      creatorFee,
+      registrationAmount,
+      maxPlayers,
+      playTimeRange,
+      option.value,
+    )
+  }
+
   return (
     <>
       {
         <>
-          {/* //TODO: implement dynamic height to dropdown */}
-          <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-            {'Encoded cron'}
+          <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+            <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
+              {'Daily game draw'}
+            </Text>
+            <Tooltip content={<Text>{`${t('Based on your current timezone')} : ${timezone}`}</Text>} />
           </Text>
-          <Input onChange={handleChange} placeholder={'0 18 * * *'} value={encodedCron} />
+          <Select defaultOptionIndex={17} options={allowedValuesCron} onOptionChange={handleCronOptionChange}></Select>
         </>
       }
     </>
@@ -405,6 +382,9 @@ const GameCreation: React.FC = () => {
   const checkFieldsAndValidate = () => {
     if (!isValidCron(encodedCron)) return toastError(t('Error'), t('Wrong entered Cron'))
 
+    if (maxPlayers < PLAYERS_MIN_LENGTH || maxPlayers > PLAYERS_MAX_LENGTH)
+      return toastError(t('Error'), t('Number of players should be between 2 and 100'))
+
     actions.nextStep(currentStep + 1)
   }
 
@@ -420,8 +400,15 @@ const GameCreation: React.FC = () => {
       </Heading>
       <OtherOptionsSelection />
       <FeeSelection />
-      {/* //TODO: implement fields validation */}
-      <Flex justifyContent="end" alignItems="center" pr={[null, null, '4px']} pl={['4px', null, '0']} mt="24px">
+      <Flex
+        justifyContent="space-between"
+        alignItems="center"
+        pr={[null, null, '4px']}
+        pl={['4px', null, '0']}
+        mb="8px"
+        mt="24px"
+      >
+        <BackStepButton onClick={() => actions.previousStep(currentStep - 1)}>{t('Previous Step')}</BackStepButton>
         <NextStepButton
           onClick={checkFieldsAndValidate}
           disabled={!treasuryFee || !registrationAmount || !maxPlayers || !playTimeRange || !encodedCron}

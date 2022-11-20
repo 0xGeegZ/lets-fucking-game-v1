@@ -79,3 +79,5 @@ export function isTokenOnList(defaultTokens: TokenAddressMap, currency?: Currenc
   if (currency?.isNative) return true
   return Boolean(currency?.isToken && defaultTokens[currency.chainId]?.[currency.address])
 }
+
+export const range = (start, end) => Array.from(Array(end + 1).keys()).slice(start)

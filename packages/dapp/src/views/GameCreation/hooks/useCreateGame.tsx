@@ -20,7 +20,8 @@ export const useCreateGame = (game) => {
 
   // TODO handle name
   const {
-    /* name, */ maxPlayers,
+    name,
+    maxPlayers,
     playTimeRange,
     registrationAmount,
     treasuryFee,
@@ -53,16 +54,12 @@ export const useCreateGame = (game) => {
 
   const registrationAmountEther = parseEther(parsedRegistrationAmount.toString())
 
-  const randomNumber = () => {
-    return Math.floor(Math.random() * (10000 - 1) + 1)
-  }
-
-  const name = formatBytes32String(`LFG MVP #${randomNumber()}`)
+  const formattedName = formatBytes32String(name)
 
   const handleCreateGame = useCallback(async () => {
     const receipt = await fetchWithCatchTxError(() =>
       contract.createNewGame(
-        name,
+        formattedName,
         maxPlayers,
         playTimeRange,
         registrationAmountEther,
@@ -86,7 +83,7 @@ export const useCreateGame = (game) => {
   }, [
     fetchWithCatchTxError,
     contract,
-    name,
+    formattedName,
     maxPlayers,
     playTimeRange,
     registrationAmountEther,

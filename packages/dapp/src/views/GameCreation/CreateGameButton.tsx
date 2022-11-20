@@ -25,6 +25,7 @@ const CreateGameButton: React.FC<React.PropsWithChildren<CreateGameButtonProps>>
   const { isPending, handleCreateGame } = useCreateGame(game)
 
   const {
+    name,
     treasuryFee,
     registrationAmount,
     maxPlayers,
@@ -36,6 +37,7 @@ const CreateGameButton: React.FC<React.PropsWithChildren<CreateGameButtonProps>>
 
   const isGameFieldKO = useMemo(
     () =>
+      !name ||
       !treasuryFee ||
       !registrationAmount ||
       !maxPlayers ||
@@ -43,7 +45,16 @@ const CreateGameButton: React.FC<React.PropsWithChildren<CreateGameButtonProps>>
       !encodedCron ||
       !numberPlayersAllowedToWin ||
       !prizeType,
-    [encodedCron, maxPlayers, numberPlayersAllowedToWin, playTimeRange, prizeType, registrationAmount, treasuryFee],
+    [
+      encodedCron,
+      maxPlayers,
+      name,
+      numberPlayersAllowedToWin,
+      playTimeRange,
+      prizeType,
+      registrationAmount,
+      treasuryFee,
+    ],
   )
 
   const isDisabledButton = useMemo(() => isGameFieldKO || isPending, [isGameFieldKO, isPending])

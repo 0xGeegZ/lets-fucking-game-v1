@@ -12,6 +12,7 @@ const Wrapper = styled.div`
 `
 
 const steps = (t: TranslateFunction) => [
+  t('Game name'),
   t('Game configuration'),
   t('Prizepool configuration'),
   t('Contract creation'),

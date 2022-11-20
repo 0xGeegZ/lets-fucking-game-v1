@@ -124,6 +124,13 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     setShowExpandableSection((prev) => !prev)
   }, [])
 
+  let timezone = 'Etc/UTC'
+  try {
+    timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  } catch (e) {
+    // noop
+  }
+
   useEffect(() => {
     if (!encodedCron) return
 
@@ -135,14 +142,11 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
       //   setCronHumanReadable(`${transform} UTC`)
 
       const interval = parser.parseExpression(encodedCron, { tz: 'Etc/UTC' })
-      setCronHumanReadable(moment(interval.next().toString()).format('hh:mm A'))
+      console.log('🚀 ~ file: GameCard.tsx ~ line 138 ~ useEffect ~ encodedCron', encodedCron)
+      const transform = moment(interval.next().toString()).format('hh:mm A')
+      //   const transform = momentTz.tz(interval.next().toString(), timezone).format('hh:mm A')
+      setCronHumanReadable(`${transform}`)
 
-      //   const timezone = 'Etc/UTC'
-      //   try {
-      //     timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-      //   } catch (e) {
-      //     // noop
-      //   }
       //   console.log('🚀 ~ file: GameCard.tsx ~ line 136 ~ useEffect ~ locale', locale)
       //   console.log('🚀 ~ file: GameCard.tsx ~ line 142 ~ useEffect ~ timezone', timezone)
 
@@ -156,7 +160,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     } catch (e) {
       setCronHumanReadable('')
     }
-  }, [encodedCron])
+  }, [encodedCron, timezone])
 
   // TODO GUIGUI isReady is when userData are loaded ??
   const isReady = game.prizepool !== undefined

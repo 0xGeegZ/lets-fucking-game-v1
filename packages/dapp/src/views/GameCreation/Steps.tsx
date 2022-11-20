@@ -7,6 +7,7 @@ import { GameCreationContext } from './contexts/GameCreationProvider'
 import NoWalletConnected from './WalletNotConnected'
 import PrizepoolConfiguration from './PrizepoolConfiguration'
 import Confirmation from './Confirmation'
+import GameName from './GameName'
 
 const Steps = () => {
   const { t } = useTranslation()
@@ -22,18 +23,22 @@ const Steps = () => {
   }
 
   if (currentStep === 0) {
-    return <GameCreation />
+    return <GameName />
   }
 
   if (currentStep === 1) {
-    return <PrizepoolConfiguration />
+    return <GameCreation />
   }
 
   if (currentStep === 2) {
-    return <GameConfirmationAndContractCreation />
+    return <PrizepoolConfiguration />
   }
 
   if (currentStep === 3) {
+    return <GameConfirmationAndContractCreation />
+  }
+
+  if (currentStep === 4) {
     return <Confirmation />
   }
 

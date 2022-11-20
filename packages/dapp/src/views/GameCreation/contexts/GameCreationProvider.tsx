@@ -2,11 +2,17 @@ import { createContext, useEffect, useMemo, useReducer } from 'react'
 
 import { useWeb3React } from '@pancakeswap/wagmi'
 import { parseEther } from '@ethersproject/units'
+import { formatBytes32String } from '@ethersproject/strings'
 import { TREASURY_FEE_DEFAULT, CREATOR_FEE_DEFAULT } from '../config'
 import { Actions, BNB, ContextType, NFT, State } from './types'
 
+const randomNumber = () => {
+  return Math.floor(Math.random() * (10000 - 1) + 1)
+}
+
 const initialState: State = {
   isInitialized: false,
+  name: `LFG MVP #${randomNumber()}`,
   currentStep: 0,
   treasuryFee: TREASURY_FEE_DEFAULT,
   creatorFee: CREATOR_FEE_DEFAULT,
@@ -37,6 +43,13 @@ const reducer = (state: State, action: Actions): State => {
         ...state,
         isInitialized: true,
         currentStep: action.currentStep,
+      }
+    case 'game_name':
+      return {
+        ...state,
+        isInitialized: true,
+        currentStep: action.currentStep,
+        name: action.name,
       }
     case 'game_creation':
       return {
@@ -110,6 +123,7 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
       previousStep: (currentStep: number) => dispatch({ type: 'previous_step', currentStep: currentStep - 1 }),
       nextStep: (currentStep: number) => dispatch({ type: 'next_step', currentStep: currentStep + 1 }),
       setInitialize: (currentStep: number) => dispatch({ type: 'initialize', currentStep }),
+      setGameName: (currentStep: number, name: string) => dispatch({ type: 'game_name', currentStep, name }),
       setGameCreation: (
         currentStep: number,
         treasuryFee: number,
