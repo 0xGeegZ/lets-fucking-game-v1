@@ -209,6 +209,7 @@ const MaximumPlayersSelection = () => {
     )
   }
 
+  // TODO GUIGUI REPLACE WITH INPUT
   const allowedValuesMaximumPlayers = [
     {
       label: '2 players',

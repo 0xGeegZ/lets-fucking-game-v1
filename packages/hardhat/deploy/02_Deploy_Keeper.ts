@@ -21,21 +21,6 @@ const func: DeployFunction = async function ({
     log: true,
   }
 
-  log('Deploying CronUpkeepDelegate contract')
-  const {
-    address: cronUpkeepDelegateAddress,
-    newlyDeployed: cronUpkeepDelegateNewlyDeployed,
-    receipt: { gasUsed: cronUpkeepDelegateGasUsed },
-  } = await deploy('CronUpkeepDelegate', {
-    ...options,
-  })
-
-  if (cronUpkeepDelegateNewlyDeployed) {
-    log(
-      `✅ Contract CronUpkeepDelegate deployed at ${cronUpkeepDelegateAddress} using ${cronUpkeepDelegateGasUsed} gas`
-    )
-  }
-
   log('Deploying CronExternal contract')
   const {
     address: cronExternalAddress,
@@ -59,12 +44,7 @@ const func: DeployFunction = async function ({
   }
 
   log('Deploying CronUpkeep contract')
-  const cronUpkeepArgs = [
-    deployer,
-    cronUpkeepDelegateAddress,
-    CRON_MAX_JOBS,
-    ethers.utils.toUtf8Bytes(''),
-  ]
+  const cronUpkeepArgs = [deployer, CRON_MAX_JOBS, ethers.utils.toUtf8Bytes('')]
   const {
     address: cronUpkeepAddress,
     newlyDeployed: cronUpkeepNewlyDeployed,

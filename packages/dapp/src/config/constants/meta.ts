@@ -3,7 +3,7 @@ import { ContextApi } from '@pancakeswap/localization'
 import { PageMeta } from './types'
 
 export const DEFAULT_META: PageMeta = {
-  title: "Let's Fucking Game",
+  title: "Let's F*#@$* Game",
   description:
     'Let\'s Fucking Game allows you to create "one button games" and offer them to your twitter community in order to provide them with a fun way to engage with your content. Once the game starts. players have to log in everyday during a random time slot. If you forget, you lose. The last players share the prizes according to the prizepool distribution.',
   image: 'https://avatars.githubusercontent.com/u/115870339?s=200&v=4',
@@ -22,7 +22,7 @@ const getPathList = (t: ContextApi['t']): PathList => {
       '/game': { title: t('Game') },
       '/create-game': { title: t('Create Game') },
     },
-    defaultTitleSuffix: t("Let's Fucking Game"),
+    defaultTitleSuffix: t("Let's F*#@$* Game"),
   }
 }
 

@@ -2,4 +2,3 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { CronUpkeep } from "./CronUpkeep";
-export type { CronUpkeepDelegate } from "./CronUpkeepDelegate";

@@ -120,8 +120,6 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     },
   } = game
 
-  const isPromotedGame = true
-
   const toggleExpandableSection = useCallback(() => {
     setShowExpandableSection((prev) => !prev)
   }, [])
@@ -161,11 +159,11 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
   }, [encodedCron])
 
   // TODO GUIGUI isReady is when userData are loaded ??
-  const isReady = game !== undefined
+  const isReady = game.prizepool !== undefined
 
   // TODO GUIGUI use RoundProgress to display a progressBar if i
   return (
-    <StyledCard isActive={isPromotedGame}>
+    <StyledCard isActive={!isDeleted}>
       <GameCardInnerContainer>
         <CardHeadingSection
           id={id}
@@ -210,6 +208,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           isPaused={isPaused}
           isCreator={isCreator}
           isAdmin={isAdmin}
+          hasLost={hasLost}
           account={account}
         />
       </GameCardInnerContainer>

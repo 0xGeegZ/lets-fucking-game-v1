@@ -1,5 +1,5 @@
-import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction } from 'hardhat-deploy/types'
 
 import { delay } from '../helpers/delay'
 
@@ -20,19 +20,6 @@ const func: DeployFunction = async function ({
   const isLocalDeployment = chainId === '31337' || chainId === '1337'
   log('Local Network Detected, Deploying external contracts')
 
-  log('Deploying Multicall contracts')
-  const {
-    address: multicallAddress,
-    newlyDeployed: multicallNewlyDeployed,
-    receipt: { gasUsed: multicallGasUsed },
-  } = await deploy('Multicall', options)
-
-  if (multicallNewlyDeployed) {
-    log(
-      `✅ Contract Multicall deployed at ${multicallAddress} using ${multicallGasUsed} gas`
-    )
-  }
-
   log('Deploying Multicall3 contracts')
 
   const {
@@ -47,18 +34,10 @@ const func: DeployFunction = async function ({
     )
   }
 
-  if (isLocalDeployment || !multicallNewlyDeployed || !multicall3NewlyDeployed)
-    return
+  if (isLocalDeployment || !multicall3NewlyDeployed) return
 
   await delay(30 * 1000)
   try {
-    log(`✅ Verifying contract Multicall`)
-    await hre.run('verify:verify', {
-      address: multicallAddress,
-      constructorArguments: [],
-    })
-    await delay(10 * 1000)
-
     log(`✅ Verifying contract Multicall3`)
     await hre.run('verify:verify', {
       address: multicall3Address,

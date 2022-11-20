@@ -57,7 +57,7 @@ export const useCreateGame = (game) => {
     return Math.floor(Math.random() * (10000 - 1) + 1)
   }
 
-  const name = formatBytes32String(`LFG ${randomNumber()}`)
+  const name = formatBytes32String(`LFG MVP #${randomNumber()}`)
 
   const handleCreateGame = useCallback(async () => {
     const receipt = await fetchWithCatchTxError(() =>

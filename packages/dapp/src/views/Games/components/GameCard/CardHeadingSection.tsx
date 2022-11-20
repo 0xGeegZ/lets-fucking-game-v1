@@ -71,7 +71,11 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
         {isReady ? <Heading mb="4px">{name}</Heading> : <Skeleton mb="4px" width={60} height={18} />}
         <Flex justifyContent="center" mt="4px">
           {isReady ? <>{isInProgress && <ProgressTag mr="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />}
-          {isReady ? <>{!isRegistering && <StartingTag mr="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />}
+          {isReady ? (
+            <>{!isRegistering && !isInProgress && <StartingTag mr="4px" />}</>
+          ) : (
+            <Skeleton ml="4px" width={42} height={28} />
+          )}
 
           {isReady ? (
             <>{isRegistering && <RegistrationTag ml="4px" />}</>

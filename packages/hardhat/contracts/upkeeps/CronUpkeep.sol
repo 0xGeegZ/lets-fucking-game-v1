@@ -19,7 +19,6 @@
 pragma solidity >=0.8.6;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/proxy/Proxy.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
@@ -37,7 +36,7 @@ import { getRevertMsg } from "@chainlink/contracts/src/v0.8/utils/utils.sol";
  * Users must use the encodeCronString() function to encode their cron jobs before
  * setting them. This keeps all the string manipulation off chain and reduces gas costs.
  */
-contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pausable, Proxy {
+contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pausable {
     using EnumerableSet for EnumerableSet.UintSet;
 
     using CronInternal for Spec;
@@ -57,8 +56,6 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
     error TickTooOld();
     error TickDoesntMatchSpec();
 
-    // TODO GUIGUI TO REMOVE
-    address immutable s_delegate;
     uint256 public immutable s_maxJobs;
     address[] s_delegators;
 
@@ -73,17 +70,14 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
 
     /**
      * @param owner the initial owner of the contract
-     * @param delegate the contract to delegate checkUpkeep calls to
      * @param maxJobs the max number of cron jobs this contract will support
      * @param firstJob an optional encoding of the first cron job
      */
     constructor(
         address owner,
-        address delegate,
         uint256 maxJobs,
         bytes memory firstJob
     ) ConfirmedOwner(owner) {
-        s_delegate = delegate;
         s_maxJobs = maxJobs;
         if (firstJob.length > 0) {
             (address target, bytes memory handler, Spec memory spec) = abi.decode(firstJob, (address, bytes, Spec));
@@ -210,15 +204,15 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
      * @return upkeepNeeded signals if upkeep is needed, performData is an abi encoding
      * of the id and "next tick" of the eligible cron job
      */
-    function checkUpkeep(bytes calldata) external view override whenNotPaused returns (bool, bytes memory) {
-        // function checkUpkeep(bytes calldata)
-        //     external
-        //     view
-        //     override
-        //     whenNotPaused
-        //     cannotExecute
-        //     returns (bool, bytes memory)
-        // {
+    // function checkUpkeep(bytes calldata) external view override whenNotPaused returns (bool, bytes memory) {
+    function checkUpkeep(bytes calldata)
+        external
+        view
+        override
+        whenNotPaused
+        cannotExecute
+        returns (bool, bytes memory)
+    {
         // _delegate(s_delegate);
         // DEV: start at a random spot in the list so that checks are
         // spread evenly among cron jobs
@@ -313,10 +307,6 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
         s_handlerSignatures[newID] = handlerSig(target, handler);
         s_nextCronJobID++;
         emit CronJobCreated(newID, target, handler);
-    }
-
-    function _implementation() internal view override returns (address) {
-        return s_delegate;
     }
 
     function _isExistDelegator(address delegator) internal view returns (bool) {

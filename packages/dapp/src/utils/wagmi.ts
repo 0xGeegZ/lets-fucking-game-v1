@@ -69,7 +69,7 @@ export const injectedConnector = new InjectedConnector({
 export const coinbaseConnector = new CoinbaseWalletConnector({
   chains,
   options: {
-    appName: "Let's Fucking Game",
+    appName: "Let's F*#@$* Game",
     appLogoUrl: 'https://lfgames.xyz/logo.png',
   },
 })

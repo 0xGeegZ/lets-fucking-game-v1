@@ -165,10 +165,12 @@ const initialiseTestData = async function () {
   this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
   this.zeroRegistrationAmount = ethers.utils.parseEther('0')
 
-  this.freeGamePrizepool = 1
-  this.freeGamePrizepoolAmount = ethers.utils.parseEther('1')
+  // this.freeGamePrizepool = 1
+  // this.freeGamePrizepoolmount = ethers.utils.parseEther('1')
+  this.freeGamePrizepool = 0.01
+  this.freeGamePrizepoolAmount = ethers.utils.parseEther('0.01')
 
-  this.gameCreationAmount = ethers.utils.parseEther('0.1')
+  this.gameCreationAmount = ethers.utils.parseEther('0.01')
   this.treasuryFee = 500 // 5%
   this.creatorFee = 500 // 5%
 

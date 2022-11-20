@@ -101,10 +101,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IKeeper__factory>;
     getContractFactory(
-      name: "Multicall",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Multicall__factory>;
-    getContractFactory(
       name: "Multicall3",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Multicall3__factory>;
@@ -112,10 +108,6 @@ declare module "hardhat/types/runtime" {
       name: "CronUpkeep",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.CronUpkeep__factory>;
-    getContractFactory(
-      name: "CronUpkeepDelegate",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.CronUpkeepDelegate__factory>;
 
     getContractAt(
       name: "ERC677Token",
@@ -228,11 +220,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IKeeper>;
     getContractAt(
-      name: "Multicall",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Multicall>;
-    getContractAt(
       name: "Multicall3",
       address: string,
       signer?: ethers.Signer
@@ -242,11 +229,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.CronUpkeep>;
-    getContractAt(
-      name: "CronUpkeepDelegate",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.CronUpkeepDelegate>;
 
     // default types
     getContractFactory(
