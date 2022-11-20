@@ -1,36 +1,29 @@
-/* eslint-disable */
 import { Card, CardBody, CommunityIcon, Flex, Heading, Text } from '@pancakeswap/uikit'
 import { useContext } from 'react'
 
 import { RowBetween } from 'components/Layout/Row'
 import { useTranslation } from '@pancakeswap/localization'
+import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
+import { range } from 'utils'
 import { GameCreationContext } from './contexts/GameCreationProvider'
 import NextStepButton from './NextStepButton'
 import SelectionCard from './SelectionCard'
 import imageTest from '../../../public/images/chains/1.png'
-import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import BackStepButton from './BackStepButton'
 
-// TODO: Refacto by split components
 const AllowedPlayersToWinSelection = () => {
-  const { numberPlayersAllowedToWin: selectedAllowedNumber, prizeType, currentStep, actions } = useGameContext()
+  const {
+    numberPlayersAllowedToWin: selectedAllowedNumber,
+    prizeType,
+    currentStep,
+    actions,
+    maxPlayers,
+  } = useGameContext()
 
-  const handleAllowedWinners = (value) => {
-    actions.setPrizeConfiguration(+value, prizeType, currentStep)
-  }
+  const halfNumberPlayers = Math.floor(maxPlayers * 0.5)
+  const listOfAllowedNumber = [...range(1, halfNumberPlayers)]
 
-  // TODO get number of player dynamically
-  const numberPlayers = 10
-  let halfNumberPlayers
-  const listOfAllowedNumber = []
-  if (numberPlayers % 2 === 0) {
-    halfNumberPlayers = numberPlayers / 2
-  } else {
-    halfNumberPlayers = numberPlayers / 2 - 0.5
-  }
-  for (let i = 0; i < halfNumberPlayers; i++) {
-    listOfAllowedNumber.push(i + 1)
-  }
+  const handleAllowedWinners = (value) => actions.setPrizeConfiguration(+value, prizeType, currentStep)
 
   return (
     <>
@@ -40,7 +33,7 @@ const AllowedPlayersToWinSelection = () => {
             Number of players allowed to win
           </Heading>
           <Text as="p" color="textSubtle" mb="24px">
-            Make a choice !
+            Each player will win a proportional share of the prize pool
           </Text>
           {listOfAllowedNumber &&
             listOfAllowedNumber.map((iteration) => {
@@ -66,7 +59,6 @@ const AllowedPlayersToWinSelection = () => {
   )
 }
 
-// TODO: Refacto by split components
 const PrizeTypeSelection = () => {
   const { prizeType: selectedPrizeType, numberPlayersAllowedToWin, currentStep, actions } = useGameContext()
 

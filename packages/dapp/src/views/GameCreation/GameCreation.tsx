@@ -1,10 +1,16 @@
-/* eslint-disable */
 import { Flex, Heading, Text, Input, useToast, CheckmarkIcon, WarningIcon } from '@pancakeswap/uikit'
-import { ChangeEvent, useCallback, useContext, useState } from 'react'
-import styled, { css } from 'styled-components'
-import cronstrue from 'cronstrue'
+import { ChangeEvent, useState } from 'react'
+import styled from 'styled-components'
 import momentTz from 'moment-timezone'
 import parser from 'cron-parser'
+
+import { useTranslation } from '@pancakeswap/localization'
+import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
+import Select, { OptionProps } from 'components/Select/Select'
+import { parseEther } from '@ethersproject/units'
+import useActiveWeb3React from 'hooks/useActiveWeb3React'
+import { isValidCron } from 'cron-validator'
+import Tooltip from 'views/Games/components/GameCardButtons/Tooltip'
 import {
   PLAYERS_MAX_LENGTH,
   PLAYERS_MIN_LENGTH,
@@ -15,20 +21,7 @@ import {
   AUTHORIZED_AMOUNTS,
 } from './config'
 
-import { RowBetween } from 'components/Layout/Row'
-import { useTranslation } from '@pancakeswap/localization'
-import { GameCreationContext } from './contexts/GameCreationProvider'
 import NextStepButton from './NextStepButton'
-import SelectionCard from './SelectionCard'
-import imageTest from '../../../public/images/chains/1.png'
-import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
-import Select, { OptionProps } from 'components/Select/Select'
-import { parseEther } from '@ethersproject/units'
-import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { TREASURY_FEE_DEFAULT, CREATOR_FEE_DEFAULT } from './config'
-import { isValidCron } from 'cron-validator'
-import { Input as NumericalInput } from 'components/NumericalInput'
-import Tooltip from 'views/Games/components/GameCardButtons/Tooltip'
 
 import BackStepButton from './BackStepButton'
 
@@ -106,23 +99,23 @@ const FeeSelection = () => {
           >
             <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
               <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-                {'Treasury fee (for us)'}
+                Treasury fee (for us)
               </Text>
               <Select
                 defaultOptionIndex={0}
                 options={allowedValuesTreasuryFee}
                 onOptionChange={handleTreasuryFeeOptionChange}
-              ></Select>
+              />
             </Flex>
             <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
               <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-                {'Creator fee (for you)'}
+                Creator fee (for you)
               </Text>
               <Select
                 defaultOptionIndex={2}
                 options={allowedValuesCreatorFee}
                 onOptionChange={handleCreatorFeeOptionChange}
-              ></Select>
+              />
             </Flex>
           </Flex>
         </>
@@ -132,8 +125,7 @@ const FeeSelection = () => {
 }
 
 const RegistrationAmountSelection = () => {
-  const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
-    useGameContext()
+  const { treasuryFee, creatorFee, maxPlayers, playTimeRange, encodedCron, currentStep, actions } = useGameContext()
 
   const handleRegistrationAmountOptionChange = (option: OptionProps) => {
     actions.setGameCreation(currentStep, treasuryFee, creatorFee, option.value, maxPlayers, playTimeRange, encodedCron)
@@ -155,13 +147,13 @@ const RegistrationAmountSelection = () => {
       {authorizedAmounts && (
         <>
           <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-            {'Registration amount'}
+            Registration amount
           </Text>
           <Select
             defaultOptionIndex={2}
             options={authorizedAmounts}
             onOptionChange={handleRegistrationAmountOptionChange}
-          ></Select>
+          />
         </>
       )}
     </>
@@ -193,7 +185,7 @@ const MaximumPlayersSelection = () => {
   return (
     <>
       <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-        {'Number of players'}
+        Number of players
       </Text>
       <InputWrap>
         <Input
@@ -218,7 +210,7 @@ const MaximumPlayersSelection = () => {
 }
 
 const PlayTimeRangeSelection = () => {
-  const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
+  const { treasuryFee, creatorFee, registrationAmount, maxPlayers, encodedCron, currentStep, actions } =
     useGameContext()
 
   const handlePlayTimeRangeOptionChange = (option: OptionProps) => {
@@ -245,13 +237,13 @@ const PlayTimeRangeSelection = () => {
       {allowedValuesPlayTimeRange && (
         <>
           <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-            {'Daily play time range'}
+            Daily play time range
           </Text>
           <Select
             defaultOptionIndex={2}
             options={allowedValuesPlayTimeRange}
             onOptionChange={handlePlayTimeRangeOptionChange}
-          ></Select>
+          />
         </>
       )}
     </>
@@ -259,7 +251,6 @@ const PlayTimeRangeSelection = () => {
 }
 
 const EncodedCronSelection = () => {
-  const { toastError, toastSuccess } = useToast()
   const { t } = useTranslation()
 
   const defaultTimezone = 'Etc/UTC'
@@ -293,17 +284,8 @@ const EncodedCronSelection = () => {
     }
   })
 
-  const [encodedCron, setEncodedCron] = useState(allowedValuesCron[17].value)
-
   const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, currentStep, actions } =
     useGameContext()
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target
-    setEncodedCron(value)
-
-    actions.setGameCreation(currentStep, treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, value)
-  }
 
   const handleCronOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
@@ -319,17 +301,15 @@ const EncodedCronSelection = () => {
 
   return (
     <>
-      {
-        <>
-          <Text bold style={{ display: 'flex', alignItems: 'center' }}>
-            <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
-              {'Daily game draw'}
-            </Text>
-            <Tooltip content={<Text>{`${t('Based on your current timezone')} : ${timezone}`}</Text>} />
+      <>
+        <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+          <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
+            Daily game draw
           </Text>
-          <Select defaultOptionIndex={17} options={allowedValuesCron} onOptionChange={handleCronOptionChange}></Select>
-        </>
-      }
+          <Tooltip content={<Text>{`${t('Based on your current timezone')} : ${timezone}`}</Text>} />
+        </Text>
+        <Select defaultOptionIndex={17} options={allowedValuesCron} onOptionChange={handleCronOptionChange} />
+      </>
     </>
   )
 }
@@ -377,7 +357,7 @@ const OtherOptionsSelection = () => {
 const GameCreation: React.FC = () => {
   const { actions, currentStep, treasuryFee, registrationAmount, maxPlayers, playTimeRange, encodedCron } =
     useGameContext()
-  const { toastError, toastSuccess } = useToast()
+  const { toastError } = useToast()
 
   const checkFieldsAndValidate = () => {
     if (!isValidCron(encodedCron)) return toastError(t('Error'), t('Wrong entered Cron'))
@@ -385,7 +365,7 @@ const GameCreation: React.FC = () => {
     if (maxPlayers < PLAYERS_MIN_LENGTH || maxPlayers > PLAYERS_MAX_LENGTH)
       return toastError(t('Error'), t('Number of players should be between 2 and 100'))
 
-    actions.nextStep(currentStep + 1)
+    return actions.nextStep(currentStep + 1)
   }
 
   const { t } = useTranslation()
