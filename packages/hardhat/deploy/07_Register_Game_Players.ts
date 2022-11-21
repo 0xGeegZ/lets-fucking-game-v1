@@ -1,8 +1,11 @@
 import { ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
+import { networkConfig } from '../config/networkConfig'
+
 const func: DeployFunction = async function ({
   deployments,
+  getChainId,
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
   const { log } = deployments
@@ -14,7 +17,12 @@ const func: DeployFunction = async function ({
 
   const deployer = await ethers.getSigner(deployerAddress)
 
-  const registrationAmount = ethers.utils.parseEther('0.0001')
+  const chainId = await getChainId()
+
+  const gameConfig = networkConfig[chainId].gameConfig
+  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
+
+  const registrationAmount = gameConfig.REGISTRATION_AMOUNT_DEFAULT
 
   const { address: cronExternalAddress } = await deployments.get('CronExternal')
   const libraries = {

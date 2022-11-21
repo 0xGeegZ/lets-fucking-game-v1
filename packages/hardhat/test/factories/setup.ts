@@ -1,11 +1,8 @@
 import { deployments, ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
+import { defaultGameConfig } from '../../config/networkConfig'
 import { ONE_DAY_IN_SECONDS } from '../helpers'
-
-const AUTHORIZED_AMOUNTS = [
-  0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
-]
 
 const setupTest = deployments.createFixture(
   async ({
@@ -187,11 +184,12 @@ const initialiseTestData = async function () {
   // TODO Implement business logic to cover keeper in test
   this.mockKeeper = mockKeeper
 
-  this.encodedCron = '0 18 * * *'
+  this.encodedCron = defaultGameConfig.ENCODED_CRON_DEFAULT
 
-  this.authorizedAmounts = AUTHORIZED_AMOUNTS.map((amount) =>
-    ethers.utils.parseEther(`${amount}`)
-  )
+  this.authorizedAmounts =
+    defaultGameConfig.AUTHORIZED_REGISTRATION_AMOUNTS.map((amount) =>
+      ethers.utils.parseEther(`${amount}`)
+    )
 
   this.prizes = [
     {
