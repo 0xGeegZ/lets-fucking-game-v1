@@ -16,6 +16,7 @@ export type Actions =
       treasuryFee: number
       creatorFee: number
       registrationAmount: string
+      freeGamePrizepoolAmount: string
       maxPlayers: number
       playTimeRange: number
       encodedCron: string
@@ -53,6 +54,7 @@ export interface State {
   treasuryFee: number
   creatorFee: number
   registrationAmount: string
+  freeGamePrizepoolAmount: string
   maxPlayers: number
   playTimeRange: number
   encodedCron: string
@@ -73,6 +75,7 @@ export interface ContextType extends State {
       treasuryFee: number,
       creatorFee: number,
       registrationAmount: string,
+      freeGamePrizepoolAmount: string,
       maxPlayers: number,
       playTimeRange: number,
       encodedCron: string,
@@ -88,6 +91,7 @@ export interface ContextType extends State {
       treasuryFee: number,
       creatorFee: number,
       registrationAmount: string,
+      freeGamePrizepoolAmount: string,
       maxPlayers: number,
       playTimeRange: number,
       encodedCron: string,

@@ -38,6 +38,7 @@ const RecapConfigGame = () => {
     treasuryFee,
     creatorFee,
     registrationAmount,
+    freeGamePrizepoolAmount,
     maxPlayers,
     playTimeRange,
     encodedCron,
@@ -76,10 +77,14 @@ const RecapConfigGame = () => {
       <Card mb="24px">
         <CardBody>
           <Heading as="h4" scale="lg" mb="8px">
-            Confirm configuration for your game : {name}
+            Confirm configuration for your game
           </Heading>
           <Text as="p" color="textSubtle" mb="24px">
             You could update configuration later if game is not in progress
+          </Text>
+
+          <Text as="h2" mt="16px">
+            {name}
           </Text>
 
           <Flex
@@ -89,59 +94,62 @@ const RecapConfigGame = () => {
             pl={['4px', null, '0']}
             mb="8px"
           >
-            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
+            <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
               <BulletList>
                 <li>
-                  <Text textAlign="center" color="textSubtle" display="inline">
+                  <Text color="textSubtle" display="inline">
                     Registration amount :{' '}
-                    {registrationAmount ? parseFloat(formatEther(registrationAmount.toString())) : '0'} {chainSymbol}
+                    {registrationAmount !== '0'
+                      ? `${parseFloat(formatEther(registrationAmount.toString()))} ${chainSymbol}`
+                      : 'FREE'}
                   </Text>
                 </li>
+
                 <li>
-                  <Text textAlign="center" color="textSubtle" display="inline">
-                    Maximum players : {maxPlayers}
-                  </Text>
-                </li>
-              </BulletList>
-            </Flex>
-            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
-              <BulletList>
-                <li>
-                  <Text textAlign="center" color="textSubtle" display="inline">
-                    Daily play time range : {playTimeRange}H
-                  </Text>
-                </li>
-                <li>
-                  <Text textAlign="center" color="textSubtle" display="inline">
+                  <Text color="textSubtle" display="inline">
                     Daily draw : {cronHumanReadable}
                   </Text>
                 </li>
-              </BulletList>
-            </Flex>
-            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
-              <BulletList>
+
                 <li>
-                  <Text textAlign="center" color="textSubtle" display="inline">
+                  <Text color="textSubtle" display="inline">
                     Winners : {numberPlayersAllowedToWin}
                   </Text>
                 </li>
+
                 <li>
-                  <Text textAlign="center" color="textSubtle" display="inline">
-                    Prize type : {chainSymbol}
-                    {/* {prizeType} */}
+                  <Text fontSize="12px" color="textSubtle" display="inline" lineHeight={2.5}>
+                    Treasury fee : {treasuryFee / 100} %
                   </Text>
                 </li>
               </BulletList>
             </Flex>
-            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
+            <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
               <BulletList>
                 <li>
-                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline" lineHeight={2.5}>
-                    Treasury fee : {treasuryFee / 100} %
+                  <Text color="textSubtle" display="inline">
+                    Prizepool :{' '}
+                    {registrationAmount !== '0'
+                      ? parseFloat(formatEther(`${registrationAmount * maxPlayers}`))
+                      : parseFloat(freeGamePrizepoolAmount)}{' '}
+                    {chainSymbol}
                   </Text>
                 </li>
+
                 <li>
-                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline">
+                  <Text color="textSubtle" display="inline">
+                    Daily play time range : {playTimeRange}H
+                  </Text>
+                </li>
+
+                <li>
+                  <Text color="textSubtle" display="inline">
+                    Maximum players : {maxPlayers}
+                  </Text>
+                </li>
+
+                <li>
+                  <Text fontSize="12px" color="textSubtle" display="inline">
                     Creator fee: {creatorFee / 100} %
                   </Text>
                 </li>

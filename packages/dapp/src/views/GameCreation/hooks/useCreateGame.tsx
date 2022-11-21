@@ -24,6 +24,7 @@ export const useCreateGame = (game) => {
     maxPlayers,
     playTimeRange,
     registrationAmount,
+    freeGamePrizepoolAmount,
     treasuryFee,
     creatorFee,
     encodedCron,
@@ -31,14 +32,23 @@ export const useCreateGame = (game) => {
     // prizeType,
   } = game
 
-  const parsedRegistrationAmount: number = registrationAmount
-    ? parseFloat(formatEther(registrationAmount.toString()))
-    : 0
+  const parsedRegistrationAmount: number = registrationAmount ? parseFloat(formatEther(`${registrationAmount}`)) : 0
+
+  // TODO GUIGUI Load gameCreationAmount directly from smart contract
+  const gameCreationAmountEther = GAME_CREATION_AMOUNT
+
+  const registrationAmountEther = parseEther(`${parsedRegistrationAmount}`)
+
+  const totalValueAmount = parsedRegistrationAmount
+    ? gameCreationAmountEther
+    : gameCreationAmountEther.add(parseEther(`${freeGamePrizepoolAmount}`))
+
+  const prizepool = parsedRegistrationAmount ? parsedRegistrationAmount * maxPlayers : freeGamePrizepoolAmount
 
   const createPrize = (index, totalWinners) => {
     return {
       position: index,
-      amount: parseEther(`${(parsedRegistrationAmount * maxPlayers) / totalWinners}`),
+      amount: parseEther(`${prizepool / totalWinners}`),
       // TODO use prizeType
       standard: 0,
       contractAddress: ZERO_ADDRESS,
@@ -48,11 +58,6 @@ export const useCreateGame = (game) => {
 
   const mapper = new Array(numberPlayersAllowedToWin).fill('').map((_, i) => i + 1)
   const prizes = mapper.map((index) => createPrize(index, numberPlayersAllowedToWin))
-
-  // TODO GUIGUI Load gameCreationAmount directly from smart contract
-  const gameCreationAmountEther = GAME_CREATION_AMOUNT
-
-  const registrationAmountEther = parseEther(parsedRegistrationAmount.toString())
 
   const formattedName = formatBytes32String(name)
 
@@ -67,7 +72,7 @@ export const useCreateGame = (game) => {
         creatorFee,
         encodedCron,
         prizes,
-        { value: gameCreationAmountEther },
+        { value: totalValueAmount },
       ),
     )
 
@@ -91,7 +96,7 @@ export const useCreateGame = (game) => {
     creatorFee,
     encodedCron,
     prizes,
-    gameCreationAmountEther,
+    totalValueAmount,
     toastSuccess,
     t,
     actions,

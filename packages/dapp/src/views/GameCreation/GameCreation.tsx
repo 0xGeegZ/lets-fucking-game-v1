@@ -3,6 +3,7 @@ import { ChangeEvent, useState } from 'react'
 import styled from 'styled-components'
 import momentTz from 'moment-timezone'
 import parser from 'cron-parser'
+import { escapeRegExp } from 'utils'
 
 import { useTranslation } from '@pancakeswap/localization'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
@@ -40,9 +41,20 @@ const Indicator = styled(Flex)`
   width: 24px;
 `
 
+const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`) // match escaped "." characters via in a non-capturing group
+
 const FeeSelection = () => {
-  const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
-    useGameContext()
+  const {
+    treasuryFee,
+    creatorFee,
+    registrationAmount,
+    freeGamePrizepoolAmount,
+    maxPlayers,
+    playTimeRange,
+    encodedCron,
+    currentStep,
+    actions,
+  } = useGameContext()
 
   const handleTreasuryFeeOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
@@ -50,6 +62,7 @@ const FeeSelection = () => {
       option.value,
       creatorFee,
       registrationAmount,
+      freeGamePrizepoolAmount,
       maxPlayers,
       playTimeRange,
       encodedCron,
@@ -62,6 +75,7 @@ const FeeSelection = () => {
       treasuryFee,
       option.value,
       registrationAmount,
+      freeGamePrizepoolAmount,
       maxPlayers,
       playTimeRange,
       encodedCron,
@@ -84,7 +98,7 @@ const FeeSelection = () => {
 
   return (
     <>
-      <Text as="h2" mb="8px" mt="24px">
+      <Text as="h2" mb="8px" mt="16px">
         Creator & Treasury fee
       </Text>
 
@@ -125,10 +139,28 @@ const FeeSelection = () => {
 }
 
 const RegistrationAmountSelection = () => {
-  const { treasuryFee, creatorFee, maxPlayers, playTimeRange, encodedCron, currentStep, actions } = useGameContext()
+  const {
+    treasuryFee,
+    creatorFee,
+    freeGamePrizepoolAmount,
+    maxPlayers,
+    playTimeRange,
+    encodedCron,
+    currentStep,
+    actions,
+  } = useGameContext()
 
   const handleRegistrationAmountOptionChange = (option: OptionProps) => {
-    actions.setGameCreation(currentStep, treasuryFee, creatorFee, option.value, maxPlayers, playTimeRange, encodedCron)
+    actions.setGameCreation(
+      currentStep,
+      treasuryFee,
+      creatorFee,
+      option.value,
+      freeGamePrizepoolAmount,
+      maxPlayers,
+      playTimeRange,
+      encodedCron,
+    )
   }
 
   const { chain } = useActiveWeb3React()
@@ -160,9 +192,116 @@ const RegistrationAmountSelection = () => {
   )
 }
 
+const FreeGameAmountSelection = () => {
+  const {
+    registrationAmount,
+    freeGamePrizepoolAmount,
+    treasuryFee,
+    creatorFee,
+    maxPlayers,
+    playTimeRange,
+    encodedCron,
+    currentStep,
+    actions,
+  } = useGameContext()
+
+  const { t } = useTranslation()
+
+  const { chain } = useActiveWeb3React()
+
+  const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
+
+  const [isValid, setIsValid] = useState(true)
+  const [message, setMessage] = useState('')
+
+  const handleChange = (value: string) => {
+    // const errorMessage = 'Number of players should be between 2 and 100.'
+
+    // if (value < PLAYERS_MIN_LENGTH || value > PLAYERS_MAX_LENGTH) {
+    //   setIsValid(false)
+    //   setMessage(errorMessage)
+    // } else {
+    //   setIsValid(true)
+    //   setMessage('')
+    // }
+
+    actions.setGameCreation(
+      currentStep,
+      treasuryFee,
+      creatorFee,
+      registrationAmount,
+      value,
+      maxPlayers,
+      playTimeRange,
+      encodedCron,
+    )
+  }
+
+  return (
+    <>
+      {registrationAmount && registrationAmount === '0' ? (
+        <>
+          <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+            <Text fontSize="12px" textTransform="uppercase" color="textSubtle" fontWeight={600}>
+              Prizepool amount
+            </Text>
+            <Tooltip
+              content={<Text>{t('You will have to send the prizepool amount during the game creation')}</Text>}
+            />
+          </Text>
+          {/* // TODO GUIGUI USE CurrencyInputPanel */}
+          <InputWrap>
+            <Input
+              value={freeGamePrizepoolAmount}
+              //   onChange={handleChange}
+              isWarning={freeGamePrizepoolAmount && !isValid}
+              isSuccess={freeGamePrizepoolAmount && isValid}
+              onChange={(event) => {
+                // replace commas with periods, because we exclusively uses period as the decimal separator
+                const nextUserInput = event.target.value.replace(/,/g, '.')
+                if (nextUserInput === '' || inputRegex.test(escapeRegExp(nextUserInput))) {
+                  handleChange(nextUserInput)
+                }
+              }}
+              // universal input options
+              inputMode="decimal"
+              autoComplete="off"
+              autoCorrect="off"
+              // text-specific options
+              type="text"
+              pattern="^[1-9][0-9]?$|^100$"
+              minLength={1}
+              maxLength={79}
+              spellCheck="false"
+            />
+            <Indicator>
+              {isValid && freeGamePrizepoolAmount && <CheckmarkIcon color="success" />}
+              {!isValid && freeGamePrizepoolAmount && <WarningIcon color="failure" />}
+            </Indicator>
+          </InputWrap>
+          <Text color="failure" fontSize="14px" py="4px" mb="16px" style={{ minHeight: 'auto' }}>
+            {message}
+          </Text>
+        </>
+      ) : (
+        <Text color="failure" fontSize="14px" py="4px" mb="16px" style={{ minHeight: 'auto' }} />
+      )}
+    </>
+  )
+}
+
 const MaximumPlayersSelection = () => {
-  const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, encodedCron, currentStep, actions } =
-    useGameContext()
+  const {
+    treasuryFee,
+    creatorFee,
+    registrationAmount,
+    freeGamePrizepoolAmount,
+    maxPlayers,
+    playTimeRange,
+    encodedCron,
+    currentStep,
+    actions,
+  } = useGameContext()
 
   const [isValid, setIsValid] = useState(true)
   const [message, setMessage] = useState('')
@@ -179,7 +318,16 @@ const MaximumPlayersSelection = () => {
       setMessage('')
     }
 
-    actions.setGameCreation(currentStep, treasuryFee, creatorFee, registrationAmount, value, playTimeRange, encodedCron)
+    actions.setGameCreation(
+      currentStep,
+      treasuryFee,
+      creatorFee,
+      registrationAmount,
+      freeGamePrizepoolAmount,
+      value,
+      playTimeRange,
+      encodedCron,
+    )
   }
 
   return (
@@ -202,7 +350,7 @@ const MaximumPlayersSelection = () => {
           {!isValid && maxPlayers && <WarningIcon color="failure" />}
         </Indicator>
       </InputWrap>
-      <Text color="failure" fontSize="14px" py="4px" mb="16px" style={{ minHeight: '30px' }}>
+      <Text color="failure" fontSize="14px" py="4px" mb="16px" style={{ minHeight: 'auto' }}>
         {message}
       </Text>
     </>
@@ -210,8 +358,16 @@ const MaximumPlayersSelection = () => {
 }
 
 const PlayTimeRangeSelection = () => {
-  const { treasuryFee, creatorFee, registrationAmount, maxPlayers, encodedCron, currentStep, actions } =
-    useGameContext()
+  const {
+    treasuryFee,
+    creatorFee,
+    registrationAmount,
+    freeGamePrizepoolAmount,
+    maxPlayers,
+    encodedCron,
+    currentStep,
+    actions,
+  } = useGameContext()
 
   const handlePlayTimeRangeOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
@@ -219,6 +375,7 @@ const PlayTimeRangeSelection = () => {
       treasuryFee,
       creatorFee,
       registrationAmount,
+      freeGamePrizepoolAmount,
       maxPlayers,
       option.value,
       encodedCron,
@@ -284,8 +441,16 @@ const EncodedCronSelection = () => {
     }
   })
 
-  const { treasuryFee, creatorFee, registrationAmount, maxPlayers, playTimeRange, currentStep, actions } =
-    useGameContext()
+  const {
+    treasuryFee,
+    creatorFee,
+    registrationAmount,
+    freeGamePrizepoolAmount,
+    maxPlayers,
+    playTimeRange,
+    currentStep,
+    actions,
+  } = useGameContext()
 
   const handleCronOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
@@ -293,6 +458,7 @@ const EncodedCronSelection = () => {
       treasuryFee,
       creatorFee,
       registrationAmount,
+      freeGamePrizepoolAmount,
       maxPlayers,
       playTimeRange,
       option.value,
@@ -325,22 +491,7 @@ const OtherOptionsSelection = () => {
         alignItems="center"
         pr={[null, null, '4px']}
         pl={['4px', null, '0']}
-        mb="16px"
-      >
-        <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
-          <RegistrationAmountSelection />
-        </Flex>
-
-        <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
-          <MaximumPlayersSelection />
-        </Flex>
-      </Flex>
-      <Flex
-        justifyContent="space-between"
-        alignItems="center"
-        pr={[null, null, '4px']}
-        pl={['4px', null, '0']}
-        mb="8px"
+        mb="24px"
       >
         <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
           <PlayTimeRangeSelection />
@@ -348,6 +499,22 @@ const OtherOptionsSelection = () => {
 
         <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
           <EncodedCronSelection />
+        </Flex>
+      </Flex>
+      <Flex
+        justifyContent="space-between"
+        alignItems="center"
+        pr={[null, null, '4px']}
+        pl={['4px', null, '0']}
+        mb="24px"
+      >
+        <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
+          <RegistrationAmountSelection />
+          <FreeGameAmountSelection />
+        </Flex>
+
+        <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
+          <MaximumPlayersSelection />
         </Flex>
       </Flex>
     </>
