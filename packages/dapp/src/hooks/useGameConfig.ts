@@ -7,7 +7,7 @@ export const useGameConfig = () => {
   const { chainId } = useActiveChainId()
 
   const { gameConfig } = networkConfig[chainId]
-  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
+  if (!gameConfig) throw new Error(`No game config found for chain id ${chainId}`)
 
   return useMemo(() => gameConfig, [gameConfig])
 }

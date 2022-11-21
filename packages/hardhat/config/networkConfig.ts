@@ -77,7 +77,6 @@ export const networkConfig: Record<
     gameConfig: {
       ...defaultGameConfig,
       GAME_CREATION_AMOUNT: parseEther('0.5'),
-      PLAYERS_DEFAULT: 5,
     },
   },
   '97': {
@@ -99,7 +98,7 @@ export const networkConfig: Record<
     gameConfig: {
       ...defaultGameConfig,
       GAME_CREATION_AMOUNT: parseEther('0.05'),
-      PLAYERS_DEFAULT: 6,
+      PLAYERS_DEFAULT: 5,
     },
   },
   '80001': {
@@ -110,7 +109,7 @@ export const networkConfig: Record<
     gameConfig: {
       ...defaultGameConfig,
       GAME_CREATION_AMOUNT: parseEther('1'),
-      PLAYERS_DEFAULT: 4,
+      PLAYERS_DEFAULT: 5,
     },
   },
 }

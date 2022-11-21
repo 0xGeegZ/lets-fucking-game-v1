@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import momentTz from 'moment-timezone'
 import parser from 'cron-parser'
 import { escapeRegExp } from 'utils'
+import { useGameConfig } from 'hooks/useGameConfig'
 
 import { useTranslation } from '@pancakeswap/localization'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
@@ -34,10 +35,7 @@ const Indicator = styled(Flex)`
 const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`) // match escaped "." characters via in a non-capturing group
 
 const FeeSelection = () => {
-  const { chainId } = useActiveWeb3React()
-
-  const { gameConfig } = networkConfig[chainId]
-  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
+  const { AUTHORIZED_TREASURY_FEE, AUTHORIZED_CREATOR_FEE } = useGameConfig()
 
   const {
     treasuryFee,
@@ -77,14 +75,14 @@ const FeeSelection = () => {
     )
   }
 
-  const allowedValuesTreasuryFee = gameConfig.AUTHORIZED_TREASURY_FEE.map((fee) => {
+  const allowedValuesTreasuryFee = AUTHORIZED_TREASURY_FEE.map((fee) => {
     return {
       label: `${fee}%`,
       value: fee * 100,
     }
   })
 
-  const allowedValuesCreatorFee = gameConfig.AUTHORIZED_CREATOR_FEE.map((fee) => {
+  const allowedValuesCreatorFee = AUTHORIZED_CREATOR_FEE.map((fee) => {
     return {
       label: `${fee}%`,
       value: fee * 100,
@@ -158,14 +156,13 @@ const RegistrationAmountSelection = () => {
     )
   }
 
-  const { chain, chainId } = useActiveWeb3React()
+  const { chain } = useActiveWeb3React()
 
-  const { gameConfig } = networkConfig[chainId]
-  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
+  const { AUTHORIZED_REGISTRATION_AMOUNTS } = useGameConfig()
 
   const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
 
-  const authorizedAmounts = gameConfig.AUTHORIZED_REGISTRATION_AMOUNTS.map((amount) => {
+  const authorizedAmounts = AUTHORIZED_REGISTRATION_AMOUNTS.map((amount) => {
     return {
       label: `${amount} ${chainSymbol}`,
       value: parseEther(`${amount}`).toString(),
@@ -304,16 +301,13 @@ const MaximumPlayersSelection = () => {
   const [isValid, setIsValid] = useState(true)
   const [message, setMessage] = useState('')
 
-  const { chainId } = useActiveWeb3React()
-
-  const { gameConfig } = networkConfig[chainId]
-  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
+  const { PLAYERS_MIN_LENGTH, PLAYERS_MAX_LENGTH } = useGameConfig()
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
     const errorMessage = 'Number of players should be between 2 and 100.'
 
-    if (Number(value) < gameConfig.PLAYERS_MIN_LENGTH || Number(value) > gameConfig.PLAYERS_MAX_LENGTH) {
+    if (Number(value) < PLAYERS_MIN_LENGTH || Number(value) > PLAYERS_MAX_LENGTH) {
       setIsValid(false)
       setMessage(errorMessage)
     } else {
@@ -361,10 +355,7 @@ const MaximumPlayersSelection = () => {
 }
 
 const PlayTimeRangeSelection = () => {
-  const { chainId } = useActiveWeb3React()
-
-  const { gameConfig } = networkConfig[chainId]
-  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
+  const { AUTHORIZED_PLAY_TIME_RANGE } = useGameConfig()
 
   const {
     treasuryFee,
@@ -390,7 +381,7 @@ const PlayTimeRangeSelection = () => {
     )
   }
 
-  const allowedValuesPlayTimeRange = gameConfig.AUTHORIZED_PLAY_TIME_RANGE.map((time) => {
+  const allowedValuesPlayTimeRange = AUTHORIZED_PLAY_TIME_RANGE.map((time) => {
     return {
       label: `${time} hour${time > 1 ? 's' : ''}`,
       value: time,
@@ -418,10 +409,7 @@ const PlayTimeRangeSelection = () => {
 const EncodedCronSelection = () => {
   const { t } = useTranslation()
 
-  const { chainId } = useActiveWeb3React()
-
-  const { gameConfig } = networkConfig[chainId]
-  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
+  const { AUTHORIZED_CRONS } = useGameConfig()
 
   const defaultTimezone = 'Etc/UTC'
   let timezone
@@ -431,7 +419,7 @@ const EncodedCronSelection = () => {
     timezone = defaultTimezone
   }
 
-  const allowedValuesCron = gameConfig.AUTHORIZED_CRONS.map((cronHour) => {
+  const allowedValuesCron = AUTHORIZED_CRONS.map((cronHour) => {
     const cron = `0 ${cronHour} * * *`
     let label = ''
     try {
@@ -539,15 +527,12 @@ const GameCreation: React.FC = () => {
     useGameContext()
   const { toastError } = useToast()
 
-  const { chainId } = useActiveWeb3React()
-
-  const { gameConfig } = networkConfig[chainId]
-  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
+  const { PLAYERS_MIN_LENGTH, PLAYERS_MAX_LENGTH } = useGameConfig()
 
   const checkFieldsAndValidate = () => {
     if (!isValidCron(encodedCron)) return toastError(t('Error'), t('Wrong entered Cron'))
 
-    if (maxPlayers < gameConfig.PLAYERS_MIN_LENGTH || maxPlayers > gameConfig.PLAYERS_MAX_LENGTH)
+    if (maxPlayers < PLAYERS_MIN_LENGTH || maxPlayers > PLAYERS_MAX_LENGTH)
       return toastError(t('Error'), t('Number of players should be between 2 and 100'))
 
     return actions.nextStep(currentStep + 1)

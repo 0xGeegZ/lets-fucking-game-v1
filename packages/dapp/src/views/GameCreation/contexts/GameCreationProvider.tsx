@@ -96,37 +96,12 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
   const { account } = useWeb3React()
 
   // TODO GUIGUI FIRST LOAD gameConfig with specific hook
-  // Then load data for current chain, then initialise state defaults values
   // Then pass data to each function in actions
-
-  //   const { chainId } = useActiveWeb3React()
-
-  //   const { gameConfig } = networkConfig[chainId]
-  //   if (!gameConfig) throw new Error('No game config found for chain id', chainId)
-  //  const { GAME_CREATION_AMOUNT, NAME_MIN_LENGTH, NAME_MAX_LENGTH } = useGameConfig()
+  //   const gameConfig = useGameConfig()
 
   // Initial checks
   useEffect(() => {
-    let isSubscribed = true
-
-    const fetchData = async () => {
-      // TODO LOAD INITIAL DATA (if needed)
-
-      dispatch({ type: 'initialize', currentStep: 0 })
-
-      // When changing wallets quickly unmounting before the hasClaim finished causes a React error
-      if (isSubscribed) {
-        dispatch({ type: 'initialize', currentStep: 0 })
-      }
-    }
-
-    if (account) {
-      fetchData()
-    }
-
-    return () => {
-      isSubscribed = false
-    }
+    if (account) dispatch({ type: 'initialize', currentStep: 0 })
   }, [account, dispatch])
 
   const actions: ContextType['actions'] = useMemo(
