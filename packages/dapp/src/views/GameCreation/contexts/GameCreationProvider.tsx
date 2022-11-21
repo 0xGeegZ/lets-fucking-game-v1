@@ -17,7 +17,7 @@ const initialState: State = {
   treasuryFee: TREASURY_FEE_DEFAULT,
   creatorFee: CREATOR_FEE_DEFAULT,
   registrationAmount: parseEther(`0.05`).toString(),
-  freeGamePrizepoolAmount: 0.5,
+  freeGamePrizepoolAmount: '0.5',
   maxPlayers: 5,
   playTimeRange: 2,
   encodedCron: '0 18 * * *',

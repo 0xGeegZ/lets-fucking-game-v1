@@ -310,7 +310,7 @@ const MaximumPlayersSelection = () => {
     const { value } = event.target
     const errorMessage = 'Number of players should be between 2 and 100.'
 
-    if (value < PLAYERS_MIN_LENGTH || value > PLAYERS_MAX_LENGTH) {
+    if (Number(value) < PLAYERS_MIN_LENGTH || Number(value) > PLAYERS_MAX_LENGTH) {
       setIsValid(false)
       setMessage(errorMessage)
     } else {
@@ -324,7 +324,7 @@ const MaximumPlayersSelection = () => {
       creatorFee,
       registrationAmount,
       freeGamePrizepoolAmount,
-      value,
+      Number(value),
       playTimeRange,
       encodedCron,
     )

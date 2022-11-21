@@ -52,7 +52,7 @@ const RecapConfigGame = () => {
 
   const [cronHumanReadable, setCronHumanReadable] = useState('')
 
-  const timezone = 'Etc/UTC'
+  let timezone = 'Etc/UTC'
   try {
     timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   } catch (e) {
@@ -130,7 +130,7 @@ const RecapConfigGame = () => {
                   <Text color="textSubtle" display="inline">
                     Prizepool :{' '}
                     {registrationAmount !== '0'
-                      ? parseFloat(formatEther(`${registrationAmount * maxPlayers}`))
+                      ? parseFloat(formatEther(`${Number(registrationAmount) * Number(maxPlayers)}`))
                       : parseFloat(freeGamePrizepoolAmount)}{' '}
                     {chainSymbol}
                   </Text>
