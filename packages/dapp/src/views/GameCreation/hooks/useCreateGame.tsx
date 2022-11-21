@@ -4,11 +4,11 @@ import { useToast } from '@pancakeswap/uikit'
 import useCatchTxError from 'hooks/useCatchTxError'
 import { ToastDescriptionWithTx } from 'components/Toast'
 import { useGameFactoryV1Contract } from 'hooks/useContract'
+import { useGameConfig } from 'hooks/useGameConfig'
 import { parseEther, formatEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import { ZERO_ADDRESS } from 'config/constants'
-import { GAME_CREATION_AMOUNT } from '../config'
 
 export const useCreateGame = (game) => {
   const { t } = useTranslation()
@@ -16,9 +16,10 @@ export const useCreateGame = (game) => {
   const contract = useGameFactoryV1Contract()
   const { actions, currentStep } = useGameContext()
 
+  const { GAME_CREATION_AMOUNT } = useGameConfig()
+
   const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
 
-  // TODO handle name
   const {
     name,
     maxPlayers,

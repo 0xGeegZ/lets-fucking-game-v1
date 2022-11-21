@@ -3,24 +3,23 @@ import { createContext, useEffect, useMemo, useReducer } from 'react'
 import { useWeb3React } from '@pancakeswap/wagmi'
 import { parseEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
-import { TREASURY_FEE_DEFAULT, CREATOR_FEE_DEFAULT } from '../config'
-import { Actions, BNB, ContextType, NFT, State } from './types'
+import useActiveWeb3React from 'hooks/useActiveWeb3React'
+import { defaultGameConfig } from 'config/internal/networkConfig'
+import { useGameConfig } from 'hooks/useGameConfig'
 
-const randomNumber = () => {
-  return Math.floor(Math.random() * (10000 - 1) + 1)
-}
+import { Actions, BNB, ContextType, NFT, State } from './types'
 
 const initialState: State = {
   isInitialized: false,
-  name: `LFG MVP #${randomNumber()}`,
+  name: defaultGameConfig.NAME_DEFAULT,
   currentStep: 0,
-  treasuryFee: TREASURY_FEE_DEFAULT,
-  creatorFee: CREATOR_FEE_DEFAULT,
-  registrationAmount: parseEther(`0.05`).toString(),
+  treasuryFee: defaultGameConfig.TREASURY_FEE_DEFAULT,
+  creatorFee: defaultGameConfig.CREATOR_FEE_DEFAULT,
+  registrationAmount: defaultGameConfig.REGISTRATION_AMOUNT_DEFAULT.toString(),
   freeGamePrizepoolAmount: '0.5',
-  maxPlayers: 5,
-  playTimeRange: 2,
-  encodedCron: '0 18 * * *',
+  maxPlayers: defaultGameConfig.PLAYERS_DEFAULT,
+  playTimeRange: defaultGameConfig.PLAY_TIME_RANGE_DEFAULT,
+  encodedCron: defaultGameConfig.ENCODED_CRON_DEFAULT,
   numberPlayersAllowedToWin: 2,
   prizeType: 'STANDARD',
   successMessage: null,
@@ -96,28 +95,13 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
   const [state, dispatch] = useReducer(reducer, initialState)
   const { account } = useWeb3React()
 
+  // TODO GUIGUI FIRST LOAD gameConfig with specific hook
+  // Then pass data to each function in actions
+  //   const gameConfig = useGameConfig()
+
   // Initial checks
   useEffect(() => {
-    let isSubscribed = true
-
-    const fetchData = async () => {
-      // TODO LOAD INITIAL DATA (if needed)
-
-      dispatch({ type: 'initialize', currentStep: 0 })
-
-      // When changing wallets quickly unmounting before the hasClaim finished causes a React error
-      if (isSubscribed) {
-        dispatch({ type: 'initialize', currentStep: 0 })
-      }
-    }
-
-    if (account) {
-      fetchData()
-    }
-
-    return () => {
-      isSubscribed = false
-    }
+    if (account) dispatch({ type: 'initialize', currentStep: 0 })
   }, [account, dispatch])
 
   const actions: ContextType['actions'] = useMemo(

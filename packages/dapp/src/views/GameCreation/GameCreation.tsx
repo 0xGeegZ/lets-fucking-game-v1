@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import momentTz from 'moment-timezone'
 import parser from 'cron-parser'
 import { escapeRegExp } from 'utils'
+import { useGameConfig } from 'hooks/useGameConfig'
 
 import { useTranslation } from '@pancakeswap/localization'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
@@ -12,18 +13,8 @@ import { parseEther } from '@ethersproject/units'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { isValidCron } from 'cron-validator'
 import Tooltip from 'views/Games/components/GameCardButtons/Tooltip'
-import {
-  PLAYERS_MAX_LENGTH,
-  PLAYERS_MIN_LENGTH,
-  AUTHORIZED_CRONS,
-  AUTHORIZED_PLAY_TIME_RANGE,
-  AUTHORIZED_CREATOR_FEE,
-  AUTHORIZED_TREASURY_FEE,
-  AUTHORIZED_AMOUNTS,
-} from './config'
-
+import { networkConfig } from 'config/internal/networkConfig'
 import NextStepButton from './NextStepButton'
-
 import BackStepButton from './BackStepButton'
 
 const InputWrap = styled.div`
@@ -44,6 +35,8 @@ const Indicator = styled(Flex)`
 const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`) // match escaped "." characters via in a non-capturing group
 
 const FeeSelection = () => {
+  const { AUTHORIZED_TREASURY_FEE, AUTHORIZED_CREATOR_FEE } = useGameConfig()
+
   const {
     treasuryFee,
     creatorFee,
@@ -165,9 +158,11 @@ const RegistrationAmountSelection = () => {
 
   const { chain } = useActiveWeb3React()
 
+  const { AUTHORIZED_REGISTRATION_AMOUNTS } = useGameConfig()
+
   const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
 
-  const authorizedAmounts = AUTHORIZED_AMOUNTS.map((amount) => {
+  const authorizedAmounts = AUTHORIZED_REGISTRATION_AMOUNTS.map((amount) => {
     return {
       label: `${amount} ${chainSymbol}`,
       value: parseEther(`${amount}`).toString(),
@@ -306,6 +301,8 @@ const MaximumPlayersSelection = () => {
   const [isValid, setIsValid] = useState(true)
   const [message, setMessage] = useState('')
 
+  const { PLAYERS_MIN_LENGTH, PLAYERS_MAX_LENGTH } = useGameConfig()
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
     const errorMessage = 'Number of players should be between 2 and 100.'
@@ -358,6 +355,8 @@ const MaximumPlayersSelection = () => {
 }
 
 const PlayTimeRangeSelection = () => {
+  const { AUTHORIZED_PLAY_TIME_RANGE } = useGameConfig()
+
   const {
     treasuryFee,
     creatorFee,
@@ -409,6 +408,8 @@ const PlayTimeRangeSelection = () => {
 
 const EncodedCronSelection = () => {
   const { t } = useTranslation()
+
+  const { AUTHORIZED_CRONS } = useGameConfig()
 
   const defaultTimezone = 'Etc/UTC'
   let timezone
@@ -525,6 +526,8 @@ const GameCreation: React.FC = () => {
   const { actions, currentStep, treasuryFee, registrationAmount, maxPlayers, playTimeRange, encodedCron } =
     useGameContext()
   const { toastError } = useToast()
+
+  const { PLAYERS_MIN_LENGTH, PLAYERS_MAX_LENGTH } = useGameConfig()
 
   const checkFieldsAndValidate = () => {
     if (!isValidCron(encodedCron)) return toastError(t('Error'), t('Wrong entered Cron'))

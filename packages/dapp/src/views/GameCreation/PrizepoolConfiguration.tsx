@@ -103,7 +103,7 @@ const PrizeTypeSelection = () => {
 }
 
 const PrizepoolConfiguration: React.FC = () => {
-  const { actions, currentStep, numberPlayersAllowedToWin, prizeType } = useContext(GameCreationContext)
+  const { actions, currentStep, numberPlayersAllowedToWin, prizeType } = useGameContext()
   const { t } = useTranslation()
 
   return (

@@ -1,9 +1,9 @@
 import { useContext } from 'react'
 import { useTranslation } from '@pancakeswap/localization'
 import { useWeb3React } from '@pancakeswap/wagmi'
+import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import GameConfirmationAndContractCreation from './GameConfirmationAndContractCreation'
 import GameCreation from './GameCreation'
-import { GameCreationContext } from './contexts/GameCreationProvider'
 import NoWalletConnected from './WalletNotConnected'
 import PrizepoolConfiguration from './PrizepoolConfiguration'
 import Confirmation from './Confirmation'
@@ -11,7 +11,7 @@ import GameName from './GameName'
 
 const Steps = () => {
   const { t } = useTranslation()
-  const { isInitialized, currentStep } = useContext(GameCreationContext)
+  const { isInitialized, currentStep } = useGameContext()
   const { account } = useWeb3React()
 
   if (!account) {

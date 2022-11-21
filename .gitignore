@@ -51,4 +51,4 @@ packages/dapp/build
 
 # Typechain Files ##
 packages/types/typechain
-packages/dapp/src/config/types
+# packages/dapp/src/config/types

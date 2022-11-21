@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import styled from 'styled-components'
 import { Breadcrumbs, Heading, Text, Link, Button } from '@pancakeswap/uikit'
 import { useTranslation, TranslateFunction } from '@pancakeswap/localization'
-import { GameCreationContext } from './contexts/GameCreationProvider'
+import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 
 const Wrapper = styled.div`
   border-bottom: 2px solid ${({ theme }) => theme.colors.textSubtle};
@@ -21,7 +21,7 @@ const steps = (t: TranslateFunction) => [
 
 const Header: React.FC<React.PropsWithChildren> = () => {
   const { t } = useTranslation()
-  const { currentStep } = useContext(GameCreationContext)
+  const { currentStep } = useGameContext()
 
   return (
     <Wrapper>

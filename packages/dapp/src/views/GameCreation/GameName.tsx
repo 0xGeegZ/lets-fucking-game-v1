@@ -17,7 +17,8 @@ import { ChangeEvent, useState } from 'react'
 import styled from 'styled-components'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { REGISTER_COST, NAME_MAX_LENGTH, NAME_MIN_LENGTH } from './config'
+import { useGameConfig } from 'hooks/useGameConfig'
+
 import NextStepButton from './NextStepButton'
 
 const InputWrap = styled.div`
@@ -51,9 +52,11 @@ const GameName: React.FC<React.PropsWithChildren> = () => {
   const [message, setMessage] = useState('')
 
   //   const { balance: cakeBalance, fetchStatus } = useGetCakeBalance()
-  //   const hasMinimumCakeRequired = fetchStatus === FetchStatus.Fetched && cakeBalance.gte(REGISTER_COST)
+  //   const hasMinimumCakeRequired = fetchStatus === FetchStatus.Fetched && cakeBalance.gte(REGISTRATION_AMOUNT_DEFAULT)
 
   const { chain } = useActiveWeb3React()
+
+  const { GAME_CREATION_AMOUNT, NAME_MIN_LENGTH, NAME_MAX_LENGTH } = useGameConfig()
 
   const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
 
@@ -122,7 +125,7 @@ const GameName: React.FC<React.PropsWithChildren> = () => {
               </div>
               <Text ml="8px">
                 {t('I understand that i will need to pay %num% %symbol% to create game and cover keeper costs.', {
-                  num: formatUnits(REGISTER_COST),
+                  num: formatUnits(GAME_CREATION_AMOUNT),
                   symbol: chainSymbol,
                 })}
               </Text>
