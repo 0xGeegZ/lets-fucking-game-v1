@@ -4,7 +4,8 @@ import { useWeb3React } from '@pancakeswap/wagmi'
 import { parseEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { defaultGameConfig, networkConfig } from 'config/internal/networkConfig'
+import { defaultGameConfig } from 'config/internal/networkConfig'
+import { useGameConfig } from 'hooks/useGameConfig'
 
 import { Actions, BNB, ContextType, NFT, State } from './types'
 
@@ -102,6 +103,7 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
 
   //   const { gameConfig } = networkConfig[chainId]
   //   if (!gameConfig) throw new Error('No game config found for chain id', chainId)
+  //  const { GAME_CREATION_AMOUNT, NAME_MIN_LENGTH, NAME_MAX_LENGTH } = useGameConfig()
 
   // Initial checks
   useEffect(() => {

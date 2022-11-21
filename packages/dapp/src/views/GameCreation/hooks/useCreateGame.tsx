@@ -4,12 +4,11 @@ import { useToast } from '@pancakeswap/uikit'
 import useCatchTxError from 'hooks/useCatchTxError'
 import { ToastDescriptionWithTx } from 'components/Toast'
 import { useGameFactoryV1Contract } from 'hooks/useContract'
+import { useGameConfig } from 'hooks/useGameConfig'
 import { parseEther, formatEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import { ZERO_ADDRESS } from 'config/constants'
-import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { networkConfig } from 'config/internal/networkConfig'
 
 export const useCreateGame = (game) => {
   const { t } = useTranslation()
@@ -17,14 +16,10 @@ export const useCreateGame = (game) => {
   const contract = useGameFactoryV1Contract()
   const { actions, currentStep } = useGameContext()
 
-  const { chainId } = useActiveWeb3React()
-
-  const { gameConfig } = networkConfig[chainId]
-  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
+  const { GAME_CREATION_AMOUNT } = useGameConfig()
 
   const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
 
-  // TODO handle name
   const {
     name,
     maxPlayers,
@@ -41,7 +36,7 @@ export const useCreateGame = (game) => {
   const parsedRegistrationAmount: number = registrationAmount ? parseFloat(formatEther(`${registrationAmount}`)) : 0
 
   // TODO GUIGUI Load gameCreationAmount directly from smart contract
-  const gameCreationAmountEther = gameConfig.GAME_CREATION_AMOUNT
+  const gameCreationAmountEther = GAME_CREATION_AMOUNT
 
   const registrationAmountEther = parseEther(`${parsedRegistrationAmount}`)
 

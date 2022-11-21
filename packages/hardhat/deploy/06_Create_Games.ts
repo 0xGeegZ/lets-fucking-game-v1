@@ -1,3 +1,4 @@
+import { formatBytes32String } from '@ethersproject/strings'
 import { ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
@@ -18,7 +19,7 @@ const func: DeployFunction = async function ({
   const gameConfig = networkConfig[chainId].gameConfig
   if (!gameConfig) throw new Error('No game config found for chain id', chainId)
 
-  const name = gameConfig.NAME_DEFAULT
+  const name = formatBytes32String(gameConfig.NAME_DEFAULT)
   const gameCreationAmount = gameConfig.GAME_CREATION_AMOUNT
   const maxPlayers = gameConfig.PLAYERS_DEFAULT
   const playTimeRange = gameConfig.PLAY_TIME_RANGE_DEFAULT
@@ -66,7 +67,7 @@ const func: DeployFunction = async function ({
 
   log('Creating new payable game')
   await gameFactory.createNewGame(
-    gameConfig.NAME_DEFAULT,
+    name,
     maxPlayers,
     playTimeRange,
     registrationAmount,

@@ -1,5 +1,4 @@
 // GAME CONFIG : UPDATE DEFAULT CONFIG FROM HARDHAT PACKAGE THEN COPY CHANGE TO DAPP BY COMPILING OR DEPLOYING CONTRACT
-import { formatBytes32String } from '@ethersproject/strings'
 import { parseEther } from '@ethersproject/units'
 
 export const range = (start, end) =>
@@ -10,7 +9,8 @@ const randomNumber = () => {
 }
 
 export const defaultGameConfig = {
-  NAME_DEFAULT: formatBytes32String(`LFG MVP #${randomNumber()}`),
+  NAME_DEFAULT: `LFG MVP #${randomNumber()}`,
+  // NAME_DEFAULT: formatBytes32String(`LFG MVP #${randomNumber()}`),
   NAME_MIN_LENGTH: 3,
   NAME_MAX_LENGTH: 32,
 

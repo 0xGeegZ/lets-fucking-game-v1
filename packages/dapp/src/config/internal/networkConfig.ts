@@ -2,15 +2,15 @@
 import { formatBytes32String } from '@ethersproject/strings'
 import { parseEther } from '@ethersproject/units'
 
-export const range = (start, end) =>
-  Array.from(Array(end + 1).keys()).slice(start)
+export const range = (start, end) => Array.from(Array(end + 1).keys()).slice(start)
 
 const randomNumber = () => {
   return Math.floor(Math.random() * (10000 - 1) + 1)
 }
 
 export const defaultGameConfig = {
-  NAME_DEFAULT: formatBytes32String(`LFG MVP #${randomNumber()}`),
+  NAME_DEFAULT: `LFG MVP #${randomNumber()}`,
+  // NAME_DEFAULT: formatBytes32String(`LFG MVP #${randomNumber()}`),
   NAME_MIN_LENGTH: 3,
   NAME_MAX_LENGTH: 32,
 
@@ -25,9 +25,7 @@ export const defaultGameConfig = {
 
   REGISTRATION_AMOUNT_DEFAULT: parseEther('0.0001'),
   REGISTRATION_AMOUNT_FREE: parseEther('0'),
-  AUTHORIZED_REGISTRATION_AMOUNTS: [
-    0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
-  ],
+  AUTHORIZED_REGISTRATION_AMOUNTS: [0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10],
 
   PRIZEPOOL_NUMBER: 0.01,
   PRIZEPOOL_AMOUNT: parseEther('0.01'),
