@@ -150,8 +150,8 @@ const CardContentSection: React.FC<React.PropsWithChildren<GameCardContentSectio
       </Flex>
 
       <Flex justifyContent="space-between">
-        {isRegistering && <Heading mr="4px">{t('Daily Draw')}: </Heading>}
-        {(isInProgress || !isRegistering) && <Heading mr="4px">{t('Game will start')}: </Heading>}
+        {(isRegistering || isInProgress) && <Heading mr="4px">{t('Daily Draw')}: </Heading>}
+        {!isInProgress && !isRegistering && <Heading mr="4px">{t('Game will start')}: </Heading>}
         {isReady ? (
           <Text style={{ display: 'flex', alignItems: 'center' }}>
             <Text bold>{t(`${cronHumanReadable}`)}</Text>

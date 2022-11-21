@@ -19,7 +19,6 @@
 pragma solidity >=0.8.6;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/proxy/Proxy.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
@@ -37,8 +36,10 @@ import { getRevertMsg } from "@chainlink/contracts/src/v0.8/utils/utils.sol";
  * Users must use the encodeCronString() function to encode their cron jobs before
  * setting them. This keeps all the string manipulation off chain and reduces gas costs.
  */
-contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pausable, Proxy {
+contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pausable {
     using EnumerableSet for EnumerableSet.UintSet;
+
+    using CronInternal for Spec;
 
     event CronJobExecuted(uint256 indexed id, uint256 timestamp);
     event CronJobCreated(uint256 indexed id, address target, bytes handler);
@@ -55,7 +56,6 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
     error TickTooOld();
     error TickDoesntMatchSpec();
 
-    address immutable s_delegate;
     uint256 public immutable s_maxJobs;
     address[] s_delegators;
 
@@ -70,17 +70,14 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
 
     /**
      * @param owner the initial owner of the contract
-     * @param delegate the contract to delegate checkUpkeep calls to
      * @param maxJobs the max number of cron jobs this contract will support
      * @param firstJob an optional encoding of the first cron job
      */
     constructor(
         address owner,
-        address delegate,
         uint256 maxJobs,
         bytes memory firstJob
     ) ConfirmedOwner(owner) {
-        s_delegate = delegate;
         s_maxJobs = maxJobs;
         if (firstJob.length > 0) {
             (address target, bytes memory handler, Spec memory spec) = abi.decode(firstJob, (address, bytes, Spec));
@@ -97,6 +94,7 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
             performData,
             (uint256, uint256, address, bytes)
         );
+
         validate(id, tickTime, target, handler);
         s_lastRuns[id] = block.timestamp;
         (bool success, bytes memory payload) = target.call(handler);
@@ -204,10 +202,37 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
     /**
      * @notice Get the id of an eligible cron job
      * @return upkeepNeeded signals if upkeep is needed, performData is an abi encoding
-     * of the id and "next tick" of the elligible cron job
+     * of the id and "next tick" of the eligible cron job
      */
-    function checkUpkeep(bytes calldata) external override whenNotPaused cannotExecute returns (bool, bytes memory) {
-        _delegate(s_delegate);
+    // function checkUpkeep(bytes calldata) external view override whenNotPaused returns (bool, bytes memory) {
+    function checkUpkeep(bytes calldata)
+        external
+        view
+        override
+        whenNotPaused
+        cannotExecute
+        returns (bool, bytes memory)
+    {
+        // _delegate(s_delegate);
+        // DEV: start at a random spot in the list so that checks are
+        // spread evenly among cron jobs
+        uint256 numCrons = s_activeCronJobIDs.length();
+
+        if (numCrons == 0) {
+            return (false, bytes(""));
+        }
+        uint256 startIdx = block.number % numCrons;
+        bool result;
+        bytes memory payload;
+        (result, payload) = checkInRange(startIdx, numCrons);
+        if (result) {
+            return (result, payload);
+        }
+        (result, payload) = checkInRange(0, startIdx);
+        if (result) {
+            return (result, payload);
+        }
+        return (false, bytes(""));
     }
 
     /**
@@ -284,10 +309,6 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
         emit CronJobCreated(newID, target, handler);
     }
 
-    function _implementation() internal view override returns (address) {
-        return s_delegate;
-    }
-
     function _isExistDelegator(address delegator) internal view returns (bool) {
         for (uint256 i = 0; i < s_delegators.length; i++) {
             if (s_delegators[i] == delegator) {
@@ -309,7 +330,7 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
         uint256 tickTime,
         address target,
         bytes memory handler
-    ) private {
+    ) private view {
         tickTime = tickTime - (tickTime % 60); // remove seconds from tick time
         if (block.timestamp < tickTime) {
             revert TickInFuture();
@@ -333,6 +354,25 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
      */
     function handlerSig(address target, bytes memory handler) private pure returns (bytes32) {
         return keccak256(abi.encodePacked(target, handler));
+    }
+
+    /**
+     * @notice checks the cron jobs in a given range
+     * @param start the starting id to check (inclusive)
+     * @param end the ending id to check (exclusive)
+     * @return upkeepNeeded signals if upkeep is needed, performData is an abi encoding
+     * of the id and "next tick" of the eligible cron job
+     */
+    function checkInRange(uint256 start, uint256 end) private view returns (bool, bytes memory) {
+        uint256 id;
+        uint256 lastTick;
+        for (uint256 idx = start; idx < end; idx++) {
+            id = s_activeCronJobIDs.at(idx);
+            lastTick = s_specs[id].lastTick();
+            if (lastTick > s_lastRuns[id]) {
+                return (true, abi.encode(id, lastTick, s_targets[id], s_handlers[id]));
+            }
+        }
     }
 
     modifier onlyValidCronID(uint256 id) {

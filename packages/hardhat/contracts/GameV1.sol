@@ -141,7 +141,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
 
         CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
             address(this),
-            bytes("triggerDailyCheckpoint()"),
+            abi.encodeWithSignature("triggerDailyCheckpoint()"),
             encodedCronBytes
         );
     }
@@ -599,7 +599,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
 
         CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
             address(this),
-            bytes("triggerDailyCheckpoint()"),
+            abi.encodeWithSignature("triggerDailyCheckpoint()"),
             encodedCronBytes
         );
     }
@@ -836,7 +836,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
 
         CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
             address(this),
-            bytes("triggerDailyCheckpoint()"),
+            abi.encodeWithSignature("triggerDailyCheckpoint()"),
             encodedCronBytes
         );
     }
@@ -857,7 +857,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         CronUpkeepInterface(cronUpkeep).updateCronJob(
             cronUpkeepJobId,
             address(this),
-            bytes("triggerDailyCheckpoint()"),
+            abi.encodeWithSignature("triggerDailyCheckpoint()"),
             encodedCronBytes
         );
     }
@@ -1005,7 +1005,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @notice Modifier that ensure only admin or keeper can access this function
      */
     modifier onlyAdminOrKeeper() {
-        require(msg.sender == creator || msg.sender == owner, "Caller is not the admin or keeper");
+        require(msg.sender == cronUpkeep || msg.sender == owner, "Caller is not the admin or keeper");
         _;
     }
 

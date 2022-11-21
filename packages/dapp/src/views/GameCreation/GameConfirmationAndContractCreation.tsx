@@ -5,6 +5,10 @@ import styled from 'styled-components'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import { BigNumber as EthersBigNumber } from '@ethersproject/bignumber'
 import { formatEther, parseEther } from '@ethersproject/units'
+import { useCallback, useState, useEffect } from 'react'
+import parser from 'cron-parser'
+import moment from 'moment'
+import momentTz from 'moment-timezone'
 
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import BackStepButton from './BackStepButton'
@@ -30,9 +34,11 @@ const BulletList = styled.ul`
 
 const RecapConfigGame = () => {
   const {
+    name,
     treasuryFee,
     creatorFee,
     registrationAmount,
+    freeGamePrizepoolAmount,
     maxPlayers,
     playTimeRange,
     encodedCron,
@@ -44,16 +50,43 @@ const RecapConfigGame = () => {
 
   const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
 
+  const [cronHumanReadable, setCronHumanReadable] = useState('')
+
+  let timezone = 'Etc/UTC'
+  try {
+    timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  } catch (e) {
+    // noop
+  }
+
+  useEffect(() => {
+    if (!encodedCron) return
+
+    try {
+      const interval = parser.parseExpression(encodedCron, { tz: timezone })
+      //   const transform = moment(interval.next().toString()).format('hh:mm A')
+      const transform = momentTz.tz(interval.next().toString(), timezone).format('hh:mm A')
+      setCronHumanReadable(`${transform} ${timezone}`)
+    } catch (e) {
+      setCronHumanReadable(encodedCron)
+    }
+  }, [encodedCron, timezone])
+
   return (
     <>
       <Card mb="24px">
         <CardBody>
           <Heading as="h4" scale="lg" mb="8px">
-            Confirm your game configuration
+            Confirm configuration for your game
           </Heading>
           <Text as="p" color="textSubtle" mb="24px">
             You could update configuration later if game is not in progress
           </Text>
+
+          <Text as="h2" mt="16px">
+            {name}
+          </Text>
+
           <Flex
             justifyContent="space-between"
             alignItems="center"
@@ -61,60 +94,62 @@ const RecapConfigGame = () => {
             pl={['4px', null, '0']}
             mb="8px"
           >
-            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
+            <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
               <BulletList>
                 <li>
-                  <Text textAlign="center" color="textSubtle" display="inline">
+                  <Text color="textSubtle" display="inline">
                     Registration amount :{' '}
-                    {registrationAmount ? parseFloat(formatEther(registrationAmount.toString())) : '0'} {chainSymbol}
+                    {registrationAmount !== '0'
+                      ? `${parseFloat(formatEther(registrationAmount.toString()))} ${chainSymbol}`
+                      : 'FREE'}
                   </Text>
                 </li>
+
                 <li>
-                  <Text textAlign="center" color="textSubtle" display="inline">
-                    Maximum players : {maxPlayers}
+                  <Text color="textSubtle" display="inline">
+                    Daily draw : {cronHumanReadable}
                   </Text>
                 </li>
-              </BulletList>
-            </Flex>
-            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
-              <BulletList>
+
                 <li>
-                  <Text textAlign="center" color="textSubtle" display="inline">
-                    Daily play time range : {playTimeRange}H
-                  </Text>
-                </li>
-                <li>
-                  <Text textAlign="center" color="textSubtle" display="inline">
-                    {/* // TODO GUIGUI HANDLE CRON TO HUMAN READABLE */}
-                    Selected Cron : {encodedCron}
-                  </Text>
-                </li>
-              </BulletList>
-            </Flex>
-            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
-              <BulletList>
-                <li>
-                  <Text textAlign="center" color="textSubtle" display="inline">
+                  <Text color="textSubtle" display="inline">
                     Winners : {numberPlayersAllowedToWin}
                   </Text>
                 </li>
+
                 <li>
-                  <Text textAlign="center" color="textSubtle" display="inline">
-                    Prize type : {chainSymbol}
-                    {/* {prizeType} */}
+                  <Text fontSize="12px" color="textSubtle" display="inline" lineHeight={2.5}>
+                    Treasury fee : {treasuryFee / 100} %
                   </Text>
                 </li>
               </BulletList>
             </Flex>
-            <Flex width="max-content" style={{ gap: '4px' }} flexDirection="column">
+            <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
               <BulletList>
                 <li>
-                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline" lineHeight={2.5}>
-                    Treasury fee : {treasuryFee / 100} %
+                  <Text color="textSubtle" display="inline">
+                    Prizepool :{' '}
+                    {registrationAmount !== '0'
+                      ? parseFloat(formatEther(`${Number(registrationAmount) * Number(maxPlayers)}`))
+                      : parseFloat(freeGamePrizepoolAmount)}{' '}
+                    {chainSymbol}
                   </Text>
                 </li>
+
                 <li>
-                  <Text fontSize="12px" textAlign="center" color="textSubtle" display="inline">
+                  <Text color="textSubtle" display="inline">
+                    Daily play time range : {playTimeRange}H
+                  </Text>
+                </li>
+
+                <li>
+                  <Text color="textSubtle" display="inline">
+                    Maximum players : {maxPlayers}
+                  </Text>
+                </li>
+
+                <li>
+                  <Text fontSize="12px" color="textSubtle" display="inline">
                     Creator fee: {creatorFee / 100} %
                   </Text>
                 </li>
@@ -134,7 +169,7 @@ const GameConfirmationAndContractCreation: React.FC<React.PropsWithChildren> = (
   return (
     <>
       <Text fontSize="20px" color="textSubtle" bold>
-        {t('Step %num%', { num: 3 })}
+        {t('Step %num%', { num: 4 })}
       </Text>
       <Heading as="h3" scale="xl" mb="24px">
         {t('Contract creation')}

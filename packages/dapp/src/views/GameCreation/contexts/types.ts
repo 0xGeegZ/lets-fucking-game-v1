@@ -6,12 +6,17 @@ export type Actions =
   | { type: 'previous_step'; currentStep: number }
   | { type: 'next_step'; currentStep: number }
   | {
-      // TODO Guillaume : It can be '' type to initialize state but we must prevent submit in frontend if this value is selected
+      type: 'game_name'
+      currentStep: number
+      name: string
+    }
+  | {
       type: 'game_creation'
       currentStep: number
       treasuryFee: number
       creatorFee: number
       registrationAmount: string
+      freeGamePrizepoolAmount: string
       maxPlayers: number
       playTimeRange: number
       encodedCron: string
@@ -25,6 +30,7 @@ export type Actions =
   | {
       type: 'game_confirmation_and_contract_creation'
       currentStep: number
+      name: string
       treasuryFee: number
       creatorFee: number
       registrationAmount: string
@@ -43,10 +49,12 @@ export type Actions =
 
 export interface State {
   isInitialized: boolean
+  name: string
   currentStep: number
   treasuryFee: number
   creatorFee: number
   registrationAmount: string
+  freeGamePrizepoolAmount: string
   maxPlayers: number
   playTimeRange: number
   encodedCron: string
@@ -61,11 +69,13 @@ export interface ContextType extends State {
     previousStep: (currentStep: number) => void
     nextStep: (currentStep: number) => void
     setInitialize: (currentStep: number) => void
+    setGameName: (currentStep: number, name: string) => void
     setGameCreation: (
       currentStep: number,
       treasuryFee: number,
       creatorFee: number,
       registrationAmount: string,
+      freeGamePrizepoolAmount: string,
       maxPlayers: number,
       playTimeRange: number,
       encodedCron: string,
@@ -77,9 +87,11 @@ export interface ContextType extends State {
     ) => void
     setGameConfirmationAndContractCreation: (
       currentStep: number,
+      name: string,
       treasuryFee: number,
       creatorFee: number,
       registrationAmount: string,
+      freeGamePrizepoolAmount: string,
       maxPlayers: number,
       playTimeRange: number,
       encodedCron: string,

@@ -91,7 +91,17 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
 
     if (!chain) throw new Error('chain not supported')
 
-    return fetchGamePublicDataPkg({ chainId })
+    // return fetchGamePublicDataPkg({ chainId })
+
+    const games = await fetchGamePublicDataPkg({ chainId })
+
+    if (state.games.data.length && games.length !== state.games.data.length) {
+      await dispatch(fetchInitialGamesData({ chainId, account }))
+      await dispatch(fetchGamePlayerDataAsync({ chainId, account }))
+
+      return fetchGamePublicDataPkg({ chainId })
+    }
+    return games
   },
   {
     condition: (arg, { getState }) => {
@@ -247,26 +257,33 @@ export const gamesSlice = createSlice({
     // Update games with live data
     builder.addCase(fetchGamesPublicDataAsync.fulfilled, (state, action) => {
       console.log('Update games with live data')
-      const gameData = action.payload
-      if (!gameData.length) return
 
-      let isError = false
+      const games = action.payload
+      if (!games.length) return
 
-      const updatedData = state.data.map((game, index) => {
+      state.data = state.data.map((game, index) => {
         const { userData, playerData } = game
-
-        const updatedGame = gameData[index] || game
-
-        if (!updatedGame) isError = true
-
         return {
-          ...updatedGame,
+          ...games[index],
           userData,
           playerData,
         }
       })
 
-      if (!isError) state.data = updatedData
+      // let isError = false
+      // const updatedData = state.data.map((game, index) => {
+      //   const { userData, playerData } = game
+      //   const updatedGame = gameData[index] || game
+      //   if (!updatedGame) isError = true
+      //   return {
+      //     ...updatedGame,
+      //     userData,
+      //     playerData,
+      //   }
+      // })
+      // // if (gameData.length !== state.data.length) state.data = gameData
+      // // else if (!isError) state.data = updatedData
+      // if (!isError) state.data = updatedData
     })
 
     // Update games with user data
@@ -278,7 +295,6 @@ export const gamesSlice = createSlice({
     })
 
     builder.addMatcher(
-      // TODO MAKE IT WORKS
       isAnyOf(fetchGamePlayerDataAsync.pending, fetchGamesPublicDataAsync.pending),
       (state, action) => {
         state.loadingKeys[serializeLoadingKey(action, 'pending')] = true

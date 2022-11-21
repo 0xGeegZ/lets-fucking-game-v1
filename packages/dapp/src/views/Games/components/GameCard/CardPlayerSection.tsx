@@ -8,6 +8,7 @@ import ConnectWalletButton from 'components/ConnectWalletButton'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
+import momentTz from 'moment-timezone'
 
 import moment from 'moment'
 import ClaimButton from '../GameCardButtons/ClaimButton'
@@ -40,6 +41,7 @@ interface GameCardPlayerSectionProps {
   isPaused: boolean
   isCreator: boolean
   isAdmin: boolean
+  hasLost: boolean
   account?: string
 }
 
@@ -62,6 +64,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   isPaused,
   isCreator,
   isAdmin,
+  hasLost,
   account,
 }) => {
   const {
@@ -105,24 +108,25 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
       {isInProgress && isPlaying && (
         <>
           <Flex justifyContent="space-between">
-            <Heading mr="4px">
-              {`${t('Next play time')} is ${moment(nextFromRange).isSame(moment(), 'day') ? 'today' : 'tomorrow'}:`}
-            </Heading>
+            <Heading mr="4px">{`${t('Next play time')}:`}</Heading>
             {isReady ? (
-              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
-                {nextFromRange && nextToRange && (
-                  <>
-                    {'Between '}
-                    {moment(nextFromRange).format('hh:mm A')} and {moment(nextToRange).format('hh:mm A')}
-                  </>
-                )}
+              <Text style={{ display: 'flex', alignItems: 'center' }}>
+                <Text bold style={{ textAlign: 'right' }}>
+                  {nextFromRange && nextToRange && (
+                    <>
+                      {moment(nextFromRange).isSame(moment(), 'day') ? 'Today' : 'Tomorrow'}
+                      {' between '}
+                      {moment(nextFromRange).format('hh:mm A')} and {moment(nextToRange).format('hh:mm A')}
+                    </>
+                  )}
+                </Text>
               </Text>
             ) : (
               <Skeleton width="100%" height={18} mb="4px" />
             )}
           </Flex>
 
-          {isInProgress && isPlaying && !isInTimeRange && moment().isAfter(moment(nextToRange)) && (
+          {hasLost && (
             <Flex justifyContent="center" m="10px">
               <WarningIcon width="16px" color="failure" style={{ verticalAlign: 'middle' }} />
               <Heading mr="4px" color="failure">

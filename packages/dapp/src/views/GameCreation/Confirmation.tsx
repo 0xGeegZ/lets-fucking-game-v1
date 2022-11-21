@@ -39,7 +39,7 @@ const Confirmation: React.FC<React.PropsWithChildren> = () => {
   return (
     <>
       <Text fontSize="20px" color="textSubtle" bold>
-        {t('Step %num%', { num: 4 })}
+        {t('Step %num%', { num: 5 })}
       </Text>
       <Heading as="h3" scale="xl" mb="24px">
         {t('Game created')}

@@ -54,6 +54,10 @@ const setupTest = deployments.createFixture(
     const gameContract = await deployments.get('GameV1', libraries)
 
     const cronUpkeepContract = await deployments.get('CronUpkeep', libraries)
+    const cronUpkeepSecondaryContract = await deployments.get(
+      'CronUpkeepSecondary',
+      libraries
+    )
 
     const secondGameV1Contract = await deploy('GameV1', {
       ...options,
@@ -75,6 +79,12 @@ const setupTest = deployments.createFixture(
 
     const cronUpkeep = new ethers.Contract(
       cronUpkeepContract.address,
+      cronUpkeepInterface.interface,
+      deployer
+    )
+
+    const cronUpkeepSecondary = new ethers.Contract(
+      cronUpkeepSecondaryContract.address,
       cronUpkeepInterface.interface,
       deployer
     )
@@ -121,6 +131,7 @@ const setupTest = deployments.createFixture(
       gameFactory,
       game,
       cronUpkeep,
+      cronUpkeepSecondary,
       secondGameV1,
       deployedPayableGame,
       deployedFreeGame,
@@ -154,10 +165,12 @@ const initialiseTestData = async function () {
   this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
   this.zeroRegistrationAmount = ethers.utils.parseEther('0')
 
-  this.freeGamePrizepool = 1
-  this.freeGamePrizepoolAmount = ethers.utils.parseEther('1')
+  // this.freeGamePrizepool = 1
+  // this.freeGamePrizepoolmount = ethers.utils.parseEther('1')
+  this.freeGamePrizepool = 0.01
+  this.freeGamePrizepoolAmount = ethers.utils.parseEther('0.01')
 
-  this.gameCreationAmount = ethers.utils.parseEther('0.1')
+  this.gameCreationAmount = ethers.utils.parseEther('0.01')
   this.treasuryFee = 500 // 5%
   this.creatorFee = 500 // 5%
 
@@ -212,6 +225,7 @@ const initialiseTestData = async function () {
     gameFactory,
     game,
     cronUpkeep,
+    cronUpkeepSecondary,
     secondGameV1,
     deployedPayableGame,
     deployedFreeGame,
@@ -224,6 +238,8 @@ const initialiseTestData = async function () {
   // this.cronExternal = cronExternal
 
   this.cronUpkeep = cronUpkeep
+  this.cronUpkeepSecondary = cronUpkeepSecondary
+
   this.gameFactory = gameFactory
   this.game = game
   this.secondGameV1 = secondGameV1

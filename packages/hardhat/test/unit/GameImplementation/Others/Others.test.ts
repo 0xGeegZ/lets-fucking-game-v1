@@ -1,3 +1,5 @@
+/* eslint-disable sonarjs/no-duplicate-string */
+import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 import { expectRevert } from '@openzeppelin/test-helpers'
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
@@ -383,16 +385,22 @@ describe('GameV1Contract - Others', function () {
       })
 
       describe('when called by admin', function () {
-        it.skip('should update keeper address for the game and associated keeper job', async function () {
-          // TODO deploy a new keeper to update keeper data
-          // this.gameFactory.connect(this.owner).updateCronUpkeep(this.owner.address)
-          expect(true).to.be.false
-          // const newCronUpkeep = '0x0000000000000000000000000000000000000001'
-          // await this.deployedPayableGame
-          //   .connect(this.owner)
-          //   .setCronUpkeep(newCronUpkeep)
-          // const updatedCronUpkeep = await this.deployedPayableGame.cronUpkeep()
-          // expect(updatedCronUpkeep).to.be.equal(newCronUpkeep)
+        it('should update keeper address for the game and associated keeper job', async function () {
+          const newCronUpkeep = this.cronUpkeepSecondary.address
+          this.cronUpkeepSecondary.addDelegator(
+            this.deployedPayableGame.address
+          )
+
+          await expect(
+            this.deployedPayableGame
+              .connect(this.owner)
+              .setCronUpkeep(newCronUpkeep)
+          )
+            .to.emit(this.deployedPayableGame, 'CronUpkeepUpdated')
+            .withArgs(anyValue, newCronUpkeep)
+          const updatedFactoryCronUpkeep =
+            await this.deployedPayableGame.cronUpkeep()
+          expect(updatedFactoryCronUpkeep).to.be.equal(newCronUpkeep)
         })
 
         it('should revert if keeper address is not a contract address', async function () {

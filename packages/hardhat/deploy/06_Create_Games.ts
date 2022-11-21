@@ -11,8 +11,14 @@ const func: DeployFunction = async function ({
 
   const deployer = await ethers.getSigner(deployerAddress)
 
-  const name = ethers.utils.formatBytes32String("Let's Fucking Game MVP")
-  const gameCreationAmount = ethers.utils.parseEther('0.1')
+  const randomNumber = () => {
+    return Math.floor(Math.random() * (10000 - 1) + 1)
+  }
+
+  const name = ethers.utils.formatBytes32String(`LFG MVP #${randomNumber()}`)
+
+  const gameCreationAmount = ethers.utils.parseEther('0.01')
+  // const gameCreationAmount = ethers.utils.parseEther('0.1')
 
   const maxPlayers = 10
   const playTimeRange = 2
@@ -20,15 +26,15 @@ const func: DeployFunction = async function ({
   const registrationAmount = ethers.utils.parseEther('0.0001')
   const zeroRegistrationAmount = ethers.utils.parseEther('0')
 
-  const freeGamePrizepool = 0.1
-  const freeGamePrizepoolAmount = ethers.utils.parseEther('0.1')
+  const freeGamePrizepool = 0.01
+  const freeGamePrizepoolAmount = ethers.utils.parseEther('0.01')
   // const freeGamePrizepool = 1
   // const freeGamePrizepoolAmount = ethers.utils.parseEther('1')
 
   const treasuryFee = 500 // 5%
   const creatorFee = 500 // 5%
 
-  const encodedCron = '0 18 * * *'
+  const encodedCron = '0 17 * * *'
 
   const prizes = [
     {
@@ -93,6 +99,20 @@ const func: DeployFunction = async function ({
     { value: gameCreationAmount.add(freeGamePrizepoolAmount) }
   )
   log(`✅ New free game created`)
+
+  // log('Creating new free game for 2 players')
+  // await gameFactory.createNewGame(
+  //   name,
+  //   2,
+  //   playTimeRange,
+  //   zeroRegistrationAmount,
+  //   treasuryFee,
+  //   creatorFee,
+  //   encodedCron,
+  //   freeGamePrizes,
+  //   { value: gameCreationAmount.add(freeGamePrizepoolAmount) }
+  // )
+  // log(`✅ New free game for 2 players created`)
 }
 
 func.tags = ['all', 'test', 'dev', 'staging', 'create-games']

@@ -12,7 +12,7 @@
     "chain": "yarn workspace lets-fucking-game-hardhat chain:force",
     "deploy": "yarn workspace lets-fucking-game-hardhat deploy",
     "compile": "yarn workspace lets-fucking-game-hardhat compile",
-    "test:contracts": "yarn workspace lets-fucking-game-hardhat test",
+    "test:contracts": "yarn workspace lets-fucking-game-hardhat test:force",
     "test:dapp": "yarn workspace lets-fucking-game-dapp test",
     "coverage:contracts": "yarn workspace lets-fucking-game-hardhat test:coverage",
     "lint:dapp": "yarn workspace lets-fucking-game-dapp lint",
