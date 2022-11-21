@@ -17,7 +17,8 @@ import { ChangeEvent, useState } from 'react'
 import styled from 'styled-components'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { REGISTER_COST, NAME_MAX_LENGTH, NAME_MIN_LENGTH } from './config'
+import { networkConfig } from 'config/internal/networkConfig'
+
 import NextStepButton from './NextStepButton'
 
 const InputWrap = styled.div`
@@ -51,9 +52,12 @@ const GameName: React.FC<React.PropsWithChildren> = () => {
   const [message, setMessage] = useState('')
 
   //   const { balance: cakeBalance, fetchStatus } = useGetCakeBalance()
-  //   const hasMinimumCakeRequired = fetchStatus === FetchStatus.Fetched && cakeBalance.gte(REGISTER_COST)
+  //   const hasMinimumCakeRequired = fetchStatus === FetchStatus.Fetched && cakeBalance.gte(REGISTRATION_AMOUNT_DEFAULT)
 
-  const { chain } = useActiveWeb3React()
+  const { chain, chainId } = useActiveWeb3React()
+
+  const { gameConfig } = networkConfig[chainId]
+  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
 
   const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
 
@@ -61,7 +65,7 @@ const GameName: React.FC<React.PropsWithChildren> = () => {
     const { value } = event.target
     const errorMessage = 'Game name must be at least 3 and at max 32 standard letters and numbers long. '
     setIsLoading(true)
-    if (value.length < NAME_MIN_LENGTH || value.length > NAME_MAX_LENGTH) {
+    if (value.length < gameConfig.NAME_MIN_LENGTH || value.length > gameConfig.NAME_MAX_LENGTH) {
       setIsValid(false)
       setMessage(errorMessage)
     } else {
@@ -101,8 +105,8 @@ const GameName: React.FC<React.PropsWithChildren> = () => {
               onChange={handleChange}
               isWarning={name && !isValid}
               isSuccess={name && isValid}
-              minLength={NAME_MIN_LENGTH}
-              maxLength={NAME_MAX_LENGTH}
+              minLength={gameConfig.NAME_MIN_LENGTH}
+              maxLength={gameConfig.NAME_MAX_LENGTH}
               placeholder={t('Game name...')}
               value={name}
             />
@@ -122,7 +126,7 @@ const GameName: React.FC<React.PropsWithChildren> = () => {
               </div>
               <Text ml="8px">
                 {t('I understand that i will need to pay %num% %symbol% to create game and cover keeper costs.', {
-                  num: formatUnits(REGISTER_COST),
+                  num: formatUnits(gameConfig.GAME_CREATION_AMOUNT),
                   symbol: chainSymbol,
                 })}
               </Text>

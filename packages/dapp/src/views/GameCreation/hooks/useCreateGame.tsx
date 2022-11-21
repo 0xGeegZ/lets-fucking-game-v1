@@ -8,13 +8,19 @@ import { parseEther, formatEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import { ZERO_ADDRESS } from 'config/constants'
-import { GAME_CREATION_AMOUNT } from '../config'
+import useActiveWeb3React from 'hooks/useActiveWeb3React'
+import { networkConfig } from 'config/internal/networkConfig'
 
 export const useCreateGame = (game) => {
   const { t } = useTranslation()
   const { toastSuccess } = useToast()
   const contract = useGameFactoryV1Contract()
   const { actions, currentStep } = useGameContext()
+
+  const { chainId } = useActiveWeb3React()
+
+  const { gameConfig } = networkConfig[chainId]
+  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
 
   const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
 
@@ -35,7 +41,7 @@ export const useCreateGame = (game) => {
   const parsedRegistrationAmount: number = registrationAmount ? parseFloat(formatEther(`${registrationAmount}`)) : 0
 
   // TODO GUIGUI Load gameCreationAmount directly from smart contract
-  const gameCreationAmountEther = GAME_CREATION_AMOUNT
+  const gameCreationAmountEther = gameConfig.GAME_CREATION_AMOUNT
 
   const registrationAmountEther = parseEther(`${parsedRegistrationAmount}`)
 

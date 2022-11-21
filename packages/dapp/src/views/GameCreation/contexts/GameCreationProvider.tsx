@@ -3,24 +3,22 @@ import { createContext, useEffect, useMemo, useReducer } from 'react'
 import { useWeb3React } from '@pancakeswap/wagmi'
 import { parseEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
-import { TREASURY_FEE_DEFAULT, CREATOR_FEE_DEFAULT } from '../config'
-import { Actions, BNB, ContextType, NFT, State } from './types'
+import useActiveWeb3React from 'hooks/useActiveWeb3React'
+import { defaultGameConfig, networkConfig } from 'config/internal/networkConfig'
 
-const randomNumber = () => {
-  return Math.floor(Math.random() * (10000 - 1) + 1)
-}
+import { Actions, BNB, ContextType, NFT, State } from './types'
 
 const initialState: State = {
   isInitialized: false,
-  name: `LFG MVP #${randomNumber()}`,
+  name: defaultGameConfig.NAME_DEFAULT,
   currentStep: 0,
-  treasuryFee: TREASURY_FEE_DEFAULT,
-  creatorFee: CREATOR_FEE_DEFAULT,
-  registrationAmount: parseEther(`0.05`).toString(),
+  treasuryFee: defaultGameConfig.TREASURY_FEE_DEFAULT,
+  creatorFee: defaultGameConfig.CREATOR_FEE_DEFAULT,
+  registrationAmount: defaultGameConfig.REGISTRATION_AMOUNT_DEFAULT.toString(),
   freeGamePrizepoolAmount: '0.5',
-  maxPlayers: 5,
-  playTimeRange: 2,
-  encodedCron: '0 18 * * *',
+  maxPlayers: defaultGameConfig.PLAYERS_DEFAULT,
+  playTimeRange: defaultGameConfig.PLAY_TIME_RANGE_DEFAULT,
+  encodedCron: defaultGameConfig.ENCODED_CRON_DEFAULT,
   numberPlayersAllowedToWin: 2,
   prizeType: 'STANDARD',
   successMessage: null,
@@ -95,6 +93,15 @@ export const GameCreationContext = createContext<ContextType>(null)
 const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { account } = useWeb3React()
+
+  // TODO GUIGUI FIRST LOAD gameConfig with specific hook
+  // Then load data for current chain, then initialise state defaults values
+  // Then pass data to each function in actions
+
+  //   const { chainId } = useActiveWeb3React()
+
+  //   const { gameConfig } = networkConfig[chainId]
+  //   if (!gameConfig) throw new Error('No game config found for chain id', chainId)
 
   // Initial checks
   useEffect(() => {
