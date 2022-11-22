@@ -11,8 +11,8 @@ import moment from 'moment'
 import momentTz from 'moment-timezone'
 
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import BackStepButton from './BackStepButton'
-import CreateGameButton from './CreateGameButton'
+import BackStepButton from 'views/GameCreation/components/buttons/BackStepButton'
+import CreateGameButton from 'views/GameCreation/components/CreateGameButton'
 
 const BulletList = styled.ul`
   list-style-type: none;

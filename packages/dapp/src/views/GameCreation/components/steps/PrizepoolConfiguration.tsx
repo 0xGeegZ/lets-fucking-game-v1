@@ -1,15 +1,12 @@
 import { Card, CardBody, CommunityIcon, Flex, Heading, Text } from '@pancakeswap/uikit'
-import { useContext } from 'react'
-
 import { RowBetween } from 'components/Layout/Row'
 import { useTranslation } from '@pancakeswap/localization'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import { range } from 'utils'
-import { GameCreationContext } from './contexts/GameCreationProvider'
-import NextStepButton from './NextStepButton'
-import SelectionCard from './SelectionCard'
-import imageTest from '../../../public/images/chains/1.png'
-import BackStepButton from './BackStepButton'
+import NextStepButton from 'views/GameCreation/components/buttons/NextStepButton'
+import SelectionCard from 'views/GameCreation/components/SelectionCard'
+import BackStepButton from 'views/GameCreation/components/buttons/BackStepButton'
+import imageTest from '../../../../../public/images/chains/1.png'
 
 const AllowedPlayersToWinSelection = () => {
   const {

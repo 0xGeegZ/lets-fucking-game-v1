@@ -7,7 +7,7 @@ import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { defaultGameConfig } from 'config/internal/gameConfig'
 import { useGameConfig } from 'hooks/useGameConfig'
 
-import { Actions, BNB, ContextType, NFT, State } from './types'
+import { Actions, BNB, ContextType, NFT, State } from 'views/GameCreation/types'
 
 const initialState: State = {
   isInitialized: false,

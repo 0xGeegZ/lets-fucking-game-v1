@@ -13,8 +13,8 @@ import { parseEther } from '@ethersproject/units'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { isValidCron } from 'cron-validator'
 import Tooltip from 'views/Games/components/GameCardButtons/Tooltip'
-import NextStepButton from './NextStepButton'
-import BackStepButton from './BackStepButton'
+import NextStepButton from 'views/GameCreation/components/buttons/NextStepButton'
+import BackStepButton from 'views/GameCreation/components/buttons/BackStepButton'
 
 const InputWrap = styled.div`
   position: relative;
