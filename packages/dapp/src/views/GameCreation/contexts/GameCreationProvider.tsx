@@ -4,7 +4,7 @@ import { useWeb3React } from '@pancakeswap/wagmi'
 import { parseEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { defaultGameConfig } from 'config/internal/networkConfig'
+import { defaultGameConfig } from 'config/internal/gameConfig'
 import { useGameConfig } from 'hooks/useGameConfig'
 
 import { Actions, BNB, ContextType, NFT, State } from './types'

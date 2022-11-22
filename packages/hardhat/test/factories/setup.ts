@@ -1,7 +1,7 @@
 import { deployments, ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
-import { defaultGameConfig } from '../../config/networkConfig'
+import { defaultGameConfig } from '../../config/gameConfig'
 import { ONE_DAY_IN_SECONDS } from '../helpers'
 
 const setupTest = deployments.createFixture(
@@ -155,24 +155,38 @@ const initialiseTestData = async function () {
   this.name = ethers.utils.formatBytes32String("Let's Fucking Game MVP")
   this.newName = ethers.utils.formatBytes32String('New Name')
 
-  this.maxPlayers = 10
-  this.playTimeRange = 2
+  this.maxPlayers = defaultGameConfig.PLAYERS_DEFAULT
+  this.playTimeRange = defaultGameConfig.PLAY_TIME_RANGE_DEFAULT
 
-  this.correctRegistrationAmount = ethers.utils.parseEther('0.0001')
-  this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
-  this.zeroRegistrationAmount = ethers.utils.parseEther('0')
+  this.correctRegistrationAmount = defaultGameConfig.REGISTRATION_AMOUNT_DEFAULT
+  this.incorrectRegistrationAmount =
+    defaultGameConfig.REGISTRATION_AMOUNT_DEFAULT.mul(999)
+  this.zeroRegistrationAmount = defaultGameConfig.REGISTRATION_AMOUNT_FREE
 
-  // this.freeGamePrizepool = 1
-  // this.freeGamePrizepoolmount = ethers.utils.parseEther('1')
-  this.freeGamePrizepool = 0.01
-  this.freeGamePrizepoolAmount = ethers.utils.parseEther('0.01')
+  this.gameCreationAmount = defaultGameConfig.GAME_CREATION_AMOUNT
+  this.treasuryFee = defaultGameConfig.TREASURY_FEE_DEFAULT
+  this.creatorFee = defaultGameConfig.CREATOR_FEE_DEFAULT
 
-  this.gameCreationAmount = ethers.utils.parseEther('0.01')
-  this.treasuryFee = 500 // 5%
-  this.creatorFee = 500 // 5%
+  this.freeGamePrizepool = defaultGameConfig.PRIZEPOOL_NUMBER
+  this.freeGamePrizepoolAmount = defaultGameConfig.PRIZEPOOL_AMOUNT
+
+  const freeGameTreasuryAmt =
+    (this.freeGamePrizepoolAmount * (this.treasuryFee + this.creatorFee)) /
+    10000
+  const freeGameRewardAmount =
+    this.freeGamePrizepoolAmount - freeGameTreasuryAmt
+
+  this.freeGamePrizeAmount = freeGameRewardAmount
 
   // prizeAmount equals total prize amount minus treasury fee
-  this.prizeAmount = ethers.utils.parseEther('0.0009')
+  const treasuryAmt =
+    (this.correctRegistrationAmount *
+      this.maxPlayers *
+      (this.treasuryFee + this.creatorFee)) /
+    10000
+  const rewardAmount =
+    this.correctRegistrationAmount * this.maxPlayers - treasuryAmt
+  this.prizeAmount = rewardAmount
 
   this.launchDuration = 60 * 60 * 25
   this.upperMaxDuration = 60 * 60 * 24

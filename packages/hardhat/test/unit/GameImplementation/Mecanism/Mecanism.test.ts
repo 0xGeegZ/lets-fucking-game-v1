@@ -865,6 +865,7 @@ describe('GameV1Contract - Mecanism', function () {
         expect(newWinner.playerAddress).to.equal(
           this.players[winnerIndex].address
         )
+
         expect(newWinner.amountWon.eq(this.prizeAmount)).to.be.true
         expect(newWinner.prizeClaimed).to.be.false
         expect(newWinner.roundId).to.equal(roundId)
@@ -1056,7 +1057,6 @@ describe('GameV1Contract - Mecanism', function () {
           winnerIndex,
           contract: this.deployedPayableGame,
           amount: this.correctRegistrationAmount,
-
           mockKeeper: this.mockKeeper,
         })
 
@@ -1169,8 +1169,7 @@ describe('GameV1Contract - Mecanism', function () {
           .withArgs(
             this.players[finalistIndex].address,
             roundId,
-            // TODO use fee to calculate 0.45
-            ethers.utils.parseEther(`${this.freeGamePrizepool * 0.45}`)
+            this.freeGamePrizeAmount / 2
           )
 
         // TODO ensure that address have receive right amount
@@ -1183,8 +1182,7 @@ describe('GameV1Contract - Mecanism', function () {
           .withArgs(
             this.players[secondFinalistIndex].address,
             roundId,
-            // TODO use fee to calculate 0.45
-            ethers.utils.parseEther(`${this.freeGamePrizepool * 0.45}`)
+            this.freeGamePrizeAmount / 2
           )
       })
 

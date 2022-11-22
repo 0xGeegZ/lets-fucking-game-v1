@@ -2,7 +2,7 @@ import { ethers } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
-import { networkConfig } from '../config/networkConfig'
+import { gameConfig } from '../config/gameConfig'
 import { delay } from '../helpers/delay'
 
 const func: DeployFunction = async function ({
@@ -18,9 +18,11 @@ const func: DeployFunction = async function ({
   const isLocalDeployment = chainId === '31337' || chainId === '1337'
   const deployer = await ethers.getSigner(deployerAddress)
 
-  const gameConfig = networkConfig[chainId].gameConfig
+  const { GAME_CREATION_AMOUNT, AUTHORIZED_REGISTRATION_AMOUNTS } =
+    gameConfig[chainId]
 
-  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
+  if (!GAME_CREATION_AMOUNT)
+    throw new Error('No game config found for chain id', chainId)
 
   const options = {
     from: deployerAddress,
@@ -38,10 +40,10 @@ const func: DeployFunction = async function ({
 
   const { address: cronUpkeepAddress } = await deployments.get('CronUpkeep')
 
-  const gameCreationAmount = gameConfig.GAME_CREATION_AMOUNT
+  const gameCreationAmount = GAME_CREATION_AMOUNT
 
-  const authorizedAmounts = gameConfig.AUTHORIZED_REGISTRATION_AMOUNTS.map(
-    (amount) => ethers.utils.parseEther(`${amount}`)
+  const authorizedAmounts = AUTHORIZED_REGISTRATION_AMOUNTS.map((amount) =>
+    ethers.utils.parseEther(`${amount}`)
   )
 
   log('Deploying GameFactory contract')

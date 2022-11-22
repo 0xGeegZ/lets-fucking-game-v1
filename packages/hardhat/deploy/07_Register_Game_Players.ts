@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
-import { networkConfig } from '../config/networkConfig'
+import { gameConfig } from '../config/gameConfig'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -19,10 +19,9 @@ const func: DeployFunction = async function ({
 
   const chainId = await getChainId()
 
-  const gameConfig = networkConfig[chainId].gameConfig
-  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
-
-  const registrationAmount = gameConfig.REGISTRATION_AMOUNT_DEFAULT
+  const { REGISTRATION_AMOUNT_DEFAULT } = gameConfig[chainId]
+  if (!REGISTRATION_AMOUNT_DEFAULT)
+    throw new Error('No game config found for chain id', chainId)
 
   const { address: cronExternalAddress } = await deployments.get('CronExternal')
   const libraries = {
@@ -77,7 +76,9 @@ const func: DeployFunction = async function ({
 
   await Promise.all(
     players.map((player) =>
-      payableGame.connect(player).registerForGame({ value: registrationAmount })
+      payableGame
+        .connect(player)
+        .registerForGame({ value: REGISTRATION_AMOUNT_DEFAULT })
     )
   )
   log(`✅ 9 players registered to payable game`)

@@ -1,6 +1,6 @@
 import fs from 'fs'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 import { saveContractData } from '../helpers/saveContractData'
 
@@ -61,10 +61,10 @@ const func: DeployFunction = async function ({
   )
   log('✅ Contracts data was copied to the dapp')
 
-  // Copy network configuration to the dapp
+  // Copy game configuration to the dapp
   await fs.copyFileSync(
-    'config/networkConfig.ts',
-    '../dapp/src/config/internal/networkConfig.ts'
+    'config/gameConfig.ts',
+    '../dapp/src/config/internal/gameConfig.ts'
   )
   log('✅ Contracts data was copied to the dapp')
 }

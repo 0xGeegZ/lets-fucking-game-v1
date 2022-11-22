@@ -1,24 +1,22 @@
 import { useMemo } from 'react'
-import { networkConfig, defaultGameConfig } from 'config/internal/networkConfig'
+import { gameConfig, defaultGameConfig } from 'config/internal/gameConfig'
 
 import { useActiveChainId } from './useActiveChainId'
 
 export const useGameConfig = () => {
   const { chainId } = useActiveChainId()
 
-  const { gameConfig } = networkConfig[chainId]
-  if (!gameConfig) throw new Error(`No game config found for chain id ${chainId}`)
+  if (!gameConfig[chainId]) throw new Error(`No game config found for chain id ${chainId}`)
 
-  return useMemo(() => gameConfig, [gameConfig])
+  return useMemo(() => gameConfig[chainId], [chainId])
 }
 
 export const useDefaultGameConfig = () => {
   return useMemo(() => defaultGameConfig, [])
 }
 
-export const useGameConfigWithDefaultFallback = () => {
+export const useGameConfigFallback = () => {
   const { chainId } = useActiveChainId()
-  const { gameConfig } = networkConfig[chainId]
 
-  return useMemo(() => gameConfig || defaultGameConfig, [gameConfig])
+  return useMemo(() => gameConfig[chainId] || defaultGameConfig, [chainId])
 }

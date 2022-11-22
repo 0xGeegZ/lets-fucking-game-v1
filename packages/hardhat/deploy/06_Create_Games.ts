@@ -2,7 +2,7 @@ import { formatBytes32String } from '@ethersproject/strings'
 import { ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
-import { networkConfig } from '../config/networkConfig'
+import { gameConfig } from '../config/gameConfig'
 
 const func: DeployFunction = async function ({
   deployments,
@@ -16,22 +16,23 @@ const func: DeployFunction = async function ({
   const deployer = await ethers.getSigner(deployerAddress)
   const chainId = await getChainId()
 
-  const gameConfig = networkConfig[chainId].gameConfig
-  if (!gameConfig) throw new Error('No game config found for chain id', chainId)
+  const currentGameConfig = gameConfig[chainId]
+  if (!currentGameConfig)
+    throw new Error('No game config found for chain id', chainId)
 
-  const name = formatBytes32String(gameConfig.NAME_DEFAULT)
-  const gameCreationAmount = gameConfig.GAME_CREATION_AMOUNT
-  const maxPlayers = gameConfig.PLAYERS_DEFAULT
-  const playTimeRange = gameConfig.PLAY_TIME_RANGE_DEFAULT
-  const registrationAmount = gameConfig.REGISTRATION_AMOUNT_DEFAULT
-  const zeroRegistrationAmount = gameConfig.REGISTRATION_AMOUNT_FREE
+  const name = formatBytes32String(currentGameConfig.NAME_DEFAULT)
+  const gameCreationAmount = currentGameConfig.GAME_CREATION_AMOUNT
+  const maxPlayers = currentGameConfig.PLAYERS_DEFAULT
+  const playTimeRange = currentGameConfig.PLAY_TIME_RANGE_DEFAULT
+  const registrationAmount = currentGameConfig.REGISTRATION_AMOUNT_DEFAULT
+  const zeroRegistrationAmount = currentGameConfig.REGISTRATION_AMOUNT_FREE
 
-  const freeGamePrizepool = gameConfig.PRIZEPOOL_NUMBER
-  const freeGamePrizepoolAmount = gameConfig.PRIZEPOOL_AMOUNT
+  const freeGamePrizepool = currentGameConfig.PRIZEPOOL_NUMBER
+  const freeGamePrizepoolAmount = currentGameConfig.PRIZEPOOL_AMOUNT
 
-  const treasuryFee = gameConfig.TREASURY_FEE_DEFAULT
-  const creatorFee = gameConfig.CREATOR_FEE_DEFAULT
-  const encodedCron = gameConfig.ENCODED_CRON_DEFAULT
+  const treasuryFee = currentGameConfig.TREASURY_FEE_DEFAULT
+  const creatorFee = currentGameConfig.CREATOR_FEE_DEFAULT
+  const encodedCron = currentGameConfig.ENCODED_CRON_DEFAULT
 
   const prizes = [
     {
@@ -93,19 +94,19 @@ const func: DeployFunction = async function ({
   )
   log(`✅ New free game created`)
 
-  log('Creating new free game for 2 players')
-  await gameFactory.createNewGame(
-    name,
-    2,
-    playTimeRange,
-    zeroRegistrationAmount,
-    treasuryFee,
-    creatorFee,
-    encodedCron,
-    freeGamePrizes,
-    { value: gameCreationAmount.add(freeGamePrizepoolAmount) }
-  )
-  log(`✅ New free game for 2 players created`)
+  // log('Creating new free game for 2 players')
+  // await gameFactory.createNewGame(
+  //   name,
+  //   2,
+  //   playTimeRange,
+  //   zeroRegistrationAmount,
+  //   treasuryFee,
+  //   creatorFee,
+  //   encodedCron,
+  //   freeGamePrizes,
+  //   { value: gameCreationAmount.add(freeGamePrizepoolAmount) }
+  // )
+  // log(`✅ New free game for 2 players created`)
 }
 
 func.tags = ['all', 'test', 'dev', 'staging', 'create-games']

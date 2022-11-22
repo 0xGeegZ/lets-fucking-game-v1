@@ -13,7 +13,6 @@ import { parseEther } from '@ethersproject/units'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { isValidCron } from 'cron-validator'
 import Tooltip from 'views/Games/components/GameCardButtons/Tooltip'
-import { networkConfig } from 'config/internal/networkConfig'
 import NextStepButton from './NextStepButton'
 import BackStepButton from './BackStepButton'
 

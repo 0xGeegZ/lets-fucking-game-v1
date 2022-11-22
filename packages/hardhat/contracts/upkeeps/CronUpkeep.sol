@@ -204,16 +204,9 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
      * @return upkeepNeeded signals if upkeep is needed, performData is an abi encoding
      * of the id and "next tick" of the eligible cron job
      */
-    // function checkUpkeep(bytes calldata) external view override whenNotPaused returns (bool, bytes memory) {
-    function checkUpkeep(bytes calldata)
-        external
-        view
-        override
-        whenNotPaused
-        cannotExecute
-        returns (bool, bytes memory)
-    {
-        // _delegate(s_delegate);
+    function checkUpkeep(bytes calldata) external view override whenNotPaused returns (bool, bytes memory) {
+        //     cannotExecute
+
         // DEV: start at a random spot in the list so that checks are
         // spread evenly among cron jobs
         uint256 numCrons = s_activeCronJobIDs.length();
