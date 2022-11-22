@@ -66,7 +66,7 @@ const func: DeployFunction = async function ({
     'config/gameConfig.ts',
     '../dapp/src/config/internal/gameConfig.ts'
   )
-  log('✅ Contracts data was copied to the dapp')
+  log('✅ Multi Chain game config data was copied to the dapp')
 }
 
 func.tags = ['all', 'dev', 'staging', 'prod', 'save-contract-data']

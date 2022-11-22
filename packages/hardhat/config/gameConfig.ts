@@ -102,7 +102,8 @@ export const gameConfig: Record<
   },
   '80001': {
     ...defaultGameConfig,
-    GAME_CREATION_AMOUNT: parseEther('1'),
+    GAME_CREATION_AMOUNT: parseEther('0.01'),
+    // GAME_CREATION_AMOUNT: parseEther('1'),
     PLAYERS_DEFAULT: 5,
   },
 }

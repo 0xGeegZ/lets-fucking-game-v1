@@ -10,46 +10,40 @@ This application was done during the [ChainLink Hackathon Fall 2022](https://dev
 
 **PRIMARY :**
 
-- GameFactory contract [0x96b639eD2eD0C4aB6EEe378BBD37B5D9C0c65C0C](https://goerli.etherscan.io/address/0x96b639eD2eD0C4aB6EEe378BBD37B5D9C0c65C0C#code)
-- GameV1 BASE contract [0x8079005dB2A42404B16ec2B8c71839d4cc585Ff9](https://goerli.etherscan.io/address/0x8079005dB2A42404B16ec2B8c71839d4cc585Ff9#code)
+- GameFactory contract [0xd768B91254ed4EA00F51A281B1095Bb7840Ccd73](https://goerli.etherscan.io/address/0xd768B91254ed4EA00F51A281B1095Bb7840Ccd73#code)
+- GameV1 BASE contract [0x19B4F2603DA9d3AA6a7068B314f29FEe3a3eCD69](https://goerli.etherscan.io/address/0x19B4F2603DA9d3AA6a7068B314f29FEe3a3eCD69#code)
 
 **SECONDARY :**
 
-- CronUpkeep contract [0xBD6daa3c74eC8C014B5E04Af28289a28c66D7B25](https://goerli.etherscan.io/address/0xBD6daa3c74eC8C014B5E04Af28289a28c66D7B25#code)
-- CronUpkeepDelegate contract [0x8473CC5B8E3169be0C6761298EFE484d0EA0E920](https://goerli.etherscan.io/address/0x8473CC5B8E3169be0C6761298EFE484d0EA0E920#code)
+- CronUpkeep contract [0x76775c74A54799792B39D1cfD1EFEEBE0344c616](https://goerli.etherscan.io/address/0x76775c74A54799792B39D1cfD1EFEEBE0344c616#code)
 - CronExternal contract [0x028108eb5f57f0f18db335208638f7e3a7f8a92f](https://goerli.etherscan.io/address/0x028108eb5f57f0f18db335208638f7e3a7f8a92f#code)
-- Multicall contracts [0xddebb58F0EA0411cF433a00D7d7A2e1f2E860ACB](https://goerli.etherscan.io/address/0xddebb58F0EA0411cF433a00D7d7A2e1f2E860ACB#code)
 - MulticallV3 contracts [0x3cB1f308f9cDF098968Cb805339936FaB72ECD72](https://goerli.etherscan.io/address/0x3cB1f308f9cDF098968Cb805339936FaB72ECD72#code)
 
 ## Contracts deployed on BNB CHAIN TESTNET :
 
 **PRIMARY :**
 
-- GameFactory contract [0xD9B4aBdF273017619b67fbDd8c6a56b71E48672a](https://testnet.bscscan.com/address/0xD9B4aBdF273017619b67fbDd8c6a56b71E48672a#code)
-- GameV1 BASE contract [0x6CDF1b48b20d07B314B8438961aF9eBe9e70F19E](https://testnet.bscscan.com/address/0x6CDF1b48b20d07B314B8438961aF9eBe9e70F19E#code)
+- GameFactory contract [0xc5ABe709741c7758A77ef72edDdFD9aCA1d08E70](https://testnet.bscscan.com/address/0xc5ABe709741c7758A77ef72edDdFD9aCA1d08E70#code)
+- GameV1 BASE contract [0x6599a4Bee1ffc4147D9Ae026C2f170436bB8Bb47](https://testnet.bscscan.com/address/0x6599a4Bee1ffc4147D9Ae026C2f170436bB8Bb47#code)
 
 **SECONDARY :**
 
-- CronUpkeep contract [0xa3b902268F15C12C1A8f814F30D608D9AdBDa517](https://testnet.bscscan.com/address/0xa3b902268F15C12C1A8f814F30D608D9AdBDa517#code)
-- CronUpkeepDelegate contract [0x997f23C4c593934EA25499b5866adcF30Bd7cc66](https://testnet.bscscan.com/address/0x997f23C4c593934EA25499b5866adcF30Bd7cc66#code)
+- CronUpkeep contract [0x6c7D3691C790953c00e5b9Ea7C18c046ECC6AD7B](https://testnet.bscscan.com/address/0x6c7D3691C790953c00e5b9Ea7C18c046ECC6AD7B#code)
 - CronExternal contract [0x9F0660311430F0a6a17f8782E77DBC7C16C1BFe2](https://testnet.bscscan.com/address/0x9F0660311430F0a6a17f8782E77DBC7C16C1BFe2#code)
-- Multicall contracts [0x420A9706e49759741c010408580AF7DB6DF2f30B](https://testnet.bscscan.com/address/0x420A9706e49759741c010408580AF7DB6DF2f30B#code)
 - MulticallV3 contracts [0x41b0b067797B8DfFb2299c133C78aae08C0fDb86](https://testnet.bscscan.com/address/0x41b0b067797B8DfFb2299c133C78aae08C0fDb86#code)
 
 ## Contracts deployed on POLYGON CHAIN TESTNET MUMBAI :
 
 **PRIMARY :**
 
-- GameFactory contract [0x94e542B2A3c847a61E8E3F96477388CDCf8Ac791](https://mumbai.polygonscan.com/address/0x94e542B2A3c847a61E8E3F96477388CDCf8Ac791#code)
-- GameV1 BASE contract [0x8693F834CC37eCdCDEa510C091D0Fe1F9827694A](https://mumbai.polygonscan.com/address/0x8693F834CC37eCdCDEa510C091D0Fe1F9827694A#code)
+- GameFactory contract [0x5A56D0D7BD2Db9d96E37F9187CbeE398315a57e2](https://mumbai.polygonscan.com/address/0x5A56D0D7BD2Db9d96E37F9187CbeE398315a57e2)
+- GameV1 BASE contract [0x7DA3e4C4B95CfDE7d919104f63A006697018D4f0](https://mumbai.polygonscan.com/address/0x7DA3e4C4B95CfDE7d919104f63A006697018D4f0)
 
 **SECONDARY :**
 
-- CronUpkeep contract [0x34d04395Eb98642Cf51b7F8c226e522573a2a6B5](https://mumbai.polygonscan.com/address/0x34d04395Eb98642Cf51b7F8c226e522573a2a6B5#code)
-- CronUpkeepDelegate contract [0x787b9B77803eD99bA20CF4A9663Acd4c2EFFa8E5](https://mumbai.polygonscan.com/address/0x787b9B77803eD99bA20CF4A9663Acd4c2EFFa8E5#code)
-- CronExternal contract [0x039B8906C439756969928FdAa7c0a78Bd302201c](https://mumbai.polygonscan.com/address/0x039B8906C439756969928FdAa7c0a78Bd302201c#code)
-- Multicall contracts [0x96b639eD2eD0C4aB6EEe378BBD37B5D9C0c65C0C](https://mumbai.polygonscan.com/address/0x96b639eD2eD0C4aB6EEe378BBD37B5D9C0c65C0C#code)
-- MulticallV3 contracts [0x7858258c475BDE1b07451A9e76C65dc078584b60](https://mumbai.polygonscan.com/address/0x7858258c475BDE1b07451A9e76C65dc078584b60#code)
+- CronUpkeep contract [0x8a88c6EEd4DF773643b1A2EEAA0CB128Ed18820A](https://mumbai.polygonscan.com/address/0x8a88c6EEd4DF773643b1A2EEAA0CB128Ed18820A)
+- CronExternal contracts [0x039B8906C439756969928FdAa7c0a78Bd302201c](https://mumbai.polygonscan.com/address/0x039B8906C439756969928FdAa7c0a78Bd302201c)
+- MulticallV3 contracts [0x7858258c475BDE1b07451A9e76C65dc078584b60](https://mumbai.polygonscan.com/address/0x7858258c475BDE1b07451A9e76C65dc078584b60)
 
 ## Inspiration
 

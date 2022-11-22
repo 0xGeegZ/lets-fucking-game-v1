@@ -2,7 +2,6 @@
 pragma solidity >=0.8.6;
 
 import "@openzeppelin/contracts/utils/Address.sol";
-
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";

@@ -1,8 +1,8 @@
 // GAME CONFIG : UPDATE DEFAULT CONFIG FROM HARDHAT PACKAGE THEN COPY CHANGE TO DAPP BY COMPILING OR DEPLOYING CONTRACT
 import { parseEther } from '@ethersproject/units'
-import { BigNumber } from '@ethersproject/bignumber'
 
-export const range = (start, end) => Array.from(Array(end + 1).keys()).slice(start)
+export const range = (start, end) =>
+  Array.from(Array(end + 1).keys()).slice(start)
 
 const randomNumber = () => {
   return Math.floor(Math.random() * (10000 - 1) + 1)
@@ -13,7 +13,7 @@ export const defaultGameConfig = {
   NAME_MIN_LENGTH: 3,
   NAME_MAX_LENGTH: 32,
 
-  PLAYERS_DEFAULT: 5,
+  PLAYERS_DEFAULT: 10,
   PLAYERS_MIN_LENGTH: 2,
   PLAYERS_MAX_LENGTH: 100,
 
@@ -24,7 +24,9 @@ export const defaultGameConfig = {
 
   REGISTRATION_AMOUNT_DEFAULT: parseEther('0.0001'),
   REGISTRATION_AMOUNT_FREE: parseEther('0'),
-  AUTHORIZED_REGISTRATION_AMOUNTS: [0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10],
+  AUTHORIZED_REGISTRATION_AMOUNTS: [
+    0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
+  ],
 
   PRIZEPOOL_NUMBER: 0.01,
   PRIZEPOOL_AMOUNT: parseEther('0.01'),
@@ -55,31 +57,31 @@ export const gameConfig: Record<
     PLAYERS_MIN_LENGTH: number
     PLAYERS_MAX_LENGTH: number
 
-    GAME_CREATION_AMOUNT: BigNumber
+    GAME_CREATION_AMOUNT: number
 
     PLAY_TIME_RANGE_DEFAULT: number
-    AUTHORIZED_PLAY_TIME_RANGE: Array<number>
+    AUTHORIZED_PLAY_TIME_RANGE: Array
 
-    REGISTRATION_AMOUNT_DEFAULT: BigNumber
-    REGISTRATION_AMOUNT_FREE: BigNumber
-    AUTHORIZED_REGISTRATION_AMOUNTS: Array<number>
+    REGISTRATION_AMOUNT_DEFAULT: number
+    REGISTRATION_AMOUNT_FREE: number
+    AUTHORIZED_REGISTRATION_AMOUNTS: Array
 
     PRIZEPOOL_NUMBER: number
-    PRIZEPOOL_AMOUNT: BigNumber
+    PRIZEPOOL_AMOUNT: number
 
     ENCODED_CRON_DEFAULT: string
-    AUTHORIZED_CRONS: Array<number>
+    AUTHORIZED_CRONS: Array
 
-    PRIZETYPE: Array<string>
+    PRIZETYPE: Array
 
     TREASURY_FEE_DEFAULT: number
     TREASURY_FEE_MIN: number
     TREASURY_FEE_MAX: number
-    AUTHORIZED_TREASURY_FEE: Array<number>
+    AUTHORIZED_TREASURY_FEE: Array
     CREATOR_FEE_DEFAULT: number
     CREATOR_FEE_MIN: number
     CREATOR_FEE_MAX: number
-    AUTHORIZED_CREATOR_FEE: Array<number>
+    AUTHORIZED_CREATOR_FEE: Array
   }
 > = {
   '31337': { ...defaultGameConfig },
@@ -100,7 +102,8 @@ export const gameConfig: Record<
   },
   '80001': {
     ...defaultGameConfig,
-    GAME_CREATION_AMOUNT: parseEther('1'),
+    GAME_CREATION_AMOUNT: parseEther('0.01'),
+    // GAME_CREATION_AMOUNT: parseEther('1'),
     PLAYERS_DEFAULT: 5,
   },
 }

@@ -3,7 +3,7 @@ import Page from 'components/Layout/Page'
 import PageLoader from 'components/Loader/PageLoader'
 import Header from 'views/GameCreation/components//Header'
 import GameCreationProvider from 'views/GameCreation/contexts/GameCreationProvider'
-import Steps from 'views/GameCreation/Steps'
+import Steps from 'views/GameCreation/components/Steps'
 
 const GameCreation = () => {
   const { account } = useWeb3React()
