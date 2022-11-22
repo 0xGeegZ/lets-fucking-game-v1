@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { GameCreationContext } from '../contexts/GameCreationProvider'
+import { GameCreationContext } from 'views/GameCreation/contexts/GameCreationProvider'
 
 export const useGameContext = () => {
   return useContext(GameCreationContext)

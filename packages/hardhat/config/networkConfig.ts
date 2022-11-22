@@ -1,16 +1,13 @@
+// GAME CONFIG : UPDATE DEFAULT CONFIG FROM HARDHAT PACKAGE THEN COPY CHANGE TO DAPP BY COMPILING OR DEPLOYING CONTRACT
+
 export const networkConfig: Record<
   string,
   {
     name: string
     linkToken?: string
-    feedRegistry?: string
-    ethUsdPriceFeed?: string
-    vrfCoordinator?: string
-    keyHash: string
-    oracle?: string
-    jobId: string
     fee: string
     fundAmount: string
+    gameConfig?
   }
 > = {
   '31337': {
@@ -35,15 +32,9 @@ export const networkConfig: Record<
     fee: '100000000000000000',
     fundAmount: '1000000000000000000',
   },
-  '4': {
-    name: 'rinkeby',
-    linkToken: '0x01be23585060835e02b77ef475b0cc51aa1e0709',
-    fee: '100000000000000000',
-    fundAmount: '1000000000000000000',
-  },
-  '42': {
-    name: 'kovan',
-    linkToken: '0xa36085F69e2889c224210F603D836748e7dC0088',
+  '5': {
+    name: 'goerli',
+    linkToken: '0x63bfb2118771bd0da7a6936667a7bb705a06c1ba',
     fee: '100000000000000000',
     fundAmount: '1000000000000000000',
   },

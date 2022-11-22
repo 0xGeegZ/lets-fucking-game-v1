@@ -14,12 +14,10 @@ const func: DeployFunction = async function ({
   const game = await deployments.get('GameV1')
   const gameFactory = await deployments.get('GameFactory')
 
-  const multiCall = await deployments.get('Multicall')
   const multiCall3 = await deployments.get('Multicall3')
 
   const cronExternal = await deployments.get('CronExternal')
   const cronUpkeep = await deployments.get('CronUpkeep')
-  const cronUpkeepDelegate = await deployments.get('CronUpkeepDelegate')
 
   saveContractData({
     [chainId]: {
@@ -47,18 +45,6 @@ const func: DeployFunction = async function ({
         transactionHash: cronUpkeep.transactionHash,
         abi: cronUpkeep.abi,
       },
-      CronUpkeepDelegate: {
-        address: cronUpkeepDelegate.address,
-        libraries: cronUpkeepDelegate.libraries || {},
-        transactionHash: cronUpkeepDelegate.transactionHash,
-        abi: cronUpkeepDelegate.abi,
-      },
-      MultiCall: {
-        address: multiCall.address,
-        libraries: multiCall.libraries || {},
-        transactionHash: multiCall.transactionHash,
-        abi: multiCall.abi,
-      },
       MultiCall3: {
         address: multiCall3.address,
         libraries: multiCall3.libraries || {},
@@ -74,6 +60,13 @@ const func: DeployFunction = async function ({
     '../dapp/src/config/internal/internal.json'
   )
   log('✅ Contracts data was copied to the dapp')
+
+  // Copy game configuration to the dapp
+  await fs.copyFileSync(
+    'config/gameConfig.ts',
+    '../dapp/src/config/internal/gameConfig.ts'
+  )
+  log('✅ Multi Chain game config data was copied to the dapp')
 }
 
 func.tags = ['all', 'dev', 'staging', 'prod', 'save-contract-data']

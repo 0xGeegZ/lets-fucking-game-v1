@@ -3,7 +3,7 @@ import { useTranslation } from '@pancakeswap/localization'
 import { Button, AutoRenewIcon, Flex, Text, WarningIcon } from '@pancakeswap/uikit'
 import { useCreateGame } from 'views/GameCreation/hooks/useCreateGame'
 import Tooltip from 'views/Games/components/GameCardButtons/Tooltip'
-import { BNB, NFT } from './contexts/types'
+import { BNB, NFT } from 'views/GameCreation/types'
 
 // TODO USE TYPECHAIN INTERFACE ??
 // TODO GUIGUI MOOVE IT TO TYPES
@@ -25,6 +25,7 @@ const CreateGameButton: React.FC<React.PropsWithChildren<CreateGameButtonProps>>
   const { isPending, handleCreateGame } = useCreateGame(game)
 
   const {
+    name,
     treasuryFee,
     registrationAmount,
     maxPlayers,
@@ -36,6 +37,7 @@ const CreateGameButton: React.FC<React.PropsWithChildren<CreateGameButtonProps>>
 
   const isGameFieldKO = useMemo(
     () =>
+      !name ||
       !treasuryFee ||
       !registrationAmount ||
       !maxPlayers ||
@@ -43,7 +45,16 @@ const CreateGameButton: React.FC<React.PropsWithChildren<CreateGameButtonProps>>
       !encodedCron ||
       !numberPlayersAllowedToWin ||
       !prizeType,
-    [encodedCron, maxPlayers, numberPlayersAllowedToWin, playTimeRange, prizeType, registrationAmount, treasuryFee],
+    [
+      encodedCron,
+      maxPlayers,
+      name,
+      numberPlayersAllowedToWin,
+      playTimeRange,
+      prizeType,
+      registrationAmount,
+      treasuryFee,
+    ],
   )
 
   const isDisabledButton = useMemo(() => isGameFieldKO || isPending, [isGameFieldKO, isPending])

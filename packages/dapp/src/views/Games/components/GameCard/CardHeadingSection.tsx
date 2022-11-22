@@ -4,6 +4,8 @@ import { Token } from '@pancakeswap/sdk'
 import { CoreTag } from 'components/Tags'
 import RegistrationTag from 'views/Games/components/GameTags/RegistrationTag'
 import ProgressTag from 'views/Games/components/GameTags/ProgressTag'
+import StartingTag from 'views/Games/components/GameTags/StartingTag'
+
 import FreeTag from 'views/Games/components/GameTags/FreeTag'
 import BigNumber from 'bignumber.js'
 import { CurrencyLogo, DoubleCurrencyLogo } from 'components/Logo'
@@ -68,12 +70,13 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
       <Flex flexDirection="column" alignItems="flex-end">
         {isReady ? <Heading mb="4px">{name}</Heading> : <Skeleton mb="4px" width={60} height={18} />}
         <Flex justifyContent="center" mt="4px">
+          {isReady ? <>{isInProgress && <ProgressTag mr="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />}
           {isReady ? (
-            <>{(isInProgress || !isRegistering) && <ProgressTag mr="4px" />}</>
+            <>{!isRegistering && !isInProgress && <StartingTag mr="4px" />}</>
           ) : (
             <Skeleton ml="4px" width={42} height={28} />
           )}
-          {/* {isReady ? <>{isInProgress && <CoreTag mr="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />} */}
+
           {isReady ? (
             <>{isRegistering && <RegistrationTag ml="4px" />}</>
           ) : (

@@ -2,7 +2,6 @@
 pragma solidity >=0.8.6;
 
 import "@openzeppelin/contracts/utils/Address.sol";
-
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
@@ -155,8 +154,6 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
                 gameCreationAmount: gameCreationAmount
             })
         );
-        emit GameCreated(nextId, newGameAddress, latestVersionId, msg.sender);
-        nextId += 1;
 
         CronUpkeepInterface(cronUpkeep).addDelegator(newGameAddress);
 
@@ -178,6 +175,9 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
 
         uint256 prizepool = msg.value - gameCreationAmount;
         GameV1Interface(newGameAddress).initialize{ value: prizepool }(initialization);
+
+        emit GameCreated(nextId, newGameAddress, latestVersionId, msg.sender);
+        nextId += 1;
 
         return newGameAddress;
     }
@@ -288,6 +288,8 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
 
         for (uint256 i = 0; i < deployedGames.length; i++) {
             Game memory game = deployedGames[i];
+            CronUpkeepInterface(cronUpkeep).addDelegator(game.deployedAddress);
+
             GameV1Interface(payable(game.deployedAddress)).setCronUpkeep(cronUpkeep);
         }
     }

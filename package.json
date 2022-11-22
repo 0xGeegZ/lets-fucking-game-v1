@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "yarn workspace lets-fucking-game-dapp dev",
-    "build": "yarn build:hardhat && yarn build:dapp",
+    "build": "(yarn run 'build:hardhat' &) && yarn compile:hardhat && yarn build:dapp",
+    "compile:hardhat": "yarn workspace lets-fucking-game-hardhat compile:force",
     "build:hardhat": "yarn workspace lets-fucking-game-hardhat build",
     "build:dapp": "yarn workspace lets-fucking-game-dapp build",
     "export": "yarn workspace lets-fucking-game-dapp export",
@@ -12,7 +13,7 @@
     "chain": "yarn workspace lets-fucking-game-hardhat chain:force",
     "deploy": "yarn workspace lets-fucking-game-hardhat deploy",
     "compile": "yarn workspace lets-fucking-game-hardhat compile",
-    "test:contracts": "yarn workspace lets-fucking-game-hardhat test",
+    "test:contracts": "yarn workspace lets-fucking-game-hardhat test:force",
     "test:dapp": "yarn workspace lets-fucking-game-dapp test",
     "coverage:contracts": "yarn workspace lets-fucking-game-hardhat test:coverage",
     "lint:dapp": "yarn workspace lets-fucking-game-dapp lint",

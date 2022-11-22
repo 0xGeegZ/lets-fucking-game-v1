@@ -1,9 +1,9 @@
 import { useWeb3React } from '@pancakeswap/wagmi'
 import Page from 'components/Layout/Page'
 import PageLoader from 'components/Loader/PageLoader'
-import Header from './Header'
-import GameCreationProvider from './contexts/GameCreationProvider'
-import Steps from './Steps'
+import Header from 'views/GameCreation/components//Header'
+import GameCreationProvider from 'views/GameCreation/contexts/GameCreationProvider'
+import Steps from 'views/GameCreation/components/Steps'
 
 const GameCreation = () => {
   const { account } = useWeb3React()

@@ -52,8 +52,6 @@ export type { GameV1Interface } from "./contracts/interfaces/GameV1Interface";
 export { GameV1Interface__factory } from "./factories/contracts/interfaces/GameV1Interface__factory";
 export type { IKeeper } from "./contracts/interfaces/IKeeper";
 export { IKeeper__factory } from "./factories/contracts/interfaces/IKeeper__factory";
-export type { Multicall } from "./contracts/multicall/Multicall";
-export { Multicall__factory } from "./factories/contracts/multicall/Multicall__factory";
 export type { Multicall3 } from "./contracts/multicall/Multicall3";
 export { Multicall3__factory } from "./factories/contracts/multicall/Multicall3__factory";
 export type { CronUpkeep } from "./contracts/upkeeps/CronUpkeep";

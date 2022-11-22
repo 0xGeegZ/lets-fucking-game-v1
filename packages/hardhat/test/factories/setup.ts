@@ -1,11 +1,8 @@
 import { deployments, ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
+import { defaultGameConfig } from '../../config/gameConfig'
 import { ONE_DAY_IN_SECONDS } from '../helpers'
-
-const AUTHORIZED_AMOUNTS = [
-  0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
-]
 
 const setupTest = deployments.createFixture(
   async ({
@@ -54,6 +51,10 @@ const setupTest = deployments.createFixture(
     const gameContract = await deployments.get('GameV1', libraries)
 
     const cronUpkeepContract = await deployments.get('CronUpkeep', libraries)
+    const cronUpkeepSecondaryContract = await deployments.get(
+      'CronUpkeepSecondary',
+      libraries
+    )
 
     const secondGameV1Contract = await deploy('GameV1', {
       ...options,
@@ -75,6 +76,12 @@ const setupTest = deployments.createFixture(
 
     const cronUpkeep = new ethers.Contract(
       cronUpkeepContract.address,
+      cronUpkeepInterface.interface,
+      deployer
+    )
+
+    const cronUpkeepSecondary = new ethers.Contract(
+      cronUpkeepSecondaryContract.address,
       cronUpkeepInterface.interface,
       deployer
     )
@@ -121,6 +128,7 @@ const setupTest = deployments.createFixture(
       gameFactory,
       game,
       cronUpkeep,
+      cronUpkeepSecondary,
       secondGameV1,
       deployedPayableGame,
       deployedFreeGame,
@@ -147,22 +155,38 @@ const initialiseTestData = async function () {
   this.name = ethers.utils.formatBytes32String("Let's Fucking Game MVP")
   this.newName = ethers.utils.formatBytes32String('New Name')
 
-  this.maxPlayers = 10
-  this.playTimeRange = 2
+  this.maxPlayers = defaultGameConfig.PLAYERS_DEFAULT
+  this.playTimeRange = defaultGameConfig.PLAY_TIME_RANGE_DEFAULT
 
-  this.correctRegistrationAmount = ethers.utils.parseEther('0.0001')
-  this.incorrectRegistrationAmount = ethers.utils.parseEther('0.03')
-  this.zeroRegistrationAmount = ethers.utils.parseEther('0')
+  this.correctRegistrationAmount = defaultGameConfig.REGISTRATION_AMOUNT_DEFAULT
+  this.incorrectRegistrationAmount =
+    defaultGameConfig.REGISTRATION_AMOUNT_DEFAULT.mul(999)
+  this.zeroRegistrationAmount = defaultGameConfig.REGISTRATION_AMOUNT_FREE
 
-  this.freeGamePrizepool = 1
-  this.freeGamePrizepoolAmount = ethers.utils.parseEther('1')
+  this.gameCreationAmount = defaultGameConfig.GAME_CREATION_AMOUNT
+  this.treasuryFee = defaultGameConfig.TREASURY_FEE_DEFAULT
+  this.creatorFee = defaultGameConfig.CREATOR_FEE_DEFAULT
 
-  this.gameCreationAmount = ethers.utils.parseEther('0.1')
-  this.treasuryFee = 500 // 5%
-  this.creatorFee = 500 // 5%
+  this.freeGamePrizepool = defaultGameConfig.PRIZEPOOL_NUMBER
+  this.freeGamePrizepoolAmount = defaultGameConfig.PRIZEPOOL_AMOUNT
+
+  const freeGameTreasuryAmt =
+    (this.freeGamePrizepoolAmount * (this.treasuryFee + this.creatorFee)) /
+    10000
+  const freeGameRewardAmount =
+    this.freeGamePrizepoolAmount - freeGameTreasuryAmt
+
+  this.freeGamePrizeAmount = freeGameRewardAmount
 
   // prizeAmount equals total prize amount minus treasury fee
-  this.prizeAmount = ethers.utils.parseEther('0.0009')
+  const treasuryAmt =
+    (this.correctRegistrationAmount *
+      this.maxPlayers *
+      (this.treasuryFee + this.creatorFee)) /
+    10000
+  const rewardAmount =
+    this.correctRegistrationAmount * this.maxPlayers - treasuryAmt
+  this.prizeAmount = rewardAmount
 
   this.launchDuration = 60 * 60 * 25
   this.upperMaxDuration = 60 * 60 * 24
@@ -174,11 +198,12 @@ const initialiseTestData = async function () {
   // TODO Implement business logic to cover keeper in test
   this.mockKeeper = mockKeeper
 
-  this.encodedCron = '0 18 * * *'
+  this.encodedCron = defaultGameConfig.ENCODED_CRON_DEFAULT
 
-  this.authorizedAmounts = AUTHORIZED_AMOUNTS.map((amount) =>
-    ethers.utils.parseEther(`${amount}`)
-  )
+  this.authorizedAmounts =
+    defaultGameConfig.AUTHORIZED_REGISTRATION_AMOUNTS.map((amount) =>
+      ethers.utils.parseEther(`${amount}`)
+    )
 
   this.prizes = [
     {
@@ -212,6 +237,7 @@ const initialiseTestData = async function () {
     gameFactory,
     game,
     cronUpkeep,
+    cronUpkeepSecondary,
     secondGameV1,
     deployedPayableGame,
     deployedFreeGame,
@@ -224,6 +250,8 @@ const initialiseTestData = async function () {
   // this.cronExternal = cronExternal
 
   this.cronUpkeep = cronUpkeep
+  this.cronUpkeepSecondary = cronUpkeepSecondary
+
   this.gameFactory = gameFactory
   this.game = game
   this.secondGameV1 = secondGameV1

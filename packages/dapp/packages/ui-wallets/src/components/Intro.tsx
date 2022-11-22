@@ -7,7 +7,8 @@ import { getDocLink } from '../docLangCodeMapping'
 const IntroSteps = [
   {
     title: <Trans>Your first step in the DeFi world</Trans>,
-    icon: 'https://cdn.pancakeswap.com/wallets/wallet_intro.png',
+    // icon: 'https://cdn.pancakeswap.com/wallets/wallet_intro.png',
+    icon: 'https://res.cloudinary.com/vaka/image/upload/v1669153009/LFG/wallet_intro.png',
     description: (
       <Trans>
         A Web3 Wallet allows you to send and receive crypto assets like bitcoin, BNB, ETH, NFTs and much more.

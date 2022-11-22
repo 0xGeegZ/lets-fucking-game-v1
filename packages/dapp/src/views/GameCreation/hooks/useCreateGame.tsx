@@ -4,11 +4,11 @@ import { useToast } from '@pancakeswap/uikit'
 import useCatchTxError from 'hooks/useCatchTxError'
 import { ToastDescriptionWithTx } from 'components/Toast'
 import { useGameFactoryV1Contract } from 'hooks/useContract'
+import { useGameConfig } from 'hooks/useGameConfig'
 import { parseEther, formatEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import { ZERO_ADDRESS } from 'config/constants'
-import { GAME_CREATION_AMOUNT } from '../config'
 
 export const useCreateGame = (game) => {
   const { t } = useTranslation()
@@ -16,13 +16,16 @@ export const useCreateGame = (game) => {
   const contract = useGameFactoryV1Contract()
   const { actions, currentStep } = useGameContext()
 
+  const { GAME_CREATION_AMOUNT } = useGameConfig()
+
   const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
 
-  // TODO handle name
   const {
-    /* name, */ maxPlayers,
+    name,
+    maxPlayers,
     playTimeRange,
     registrationAmount,
+    freeGamePrizepoolAmount,
     treasuryFee,
     creatorFee,
     encodedCron,
@@ -30,14 +33,23 @@ export const useCreateGame = (game) => {
     // prizeType,
   } = game
 
-  const parsedRegistrationAmount: number = registrationAmount
-    ? parseFloat(formatEther(registrationAmount.toString()))
-    : 0
+  const parsedRegistrationAmount: number = registrationAmount ? parseFloat(formatEther(`${registrationAmount}`)) : 0
+
+  // TODO GUIGUI Load gameCreationAmount directly from smart contract
+  const gameCreationAmountEther = GAME_CREATION_AMOUNT
+
+  const registrationAmountEther = parseEther(`${parsedRegistrationAmount}`)
+
+  const totalValueAmount = parsedRegistrationAmount
+    ? gameCreationAmountEther
+    : gameCreationAmountEther.add(parseEther(`${freeGamePrizepoolAmount}`))
+
+  const prizepool = parsedRegistrationAmount ? parsedRegistrationAmount * maxPlayers : freeGamePrizepoolAmount
 
   const createPrize = (index, totalWinners) => {
     return {
       position: index,
-      amount: parseEther(`${(parsedRegistrationAmount * maxPlayers) / totalWinners}`),
+      amount: parseEther(`${prizepool / totalWinners}`),
       // TODO use prizeType
       standard: 0,
       contractAddress: ZERO_ADDRESS,
@@ -48,21 +60,12 @@ export const useCreateGame = (game) => {
   const mapper = new Array(numberPlayersAllowedToWin).fill('').map((_, i) => i + 1)
   const prizes = mapper.map((index) => createPrize(index, numberPlayersAllowedToWin))
 
-  // TODO GUIGUI Load gameCreationAmount directly from smart contract
-  const gameCreationAmountEther = GAME_CREATION_AMOUNT
-
-  const registrationAmountEther = parseEther(parsedRegistrationAmount.toString())
-
-  const randomNumber = () => {
-    return Math.floor(Math.random() * (10000 - 1) + 1)
-  }
-
-  const name = formatBytes32String(`LFG ${randomNumber()}`)
+  const formattedName = formatBytes32String(name)
 
   const handleCreateGame = useCallback(async () => {
     const receipt = await fetchWithCatchTxError(() =>
       contract.createNewGame(
-        name,
+        formattedName,
         maxPlayers,
         playTimeRange,
         registrationAmountEther,
@@ -70,7 +73,7 @@ export const useCreateGame = (game) => {
         creatorFee,
         encodedCron,
         prizes,
-        { value: gameCreationAmountEther },
+        { value: totalValueAmount },
       ),
     )
 
@@ -86,7 +89,7 @@ export const useCreateGame = (game) => {
   }, [
     fetchWithCatchTxError,
     contract,
-    name,
+    formattedName,
     maxPlayers,
     playTimeRange,
     registrationAmountEther,
@@ -94,7 +97,7 @@ export const useCreateGame = (game) => {
     creatorFee,
     encodedCron,
     prizes,
-    gameCreationAmountEther,
+    totalValueAmount,
     toastSuccess,
     t,
     actions,

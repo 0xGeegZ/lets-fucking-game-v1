@@ -1,6 +1,6 @@
 import { ethers, run } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
-import { DeployFunction, DeployFunction } from 'hardhat-deploy/types'
+import { DeployFunction } from 'hardhat-deploy/types'
 
 import { networkConfig } from '../config/networkConfig'
 import { autoFundCheck } from '../helpers/autoFundCheck'
@@ -8,7 +8,6 @@ import { autoFundCheck } from '../helpers/autoFundCheck'
 const func: DeployFunction = async function ({
   deployments,
   getChainId,
-  getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
   const { get } = deployments
   const chainId = await getChainId()

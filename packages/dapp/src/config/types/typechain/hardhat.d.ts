@@ -101,10 +101,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IKeeper__factory>;
     getContractFactory(
-      name: "Multicall",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Multicall__factory>;
-    getContractFactory(
       name: "Multicall3",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Multicall3__factory>;
@@ -223,11 +219,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IKeeper>;
-    getContractAt(
-      name: "Multicall",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Multicall>;
     getContractAt(
       name: "Multicall3",
       address: string,

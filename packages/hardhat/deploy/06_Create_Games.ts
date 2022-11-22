@@ -1,8 +1,12 @@
+import { formatBytes32String } from '@ethersproject/strings'
 import { ethers } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
+import { gameConfig } from '../config/gameConfig'
+
 const func: DeployFunction = async function ({
   deployments,
+  getChainId,
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
   const { log } = deployments
@@ -10,25 +14,25 @@ const func: DeployFunction = async function ({
   const { deployer: deployerAddress } = await getNamedAccounts()
 
   const deployer = await ethers.getSigner(deployerAddress)
+  const chainId = await getChainId()
 
-  const name = ethers.utils.formatBytes32String("Let's Fucking Game MVP")
-  const gameCreationAmount = ethers.utils.parseEther('0.1')
+  const currentGameConfig = gameConfig[chainId]
+  if (!currentGameConfig)
+    throw new Error('No game config found for chain id', chainId)
 
-  const maxPlayers = 10
-  const playTimeRange = 2
+  const name = formatBytes32String(currentGameConfig.NAME_DEFAULT)
+  const gameCreationAmount = currentGameConfig.GAME_CREATION_AMOUNT
+  const maxPlayers = currentGameConfig.PLAYERS_DEFAULT
+  const playTimeRange = currentGameConfig.PLAY_TIME_RANGE_DEFAULT
+  const registrationAmount = currentGameConfig.REGISTRATION_AMOUNT_DEFAULT
+  const zeroRegistrationAmount = currentGameConfig.REGISTRATION_AMOUNT_FREE
 
-  const registrationAmount = ethers.utils.parseEther('0.0001')
-  const zeroRegistrationAmount = ethers.utils.parseEther('0')
+  const freeGamePrizepool = currentGameConfig.PRIZEPOOL_NUMBER
+  const freeGamePrizepoolAmount = currentGameConfig.PRIZEPOOL_AMOUNT
 
-  const freeGamePrizepool = 0.1
-  const freeGamePrizepoolAmount = ethers.utils.parseEther('0.1')
-  // const freeGamePrizepool = 1
-  // const freeGamePrizepoolAmount = ethers.utils.parseEther('1')
-
-  const treasuryFee = 500 // 5%
-  const creatorFee = 500 // 5%
-
-  const encodedCron = '0 18 * * *'
+  const treasuryFee = currentGameConfig.TREASURY_FEE_DEFAULT
+  const creatorFee = currentGameConfig.CREATOR_FEE_DEFAULT
+  const encodedCron = currentGameConfig.ENCODED_CRON_DEFAULT
 
   const prizes = [
     {
@@ -44,12 +48,8 @@ const func: DeployFunction = async function ({
   updatedPrizes.push({ ...prizes[0] })
   updatedPrizes.push({ ...prizes[0] })
 
-  updatedPrizes[0].amount = ethers.utils.parseEther(
-    `${freeGamePrizepool * 0.5}`
-  )
-  updatedPrizes[1].amount = ethers.utils.parseEther(
-    `${freeGamePrizepool * 0.5}`
-  )
+  updatedPrizes[0].amount = ethers.utils.parseEther(`${freeGamePrizepool / 2}`)
+  updatedPrizes[1].amount = ethers.utils.parseEther(`${freeGamePrizepool / 2}`)
   updatedPrizes[1].position = 2
 
   const freeGamePrizes = updatedPrizes
@@ -93,6 +93,20 @@ const func: DeployFunction = async function ({
     { value: gameCreationAmount.add(freeGamePrizepoolAmount) }
   )
   log(`✅ New free game created`)
+
+  // log('Creating new free game for 2 players')
+  // await gameFactory.createNewGame(
+  //   name,
+  //   2,
+  //   playTimeRange,
+  //   zeroRegistrationAmount,
+  //   treasuryFee,
+  //   creatorFee,
+  //   '*/10 * * * *',
+  //   freeGamePrizes,
+  //   { value: gameCreationAmount.add(freeGamePrizepoolAmount) }
+  // )
+  // log(`✅ New free game for 2 players created`)
 }
 
 func.tags = ['all', 'test', 'dev', 'staging', 'create-games']
