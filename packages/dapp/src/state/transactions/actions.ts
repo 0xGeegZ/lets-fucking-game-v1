@@ -4,6 +4,14 @@ import { Order } from '@gelatonetwork/limit-orders-lib'
 
 export type TransactionType =
   | 'approve'
+  | 'register'
+  | 'play'
+  | 'claim-prize'
+  | 'vote-split-pot'
+  | 'create-game'
+  | 'pause-game'
+  | 'unpause-game'
+  // TODO GUIGUI DELETE UNUSED TRANSACTION TYPE
   | 'swap'
   | 'wrap'
   | 'add-liquidity'

@@ -7,6 +7,8 @@ import ProgressTag from 'views/Games/components/GameTags/ProgressTag'
 import StartingTag from 'views/Games/components/GameTags/StartingTag'
 
 import FreeTag from 'views/Games/components/GameTags/FreeTag'
+import PausedTag from 'views/Games/components/GameTags/PausedTag'
+
 import BigNumber from 'bignumber.js'
 import { CurrencyLogo, DoubleCurrencyLogo } from 'components/Logo'
 import Dots from 'components/Loader/Dots'
@@ -24,6 +26,7 @@ export interface ExpandableSectionProps {
   chainId: number
   prizepool: BigNumber
   multiplier: BigNumber
+  isPaused: boolean
   isReady: boolean
   isFree: boolean
   isInProgress: boolean
@@ -46,6 +49,7 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
   chainId,
   prizepool,
   multiplier,
+  isPaused,
   isReady,
   isFree,
   isInProgress,
@@ -72,16 +76,17 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
         <Flex justifyContent="center" mt="4px">
           {isReady ? <>{isInProgress && <ProgressTag mr="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />}
           {isReady ? (
-            <>{!isRegistering && !isInProgress && <StartingTag mr="4px" />}</>
+            <>{!isRegistering && !isInProgress && !isPaused && <StartingTag mr="4px" />}</>
+          ) : (
+            <Skeleton ml="4px" width={42} height={28} />
+          )}
+          {isReady ? (
+            <>{isRegistering && !isPaused && <RegistrationTag ml="4px" />}</>
           ) : (
             <Skeleton ml="4px" width={42} height={28} />
           )}
 
-          {isReady ? (
-            <>{isRegistering && <RegistrationTag ml="4px" />}</>
-          ) : (
-            <Skeleton ml="4px" width={42} height={28} />
-          )}
+          {isReady && isPaused && <PausedTag ml="4px" />}
           {isReady ? <>{isFree && <FreeTag ml="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />}
           {isReady ? (
             <>{multiplier && <MultiplierTag variant="secondary">{`x${multiplier.toNumber()}`}</MultiplierTag>}</>

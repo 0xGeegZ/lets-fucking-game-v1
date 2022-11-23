@@ -6,10 +6,13 @@ import { ToastDescriptionWithTx } from 'components/Toast'
 import { useGameV1Contract } from 'hooks/useContract'
 import BigNumber from 'bignumber.js'
 import { parseEther } from '@ethersproject/units'
+import { useTransactionAdder } from 'state/transactions/hooks'
 
 export const useRegisterForGame = (gameAddress: string, registrationAmount: BigNumber) => {
   const { t } = useTranslation()
   const { toastSuccess } = useToast()
+  const addTransaction = useTransactionAdder()
+
   const contract = useGameV1Contract(gameAddress)
 
   const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
@@ -19,6 +22,20 @@ export const useRegisterForGame = (gameAddress: string, registrationAmount: BigN
       contract.registerForGame({ value: parseEther(`${registrationAmount}`) }),
     )
 
+    addTransaction(
+      {
+        ...receipt,
+        hash: receipt.transactionHash,
+      },
+      {
+        summary: `Register for game ${gameAddress} with amount ${registrationAmount}`,
+        translatableSummary: {
+          text: 'Register for game %gameAddress% with amount %registrationAmount%',
+          data: { gameAddress, registrationAmount: registrationAmount.toNumber() },
+        },
+        type: 'register',
+      },
+    )
     if (receipt?.status) {
       toastSuccess(
         t('Success!'),
@@ -27,7 +44,7 @@ export const useRegisterForGame = (gameAddress: string, registrationAmount: BigN
         </ToastDescriptionWithTx>,
       )
     }
-  }, [registrationAmount, fetchWithCatchTxError, contract, toastSuccess, t])
+  }, [fetchWithCatchTxError, contract, registrationAmount, toastSuccess, t, addTransaction, gameAddress])
 
   return { isPending, handleRegister }
 }

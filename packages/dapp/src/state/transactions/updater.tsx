@@ -78,11 +78,11 @@ export const Updater: React.FC<{ chainId: number }> = ({ chainId }) => {
                 }),
               )
 
-              const toast = receipt.status === 1 ? toastSuccess : toastError
-              toast(
-                t('Transaction receipt'),
-                <ToastDescriptionWithTx txHash={receipt.transactionHash} txChainId={chainId} />,
-              )
+              //   const toast = receipt.status === 1 ? toastSuccess : toastError
+              //   toast(
+              //     t('Transaction receipt'),
+              //     <ToastDescriptionWithTx txHash={receipt.transactionHash} txChainId={chainId} />,
+              //   )
               return true
             },
             { onceBlock: provider },

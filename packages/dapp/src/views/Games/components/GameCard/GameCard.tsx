@@ -142,7 +142,6 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
       //   setCronHumanReadable(`${transform} UTC`)
 
       const interval = parser.parseExpression(encodedCron, { tz: 'Etc/UTC' })
-      console.log('🚀 ~ file: GameCard.tsx ~ line 138 ~ useEffect ~ encodedCron', encodedCron)
       const transform = moment(interval.next().toString()).format('hh:mm A')
       //   const transform = momentTz.tz(interval.next().toString(), timezone).format('hh:mm A')
       setCronHumanReadable(`${transform}`)
@@ -175,6 +174,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           chainId={chainId}
           prizepool={prizepool}
           multiplier={registrationAmount.toNumber() !== 0 ? prizepool.dividedBy(registrationAmount) : null}
+          isPaused={isPaused}
           isReady={isReady}
           isFree={registrationAmount.toNumber() === 0}
           isInProgress={isInProgress}
@@ -202,6 +202,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           nextFromRange={nextFromRange}
           nextToRange={nextToRange}
           encodedCron={encodedCron}
+          playerAddressesCount={playerAddressesCount}
           isPlaying={isPlaying}
           isWonLastGames={isWonLastGames}
           isCanVoteSplitPot={isCanVoteSplitPot}

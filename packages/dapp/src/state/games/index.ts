@@ -27,10 +27,9 @@ const initialState: SerializedGamesState = {
 
 // Async thunks
 export const fetchInitialGamesData = createAsyncThunk<
-  { data: SerializedGame[]; chainId: number },
-  { chainId: number; account: string }
->('games/fetchInitialGamesData', async ({ chainId, account }) => {
-  console.log('fetchInitialGamesData')
+  { data?: SerializedGame[]; chainId?: number },
+  { account: string; chainId: number }
+>('games/fetchInitialGamesData', async ({ chainId, account }, { dispatch, getState }) => {
   const chain = chains.find((c) => c.id === chainId)
 
   if (!chain) throw new Error('chain not supported')
@@ -64,16 +63,24 @@ export const fetchInitialGamesData = createAsyncThunk<
     }
   })
 
-  return {
-    data: initialGames,
-    chainId,
-  }
+  const state: any = getState()
+  if (state.games && (!state.games.data.length || state.games.data.length !== games.length))
+    return {
+      data: initialGames,
+      chainId,
+    }
+
+  return {}
+  // return {
+  //   data: initialGames,
+  //   chainId,
+  // }
 })
 
 export const fetchGamesPublicDataAsync = createAsyncThunk<
   // { data: SerializedGame[]; chainId: number },
   SerializedGame[],
-  { chainId: number; account: string },
+  { account: string; chainId: number },
   {
     state: AppState
   }
@@ -81,7 +88,6 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
   'games/fetchGamesPublicDataAsync',
   // eslint-disable-next-line consistent-return
   async ({ chainId, account }, { dispatch, getState }) => {
-    console.log('fetchGamesPublicDataAsync')
     const state = getState()
     if (state.games.chainId && state.games.chainId !== chainId) {
       await dispatch(fetchInitialGamesData({ chainId, account }))
@@ -115,26 +121,6 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
   },
 )
 
-//   const gameAllowances = userGameAllowances.map((gameAllowance, index) => {
-//     return {
-//       id: games[index].id,
-//       allowance: userGameAllowances[index],
-//       tokenBalance: userGameTokenBalances[index],
-//       stakedBalance: userStakedBalances[index],
-//       earnings: userGameEarnings[index],
-//       proxy: {
-//         allowance: proxyUserGameAllowances[index],
-//         // NOTE: Duplicate tokenBalance to maintain data structure consistence
-//         tokenBalance: userGameTokenBalances[index],
-//         stakedBalance: proxyUserStakedBalances[index],
-//         earnings: proxyUserGameEarnings[index],
-//       },
-//     }
-//   })
-
-//   return gameAllowances
-// }
-
 // async function getNormalGamesStakeValue(games, account, chainId) {
 //   const [userGameAllowances, userGameTokenBalances, userStakedBalances, userGameEarnings] = await Promise.all([
 //     fetchGamePlayerAllowances(account, games, chainId),
@@ -165,8 +151,6 @@ export const fetchGamePlayerDataAsync = createAsyncThunk<
 >(
   'games/fetchGamePlayerDataAsync',
   async ({ chainId, account }, { dispatch, getState }) => {
-    console.log('fetchGamePlayerDataAsync')
-
     let state = getState()
     if (state.games.chainId && state.games.chainId !== chainId) {
       await dispatch(fetchInitialGamesData({ chainId, account }))
@@ -248,16 +232,15 @@ export const gamesSlice = createSlice({
     })
     // Init game data
     builder.addCase(fetchInitialGamesData.fulfilled, (state, action) => {
-      console.log('Init game data')
       const { data, chainId } = action.payload
-      state.data = data
-      state.chainId = chainId
+      if (data && chainId) {
+        state.data = data
+        state.chainId = chainId
+      }
     })
 
     // Update games with live data
     builder.addCase(fetchGamesPublicDataAsync.fulfilled, (state, action) => {
-      console.log('Update games with live data')
-
       const games = action.payload
       if (!games.length) return
 
@@ -288,7 +271,6 @@ export const gamesSlice = createSlice({
 
     // Update games with user data
     builder.addCase(fetchGamePlayerDataAsync.fulfilled, (state, action) => {
-      console.log('Update games with user data')
       const gameData = action.payload
       state.data = gameData
       state.userDataLoaded = true
