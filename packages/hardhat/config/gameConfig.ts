@@ -1,4 +1,5 @@
 // GAME CONFIG : UPDATE DEFAULT CONFIG FROM HARDHAT PACKAGE THEN COPY CHANGE TO DAPP BY COMPILING OR DEPLOYING CONTRACT
+import { BigNumber } from '@ethersproject/bignumber'
 import { parseEther } from '@ethersproject/units'
 
 export const range = (start, end) =>
@@ -57,31 +58,31 @@ export const gameConfig: Record<
     PLAYERS_MIN_LENGTH: number
     PLAYERS_MAX_LENGTH: number
 
-    GAME_CREATION_AMOUNT: number
+    GAME_CREATION_AMOUNT: BigNumber
 
     PLAY_TIME_RANGE_DEFAULT: number
-    AUTHORIZED_PLAY_TIME_RANGE: Array
+    AUTHORIZED_PLAY_TIME_RANGE: Array<number>
 
-    REGISTRATION_AMOUNT_DEFAULT: number
-    REGISTRATION_AMOUNT_FREE: number
-    AUTHORIZED_REGISTRATION_AMOUNTS: Array
+    REGISTRATION_AMOUNT_DEFAULT: BigNumber
+    REGISTRATION_AMOUNT_FREE: BigNumber
+    AUTHORIZED_REGISTRATION_AMOUNTS: Array<number>
 
     PRIZEPOOL_NUMBER: number
-    PRIZEPOOL_AMOUNT: number
+    PRIZEPOOL_AMOUNT: BigNumber
 
     ENCODED_CRON_DEFAULT: string
-    AUTHORIZED_CRONS: Array
+    AUTHORIZED_CRONS: Array<number>
 
-    PRIZETYPE: Array
+    PRIZETYPE: Array<string>
 
     TREASURY_FEE_DEFAULT: number
     TREASURY_FEE_MIN: number
     TREASURY_FEE_MAX: number
-    AUTHORIZED_TREASURY_FEE: Array
+    AUTHORIZED_TREASURY_FEE: Array<number>
     CREATOR_FEE_DEFAULT: number
     CREATOR_FEE_MIN: number
     CREATOR_FEE_MAX: number
-    AUTHORIZED_CREATOR_FEE: Array
+    AUTHORIZED_CREATOR_FEE: Array<number>
   }
 > = {
   '31337': { ...defaultGameConfig },
