@@ -32,6 +32,7 @@ interface GameCardPlayerSectionProps {
   wonAmount: BigNumber
   nextFromRange: string
   nextToRange: string
+  playerAddressesCount: BigNumber
   encodedCron: string
   isPlaying: boolean
   isWonLastGames: boolean
@@ -56,6 +57,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   nextFromRange,
   nextToRange,
   encodedCron,
+  playerAddressesCount,
   isPlaying,
   isWonLastGames,
   isCanVoteSplitPot,
@@ -103,6 +105,27 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             </Text>
           </Flex>
         </>
+      )}
+
+      {isInProgress && isPlaying && false && (
+        <Flex justifyContent="space-between">
+          <Heading mr="4px">{`${t('Split pot')}:`}</Heading>
+          {isReady ? (
+            <Text style={{ display: 'flex', alignItems: 'center' }}>
+              <Text bold>
+                {isReady ? (
+                  <>
+                    {0}/{playerAddressesCount.toNumber()}
+                  </>
+                ) : (
+                  <Skeleton width={80} height={36} mb="4px" />
+                )}
+              </Text>
+            </Text>
+          ) : (
+            <Skeleton width="100%" height={18} mb="4px" />
+          )}
+        </Flex>
       )}
 
       {isInProgress && isPlaying && (
@@ -159,7 +182,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             />
           )}
           {isCanVoteSplitPot && <VoteSplitButton address={address} />}
-          {(isCreator || isAdmin) && (
+          {(isCreator || isAdmin) && !isInProgress && isRegistering && (
             <>
               {isPaused && <UnpauseButton address={address} isInProgress={isInProgress} />}
               {!isPaused && <PauseButton address={address} isInProgress={isInProgress} />}

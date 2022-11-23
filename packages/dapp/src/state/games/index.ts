@@ -123,26 +123,6 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
   },
 )
 
-//   const gameAllowances = userGameAllowances.map((gameAllowance, index) => {
-//     return {
-//       id: games[index].id,
-//       allowance: userGameAllowances[index],
-//       tokenBalance: userGameTokenBalances[index],
-//       stakedBalance: userStakedBalances[index],
-//       earnings: userGameEarnings[index],
-//       proxy: {
-//         allowance: proxyUserGameAllowances[index],
-//         // NOTE: Duplicate tokenBalance to maintain data structure consistence
-//         tokenBalance: userGameTokenBalances[index],
-//         stakedBalance: proxyUserStakedBalances[index],
-//         earnings: proxyUserGameEarnings[index],
-//       },
-//     }
-//   })
-
-//   return gameAllowances
-// }
-
 // async function getNormalGamesStakeValue(games, account, chainId) {
 //   const [userGameAllowances, userGameTokenBalances, userStakedBalances, userGameEarnings] = await Promise.all([
 //     fetchGamePlayerAllowances(account, games, chainId),

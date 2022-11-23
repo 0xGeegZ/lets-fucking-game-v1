@@ -9,10 +9,13 @@ import { parseEther, formatEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import { ZERO_ADDRESS } from 'config/constants'
+import { useTransactionAdder } from 'state/transactions/hooks'
 
 export const useCreateGame = (game) => {
   const { t } = useTranslation()
   const { toastSuccess } = useToast()
+  const addTransaction = useTransactionAdder()
+
   const contract = useGameFactoryV1Contract()
   const { actions, currentStep } = useGameContext()
 
@@ -77,6 +80,21 @@ export const useCreateGame = (game) => {
       ),
     )
 
+    addTransaction(
+      {
+        ...receipt,
+        hash: receipt.transactionHash,
+      },
+      {
+        summary: `Game ${name} created`,
+        translatableSummary: {
+          text: 'Game %name% create',
+          data: { name },
+        },
+        type: 'create-game',
+      },
+    )
+
     if (receipt?.status) {
       toastSuccess(
         t('Success!'),
@@ -88,6 +106,8 @@ export const useCreateGame = (game) => {
     }
   }, [
     fetchWithCatchTxError,
+    addTransaction,
+    name,
     contract,
     formattedName,
     maxPlayers,

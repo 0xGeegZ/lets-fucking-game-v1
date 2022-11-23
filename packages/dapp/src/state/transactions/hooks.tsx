@@ -1,4 +1,4 @@
-import { TransactionResponse } from '@ethersproject/providers'
+import { TransactionResponse, TransactionReceipt } from '@ethersproject/providers'
 import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Order } from '@gelatonetwork/limit-orders-lib'
@@ -19,9 +19,16 @@ import {
 } from './actions'
 import { AppState, useAppDispatch } from '../index'
 
+export interface TransactionReceiptExt extends TransactionReceipt {
+  hash: string
+}
+
+export type TxResponse = TransactionResponse | TransactionReceiptExt
+
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
-  response: TransactionResponse,
+  response: TxResponse,
+  //   response: TransactionResponse,
   customData?: {
     summary?: string
     translatableSummary?: { text: string; data?: Record<string, string | number> }
@@ -37,7 +44,9 @@ export function useTransactionAdder(): (
 
   return useCallback(
     (
-      response: TransactionResponse,
+      response: TxResponse,
+      //   response: TransactionResponse,
+
       {
         summary,
         translatableSummary,

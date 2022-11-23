@@ -174,6 +174,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           chainId={chainId}
           prizepool={prizepool}
           multiplier={registrationAmount.toNumber() !== 0 ? prizepool.dividedBy(registrationAmount) : null}
+          isPaused={isPaused}
           isReady={isReady}
           isFree={registrationAmount.toNumber() === 0}
           isInProgress={isInProgress}
@@ -201,6 +202,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           nextFromRange={nextFromRange}
           nextToRange={nextToRange}
           encodedCron={encodedCron}
+          playerAddressesCount={playerAddressesCount}
           isPlaying={isPlaying}
           isWonLastGames={isWonLastGames}
           isCanVoteSplitPot={isCanVoteSplitPot}
