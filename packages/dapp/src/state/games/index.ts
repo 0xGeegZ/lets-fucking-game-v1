@@ -27,7 +27,7 @@ const initialState: SerializedGamesState = {
 
 // Async thunks
 export const fetchInitialGamesData = createAsyncThunk<
-  { data: SerializedGame[]; chainId: number },
+  { data?: SerializedGame[]; chainId?: number },
   { account: string; chainId: number }
 >('games/fetchInitialGamesData', async ({ chainId, account }, { dispatch, getState }) => {
   console.log('fetchInitialGamesData')
@@ -35,7 +35,7 @@ export const fetchInitialGamesData = createAsyncThunk<
 
   if (!chain) throw new Error('chain not supported')
 
-  const games = await fetchGamePublicDataPkg({ chainId, account })
+  const games = await fetchGamePublicDataPkg({ chainId })
 
   const initialGames = games.map((game) => {
     return {
@@ -64,14 +64,14 @@ export const fetchInitialGamesData = createAsyncThunk<
     }
   })
 
-  const state = getState()
-  if ((state.games && !state.games.data.length) || state.games.data.length !== games.length) {
+  const state: any = getState()
+  if (state.games && (!state.games.data.length || state.games.data.length !== games.length))
     return {
       data: initialGames,
       chainId,
     }
-  }
 
+  return {}
   // return {
   //   data: initialGames,
   //   chainId,
@@ -256,9 +256,9 @@ export const gamesSlice = createSlice({
     })
     // Init game data
     builder.addCase(fetchInitialGamesData.fulfilled, (state, action) => {
-      if (action.payload) {
-        console.log('Init game data')
-        const { data, chainId } = action.payload
+      console.log('Init game data')
+      const { data, chainId } = action.payload
+      if (data && chainId) {
         state.data = data
         state.chainId = chainId
       }
