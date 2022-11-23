@@ -30,7 +30,6 @@ export const fetchInitialGamesData = createAsyncThunk<
   { data?: SerializedGame[]; chainId?: number },
   { account: string; chainId: number }
 >('games/fetchInitialGamesData', async ({ chainId, account }, { dispatch, getState }) => {
-  console.log('fetchInitialGamesData')
   const chain = chains.find((c) => c.id === chainId)
 
   if (!chain) throw new Error('chain not supported')
@@ -89,7 +88,6 @@ export const fetchGamesPublicDataAsync = createAsyncThunk<
   'games/fetchGamesPublicDataAsync',
   // eslint-disable-next-line consistent-return
   async ({ chainId, account }, { dispatch, getState }) => {
-    console.log('fetchGamesPublicDataAsync')
     const state = getState()
     if (state.games.chainId && state.games.chainId !== chainId) {
       await dispatch(fetchInitialGamesData({ chainId, account }))
@@ -153,8 +151,6 @@ export const fetchGamePlayerDataAsync = createAsyncThunk<
 >(
   'games/fetchGamePlayerDataAsync',
   async ({ chainId, account }, { dispatch, getState }) => {
-    console.log('fetchGamePlayerDataAsync')
-
     let state = getState()
     if (state.games.chainId && state.games.chainId !== chainId) {
       await dispatch(fetchInitialGamesData({ chainId, account }))
@@ -236,7 +232,6 @@ export const gamesSlice = createSlice({
     })
     // Init game data
     builder.addCase(fetchInitialGamesData.fulfilled, (state, action) => {
-      console.log('Init game data')
       const { data, chainId } = action.payload
       if (data && chainId) {
         state.data = data
@@ -246,8 +241,6 @@ export const gamesSlice = createSlice({
 
     // Update games with live data
     builder.addCase(fetchGamesPublicDataAsync.fulfilled, (state, action) => {
-      console.log('Update games with live data')
-
       const games = action.payload
       if (!games.length) return
 
@@ -278,7 +271,6 @@ export const gamesSlice = createSlice({
 
     // Update games with user data
     builder.addCase(fetchGamePlayerDataAsync.fulfilled, (state, action) => {
-      console.log('Update games with user data')
       const gameData = action.payload
       state.data = gameData
       state.userDataLoaded = true
