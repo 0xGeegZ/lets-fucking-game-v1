@@ -61,7 +61,7 @@ export const usePollCoreGameData = () => {
 
   // TODO GUIGUI LOAD PLAYER DATA
   // useFastRefreshEffect(() => {
-  //   if (chainId) {
+  //   if (chainId && dispatch) {
   //     dispatch(fetchGamePlayerDataAsync({ chainId, account }))
   //   }
   // }, [dispatch, chainId, account])

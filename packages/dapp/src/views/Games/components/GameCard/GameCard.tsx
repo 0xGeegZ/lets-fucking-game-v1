@@ -142,7 +142,6 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
       //   setCronHumanReadable(`${transform} UTC`)
 
       const interval = parser.parseExpression(encodedCron, { tz: 'Etc/UTC' })
-      console.log('🚀 ~ file: GameCard.tsx ~ line 138 ~ useEffect ~ encodedCron', encodedCron)
       const transform = moment(interval.next().toString()).format('hh:mm A')
       //   const transform = momentTz.tz(interval.next().toString(), timezone).format('hh:mm A')
       setCronHumanReadable(`${transform}`)

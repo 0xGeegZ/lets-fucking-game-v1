@@ -126,7 +126,8 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             )}
           </Flex>
 
-          {hasLost && (
+          {/* {(hasLost || (!isInTimeRange && moment().isAfter(moment(nextToRange)))) && ( */}
+          {(hasLost || moment().isAfter(moment(nextToRange))) && (
             <Flex justifyContent="center" m="10px">
               <WarningIcon width="16px" color="failure" style={{ verticalAlign: 'middle' }} />
               <Heading mr="4px" color="failure">
