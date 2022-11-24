@@ -171,7 +171,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             <PlayButton
               address={address}
               isInTimeRange={isInTimeRange}
-              isDisabled={isPlaying || isCreator || isAdmin || isPaused}
+              isDisabled={!isPlaying || isCreator || isAdmin || isPaused}
             />
           )}
           {isRegistering && (
