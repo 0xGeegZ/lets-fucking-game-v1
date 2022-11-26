@@ -11,7 +11,6 @@ const ClaimCreatorFeeButton: React.FC<React.PropsWithChildren<ClaimCreatorFeeBut
   const { t } = useTranslation()
   const { isPending, handleClaimCreatorFee } = useClaimCreatorFee(address)
 
-  // TODO add check if remaining player count is less than 50%
   const isDisabledButton = useMemo(() => !address || isPending, [address, isPending])
 
   return (

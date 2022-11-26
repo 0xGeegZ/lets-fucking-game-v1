@@ -11,7 +11,6 @@ const ClaimTreasuryFeeButton: React.FC<React.PropsWithChildren<ClaimTreasuryFeeB
   const { t } = useTranslation()
   const { isPending, handleClaimTreasuryFee } = useClaimTreasuryFee(address)
 
-  // TODO add check if remaining player count is less than 50%
   const isDisabledButton = useMemo(() => !address || isPending, [address, isPending])
 
   return (

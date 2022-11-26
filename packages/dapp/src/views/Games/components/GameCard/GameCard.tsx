@@ -123,7 +123,12 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
   const isRegistering = !isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber()
   // TODO GUIGUI use RoundProgress to display a progressBar if i
   return (
-    <StyledCard isActive={!isDeleted} isFailure={hasLost} isWarning={isInTimeRange} isSuccess={isPlaying}>
+    <StyledCard
+      isActive={!isDeleted}
+      isFailure={hasLost}
+      isWarning={!isRegistering && !isInProgress}
+      isSuccess={isPlaying}
+    >
       <GameCardInnerContainer>
         <CardHeadingSection
           id={id}

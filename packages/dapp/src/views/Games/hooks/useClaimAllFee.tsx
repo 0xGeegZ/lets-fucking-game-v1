@@ -15,14 +15,14 @@ export const useClaimAllFee = (gameAddress: string) => {
 
   const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
 
-  const handleClaimAllFee = useCallback(async () => {
-    const receipt = await fetchWithCatchTxError(() => contract.claimAllFee())
+  const handleClaimTreasuryFee = useCallback(async () => {
+    const receipt = await fetchWithCatchTxError(() => contract.claimTreasuryFee())
 
     if (receipt?.status) {
       toastSuccess(
         t('Success!'),
         <ToastDescriptionWithTx txHash={receipt.transactionHash}>
-          {t('You have successfully claimed treasury and creator fee')}
+          {t('You have successfully claimed treasury fee')}
         </ToastDescriptionWithTx>,
       )
       addTransaction(
@@ -31,16 +31,48 @@ export const useClaimAllFee = (gameAddress: string) => {
           hash: receipt.transactionHash,
         },
         {
-          summary: `Claim treasury and creator fee for game ${gameAddress}`,
+          summary: `Claim treasury fee for game ${gameAddress}`,
           translatableSummary: {
-            text: 'Claim treasury and creator fee for game %gameAddress%',
+            text: 'Claim treasury fee for game %gameAddress%',
             data: { gameAddress },
           },
-          type: 'claim-all-fee',
+          type: 'claim-treasury-fee',
         },
       )
     }
   }, [fetchWithCatchTxError, contract, toastSuccess, t, addTransaction, gameAddress])
+
+  const handleClaimCreatorFee = useCallback(async () => {
+    const receipt = await fetchWithCatchTxError(() => contract.claimCreatorFee())
+
+    if (receipt?.status) {
+      toastSuccess(
+        t('Success!'),
+        <ToastDescriptionWithTx txHash={receipt.transactionHash}>
+          {t('You have successfully claimed creator fee')}
+        </ToastDescriptionWithTx>,
+      )
+      addTransaction(
+        {
+          ...receipt,
+          hash: receipt.transactionHash,
+        },
+        {
+          summary: `Claim creator fee for game ${gameAddress}`,
+          translatableSummary: {
+            text: 'Claim creator fee for game %gameAddress%',
+            data: { gameAddress },
+          },
+          type: 'claim-creator-fee',
+        },
+      )
+    }
+  }, [fetchWithCatchTxError, contract, toastSuccess, t, addTransaction, gameAddress])
+
+  const handleClaimAllFee = useCallback(async () => {
+    handleClaimTreasuryFee()
+    handleClaimCreatorFee()
+  }, [handleClaimTreasuryFee, handleClaimCreatorFee])
 
   return { isPending, handleClaimAllFee }
 }

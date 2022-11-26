@@ -2,55 +2,58 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from 'ethers'
-import type { Provider } from '@ethersproject/providers'
+import { Contract, Signer, utils } from "ethers";
+import type { Provider } from "@ethersproject/providers";
 import type {
   OwnableInterface,
   OwnableInterfaceInterface,
-} from '../../../../../../@chainlink/contracts/src/v0.8/interfaces/OwnableInterface'
+} from "../../../../../../@chainlink/contracts/src/v0.8/interfaces/OwnableInterface";
 
 const _abi = [
   {
     inputs: [],
-    name: 'acceptOwnership',
+    name: "acceptOwnership",
     outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [],
-    name: 'owner',
+    name: "owner",
     outputs: [
       {
-        internalType: 'address',
-        name: '',
-        type: 'address',
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
-    stateMutability: 'nonpayable',
-    type: 'function',
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [
       {
-        internalType: 'address',
-        name: 'recipient',
-        type: 'address',
+        internalType: "address",
+        name: "recipient",
+        type: "address",
       },
     ],
-    name: 'transferOwnership',
+    name: "transferOwnership",
     outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
+    stateMutability: "nonpayable",
+    type: "function",
   },
-]
+];
 
 export class OwnableInterface__factory {
-  static readonly abi = _abi
+  static readonly abi = _abi;
   static createInterface(): OwnableInterfaceInterface {
-    return new utils.Interface(_abi) as OwnableInterfaceInterface
+    return new utils.Interface(_abi) as OwnableInterfaceInterface;
   }
-  static connect(address: string, signerOrProvider: Signer | Provider): OwnableInterface {
-    return new Contract(address, _abi, signerOrProvider) as OwnableInterface
+  static connect(
+    address: string,
+    signerOrProvider: Signer | Provider
+  ): OwnableInterface {
+    return new Contract(address, _abi, signerOrProvider) as OwnableInterface;
   }
 }

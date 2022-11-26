@@ -83,7 +83,9 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @dev TODO NEXT VERSION Remove _isGameAllPrizesStandard limitation to include other prize typ
      * @dev TODO NEXT VERSION Make it only accessible to factory
      */
-    function initialize(Initialization calldata _initialization)
+    function initialize(
+        Initialization calldata _initialization
+    )
         external
         payable
         override
@@ -223,6 +225,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @dev TODO NEXT VERSION Update triggerDailyCheckpoint to make it only callable by keeper
      */
     function triggerDailyCheckpoint() external override onlyAdminOrKeeper whenNotPaused {
+        emit TriggeredDailyCheckpoint(roundId, msg.sender);
         if (isInProgress) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
@@ -272,7 +275,9 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      *      Need to store the factory gameCreationAmount in this contract on initialisation
      * @dev TODO NEXT VERSION Remove _isGameAllPrizesStandard limitation to include other prize typ
      */
-    function addPrizes(Prize[] memory _prizes)
+    function addPrizes(
+        Prize[] memory _prizes
+    )
         external
         payable
         override
@@ -425,11 +430,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         }
     }
 
-    function _addWinner(
-        uint256 _position,
-        address _playerAddress,
-        uint256 _amount
-    ) internal {
+    function _addWinner(uint256 _position, address _playerAddress, uint256 _amount) internal {
         winners[roundId].push(
             Winner({
                 roundId: roundId,
@@ -665,13 +666,9 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @param _roundId the round id
      * @return gameWinners list of Winner
      */
-    function getWinners(uint256 _roundId)
-        external
-        view
-        override
-        onlyIfRoundId(_roundId)
-        returns (Winner[] memory gameWinners)
-    {
+    function getWinners(
+        uint256 _roundId
+    ) external view override onlyIfRoundId(_roundId) returns (Winner[] memory gameWinners) {
         return winners[_roundId];
     }
 
@@ -680,13 +677,9 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @param _roundId the round id
      * @return gamePrizes list of Prize
      */
-    function getPrizes(uint256 _roundId)
-        external
-        view
-        override
-        onlyIfRoundId(_roundId)
-        returns (Prize[] memory gamePrizes)
-    {
+    function getPrizes(
+        uint256 _roundId
+    ) external view override onlyIfRoundId(_roundId) returns (Prize[] memory gamePrizes) {
         return prizes[_roundId];
     }
 
@@ -740,13 +733,9 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @param _maxPlayers the new max players limit
      * @dev Callable by admin or creator
      */
-    function setMaxPlayers(uint256 _maxPlayers)
-        external
-        override
-        onlyAdminOrCreator
-        onlyAllowedNumberOfPlayers(_maxPlayers)
-        onlyIfGameIsNotInProgress
-    {
+    function setMaxPlayers(
+        uint256 _maxPlayers
+    ) external override onlyAdminOrCreator onlyAllowedNumberOfPlayers(_maxPlayers) onlyIfGameIsNotInProgress {
         maxPlayers = _maxPlayers;
     }
 
@@ -756,13 +745,9 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @dev Callable by admin or creator
      * @dev Callable when game if not in progress
      */
-    function setCreatorFee(uint256 _creatorFee)
-        external
-        override
-        onlyAdminOrCreator
-        onlyIfGameIsNotInProgress
-        onlyCreatorFee(_creatorFee)
-    {
+    function setCreatorFee(
+        uint256 _creatorFee
+    ) external override onlyAdminOrCreator onlyIfGameIsNotInProgress onlyCreatorFee(_creatorFee) {
         creatorFee = _creatorFee;
     }
 
@@ -810,13 +795,9 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @dev Callable by admin
      * @dev Callable when game if not in progress
      */
-    function setTreasuryFee(uint256 _treasuryFee)
-        external
-        override
-        onlyAdmin
-        onlyIfGameIsNotInProgress
-        onlyTreasuryFee(_treasuryFee)
-    {
+    function setTreasuryFee(
+        uint256 _treasuryFee
+    ) external override onlyAdmin onlyIfGameIsNotInProgress onlyTreasuryFee(_treasuryFee) {
         treasuryFee = _treasuryFee;
     }
 

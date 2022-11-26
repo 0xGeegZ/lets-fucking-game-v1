@@ -97,13 +97,13 @@ const func: DeployFunction = async function ({
   // log('Creating new free game for 2 players')
   // await gameFactory.createNewGame(
   //   name,
-  //   5,
+  //   2,
   //   playTimeRange,
   //   zeroRegistrationAmount,
   //   treasuryFee,
   //   creatorFee,
-  //   // '*/10 * * * *',
-  //   encodedCron,
+  //   '*/10 * * * *',
+  //   // encodedCron,
   //   freeGamePrizes,
   //   { value: gameCreationAmount.add(freeGamePrizepoolAmount) }
   // )

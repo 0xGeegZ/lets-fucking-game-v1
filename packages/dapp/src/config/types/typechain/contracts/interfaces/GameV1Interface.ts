@@ -13,44 +13,60 @@ import type {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers'
-import type { FunctionFragment, Result, EventFragment } from '@ethersproject/abi'
-import type { Listener, Provider } from '@ethersproject/providers'
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from '../../common'
+} from "ethers";
+import type {
+  FunctionFragment,
+  Result,
+  EventFragment,
+} from "@ethersproject/abi";
+import type { Listener, Provider } from "@ethersproject/providers";
+import type {
+  TypedEventFilter,
+  TypedEvent,
+  TypedListener,
+  OnEvent,
+  PromiseOrValue,
+} from "../../common";
 
 export declare namespace GameV1Interface {
   export type PrizeStruct = {
-    position: PromiseOrValue<BigNumberish>
-    amount: PromiseOrValue<BigNumberish>
-    standard: PromiseOrValue<BigNumberish>
-    contractAddress: PromiseOrValue<string>
-    tokenId: PromiseOrValue<BigNumberish>
-  }
+    position: PromiseOrValue<BigNumberish>;
+    amount: PromiseOrValue<BigNumberish>;
+    standard: PromiseOrValue<BigNumberish>;
+    contractAddress: PromiseOrValue<string>;
+    tokenId: PromiseOrValue<BigNumberish>;
+  };
 
-  export type PrizeStructOutput = [BigNumber, BigNumber, BigNumber, string, BigNumber] & {
-    position: BigNumber
-    amount: BigNumber
-    standard: BigNumber
-    contractAddress: string
-    tokenId: BigNumber
-  }
+  export type PrizeStructOutput = [
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    string,
+    BigNumber
+  ] & {
+    position: BigNumber;
+    amount: BigNumber;
+    standard: BigNumber;
+    contractAddress: string;
+    tokenId: BigNumber;
+  };
 
   export type GameDataStruct = {
-    id: PromiseOrValue<BigNumberish>
-    roundId: PromiseOrValue<BigNumberish>
-    name: PromiseOrValue<BytesLike>
-    playerAddressesCount: PromiseOrValue<BigNumberish>
-    maxPlayers: PromiseOrValue<BigNumberish>
-    registrationAmount: PromiseOrValue<BigNumberish>
-    playTimeRange: PromiseOrValue<BigNumberish>
-    treasuryFee: PromiseOrValue<BigNumberish>
-    creatorFee: PromiseOrValue<BigNumberish>
-    isPaused: PromiseOrValue<boolean>
-    isInProgress: PromiseOrValue<boolean>
-    creator: PromiseOrValue<string>
-    admin: PromiseOrValue<string>
-    encodedCron: PromiseOrValue<string>
-  }
+    id: PromiseOrValue<BigNumberish>;
+    roundId: PromiseOrValue<BigNumberish>;
+    name: PromiseOrValue<BytesLike>;
+    playerAddressesCount: PromiseOrValue<BigNumberish>;
+    maxPlayers: PromiseOrValue<BigNumberish>;
+    registrationAmount: PromiseOrValue<BigNumberish>;
+    playTimeRange: PromiseOrValue<BigNumberish>;
+    treasuryFee: PromiseOrValue<BigNumberish>;
+    creatorFee: PromiseOrValue<BigNumberish>;
+    isPaused: PromiseOrValue<boolean>;
+    isInProgress: PromiseOrValue<boolean>;
+    creator: PromiseOrValue<string>;
+    admin: PromiseOrValue<string>;
+    encodedCron: PromiseOrValue<string>;
+  };
 
   export type GameDataStructOutput = [
     BigNumber,
@@ -66,77 +82,92 @@ export declare namespace GameV1Interface {
     boolean,
     string,
     string,
-    string,
+    string
   ] & {
-    id: BigNumber
-    roundId: BigNumber
-    name: string
-    playerAddressesCount: BigNumber
-    maxPlayers: BigNumber
-    registrationAmount: BigNumber
-    playTimeRange: BigNumber
-    treasuryFee: BigNumber
-    creatorFee: BigNumber
-    isPaused: boolean
-    isInProgress: boolean
-    creator: string
-    admin: string
-    encodedCron: string
-  }
+    id: BigNumber;
+    roundId: BigNumber;
+    name: string;
+    playerAddressesCount: BigNumber;
+    maxPlayers: BigNumber;
+    registrationAmount: BigNumber;
+    playTimeRange: BigNumber;
+    treasuryFee: BigNumber;
+    creatorFee: BigNumber;
+    isPaused: boolean;
+    isInProgress: boolean;
+    creator: string;
+    admin: string;
+    encodedCron: string;
+  };
 
   export type PlayerStruct = {
-    playerAddress: PromiseOrValue<string>
-    roundRangeLowerLimit: PromiseOrValue<BigNumberish>
-    roundRangeUpperLimit: PromiseOrValue<BigNumberish>
-    hasPlayedRound: PromiseOrValue<boolean>
-    roundCount: PromiseOrValue<BigNumberish>
-    position: PromiseOrValue<BigNumberish>
-    hasLost: PromiseOrValue<boolean>
-    isSplitOk: PromiseOrValue<boolean>
-  }
+    playerAddress: PromiseOrValue<string>;
+    roundRangeLowerLimit: PromiseOrValue<BigNumberish>;
+    roundRangeUpperLimit: PromiseOrValue<BigNumberish>;
+    hasPlayedRound: PromiseOrValue<boolean>;
+    roundCount: PromiseOrValue<BigNumberish>;
+    position: PromiseOrValue<BigNumberish>;
+    hasLost: PromiseOrValue<boolean>;
+    isSplitOk: PromiseOrValue<boolean>;
+  };
 
-  export type PlayerStructOutput = [string, BigNumber, BigNumber, boolean, BigNumber, BigNumber, boolean, boolean] & {
-    playerAddress: string
-    roundRangeLowerLimit: BigNumber
-    roundRangeUpperLimit: BigNumber
-    hasPlayedRound: boolean
-    roundCount: BigNumber
-    position: BigNumber
-    hasLost: boolean
-    isSplitOk: boolean
-  }
+  export type PlayerStructOutput = [
+    string,
+    BigNumber,
+    BigNumber,
+    boolean,
+    BigNumber,
+    BigNumber,
+    boolean,
+    boolean
+  ] & {
+    playerAddress: string;
+    roundRangeLowerLimit: BigNumber;
+    roundRangeUpperLimit: BigNumber;
+    hasPlayedRound: boolean;
+    roundCount: BigNumber;
+    position: BigNumber;
+    hasLost: boolean;
+    isSplitOk: boolean;
+  };
 
   export type WinnerStruct = {
-    roundId: PromiseOrValue<BigNumberish>
-    playerAddress: PromiseOrValue<string>
-    amountWon: PromiseOrValue<BigNumberish>
-    position: PromiseOrValue<BigNumberish>
-    prizeClaimed: PromiseOrValue<boolean>
-  }
+    roundId: PromiseOrValue<BigNumberish>;
+    playerAddress: PromiseOrValue<string>;
+    amountWon: PromiseOrValue<BigNumberish>;
+    position: PromiseOrValue<BigNumberish>;
+    prizeClaimed: PromiseOrValue<boolean>;
+  };
 
-  export type WinnerStructOutput = [BigNumber, string, BigNumber, BigNumber, boolean] & {
-    roundId: BigNumber
-    playerAddress: string
-    amountWon: BigNumber
-    position: BigNumber
-    prizeClaimed: boolean
-  }
+  export type WinnerStructOutput = [
+    BigNumber,
+    string,
+    BigNumber,
+    BigNumber,
+    boolean
+  ] & {
+    roundId: BigNumber;
+    playerAddress: string;
+    amountWon: BigNumber;
+    position: BigNumber;
+    prizeClaimed: boolean;
+  };
 
   export type InitializationStruct = {
-    owner: PromiseOrValue<string>
-    creator: PromiseOrValue<string>
-    cronUpkeep: PromiseOrValue<string>
-    name: PromiseOrValue<BytesLike>
-    version: PromiseOrValue<BigNumberish>
-    id: PromiseOrValue<BigNumberish>
-    playTimeRange: PromiseOrValue<BigNumberish>
-    maxPlayers: PromiseOrValue<BigNumberish>
-    registrationAmount: PromiseOrValue<BigNumberish>
-    treasuryFee: PromiseOrValue<BigNumberish>
-    creatorFee: PromiseOrValue<BigNumberish>
-    encodedCron: PromiseOrValue<string>
-    prizes: GameV1Interface.PrizeStruct[]
-  }
+    owner: PromiseOrValue<string>;
+    creator: PromiseOrValue<string>;
+    cronUpkeep: PromiseOrValue<string>;
+    name: PromiseOrValue<BytesLike>;
+    version: PromiseOrValue<BigNumberish>;
+    id: PromiseOrValue<BigNumberish>;
+    playTimeRange: PromiseOrValue<BigNumberish>;
+    maxPlayers: PromiseOrValue<BigNumberish>;
+    registrationAmount: PromiseOrValue<BigNumberish>;
+    treasuryFee: PromiseOrValue<BigNumberish>;
+    creatorFee: PromiseOrValue<BigNumberish>;
+    encodedCron: PromiseOrValue<string>;
+    prizes: GameV1Interface.PrizeStruct[];
+  };
 
   export type InitializationStructOutput = [
     string,
@@ -151,996 +182,1466 @@ export declare namespace GameV1Interface {
     BigNumber,
     BigNumber,
     string,
-    GameV1Interface.PrizeStructOutput[],
+    GameV1Interface.PrizeStructOutput[]
   ] & {
-    owner: string
-    creator: string
-    cronUpkeep: string
-    name: string
-    version: BigNumber
-    id: BigNumber
-    playTimeRange: BigNumber
-    maxPlayers: BigNumber
-    registrationAmount: BigNumber
-    treasuryFee: BigNumber
-    creatorFee: BigNumber
-    encodedCron: string
-    prizes: GameV1Interface.PrizeStructOutput[]
-  }
+    owner: string;
+    creator: string;
+    cronUpkeep: string;
+    name: string;
+    version: BigNumber;
+    id: BigNumber;
+    playTimeRange: BigNumber;
+    maxPlayers: BigNumber;
+    registrationAmount: BigNumber;
+    treasuryFee: BigNumber;
+    creatorFee: BigNumber;
+    encodedCron: string;
+    prizes: GameV1Interface.PrizeStructOutput[];
+  };
 }
 
 export interface GameV1InterfaceInterface extends utils.Interface {
   functions: {
-    'addPrizes((uint256,uint256,uint256,address,uint256)[])': FunctionFragment
-    'claimCreatorFee()': FunctionFragment
-    'claimPrize(uint256)': FunctionFragment
-    'claimTreasuryFee()': FunctionFragment
-    'getGameData()': FunctionFragment
-    'getPlayer(address)': FunctionFragment
-    'getPlayerAddresses()': FunctionFragment
-    'getPrizes(uint256)': FunctionFragment
-    'getRemainingPlayersCount()': FunctionFragment
-    'getWinners(uint256)': FunctionFragment
-    'initialize((address,address,address,bytes32,uint256,uint256,uint256,uint256,uint256,uint256,uint256,string,(uint256,uint256,uint256,address,uint256)[]))': FunctionFragment
-    'isAllPlayersSplitOk()': FunctionFragment
-    'isGameAllPrizesStandard()': FunctionFragment
-    'isGamePayable()': FunctionFragment
-    'pause()': FunctionFragment
-    'playRound()': FunctionFragment
-    'registerForGame()': FunctionFragment
-    'setCreatorFee(uint256)': FunctionFragment
-    'setCronUpkeep(address)': FunctionFragment
-    'setEncodedCron(string)': FunctionFragment
-    'setMaxPlayers(uint256)': FunctionFragment
-    'setName(bytes32)': FunctionFragment
-    'setTreasuryFee(uint256)': FunctionFragment
-    'startGame()': FunctionFragment
-    'transferAdminOwnership(address)': FunctionFragment
-    'transferCreatorOwnership(address)': FunctionFragment
-    'transferFactoryOwnership(address)': FunctionFragment
-    'triggerDailyCheckpoint()': FunctionFragment
-    'unpause()': FunctionFragment
-    'voteToSplitPot()': FunctionFragment
-    'withdrawFunds(address)': FunctionFragment
-  }
+    "addPrizes((uint256,uint256,uint256,address,uint256)[])": FunctionFragment;
+    "claimCreatorFee()": FunctionFragment;
+    "claimPrize(uint256)": FunctionFragment;
+    "claimTreasuryFee()": FunctionFragment;
+    "getGameData()": FunctionFragment;
+    "getPlayer(address)": FunctionFragment;
+    "getPlayerAddresses()": FunctionFragment;
+    "getPrizes(uint256)": FunctionFragment;
+    "getRemainingPlayersCount()": FunctionFragment;
+    "getWinners(uint256)": FunctionFragment;
+    "initialize((address,address,address,bytes32,uint256,uint256,uint256,uint256,uint256,uint256,uint256,string,(uint256,uint256,uint256,address,uint256)[]))": FunctionFragment;
+    "isAllPlayersSplitOk()": FunctionFragment;
+    "isGameAllPrizesStandard()": FunctionFragment;
+    "isGamePayable()": FunctionFragment;
+    "pause()": FunctionFragment;
+    "playRound()": FunctionFragment;
+    "registerForGame()": FunctionFragment;
+    "setCreatorFee(uint256)": FunctionFragment;
+    "setCronUpkeep(address)": FunctionFragment;
+    "setEncodedCron(string)": FunctionFragment;
+    "setMaxPlayers(uint256)": FunctionFragment;
+    "setName(bytes32)": FunctionFragment;
+    "setTreasuryFee(uint256)": FunctionFragment;
+    "startGame()": FunctionFragment;
+    "transferAdminOwnership(address)": FunctionFragment;
+    "transferCreatorOwnership(address)": FunctionFragment;
+    "transferFactoryOwnership(address)": FunctionFragment;
+    "triggerDailyCheckpoint()": FunctionFragment;
+    "unpause()": FunctionFragment;
+    "voteToSplitPot()": FunctionFragment;
+    "withdrawFunds(address)": FunctionFragment;
+  };
 
   getFunction(
     nameOrSignatureOrTopic:
-      | 'addPrizes'
-      | 'claimCreatorFee'
-      | 'claimPrize'
-      | 'claimTreasuryFee'
-      | 'getGameData'
-      | 'getPlayer'
-      | 'getPlayerAddresses'
-      | 'getPrizes'
-      | 'getRemainingPlayersCount'
-      | 'getWinners'
-      | 'initialize'
-      | 'isAllPlayersSplitOk'
-      | 'isGameAllPrizesStandard'
-      | 'isGamePayable'
-      | 'pause'
-      | 'playRound'
-      | 'registerForGame'
-      | 'setCreatorFee'
-      | 'setCronUpkeep'
-      | 'setEncodedCron'
-      | 'setMaxPlayers'
-      | 'setName'
-      | 'setTreasuryFee'
-      | 'startGame'
-      | 'transferAdminOwnership'
-      | 'transferCreatorOwnership'
-      | 'transferFactoryOwnership'
-      | 'triggerDailyCheckpoint'
-      | 'unpause'
-      | 'voteToSplitPot'
-      | 'withdrawFunds',
-  ): FunctionFragment
+      | "addPrizes"
+      | "claimCreatorFee"
+      | "claimPrize"
+      | "claimTreasuryFee"
+      | "getGameData"
+      | "getPlayer"
+      | "getPlayerAddresses"
+      | "getPrizes"
+      | "getRemainingPlayersCount"
+      | "getWinners"
+      | "initialize"
+      | "isAllPlayersSplitOk"
+      | "isGameAllPrizesStandard"
+      | "isGamePayable"
+      | "pause"
+      | "playRound"
+      | "registerForGame"
+      | "setCreatorFee"
+      | "setCronUpkeep"
+      | "setEncodedCron"
+      | "setMaxPlayers"
+      | "setName"
+      | "setTreasuryFee"
+      | "startGame"
+      | "transferAdminOwnership"
+      | "transferCreatorOwnership"
+      | "transferFactoryOwnership"
+      | "triggerDailyCheckpoint"
+      | "unpause"
+      | "voteToSplitPot"
+      | "withdrawFunds"
+  ): FunctionFragment;
 
-  encodeFunctionData(functionFragment: 'addPrizes', values: [GameV1Interface.PrizeStruct[]]): string
-  encodeFunctionData(functionFragment: 'claimCreatorFee', values?: undefined): string
-  encodeFunctionData(functionFragment: 'claimPrize', values: [PromiseOrValue<BigNumberish>]): string
-  encodeFunctionData(functionFragment: 'claimTreasuryFee', values?: undefined): string
-  encodeFunctionData(functionFragment: 'getGameData', values?: undefined): string
-  encodeFunctionData(functionFragment: 'getPlayer', values: [PromiseOrValue<string>]): string
-  encodeFunctionData(functionFragment: 'getPlayerAddresses', values?: undefined): string
-  encodeFunctionData(functionFragment: 'getPrizes', values: [PromiseOrValue<BigNumberish>]): string
-  encodeFunctionData(functionFragment: 'getRemainingPlayersCount', values?: undefined): string
-  encodeFunctionData(functionFragment: 'getWinners', values: [PromiseOrValue<BigNumberish>]): string
-  encodeFunctionData(functionFragment: 'initialize', values: [GameV1Interface.InitializationStruct]): string
-  encodeFunctionData(functionFragment: 'isAllPlayersSplitOk', values?: undefined): string
-  encodeFunctionData(functionFragment: 'isGameAllPrizesStandard', values?: undefined): string
-  encodeFunctionData(functionFragment: 'isGamePayable', values?: undefined): string
-  encodeFunctionData(functionFragment: 'pause', values?: undefined): string
-  encodeFunctionData(functionFragment: 'playRound', values?: undefined): string
-  encodeFunctionData(functionFragment: 'registerForGame', values?: undefined): string
-  encodeFunctionData(functionFragment: 'setCreatorFee', values: [PromiseOrValue<BigNumberish>]): string
-  encodeFunctionData(functionFragment: 'setCronUpkeep', values: [PromiseOrValue<string>]): string
-  encodeFunctionData(functionFragment: 'setEncodedCron', values: [PromiseOrValue<string>]): string
-  encodeFunctionData(functionFragment: 'setMaxPlayers', values: [PromiseOrValue<BigNumberish>]): string
-  encodeFunctionData(functionFragment: 'setName', values: [PromiseOrValue<BytesLike>]): string
-  encodeFunctionData(functionFragment: 'setTreasuryFee', values: [PromiseOrValue<BigNumberish>]): string
-  encodeFunctionData(functionFragment: 'startGame', values?: undefined): string
-  encodeFunctionData(functionFragment: 'transferAdminOwnership', values: [PromiseOrValue<string>]): string
-  encodeFunctionData(functionFragment: 'transferCreatorOwnership', values: [PromiseOrValue<string>]): string
-  encodeFunctionData(functionFragment: 'transferFactoryOwnership', values: [PromiseOrValue<string>]): string
-  encodeFunctionData(functionFragment: 'triggerDailyCheckpoint', values?: undefined): string
-  encodeFunctionData(functionFragment: 'unpause', values?: undefined): string
-  encodeFunctionData(functionFragment: 'voteToSplitPot', values?: undefined): string
-  encodeFunctionData(functionFragment: 'withdrawFunds', values: [PromiseOrValue<string>]): string
+  encodeFunctionData(
+    functionFragment: "addPrizes",
+    values: [GameV1Interface.PrizeStruct[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "claimCreatorFee",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "claimPrize",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "claimTreasuryFee",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getGameData",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPlayer",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPlayerAddresses",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPrizes",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRemainingPlayersCount",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getWinners",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "initialize",
+    values: [GameV1Interface.InitializationStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isAllPlayersSplitOk",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isGameAllPrizesStandard",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isGamePayable",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "playRound", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "registerForGame",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setCreatorFee",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setCronUpkeep",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setEncodedCron",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setMaxPlayers",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setName",
+    values: [PromiseOrValue<BytesLike>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setTreasuryFee",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(functionFragment: "startGame", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "transferAdminOwnership",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "transferCreatorOwnership",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "transferFactoryOwnership",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "triggerDailyCheckpoint",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "voteToSplitPot",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawFunds",
+    values: [PromiseOrValue<string>]
+  ): string;
 
-  decodeFunctionResult(functionFragment: 'addPrizes', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'claimCreatorFee', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'claimPrize', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'claimTreasuryFee', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'getGameData', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'getPlayer', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'getPlayerAddresses', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'getPrizes', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'getRemainingPlayersCount', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'getWinners', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'isAllPlayersSplitOk', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'isGameAllPrizesStandard', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'isGamePayable', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'pause', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'playRound', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'registerForGame', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'setCreatorFee', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'setCronUpkeep', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'setEncodedCron', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'setMaxPlayers', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'setName', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'setTreasuryFee', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'startGame', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'transferAdminOwnership', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'transferCreatorOwnership', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'transferFactoryOwnership', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'triggerDailyCheckpoint', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'unpause', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'voteToSplitPot', data: BytesLike): Result
-  decodeFunctionResult(functionFragment: 'withdrawFunds', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: "addPrizes", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "claimCreatorFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "claimPrize", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "claimTreasuryFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getGameData",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getPlayer", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getPlayerAddresses",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getPrizes", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getRemainingPlayersCount",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getWinners", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isAllPlayersSplitOk",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "isGameAllPrizesStandard",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "isGamePayable",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "playRound", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "registerForGame",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setCreatorFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setCronUpkeep",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setEncodedCron",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMaxPlayers",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "setName", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setTreasuryFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "startGame", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "transferAdminOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferCreatorOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferFactoryOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "triggerDailyCheckpoint",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "voteToSplitPot",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawFunds",
+    data: BytesLike
+  ): Result;
 
   events: {
-    'AdminOwnershipTransferred(address,address)': EventFragment
-    'CreatorFeeClaimed(uint256)': EventFragment
-    'CreatorOwnershipTransferred(address,address)': EventFragment
-    'CronUpkeepUpdated(uint256,address)': EventFragment
-    'EncodedCronUpdated(uint256,string)': EventFragment
-    'FactoryOwnershipTransferred(address,address)': EventFragment
-    'FailedTransfer(address,uint256)': EventFragment
-    'GameLost(uint256,address,uint256)': EventFragment
-    'GamePrizeClaimed(address,uint256,uint256)': EventFragment
-    'GameSplitted(uint256,uint256,uint256)': EventFragment
-    'GameWon(uint256,uint256,address,uint256)': EventFragment
-    'PlayedRound(address)': EventFragment
-    'PrizeAdded(uint256,uint256,uint256,uint256,address,uint256)': EventFragment
-    'Received(address,uint256)': EventFragment
-    'RegisteredForGame(address,uint256)': EventFragment
-    'ResetGame(uint256,uint256)': EventFragment
-    'StartedGame(uint256,uint256)': EventFragment
-    'TreasuryFeeClaimed(uint256)': EventFragment
-    'TreasuryFeeClaimedByFactory(uint256)': EventFragment
-    'VoteToSplitPot(uint256,address)': EventFragment
-  }
+    "AdminOwnershipTransferred(address,address)": EventFragment;
+    "CreatorFeeClaimed(uint256)": EventFragment;
+    "CreatorOwnershipTransferred(address,address)": EventFragment;
+    "CronUpkeepUpdated(uint256,address)": EventFragment;
+    "EncodedCronUpdated(uint256,string)": EventFragment;
+    "FactoryOwnershipTransferred(address,address)": EventFragment;
+    "FailedTransfer(address,uint256)": EventFragment;
+    "GameLost(uint256,address,uint256)": EventFragment;
+    "GamePrizeClaimed(address,uint256,uint256)": EventFragment;
+    "GameSplitted(uint256,uint256,uint256)": EventFragment;
+    "GameWon(uint256,uint256,address,uint256)": EventFragment;
+    "PlayedRound(address)": EventFragment;
+    "PrizeAdded(uint256,uint256,uint256,uint256,address,uint256)": EventFragment;
+    "Received(address,uint256)": EventFragment;
+    "RegisteredForGame(address,uint256)": EventFragment;
+    "ResetGame(uint256,uint256)": EventFragment;
+    "StartedGame(uint256,uint256)": EventFragment;
+    "TreasuryFeeClaimed(uint256)": EventFragment;
+    "TreasuryFeeClaimedByFactory(uint256)": EventFragment;
+    "TriggeredDailyCheckpoint(uint256,address)": EventFragment;
+    "VoteToSplitPot(uint256,address)": EventFragment;
+  };
 
-  getEvent(nameOrSignatureOrTopic: 'AdminOwnershipTransferred'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'CreatorFeeClaimed'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'CreatorOwnershipTransferred'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'CronUpkeepUpdated'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'EncodedCronUpdated'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'FactoryOwnershipTransferred'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'FailedTransfer'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'GameLost'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'GamePrizeClaimed'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'GameSplitted'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'GameWon'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'PlayedRound'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'PrizeAdded'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'Received'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'RegisteredForGame'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'ResetGame'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'StartedGame'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'TreasuryFeeClaimed'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'TreasuryFeeClaimedByFactory'): EventFragment
-  getEvent(nameOrSignatureOrTopic: 'VoteToSplitPot'): EventFragment
+  getEvent(nameOrSignatureOrTopic: "AdminOwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "CreatorFeeClaimed"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "CreatorOwnershipTransferred"
+  ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "CronUpkeepUpdated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "EncodedCronUpdated"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "FactoryOwnershipTransferred"
+  ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "FailedTransfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "GameLost"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "GamePrizeClaimed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "GameSplitted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "GameWon"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PlayedRound"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PrizeAdded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Received"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RegisteredForGame"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ResetGame"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "StartedGame"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TreasuryFeeClaimed"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "TreasuryFeeClaimedByFactory"
+  ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TriggeredDailyCheckpoint"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "VoteToSplitPot"): EventFragment;
 }
 
 export interface AdminOwnershipTransferredEventObject {
-  oldAdmin: string
-  newAdmin: string
+  oldAdmin: string;
+  newAdmin: string;
 }
-export type AdminOwnershipTransferredEvent = TypedEvent<[string, string], AdminOwnershipTransferredEventObject>
+export type AdminOwnershipTransferredEvent = TypedEvent<
+  [string, string],
+  AdminOwnershipTransferredEventObject
+>;
 
-export type AdminOwnershipTransferredEventFilter = TypedEventFilter<AdminOwnershipTransferredEvent>
+export type AdminOwnershipTransferredEventFilter =
+  TypedEventFilter<AdminOwnershipTransferredEvent>;
 
 export interface CreatorFeeClaimedEventObject {
-  amount: BigNumber
+  amount: BigNumber;
 }
-export type CreatorFeeClaimedEvent = TypedEvent<[BigNumber], CreatorFeeClaimedEventObject>
+export type CreatorFeeClaimedEvent = TypedEvent<
+  [BigNumber],
+  CreatorFeeClaimedEventObject
+>;
 
-export type CreatorFeeClaimedEventFilter = TypedEventFilter<CreatorFeeClaimedEvent>
+export type CreatorFeeClaimedEventFilter =
+  TypedEventFilter<CreatorFeeClaimedEvent>;
 
 export interface CreatorOwnershipTransferredEventObject {
-  oldCreator: string
-  newCreator: string
+  oldCreator: string;
+  newCreator: string;
 }
-export type CreatorOwnershipTransferredEvent = TypedEvent<[string, string], CreatorOwnershipTransferredEventObject>
+export type CreatorOwnershipTransferredEvent = TypedEvent<
+  [string, string],
+  CreatorOwnershipTransferredEventObject
+>;
 
-export type CreatorOwnershipTransferredEventFilter = TypedEventFilter<CreatorOwnershipTransferredEvent>
+export type CreatorOwnershipTransferredEventFilter =
+  TypedEventFilter<CreatorOwnershipTransferredEvent>;
 
 export interface CronUpkeepUpdatedEventObject {
-  jobId: BigNumber
-  cronUpkeep: string
+  jobId: BigNumber;
+  cronUpkeep: string;
 }
-export type CronUpkeepUpdatedEvent = TypedEvent<[BigNumber, string], CronUpkeepUpdatedEventObject>
+export type CronUpkeepUpdatedEvent = TypedEvent<
+  [BigNumber, string],
+  CronUpkeepUpdatedEventObject
+>;
 
-export type CronUpkeepUpdatedEventFilter = TypedEventFilter<CronUpkeepUpdatedEvent>
+export type CronUpkeepUpdatedEventFilter =
+  TypedEventFilter<CronUpkeepUpdatedEvent>;
 
 export interface EncodedCronUpdatedEventObject {
-  jobId: BigNumber
-  encodedCron: string
+  jobId: BigNumber;
+  encodedCron: string;
 }
-export type EncodedCronUpdatedEvent = TypedEvent<[BigNumber, string], EncodedCronUpdatedEventObject>
+export type EncodedCronUpdatedEvent = TypedEvent<
+  [BigNumber, string],
+  EncodedCronUpdatedEventObject
+>;
 
-export type EncodedCronUpdatedEventFilter = TypedEventFilter<EncodedCronUpdatedEvent>
+export type EncodedCronUpdatedEventFilter =
+  TypedEventFilter<EncodedCronUpdatedEvent>;
 
 export interface FactoryOwnershipTransferredEventObject {
-  oldFactory: string
-  newFactory: string
+  oldFactory: string;
+  newFactory: string;
 }
-export type FactoryOwnershipTransferredEvent = TypedEvent<[string, string], FactoryOwnershipTransferredEventObject>
+export type FactoryOwnershipTransferredEvent = TypedEvent<
+  [string, string],
+  FactoryOwnershipTransferredEventObject
+>;
 
-export type FactoryOwnershipTransferredEventFilter = TypedEventFilter<FactoryOwnershipTransferredEvent>
+export type FactoryOwnershipTransferredEventFilter =
+  TypedEventFilter<FactoryOwnershipTransferredEvent>;
 
 export interface FailedTransferEventObject {
-  receiver: string
-  amount: BigNumber
+  receiver: string;
+  amount: BigNumber;
 }
-export type FailedTransferEvent = TypedEvent<[string, BigNumber], FailedTransferEventObject>
+export type FailedTransferEvent = TypedEvent<
+  [string, BigNumber],
+  FailedTransferEventObject
+>;
 
-export type FailedTransferEventFilter = TypedEventFilter<FailedTransferEvent>
+export type FailedTransferEventFilter = TypedEventFilter<FailedTransferEvent>;
 
 export interface GameLostEventObject {
-  roundId: BigNumber
-  playerAddress: string
-  roundCount: BigNumber
+  roundId: BigNumber;
+  playerAddress: string;
+  roundCount: BigNumber;
 }
-export type GameLostEvent = TypedEvent<[BigNumber, string, BigNumber], GameLostEventObject>
+export type GameLostEvent = TypedEvent<
+  [BigNumber, string, BigNumber],
+  GameLostEventObject
+>;
 
-export type GameLostEventFilter = TypedEventFilter<GameLostEvent>
+export type GameLostEventFilter = TypedEventFilter<GameLostEvent>;
 
 export interface GamePrizeClaimedEventObject {
-  claimer: string
-  roundId: BigNumber
-  amountClaimed: BigNumber
+  claimer: string;
+  roundId: BigNumber;
+  amountClaimed: BigNumber;
 }
-export type GamePrizeClaimedEvent = TypedEvent<[string, BigNumber, BigNumber], GamePrizeClaimedEventObject>
+export type GamePrizeClaimedEvent = TypedEvent<
+  [string, BigNumber, BigNumber],
+  GamePrizeClaimedEventObject
+>;
 
-export type GamePrizeClaimedEventFilter = TypedEventFilter<GamePrizeClaimedEvent>
+export type GamePrizeClaimedEventFilter =
+  TypedEventFilter<GamePrizeClaimedEvent>;
 
 export interface GameSplittedEventObject {
-  roundId: BigNumber
-  remainingPlayersCount: BigNumber
-  amountWon: BigNumber
+  roundId: BigNumber;
+  remainingPlayersCount: BigNumber;
+  amountWon: BigNumber;
 }
-export type GameSplittedEvent = TypedEvent<[BigNumber, BigNumber, BigNumber], GameSplittedEventObject>
+export type GameSplittedEvent = TypedEvent<
+  [BigNumber, BigNumber, BigNumber],
+  GameSplittedEventObject
+>;
 
-export type GameSplittedEventFilter = TypedEventFilter<GameSplittedEvent>
+export type GameSplittedEventFilter = TypedEventFilter<GameSplittedEvent>;
 
 export interface GameWonEventObject {
-  roundId: BigNumber
-  winnersCounter: BigNumber
-  playerAddress: string
-  amountWon: BigNumber
+  roundId: BigNumber;
+  winnersCounter: BigNumber;
+  playerAddress: string;
+  amountWon: BigNumber;
 }
-export type GameWonEvent = TypedEvent<[BigNumber, BigNumber, string, BigNumber], GameWonEventObject>
+export type GameWonEvent = TypedEvent<
+  [BigNumber, BigNumber, string, BigNumber],
+  GameWonEventObject
+>;
 
-export type GameWonEventFilter = TypedEventFilter<GameWonEvent>
+export type GameWonEventFilter = TypedEventFilter<GameWonEvent>;
 
 export interface PlayedRoundEventObject {
-  playerAddress: string
+  playerAddress: string;
 }
-export type PlayedRoundEvent = TypedEvent<[string], PlayedRoundEventObject>
+export type PlayedRoundEvent = TypedEvent<[string], PlayedRoundEventObject>;
 
-export type PlayedRoundEventFilter = TypedEventFilter<PlayedRoundEvent>
+export type PlayedRoundEventFilter = TypedEventFilter<PlayedRoundEvent>;
 
 export interface PrizeAddedEventObject {
-  roundId: BigNumber
-  position: BigNumber
-  amount: BigNumber
-  standard: BigNumber
-  contractAddress: string
-  tokenId: BigNumber
+  roundId: BigNumber;
+  position: BigNumber;
+  amount: BigNumber;
+  standard: BigNumber;
+  contractAddress: string;
+  tokenId: BigNumber;
 }
 export type PrizeAddedEvent = TypedEvent<
   [BigNumber, BigNumber, BigNumber, BigNumber, string, BigNumber],
   PrizeAddedEventObject
->
+>;
 
-export type PrizeAddedEventFilter = TypedEventFilter<PrizeAddedEvent>
+export type PrizeAddedEventFilter = TypedEventFilter<PrizeAddedEvent>;
 
 export interface ReceivedEventObject {
-  sender: string
-  amount: BigNumber
+  sender: string;
+  amount: BigNumber;
 }
-export type ReceivedEvent = TypedEvent<[string, BigNumber], ReceivedEventObject>
+export type ReceivedEvent = TypedEvent<
+  [string, BigNumber],
+  ReceivedEventObject
+>;
 
-export type ReceivedEventFilter = TypedEventFilter<ReceivedEvent>
+export type ReceivedEventFilter = TypedEventFilter<ReceivedEvent>;
 
 export interface RegisteredForGameEventObject {
-  playerAddress: string
-  playersCount: BigNumber
+  playerAddress: string;
+  playersCount: BigNumber;
 }
-export type RegisteredForGameEvent = TypedEvent<[string, BigNumber], RegisteredForGameEventObject>
+export type RegisteredForGameEvent = TypedEvent<
+  [string, BigNumber],
+  RegisteredForGameEventObject
+>;
 
-export type RegisteredForGameEventFilter = TypedEventFilter<RegisteredForGameEvent>
+export type RegisteredForGameEventFilter =
+  TypedEventFilter<RegisteredForGameEvent>;
 
 export interface ResetGameEventObject {
-  timelock: BigNumber
-  resetId: BigNumber
+  timelock: BigNumber;
+  resetId: BigNumber;
 }
-export type ResetGameEvent = TypedEvent<[BigNumber, BigNumber], ResetGameEventObject>
+export type ResetGameEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  ResetGameEventObject
+>;
 
-export type ResetGameEventFilter = TypedEventFilter<ResetGameEvent>
+export type ResetGameEventFilter = TypedEventFilter<ResetGameEvent>;
 
 export interface StartedGameEventObject {
-  timelock: BigNumber
-  playersCount: BigNumber
+  timelock: BigNumber;
+  playersCount: BigNumber;
 }
-export type StartedGameEvent = TypedEvent<[BigNumber, BigNumber], StartedGameEventObject>
+export type StartedGameEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  StartedGameEventObject
+>;
 
-export type StartedGameEventFilter = TypedEventFilter<StartedGameEvent>
+export type StartedGameEventFilter = TypedEventFilter<StartedGameEvent>;
 
 export interface TreasuryFeeClaimedEventObject {
-  amount: BigNumber
+  amount: BigNumber;
 }
-export type TreasuryFeeClaimedEvent = TypedEvent<[BigNumber], TreasuryFeeClaimedEventObject>
+export type TreasuryFeeClaimedEvent = TypedEvent<
+  [BigNumber],
+  TreasuryFeeClaimedEventObject
+>;
 
-export type TreasuryFeeClaimedEventFilter = TypedEventFilter<TreasuryFeeClaimedEvent>
+export type TreasuryFeeClaimedEventFilter =
+  TypedEventFilter<TreasuryFeeClaimedEvent>;
 
 export interface TreasuryFeeClaimedByFactoryEventObject {
-  amount: BigNumber
+  amount: BigNumber;
 }
-export type TreasuryFeeClaimedByFactoryEvent = TypedEvent<[BigNumber], TreasuryFeeClaimedByFactoryEventObject>
+export type TreasuryFeeClaimedByFactoryEvent = TypedEvent<
+  [BigNumber],
+  TreasuryFeeClaimedByFactoryEventObject
+>;
 
-export type TreasuryFeeClaimedByFactoryEventFilter = TypedEventFilter<TreasuryFeeClaimedByFactoryEvent>
+export type TreasuryFeeClaimedByFactoryEventFilter =
+  TypedEventFilter<TreasuryFeeClaimedByFactoryEvent>;
+
+export interface TriggeredDailyCheckpointEventObject {
+  roundId: BigNumber;
+  emmiter: string;
+}
+export type TriggeredDailyCheckpointEvent = TypedEvent<
+  [BigNumber, string],
+  TriggeredDailyCheckpointEventObject
+>;
+
+export type TriggeredDailyCheckpointEventFilter =
+  TypedEventFilter<TriggeredDailyCheckpointEvent>;
 
 export interface VoteToSplitPotEventObject {
-  roundId: BigNumber
-  playerAddress: string
+  roundId: BigNumber;
+  playerAddress: string;
 }
-export type VoteToSplitPotEvent = TypedEvent<[BigNumber, string], VoteToSplitPotEventObject>
+export type VoteToSplitPotEvent = TypedEvent<
+  [BigNumber, string],
+  VoteToSplitPotEventObject
+>;
 
-export type VoteToSplitPotEventFilter = TypedEventFilter<VoteToSplitPotEvent>
+export type VoteToSplitPotEventFilter = TypedEventFilter<VoteToSplitPotEvent>;
 
 export interface GameV1Interface extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this
-  attach(addressOrName: string): this
-  deployed(): Promise<this>
+  connect(signerOrProvider: Signer | Provider | string): this;
+  attach(addressOrName: string): this;
+  deployed(): Promise<this>;
 
-  interface: GameV1InterfaceInterface
+  interface: GameV1InterfaceInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
-  ): Promise<Array<TEvent>>
+    toBlock?: string | number | undefined
+  ): Promise<Array<TEvent>>;
 
-  listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>
-  listeners(eventName?: string): Array<Listener>
-  removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this
-  removeAllListeners(eventName?: string): this
-  off: OnEvent<this>
-  on: OnEvent<this>
-  once: OnEvent<this>
-  removeListener: OnEvent<this>
+  listeners<TEvent extends TypedEvent>(
+    eventFilter?: TypedEventFilter<TEvent>
+  ): Array<TypedListener<TEvent>>;
+  listeners(eventName?: string): Array<Listener>;
+  removeAllListeners<TEvent extends TypedEvent>(
+    eventFilter: TypedEventFilter<TEvent>
+  ): this;
+  removeAllListeners(eventName?: string): this;
+  off: OnEvent<this>;
+  on: OnEvent<this>;
+  once: OnEvent<this>;
+  removeListener: OnEvent<this>;
 
   functions: {
     addPrizes(
       _prizes: GameV1Interface.PrizeStruct[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
-    claimCreatorFee(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+    claimCreatorFee(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     claimPrize(
       _roundId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
-    claimTreasuryFee(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+    claimTreasuryFee(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
-    getGameData(overrides?: CallOverrides): Promise<
+    getGameData(
+      overrides?: CallOverrides
+    ): Promise<
       [GameV1Interface.GameDataStructOutput] & {
-        gameData: GameV1Interface.GameDataStructOutput
+        gameData: GameV1Interface.GameDataStructOutput;
       }
-    >
+    >;
 
     getPlayer(
       _player: PromiseOrValue<string>,
-      overrides?: CallOverrides,
+      overrides?: CallOverrides
     ): Promise<
       [GameV1Interface.PlayerStructOutput] & {
-        gamePlayer: GameV1Interface.PlayerStructOutput
+        gamePlayer: GameV1Interface.PlayerStructOutput;
       }
-    >
+    >;
 
-    getPlayerAddresses(overrides?: CallOverrides): Promise<[string[]] & { gamePlayerAddresses: string[] }>
+    getPlayerAddresses(
+      overrides?: CallOverrides
+    ): Promise<[string[]] & { gamePlayerAddresses: string[] }>;
 
     getPrizes(
       _roundId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides,
+      overrides?: CallOverrides
     ): Promise<
       [GameV1Interface.PrizeStructOutput[]] & {
-        gamePrizes: GameV1Interface.PrizeStructOutput[]
+        gamePrizes: GameV1Interface.PrizeStructOutput[];
       }
-    >
+    >;
 
-    getRemainingPlayersCount(overrides?: CallOverrides): Promise<[BigNumber] & { remainingPlayersCount: BigNumber }>
+    getRemainingPlayersCount(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { remainingPlayersCount: BigNumber }>;
 
     getWinners(
       _roundId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides,
+      overrides?: CallOverrides
     ): Promise<
       [GameV1Interface.WinnerStructOutput[]] & {
-        gameWinners: GameV1Interface.WinnerStructOutput[]
+        gameWinners: GameV1Interface.WinnerStructOutput[];
       }
-    >
+    >;
 
     initialize(
       _initialization: GameV1Interface.InitializationStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
-    isAllPlayersSplitOk(overrides?: CallOverrides): Promise<[boolean] & { isSplitOk: boolean }>
+    isAllPlayersSplitOk(
+      overrides?: CallOverrides
+    ): Promise<[boolean] & { isSplitOk: boolean }>;
 
-    isGameAllPrizesStandard(overrides?: CallOverrides): Promise<[boolean] & { isStandard: boolean }>
+    isGameAllPrizesStandard(
+      overrides?: CallOverrides
+    ): Promise<[boolean] & { isStandard: boolean }>;
 
-    isGamePayable(overrides?: CallOverrides): Promise<[boolean] & { isPayable: boolean }>
+    isGamePayable(
+      overrides?: CallOverrides
+    ): Promise<[boolean] & { isPayable: boolean }>;
 
-    pause(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+    pause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
-    playRound(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+    playRound(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
-    registerForGame(overrides?: PayableOverrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+    registerForGame(
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     setCreatorFee(
       _creatorFee: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     setCronUpkeep(
       _cronUpkeep: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     setEncodedCron(
       _encodedCron: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     setMaxPlayers(
       _maxPlayers: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     setName(
       _name: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     setTreasuryFee(
       _treasuryFee: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
-    startGame(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+    startGame(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     transferAdminOwnership(
       _adminAddress: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     transferCreatorOwnership(
       _creator: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     transferFactoryOwnership(
       _factory: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
-    triggerDailyCheckpoint(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+    triggerDailyCheckpoint(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
-    unpause(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+    unpause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
-    voteToSplitPot(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+    voteToSplitPot(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     withdrawFunds(
       _receiver: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<ContractTransaction>
-  }
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+  };
 
   addPrizes(
     _prizes: GameV1Interface.PrizeStruct[],
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  claimCreatorFee(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+  claimCreatorFee(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   claimPrize(
     _roundId: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  claimTreasuryFee(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+  claimTreasuryFee(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  getGameData(overrides?: CallOverrides): Promise<GameV1Interface.GameDataStructOutput>
+  getGameData(
+    overrides?: CallOverrides
+  ): Promise<GameV1Interface.GameDataStructOutput>;
 
-  getPlayer(_player: PromiseOrValue<string>, overrides?: CallOverrides): Promise<GameV1Interface.PlayerStructOutput>
+  getPlayer(
+    _player: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<GameV1Interface.PlayerStructOutput>;
 
-  getPlayerAddresses(overrides?: CallOverrides): Promise<string[]>
+  getPlayerAddresses(overrides?: CallOverrides): Promise<string[]>;
 
   getPrizes(
     _roundId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides,
-  ): Promise<GameV1Interface.PrizeStructOutput[]>
+    overrides?: CallOverrides
+  ): Promise<GameV1Interface.PrizeStructOutput[]>;
 
-  getRemainingPlayersCount(overrides?: CallOverrides): Promise<BigNumber>
+  getRemainingPlayersCount(overrides?: CallOverrides): Promise<BigNumber>;
 
   getWinners(
     _roundId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides,
-  ): Promise<GameV1Interface.WinnerStructOutput[]>
+    overrides?: CallOverrides
+  ): Promise<GameV1Interface.WinnerStructOutput[]>;
 
   initialize(
     _initialization: GameV1Interface.InitializationStruct,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  isAllPlayersSplitOk(overrides?: CallOverrides): Promise<boolean>
+  isAllPlayersSplitOk(overrides?: CallOverrides): Promise<boolean>;
 
-  isGameAllPrizesStandard(overrides?: CallOverrides): Promise<boolean>
+  isGameAllPrizesStandard(overrides?: CallOverrides): Promise<boolean>;
 
-  isGamePayable(overrides?: CallOverrides): Promise<boolean>
+  isGamePayable(overrides?: CallOverrides): Promise<boolean>;
 
-  pause(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+  pause(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  playRound(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+  playRound(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  registerForGame(overrides?: PayableOverrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+  registerForGame(
+    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   setCreatorFee(
     _creatorFee: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   setCronUpkeep(
     _cronUpkeep: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   setEncodedCron(
     _encodedCron: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   setMaxPlayers(
     _maxPlayers: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   setName(
     _name: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   setTreasuryFee(
     _treasuryFee: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  startGame(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+  startGame(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   transferAdminOwnership(
     _adminAddress: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   transferCreatorOwnership(
     _creator: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   transferFactoryOwnership(
     _factory: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  triggerDailyCheckpoint(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+  triggerDailyCheckpoint(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  unpause(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+  unpause(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  voteToSplitPot(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<ContractTransaction>
+  voteToSplitPot(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   withdrawFunds(
     _receiver: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
-  ): Promise<ContractTransaction>
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   callStatic: {
-    addPrizes(_prizes: GameV1Interface.PrizeStruct[], overrides?: CallOverrides): Promise<void>
+    addPrizes(
+      _prizes: GameV1Interface.PrizeStruct[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    claimCreatorFee(overrides?: CallOverrides): Promise<void>
+    claimCreatorFee(overrides?: CallOverrides): Promise<void>;
 
-    claimPrize(_roundId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>
+    claimPrize(
+      _roundId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    claimTreasuryFee(overrides?: CallOverrides): Promise<void>
+    claimTreasuryFee(overrides?: CallOverrides): Promise<void>;
 
-    getGameData(overrides?: CallOverrides): Promise<GameV1Interface.GameDataStructOutput>
+    getGameData(
+      overrides?: CallOverrides
+    ): Promise<GameV1Interface.GameDataStructOutput>;
 
-    getPlayer(_player: PromiseOrValue<string>, overrides?: CallOverrides): Promise<GameV1Interface.PlayerStructOutput>
+    getPlayer(
+      _player: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<GameV1Interface.PlayerStructOutput>;
 
-    getPlayerAddresses(overrides?: CallOverrides): Promise<string[]>
+    getPlayerAddresses(overrides?: CallOverrides): Promise<string[]>;
 
     getPrizes(
       _roundId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides,
-    ): Promise<GameV1Interface.PrizeStructOutput[]>
+      overrides?: CallOverrides
+    ): Promise<GameV1Interface.PrizeStructOutput[]>;
 
-    getRemainingPlayersCount(overrides?: CallOverrides): Promise<BigNumber>
+    getRemainingPlayersCount(overrides?: CallOverrides): Promise<BigNumber>;
 
     getWinners(
       _roundId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides,
-    ): Promise<GameV1Interface.WinnerStructOutput[]>
+      overrides?: CallOverrides
+    ): Promise<GameV1Interface.WinnerStructOutput[]>;
 
-    initialize(_initialization: GameV1Interface.InitializationStruct, overrides?: CallOverrides): Promise<void>
+    initialize(
+      _initialization: GameV1Interface.InitializationStruct,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    isAllPlayersSplitOk(overrides?: CallOverrides): Promise<boolean>
+    isAllPlayersSplitOk(overrides?: CallOverrides): Promise<boolean>;
 
-    isGameAllPrizesStandard(overrides?: CallOverrides): Promise<boolean>
+    isGameAllPrizesStandard(overrides?: CallOverrides): Promise<boolean>;
 
-    isGamePayable(overrides?: CallOverrides): Promise<boolean>
+    isGamePayable(overrides?: CallOverrides): Promise<boolean>;
 
-    pause(overrides?: CallOverrides): Promise<void>
+    pause(overrides?: CallOverrides): Promise<void>;
 
-    playRound(overrides?: CallOverrides): Promise<void>
+    playRound(overrides?: CallOverrides): Promise<void>;
 
-    registerForGame(overrides?: CallOverrides): Promise<void>
+    registerForGame(overrides?: CallOverrides): Promise<void>;
 
-    setCreatorFee(_creatorFee: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>
+    setCreatorFee(
+      _creatorFee: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    setCronUpkeep(_cronUpkeep: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>
+    setCronUpkeep(
+      _cronUpkeep: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    setEncodedCron(_encodedCron: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>
+    setEncodedCron(
+      _encodedCron: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    setMaxPlayers(_maxPlayers: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>
+    setMaxPlayers(
+      _maxPlayers: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    setName(_name: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>
+    setName(
+      _name: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    setTreasuryFee(_treasuryFee: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>
+    setTreasuryFee(
+      _treasuryFee: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    startGame(overrides?: CallOverrides): Promise<void>
+    startGame(overrides?: CallOverrides): Promise<void>;
 
-    transferAdminOwnership(_adminAddress: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>
+    transferAdminOwnership(
+      _adminAddress: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    transferCreatorOwnership(_creator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>
+    transferCreatorOwnership(
+      _creator: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    transferFactoryOwnership(_factory: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>
+    transferFactoryOwnership(
+      _factory: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    triggerDailyCheckpoint(overrides?: CallOverrides): Promise<void>
+    triggerDailyCheckpoint(overrides?: CallOverrides): Promise<void>;
 
-    unpause(overrides?: CallOverrides): Promise<void>
+    unpause(overrides?: CallOverrides): Promise<void>;
 
-    voteToSplitPot(overrides?: CallOverrides): Promise<void>
+    voteToSplitPot(overrides?: CallOverrides): Promise<void>;
 
-    withdrawFunds(_receiver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>
-  }
+    withdrawFunds(
+      _receiver: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+  };
 
   filters: {
-    'AdminOwnershipTransferred(address,address)'(oldAdmin?: null, newAdmin?: null): AdminOwnershipTransferredEventFilter
-    AdminOwnershipTransferred(oldAdmin?: null, newAdmin?: null): AdminOwnershipTransferredEventFilter
+    "AdminOwnershipTransferred(address,address)"(
+      oldAdmin?: null,
+      newAdmin?: null
+    ): AdminOwnershipTransferredEventFilter;
+    AdminOwnershipTransferred(
+      oldAdmin?: null,
+      newAdmin?: null
+    ): AdminOwnershipTransferredEventFilter;
 
-    'CreatorFeeClaimed(uint256)'(amount?: null): CreatorFeeClaimedEventFilter
-    CreatorFeeClaimed(amount?: null): CreatorFeeClaimedEventFilter
+    "CreatorFeeClaimed(uint256)"(amount?: null): CreatorFeeClaimedEventFilter;
+    CreatorFeeClaimed(amount?: null): CreatorFeeClaimedEventFilter;
 
-    'CreatorOwnershipTransferred(address,address)'(
+    "CreatorOwnershipTransferred(address,address)"(
       oldCreator?: null,
-      newCreator?: null,
-    ): CreatorOwnershipTransferredEventFilter
-    CreatorOwnershipTransferred(oldCreator?: null, newCreator?: null): CreatorOwnershipTransferredEventFilter
+      newCreator?: null
+    ): CreatorOwnershipTransferredEventFilter;
+    CreatorOwnershipTransferred(
+      oldCreator?: null,
+      newCreator?: null
+    ): CreatorOwnershipTransferredEventFilter;
 
-    'CronUpkeepUpdated(uint256,address)'(jobId?: null, cronUpkeep?: null): CronUpkeepUpdatedEventFilter
-    CronUpkeepUpdated(jobId?: null, cronUpkeep?: null): CronUpkeepUpdatedEventFilter
+    "CronUpkeepUpdated(uint256,address)"(
+      jobId?: null,
+      cronUpkeep?: null
+    ): CronUpkeepUpdatedEventFilter;
+    CronUpkeepUpdated(
+      jobId?: null,
+      cronUpkeep?: null
+    ): CronUpkeepUpdatedEventFilter;
 
-    'EncodedCronUpdated(uint256,string)'(jobId?: null, encodedCron?: null): EncodedCronUpdatedEventFilter
-    EncodedCronUpdated(jobId?: null, encodedCron?: null): EncodedCronUpdatedEventFilter
+    "EncodedCronUpdated(uint256,string)"(
+      jobId?: null,
+      encodedCron?: null
+    ): EncodedCronUpdatedEventFilter;
+    EncodedCronUpdated(
+      jobId?: null,
+      encodedCron?: null
+    ): EncodedCronUpdatedEventFilter;
 
-    'FactoryOwnershipTransferred(address,address)'(
+    "FactoryOwnershipTransferred(address,address)"(
       oldFactory?: null,
-      newFactory?: null,
-    ): FactoryOwnershipTransferredEventFilter
-    FactoryOwnershipTransferred(oldFactory?: null, newFactory?: null): FactoryOwnershipTransferredEventFilter
+      newFactory?: null
+    ): FactoryOwnershipTransferredEventFilter;
+    FactoryOwnershipTransferred(
+      oldFactory?: null,
+      newFactory?: null
+    ): FactoryOwnershipTransferredEventFilter;
 
-    'FailedTransfer(address,uint256)'(receiver?: null, amount?: null): FailedTransferEventFilter
-    FailedTransfer(receiver?: null, amount?: null): FailedTransferEventFilter
+    "FailedTransfer(address,uint256)"(
+      receiver?: null,
+      amount?: null
+    ): FailedTransferEventFilter;
+    FailedTransfer(receiver?: null, amount?: null): FailedTransferEventFilter;
 
-    'GameLost(uint256,address,uint256)'(roundId?: null, playerAddress?: null, roundCount?: null): GameLostEventFilter
-    GameLost(roundId?: null, playerAddress?: null, roundCount?: null): GameLostEventFilter
+    "GameLost(uint256,address,uint256)"(
+      roundId?: null,
+      playerAddress?: null,
+      roundCount?: null
+    ): GameLostEventFilter;
+    GameLost(
+      roundId?: null,
+      playerAddress?: null,
+      roundCount?: null
+    ): GameLostEventFilter;
 
-    'GamePrizeClaimed(address,uint256,uint256)'(
+    "GamePrizeClaimed(address,uint256,uint256)"(
       claimer?: null,
       roundId?: null,
-      amountClaimed?: null,
-    ): GamePrizeClaimedEventFilter
-    GamePrizeClaimed(claimer?: null, roundId?: null, amountClaimed?: null): GamePrizeClaimedEventFilter
+      amountClaimed?: null
+    ): GamePrizeClaimedEventFilter;
+    GamePrizeClaimed(
+      claimer?: null,
+      roundId?: null,
+      amountClaimed?: null
+    ): GamePrizeClaimedEventFilter;
 
-    'GameSplitted(uint256,uint256,uint256)'(
+    "GameSplitted(uint256,uint256,uint256)"(
       roundId?: null,
       remainingPlayersCount?: null,
-      amountWon?: null,
-    ): GameSplittedEventFilter
-    GameSplitted(roundId?: null, remainingPlayersCount?: null, amountWon?: null): GameSplittedEventFilter
+      amountWon?: null
+    ): GameSplittedEventFilter;
+    GameSplitted(
+      roundId?: null,
+      remainingPlayersCount?: null,
+      amountWon?: null
+    ): GameSplittedEventFilter;
 
-    'GameWon(uint256,uint256,address,uint256)'(
+    "GameWon(uint256,uint256,address,uint256)"(
       roundId?: null,
       winnersCounter?: null,
       playerAddress?: null,
-      amountWon?: null,
-    ): GameWonEventFilter
-    GameWon(roundId?: null, winnersCounter?: null, playerAddress?: null, amountWon?: null): GameWonEventFilter
+      amountWon?: null
+    ): GameWonEventFilter;
+    GameWon(
+      roundId?: null,
+      winnersCounter?: null,
+      playerAddress?: null,
+      amountWon?: null
+    ): GameWonEventFilter;
 
-    'PlayedRound(address)'(playerAddress?: null): PlayedRoundEventFilter
-    PlayedRound(playerAddress?: null): PlayedRoundEventFilter
+    "PlayedRound(address)"(playerAddress?: null): PlayedRoundEventFilter;
+    PlayedRound(playerAddress?: null): PlayedRoundEventFilter;
 
-    'PrizeAdded(uint256,uint256,uint256,uint256,address,uint256)'(
+    "PrizeAdded(uint256,uint256,uint256,uint256,address,uint256)"(
       roundId?: null,
       position?: null,
       amount?: null,
       standard?: null,
       contractAddress?: null,
-      tokenId?: null,
-    ): PrizeAddedEventFilter
+      tokenId?: null
+    ): PrizeAddedEventFilter;
     PrizeAdded(
       roundId?: null,
       position?: null,
       amount?: null,
       standard?: null,
       contractAddress?: null,
-      tokenId?: null,
-    ): PrizeAddedEventFilter
+      tokenId?: null
+    ): PrizeAddedEventFilter;
 
-    'Received(address,uint256)'(sender?: null, amount?: null): ReceivedEventFilter
-    Received(sender?: null, amount?: null): ReceivedEventFilter
+    "Received(address,uint256)"(
+      sender?: null,
+      amount?: null
+    ): ReceivedEventFilter;
+    Received(sender?: null, amount?: null): ReceivedEventFilter;
 
-    'RegisteredForGame(address,uint256)'(playerAddress?: null, playersCount?: null): RegisteredForGameEventFilter
-    RegisteredForGame(playerAddress?: null, playersCount?: null): RegisteredForGameEventFilter
+    "RegisteredForGame(address,uint256)"(
+      playerAddress?: null,
+      playersCount?: null
+    ): RegisteredForGameEventFilter;
+    RegisteredForGame(
+      playerAddress?: null,
+      playersCount?: null
+    ): RegisteredForGameEventFilter;
 
-    'ResetGame(uint256,uint256)'(timelock?: null, resetId?: null): ResetGameEventFilter
-    ResetGame(timelock?: null, resetId?: null): ResetGameEventFilter
+    "ResetGame(uint256,uint256)"(
+      timelock?: null,
+      resetId?: null
+    ): ResetGameEventFilter;
+    ResetGame(timelock?: null, resetId?: null): ResetGameEventFilter;
 
-    'StartedGame(uint256,uint256)'(timelock?: null, playersCount?: null): StartedGameEventFilter
-    StartedGame(timelock?: null, playersCount?: null): StartedGameEventFilter
+    "StartedGame(uint256,uint256)"(
+      timelock?: null,
+      playersCount?: null
+    ): StartedGameEventFilter;
+    StartedGame(timelock?: null, playersCount?: null): StartedGameEventFilter;
 
-    'TreasuryFeeClaimed(uint256)'(amount?: null): TreasuryFeeClaimedEventFilter
-    TreasuryFeeClaimed(amount?: null): TreasuryFeeClaimedEventFilter
+    "TreasuryFeeClaimed(uint256)"(amount?: null): TreasuryFeeClaimedEventFilter;
+    TreasuryFeeClaimed(amount?: null): TreasuryFeeClaimedEventFilter;
 
-    'TreasuryFeeClaimedByFactory(uint256)'(amount?: null): TreasuryFeeClaimedByFactoryEventFilter
-    TreasuryFeeClaimedByFactory(amount?: null): TreasuryFeeClaimedByFactoryEventFilter
+    "TreasuryFeeClaimedByFactory(uint256)"(
+      amount?: null
+    ): TreasuryFeeClaimedByFactoryEventFilter;
+    TreasuryFeeClaimedByFactory(
+      amount?: null
+    ): TreasuryFeeClaimedByFactoryEventFilter;
 
-    'VoteToSplitPot(uint256,address)'(roundId?: null, playerAddress?: null): VoteToSplitPotEventFilter
-    VoteToSplitPot(roundId?: null, playerAddress?: null): VoteToSplitPotEventFilter
-  }
+    "TriggeredDailyCheckpoint(uint256,address)"(
+      roundId?: null,
+      emmiter?: null
+    ): TriggeredDailyCheckpointEventFilter;
+    TriggeredDailyCheckpoint(
+      roundId?: null,
+      emmiter?: null
+    ): TriggeredDailyCheckpointEventFilter;
+
+    "VoteToSplitPot(uint256,address)"(
+      roundId?: null,
+      playerAddress?: null
+    ): VoteToSplitPotEventFilter;
+    VoteToSplitPot(
+      roundId?: null,
+      playerAddress?: null
+    ): VoteToSplitPotEventFilter;
+  };
 
   estimateGas: {
     addPrizes(
       _prizes: GameV1Interface.PrizeStruct[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
-    claimCreatorFee(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<BigNumber>
+    claimCreatorFee(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     claimPrize(
       _roundId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
-    claimTreasuryFee(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<BigNumber>
+    claimTreasuryFee(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
-    getGameData(overrides?: CallOverrides): Promise<BigNumber>
+    getGameData(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getPlayer(_player: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>
+    getPlayer(
+      _player: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    getPlayerAddresses(overrides?: CallOverrides): Promise<BigNumber>
+    getPlayerAddresses(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getPrizes(_roundId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>
+    getPrizes(
+      _roundId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    getRemainingPlayersCount(overrides?: CallOverrides): Promise<BigNumber>
+    getRemainingPlayersCount(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getWinners(_roundId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>
+    getWinners(
+      _roundId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     initialize(
       _initialization: GameV1Interface.InitializationStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
-    isAllPlayersSplitOk(overrides?: CallOverrides): Promise<BigNumber>
+    isAllPlayersSplitOk(overrides?: CallOverrides): Promise<BigNumber>;
 
-    isGameAllPrizesStandard(overrides?: CallOverrides): Promise<BigNumber>
+    isGameAllPrizesStandard(overrides?: CallOverrides): Promise<BigNumber>;
 
-    isGamePayable(overrides?: CallOverrides): Promise<BigNumber>
+    isGamePayable(overrides?: CallOverrides): Promise<BigNumber>;
 
-    pause(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<BigNumber>
+    pause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
-    playRound(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<BigNumber>
+    playRound(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
-    registerForGame(overrides?: PayableOverrides & { from?: PromiseOrValue<string> }): Promise<BigNumber>
+    registerForGame(
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     setCreatorFee(
       _creatorFee: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     setCronUpkeep(
       _cronUpkeep: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     setEncodedCron(
       _encodedCron: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     setMaxPlayers(
       _maxPlayers: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     setName(
       _name: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     setTreasuryFee(
       _treasuryFee: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
-    startGame(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<BigNumber>
+    startGame(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     transferAdminOwnership(
       _adminAddress: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     transferCreatorOwnership(
       _creator: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     transferFactoryOwnership(
       _factory: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
-    triggerDailyCheckpoint(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<BigNumber>
+    triggerDailyCheckpoint(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
-    unpause(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<BigNumber>
+    unpause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
-    voteToSplitPot(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<BigNumber>
+    voteToSplitPot(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     withdrawFunds(
       _receiver: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<BigNumber>
-  }
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+  };
 
   populateTransaction: {
     addPrizes(
       _prizes: GameV1Interface.PrizeStruct[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
-    claimCreatorFee(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<PopulatedTransaction>
+    claimCreatorFee(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     claimPrize(
       _roundId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
-    claimTreasuryFee(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<PopulatedTransaction>
+    claimTreasuryFee(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
-    getGameData(overrides?: CallOverrides): Promise<PopulatedTransaction>
+    getGameData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getPlayer(_player: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>
+    getPlayer(
+      _player: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
-    getPlayerAddresses(overrides?: CallOverrides): Promise<PopulatedTransaction>
+    getPlayerAddresses(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
-    getPrizes(_roundId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>
+    getPrizes(
+      _roundId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
-    getRemainingPlayersCount(overrides?: CallOverrides): Promise<PopulatedTransaction>
+    getRemainingPlayersCount(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
-    getWinners(_roundId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>
+    getWinners(
+      _roundId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     initialize(
       _initialization: GameV1Interface.InitializationStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
-    isAllPlayersSplitOk(overrides?: CallOverrides): Promise<PopulatedTransaction>
+    isAllPlayersSplitOk(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
-    isGameAllPrizesStandard(overrides?: CallOverrides): Promise<PopulatedTransaction>
+    isGameAllPrizesStandard(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
-    isGamePayable(overrides?: CallOverrides): Promise<PopulatedTransaction>
+    isGamePayable(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    pause(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<PopulatedTransaction>
+    pause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
-    playRound(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<PopulatedTransaction>
+    playRound(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
-    registerForGame(overrides?: PayableOverrides & { from?: PromiseOrValue<string> }): Promise<PopulatedTransaction>
+    registerForGame(
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     setCreatorFee(
       _creatorFee: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     setCronUpkeep(
       _cronUpkeep: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     setEncodedCron(
       _encodedCron: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     setMaxPlayers(
       _maxPlayers: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     setName(
       _name: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     setTreasuryFee(
       _treasuryFee: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
-    startGame(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<PopulatedTransaction>
+    startGame(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     transferAdminOwnership(
       _adminAddress: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     transferCreatorOwnership(
       _creator: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     transferFactoryOwnership(
       _factory: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
-    triggerDailyCheckpoint(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<PopulatedTransaction>
+    triggerDailyCheckpoint(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
-    unpause(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<PopulatedTransaction>
+    unpause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
-    voteToSplitPot(overrides?: Overrides & { from?: PromiseOrValue<string> }): Promise<PopulatedTransaction>
+    voteToSplitPot(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     withdrawFunds(
       _receiver: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> },
-    ): Promise<PopulatedTransaction>
-  }
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+  };
 }

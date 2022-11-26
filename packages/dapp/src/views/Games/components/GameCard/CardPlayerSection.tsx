@@ -160,13 +160,6 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
                       </>
                     )}
                   </Text>
-                  //   <Text bold style={{ textAlign: 'right' }}>
-                  //     <>
-                  //       {moment(nextFromRange).isSame(moment(), 'day') ? 'Today' : 'Tomorrow'}
-                  //       {' between '}
-                  //       {moment(nextFromRange).format('hh:mm A')} and {moment(nextToRange).format('hh:mm A')}
-                  //     </>
-                  //   </Text>
                 )}
               </Text>
             ) : (
@@ -226,11 +219,9 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               {!isPaused && <PauseButton address={address} isInProgress={isInProgress} />}
             </>
           )}
-          {isPaused && isCreator && isAdmin && <ClaimAllFeeButton address={address} isInProgress={isInProgress} />}
-          {isPaused && isCreator && !isAdmin && <ClaimCreatorFeeButton address={address} isInProgress={isInProgress} />}
-          {isPaused && isAdmin && !isCreator && (
-            <ClaimTreasuryFeeButton address={address} isInProgress={isInProgress} />
-          )}
+          {isPaused && isCreator && isAdmin && <ClaimAllFeeButton address={address} />}
+          {isPaused && isCreator && !isAdmin && <ClaimCreatorFeeButton address={address} />}
+          {isPaused && isAdmin && !isCreator && <ClaimTreasuryFeeButton address={address} />}
         </>
       )}
 

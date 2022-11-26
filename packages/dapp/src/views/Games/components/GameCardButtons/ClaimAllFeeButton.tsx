@@ -11,7 +11,6 @@ const ClaimAllFeeButton: React.FC<React.PropsWithChildren<ClaimAllFeeButtonProps
   const { t } = useTranslation()
   const { isPending, handleClaimAllFee } = useClaimAllFee(address)
 
-  // TODO add check if remaining player count is less than 50%
   const isDisabledButton = useMemo(() => !address || isPending, [address, isPending])
 
   return (
