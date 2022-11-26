@@ -49,7 +49,6 @@ export const useCreateGame = (game) => {
     : gameCreationAmountEther.add(parseEther(`${freeGamePrizepoolAmount}`))
 
   const prizepool = parsedRegistrationAmount ? parsedRegistrationAmount * maxPlayers : freeGamePrizepoolAmount
-  console.log('🚀 ~ file: useCreateGame.tsx ~ line 49 ~ useCreateGame ~ prizepool', prizepool)
 
   const createPrize = (index, totalWinners) => {
     const parsedPrizepool = parseEther(`${prizepool}`)

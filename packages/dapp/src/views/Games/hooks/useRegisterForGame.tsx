@@ -22,26 +22,26 @@ export const useRegisterForGame = (gameAddress: string, registrationAmount: BigN
       contract.registerForGame({ value: parseEther(`${registrationAmount}`) }),
     )
 
-    addTransaction(
-      {
-        ...receipt,
-        hash: receipt.transactionHash,
-      },
-      {
-        summary: `Register for game ${gameAddress} with amount ${registrationAmount}`,
-        translatableSummary: {
-          text: 'Register for game %gameAddress% with amount %registrationAmount%',
-          data: { gameAddress, registrationAmount: registrationAmount.toNumber() },
-        },
-        type: 'register',
-      },
-    )
     if (receipt?.status) {
       toastSuccess(
         t('Success!'),
         <ToastDescriptionWithTx txHash={receipt.transactionHash}>
           {t('You have successfully registered for this game.')}
         </ToastDescriptionWithTx>,
+      )
+      addTransaction(
+        {
+          ...receipt,
+          hash: receipt.transactionHash,
+        },
+        {
+          summary: `Register for game ${gameAddress} with amount ${registrationAmount}`,
+          translatableSummary: {
+            text: 'Register for game %gameAddress% with amount %registrationAmount%',
+            data: { gameAddress, registrationAmount: registrationAmount.toNumber() },
+          },
+          type: 'register',
+        },
       )
     }
   }, [fetchWithCatchTxError, contract, registrationAmount, toastSuccess, t, addTransaction, gameAddress])

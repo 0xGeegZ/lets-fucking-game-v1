@@ -23,7 +23,7 @@ const Tooltip: React.FC<TooltipPropsType> = ({ content, additionalStyle }) => {
   const { isMobile } = useMatchBreakpoints()
 
   const { targetRef, tooltip, tooltipVisible } = useTooltip(<TooltipElement content={content} />, {
-    placement: 'top',
+    placement: 'auto',
     ...(isMobile && { hideTimeout: 1500 }),
   })
 

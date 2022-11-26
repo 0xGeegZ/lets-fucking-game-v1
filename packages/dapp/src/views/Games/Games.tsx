@@ -159,7 +159,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   const mineOnlyGames = games.filter((game) => game.userData && game.userData.isCreator)
 
-  const deletedGames = games.filter((game) => game.isDeleted)
+  const deletedGames = games.filter((game) => game.isDeleted || game.isPaused)
   const myDeletedGames = games.filter((game) => game.isDeleted && game.userData && game.userData.isCreator)
 
   // const archivedGames = archivedGames.filter((game) => game.userData && false)
@@ -197,7 +197,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
       chosenFs = gamesList(activeGames)
     }
 
-    if (isDeleted && isMyGames) {
+    if (isDeleted) {
       if (isMyGames) chosenFs = gamesList(myDeletedGames)
       else chosenFs = gamesList(deletedGames)
     }
@@ -276,7 +276,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
         <GameFlexWrapper justifyContent="space-between">
           <Box>
             <GameH1 as="h1" scale="xxl" color="secondary" mb="24px">
-              {t('Games')}
+              {isMyGames ? t('My Games') : t('Games')}
             </GameH1>
             <GameH2 scale="lg" color="text">
               {t('Register to a game to start playing.')}
@@ -330,7 +330,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
               />
               <Text> {t('Not full only')}</Text>
             </ToggleWrapper>
-            <GameTabButtons hasStakeInFinishedGames={deletedGames.length > 0} />
+            <GameTabButtons hasStakeInFinishedGames={false} />
           </ViewControls>
           <FilterContainer>
             <LabelWrapper>

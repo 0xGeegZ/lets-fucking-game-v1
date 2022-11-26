@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { DeserializedPrizeData } from 'state/types'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import Tooltip from '../GameCardButtons/Tooltip'
+import Tooltip from 'views/Games/components/GameCardButtons/Tooltip'
 
 const BulletList = styled.ul`
   list-style-type: none;

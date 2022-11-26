@@ -137,6 +137,11 @@ interface GameV1Interface {
      */
     event VoteToSplitPot(uint256 roundId, address playerAddress);
     /**
+     * @notice Called when TriggerDailyCheckpoint function is called
+     */
+    event TriggeredDailyCheckpoint(uint256 roundId, address emmiter);
+
+    /**
      * @notice Called when a prize is added
      */
     event PrizeAdded(

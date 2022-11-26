@@ -6,7 +6,7 @@ import { ToastDescriptionWithTx } from 'components/Toast'
 import { useGameV1Contract } from 'hooks/useContract'
 import { useTransactionAdder } from 'state/transactions/hooks'
 
-export const useVoteToSplitPot = (gameAddress: string) => {
+export const useClaimCreatorFee = (gameAddress: string) => {
   const { t } = useTranslation()
   const { toastSuccess } = useToast()
   const addTransaction = useTransactionAdder()
@@ -15,14 +15,14 @@ export const useVoteToSplitPot = (gameAddress: string) => {
 
   const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
 
-  const handleVote = useCallback(async () => {
-    const receipt = await fetchWithCatchTxError(() => contract.voteToSplitPot())
+  const handleClaimCreatorFee = useCallback(async () => {
+    const receipt = await fetchWithCatchTxError(() => contract.claimCreatorFee())
 
     if (receipt?.status) {
       toastSuccess(
         t('Success!'),
         <ToastDescriptionWithTx txHash={receipt.transactionHash}>
-          {t('You have successfully vote to split pot.')}
+          {t('You have successfully claimed creator fee')}
         </ToastDescriptionWithTx>,
       )
       addTransaction(
@@ -31,16 +31,16 @@ export const useVoteToSplitPot = (gameAddress: string) => {
           hash: receipt.transactionHash,
         },
         {
-          summary: `Vote to split pot for game ${gameAddress}`,
+          summary: `Claim creator fee for game ${gameAddress}`,
           translatableSummary: {
-            text: 'Vote to split pot for game %gameAddress%',
+            text: 'Claim creator fee for game %gameAddress%',
             data: { gameAddress },
           },
-          type: 'vote-split-pot',
+          type: 'claim-creator-fee',
         },
       )
     }
   }, [fetchWithCatchTxError, contract, toastSuccess, t, addTransaction, gameAddress])
 
-  return { isPending, handleVote }
+  return { isPending, handleClaimCreatorFee }
 }
