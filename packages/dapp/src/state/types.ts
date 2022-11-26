@@ -95,6 +95,7 @@ export interface SerializedGame {
   isDeleted: boolean
   maxPlayers: number
   playTimeRange: number
+  remainingPlayersCount: number
   playerAddressesCount: number
   gameCreationAmount: string
   registrationAmount: string
@@ -120,6 +121,7 @@ export interface DeserializedGame {
   isDeleted: boolean
   maxPlayers: BigNumber
   playTimeRange: BigNumber
+  remainingPlayersCount: BigNumber
   playerAddressesCount: BigNumber
   gameCreationAmount: BigNumber
   registrationAmount: BigNumber

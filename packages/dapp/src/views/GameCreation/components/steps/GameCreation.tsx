@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import momentTz from 'moment-timezone'
 import parser from 'cron-parser'
 import { escapeRegExp } from 'utils'
-import { useGameConfig } from 'hooks/useGameConfig'
 
 import { useTranslation } from '@pancakeswap/localization'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
@@ -34,9 +33,8 @@ const Indicator = styled(Flex)`
 const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`) // match escaped "." characters via in a non-capturing group
 
 const FeeSelection = () => {
-  const { AUTHORIZED_TREASURY_FEE, AUTHORIZED_CREATOR_FEE } = useGameConfig()
-
   const {
+    gameConfig,
     treasuryFee,
     creatorFee,
     registrationAmount,
@@ -47,6 +45,8 @@ const FeeSelection = () => {
     currentStep,
     actions,
   } = useGameContext()
+
+  const { AUTHORIZED_TREASURY_FEE, AUTHORIZED_CREATOR_FEE } = gameConfig
 
   const handleTreasuryFeeOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
@@ -132,6 +132,7 @@ const FeeSelection = () => {
 
 const RegistrationAmountSelection = () => {
   const {
+    gameConfig,
     treasuryFee,
     creatorFee,
     freeGamePrizepoolAmount,
@@ -157,7 +158,7 @@ const RegistrationAmountSelection = () => {
 
   const { chain } = useActiveWeb3React()
 
-  const { AUTHORIZED_REGISTRATION_AMOUNTS } = useGameConfig()
+  const { AUTHORIZED_REGISTRATION_AMOUNTS, REGISTRATION_AMOUNT_DEFAULT } = gameConfig
 
   const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
 
@@ -168,6 +169,8 @@ const RegistrationAmountSelection = () => {
     }
   })
 
+  const defaultIndex = authorizedAmounts.findIndex((amount) => +amount.value === +REGISTRATION_AMOUNT_DEFAULT) + 1
+
   return (
     <>
       {authorizedAmounts && (
@@ -176,7 +179,7 @@ const RegistrationAmountSelection = () => {
             Registration amount
           </Text>
           <Select
-            defaultOptionIndex={2}
+            defaultOptionIndex={defaultIndex}
             options={authorizedAmounts}
             onOptionChange={handleRegistrationAmountOptionChange}
           />
@@ -286,6 +289,7 @@ const FreeGameAmountSelection = () => {
 
 const MaximumPlayersSelection = () => {
   const {
+    gameConfig,
     treasuryFee,
     creatorFee,
     registrationAmount,
@@ -300,7 +304,7 @@ const MaximumPlayersSelection = () => {
   const [isValid, setIsValid] = useState(true)
   const [message, setMessage] = useState('')
 
-  const { PLAYERS_MIN_LENGTH, PLAYERS_MAX_LENGTH } = useGameConfig()
+  const { PLAYERS_MIN_LENGTH, PLAYERS_MAX_LENGTH } = gameConfig
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
@@ -354,9 +358,8 @@ const MaximumPlayersSelection = () => {
 }
 
 const PlayTimeRangeSelection = () => {
-  const { AUTHORIZED_PLAY_TIME_RANGE } = useGameConfig()
-
   const {
+    gameConfig,
     treasuryFee,
     creatorFee,
     registrationAmount,
@@ -366,6 +369,8 @@ const PlayTimeRangeSelection = () => {
     currentStep,
     actions,
   } = useGameContext()
+
+  const { AUTHORIZED_PLAY_TIME_RANGE } = gameConfig
 
   const handlePlayTimeRangeOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
@@ -408,7 +413,19 @@ const PlayTimeRangeSelection = () => {
 const EncodedCronSelection = () => {
   const { t } = useTranslation()
 
-  const { AUTHORIZED_CRONS } = useGameConfig()
+  const {
+    gameConfig,
+    treasuryFee,
+    creatorFee,
+    registrationAmount,
+    freeGamePrizepoolAmount,
+    maxPlayers,
+    playTimeRange,
+    currentStep,
+    actions,
+  } = useGameContext()
+
+  const { AUTHORIZED_CRONS } = gameConfig
 
   const defaultTimezone = 'Etc/UTC'
   let timezone
@@ -440,17 +457,6 @@ const EncodedCronSelection = () => {
       value: cron,
     }
   })
-
-  const {
-    treasuryFee,
-    creatorFee,
-    registrationAmount,
-    freeGamePrizepoolAmount,
-    maxPlayers,
-    playTimeRange,
-    currentStep,
-    actions,
-  } = useGameContext()
 
   const handleCronOptionChange = (option: OptionProps) => {
     actions.setGameCreation(
@@ -522,11 +528,11 @@ const OtherOptionsSelection = () => {
 }
 
 const GameCreation: React.FC = () => {
-  const { actions, currentStep, treasuryFee, registrationAmount, maxPlayers, playTimeRange, encodedCron } =
+  const { actions, gameConfig, currentStep, treasuryFee, registrationAmount, maxPlayers, playTimeRange, encodedCron } =
     useGameContext()
   const { toastError } = useToast()
 
-  const { PLAYERS_MIN_LENGTH, PLAYERS_MAX_LENGTH } = useGameConfig()
+  const { PLAYERS_MIN_LENGTH, PLAYERS_MAX_LENGTH } = gameConfig
 
   const checkFieldsAndValidate = () => {
     if (!isValidCron(encodedCron)) return toastError(t('Error'), t('Wrong entered Cron'))

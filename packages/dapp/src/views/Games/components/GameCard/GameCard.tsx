@@ -86,6 +86,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     isInProgress,
     isDeleted,
     maxPlayers,
+    remainingPlayersCount,
     playerAddressesCount,
     registrationAmount,
     gameCreationAmount,
@@ -185,6 +186,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           registrationAmount={registrationAmount}
           prizepool={prizepool}
           maxPlayers={maxPlayers}
+          remainingPlayersCount={remainingPlayersCount}
           playerAddressesCount={playerAddressesCount}
           cronHumanReadable={cronHumanReadable}
           isReady={isReady}
@@ -202,6 +204,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           nextFromRange={nextFromRange}
           nextToRange={nextToRange}
           encodedCron={encodedCron}
+          remainingPlayersCount={remainingPlayersCount}
           playerAddressesCount={playerAddressesCount}
           isPlaying={isPlaying}
           isWonLastGames={isWonLastGames}
@@ -214,6 +217,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           isCreator={isCreator}
           isAdmin={isAdmin}
           hasLost={hasLost}
+          hasPlayedRound={hasPlayedRound}
           account={account}
         />
       </GameCardInnerContainer>

@@ -9,16 +9,12 @@ import BackStepButton from 'views/GameCreation/components/buttons/BackStepButton
 import imageTest from '../../../../../public/images/chains/1.png'
 
 const AllowedPlayersToWinSelection = () => {
-  const {
-    numberPlayersAllowedToWin: selectedAllowedNumber,
-    prizeType,
-    currentStep,
-    actions,
-    maxPlayers,
-  } = useGameContext()
+  const { numberPlayersAllowedToWin, prizeType, currentStep, actions, maxPlayers } = useGameContext()
 
   const halfNumberPlayers = Math.floor(maxPlayers * 0.5)
   const listOfAllowedNumber = [...range(1, halfNumberPlayers)]
+
+  const selectedAllowedNumber = numberPlayersAllowedToWin > listOfAllowedNumber.length ? 1 : numberPlayersAllowedToWin
 
   const handleAllowedWinners = (value) => actions.setPrizeConfiguration(+value, prizeType, currentStep)
 

@@ -4,7 +4,6 @@ import { useToast } from '@pancakeswap/uikit'
 import useCatchTxError from 'hooks/useCatchTxError'
 import { ToastDescriptionWithTx } from 'components/Toast'
 import { useGameFactoryV1Contract } from 'hooks/useContract'
-import { useGameConfig } from 'hooks/useGameConfig'
 import { parseEther, formatEther } from '@ethersproject/units'
 import { formatBytes32String } from '@ethersproject/strings'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
@@ -17,9 +16,9 @@ export const useCreateGame = (game) => {
   const addTransaction = useTransactionAdder()
 
   const contract = useGameFactoryV1Contract()
-  const { actions, currentStep } = useGameContext()
+  const { actions, gameConfig, currentStep } = useGameContext()
 
-  const { GAME_CREATION_AMOUNT } = useGameConfig()
+  const { GAME_CREATION_AMOUNT } = gameConfig
 
   const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
 
@@ -80,21 +79,6 @@ export const useCreateGame = (game) => {
       ),
     )
 
-    addTransaction(
-      {
-        ...receipt,
-        hash: receipt.transactionHash,
-      },
-      {
-        summary: `Game ${name} created`,
-        translatableSummary: {
-          text: 'Game %name% create',
-          data: { name },
-        },
-        type: 'create-game',
-      },
-    )
-
     if (receipt?.status) {
       toastSuccess(
         t('Success!'),
@@ -102,6 +86,21 @@ export const useCreateGame = (game) => {
           {t('You have successfully claimed your prize.')}
         </ToastDescriptionWithTx>,
       )
+      addTransaction(
+        {
+          ...receipt,
+          hash: receipt.transactionHash,
+        },
+        {
+          summary: `Game ${name} created`,
+          translatableSummary: {
+            text: 'Game %name% create',
+            data: { name },
+          },
+          type: 'create-game',
+        },
+      )
+
       actions.nextStep(currentStep + 1)
     }
   }, [

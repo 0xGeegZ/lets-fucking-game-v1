@@ -18,27 +18,26 @@ export const useUnpauseGame = (gameAddress: string) => {
   const handleUnpause = useCallback(async () => {
     const receipt = await fetchWithCatchTxError(() => contract.unpause())
 
-    addTransaction(
-      {
-        ...receipt,
-        hash: receipt.transactionHash,
-      },
-      {
-        summary: `Unpause game ${gameAddress}`,
-        translatableSummary: {
-          text: 'Unpause game %gameAddress%',
-          data: { gameAddress },
-        },
-        type: 'unpause-game',
-      },
-    )
-
     if (receipt?.status) {
       toastSuccess(
         t('Success!'),
         <ToastDescriptionWithTx txHash={receipt.transactionHash}>
           {t('You have successfully unpaused the game.')}
         </ToastDescriptionWithTx>,
+      )
+      addTransaction(
+        {
+          ...receipt,
+          hash: receipt.transactionHash,
+        },
+        {
+          summary: `Unpause game ${gameAddress}`,
+          translatableSummary: {
+            text: 'Unpause game %gameAddress%',
+            data: { gameAddress },
+          },
+          type: 'unpause-game',
+        },
       )
     }
   }, [fetchWithCatchTxError, contract, toastSuccess, t, addTransaction, gameAddress])

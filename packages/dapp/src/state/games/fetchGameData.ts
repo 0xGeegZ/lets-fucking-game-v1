@@ -30,6 +30,27 @@ export const fetchPublicGamesData = async (
   return chunk(gameMultiCallResult, chunkSize)
 }
 
+export const fetchGamesRemainingPlayersCount = async (
+  games: GameFactory.GameStructOutput[],
+  chainId = ChainId.BSC,
+): Promise<any[]> => {
+  const gameCalls = games.map((game) => {
+    return {
+      address: game.deployedAddress,
+      name: 'getRemainingPlayersCount',
+    }
+  })
+  const chunkSize = gameCalls.length / games.length
+
+  const gameMultiCallResult = await multicallv2({
+    abi: internal[chainId || ChainId.BSC].GameV1.abi,
+    calls: gameCalls,
+    chainId,
+  })
+
+  return chunk(gameMultiCallResult, chunkSize)
+}
+
 export const fetchGamesPlayersAddresses = async (
   games: GameFactory.GameStructOutput[],
   chainId = ChainId.BSC,

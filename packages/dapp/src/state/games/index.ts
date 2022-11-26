@@ -11,11 +11,11 @@ import { chains } from 'utils/wagmi'
 
 import { resetUserState } from '../global/actions'
 import { SerializedGame, SerializedGamesState, SerializedGamePlayerData } from '../types'
-import fetchGames from './fetchGames'
+import fetchGamesFull from './fetchGamesFull'
 import { fetchGamesPlayerData } from './fetchGamePlayerData'
 import { gamePlayerDataTransformer } from './transformers'
 
-const fetchGamePublicDataPkg = async ({ chainId }): Promise<SerializedGame[]> => fetchGames(chainId)
+const fetchGamePublicDataPkg = async ({ chainId }): Promise<SerializedGame[]> => fetchGamesFull(chainId)
 
 const initialState: SerializedGamesState = {
   data: [],

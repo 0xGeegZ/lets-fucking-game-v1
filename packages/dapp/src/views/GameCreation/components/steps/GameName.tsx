@@ -17,7 +17,6 @@ import { ChangeEvent, useState } from 'react'
 import styled from 'styled-components'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { useGameConfig } from 'hooks/useGameConfig'
 
 import NextStepButton from 'views/GameCreation/components/buttons/NextStepButton'
 
@@ -44,7 +43,7 @@ const Indicator = styled(Flex)`
 const GameName: React.FC<React.PropsWithChildren> = () => {
   const [isAcknowledged, setIsAcknowledged] = useState(false)
 
-  const { actions, name, currentStep } = useGameContext()
+  const { actions, gameConfig, name, currentStep } = useGameContext()
   const { t } = useTranslation()
 
   const [isValid, setIsValid] = useState(true)
@@ -56,7 +55,7 @@ const GameName: React.FC<React.PropsWithChildren> = () => {
 
   const { chain } = useActiveWeb3React()
 
-  const { GAME_CREATION_AMOUNT, NAME_MIN_LENGTH, NAME_MAX_LENGTH } = useGameConfig()
+  const { GAME_CREATION_AMOUNT, NAME_MIN_LENGTH, NAME_MAX_LENGTH } = gameConfig
 
   const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
 
