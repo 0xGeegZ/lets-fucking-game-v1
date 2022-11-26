@@ -121,6 +121,8 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
           : updatedAuthorizedAmounts[0]
         ).toString()}`,
       )
+
+      // TODO GUIGUI Load gameCreationAmount directly from smart contract
       const updatingGameConfig = {
         ...initialGameConfig,
         AUTHORIZED_REGISTRATION_AMOUNTS: updatedAuthorizedAmounts,
