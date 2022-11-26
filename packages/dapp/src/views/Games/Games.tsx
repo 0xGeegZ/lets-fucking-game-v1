@@ -276,7 +276,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
         <GameFlexWrapper justifyContent="space-between">
           <Box>
             <GameH1 as="h1" scale="xxl" color="secondary" mb="24px">
-              {t('Games')}
+              {isMyGames ? t('My Games') : t('Games')}
             </GameH1>
             <GameH2 scale="lg" color="text">
               {t('Register to a game to start playing.')}

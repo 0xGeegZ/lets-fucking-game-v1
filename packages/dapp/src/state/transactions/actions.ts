@@ -11,6 +11,9 @@ export type TransactionType =
   | 'create-game'
   | 'pause-game'
   | 'unpause-game'
+  | 'claim-treasury-fee'
+  | 'claim-creator-fee'
+  | 'claim-all-fee'
   // TODO GUIGUI DELETE UNUSED TRANSACTION TYPE
   | 'swap'
   | 'wrap'
