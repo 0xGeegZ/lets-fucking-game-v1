@@ -629,6 +629,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
                 roundId: roundId,
                 name: name,
                 playerAddressesCount: playerAddresses.length,
+                // remainingPlayersCount: _getRemainingPlayersCount(),
                 maxPlayers: maxPlayers,
                 registrationAmount: registrationAmount,
                 playTimeRange: playTimeRange,

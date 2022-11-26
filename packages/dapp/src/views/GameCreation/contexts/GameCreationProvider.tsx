@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo, useReducer } from 'react'
+import { createContext, useEffect, useMemo, useReducer, useState } from 'react'
 
 import { useWeb3React } from '@pancakeswap/wagmi'
 import { parseEther } from '@ethersproject/units'
@@ -6,6 +6,8 @@ import { formatBytes32String } from '@ethersproject/strings'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { defaultGameConfig } from 'config/internal/gameConfig'
 import { useGameConfig } from 'hooks/useGameConfig'
+
+import fetchGamesFull from 'state/games/fetchGamesFull'
 
 import { Actions, BNB, ContextType, NFT, State } from 'views/GameCreation/types'
 
@@ -43,6 +45,7 @@ const reducer = (state: State, action: Actions): State => {
         ...state,
         isInitialized: true,
         currentStep: action.currentStep,
+        registrationAmount: action.registrationAmount,
       }
     case 'game_name':
       return {
@@ -93,22 +96,50 @@ export const GameCreationContext = createContext<ContextType>(null)
 
 const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { account } = useWeb3React()
-
-  // TODO GUIGUI FIRST LOAD gameConfig with specific hook
-  // Then pass data to each function in actions
-  //   const gameConfig = useGameConfig()
+  const { account, chainId } = useActiveWeb3React()
+  const initialGameConfig = useGameConfig()
+  const [gameConfig, setGameConfig] = useState(null)
 
   // Initial checks
   useEffect(() => {
-    if (account) dispatch({ type: 'initialize', currentStep: 0 })
-  }, [account, dispatch])
+    const loadGames = async () => {
+      // TODO create custom hook
+      const games = await fetchGamesFull(chainId)
+      const usedAmounts = games
+        .map((game) => {
+          return Number(game.registrationAmount)
+        })
+        .filter(Boolean)
+
+      const updatedAuthorizedAmounts = initialGameConfig.AUTHORIZED_REGISTRATION_AMOUNTS.filter(
+        (amount) => !usedAmounts.includes(amount),
+      )
+
+      const updatedRegistrationAmount = parseEther(
+        `${(updatedAuthorizedAmounts.length > 1
+          ? updatedAuthorizedAmounts[1]
+          : updatedAuthorizedAmounts[0]
+        ).toString()}`,
+      )
+      const updatingGameConfig = {
+        ...initialGameConfig,
+        AUTHORIZED_REGISTRATION_AMOUNTS: updatedAuthorizedAmounts,
+        REGISTRATION_AMOUNT_DEFAULT: updatedRegistrationAmount,
+      }
+
+      setGameConfig(updatingGameConfig)
+      dispatch({ type: 'initialize', currentStep: 0, registrationAmount: updatedRegistrationAmount.toString() })
+    }
+
+    if (account && initialGameConfig) loadGames()
+  }, [account, chainId, initialGameConfig])
 
   const actions: ContextType['actions'] = useMemo(
     () => ({
       previousStep: (currentStep: number) => dispatch({ type: 'previous_step', currentStep: currentStep - 1 }),
       nextStep: (currentStep: number) => dispatch({ type: 'next_step', currentStep: currentStep + 1 }),
-      setInitialize: (currentStep: number) => dispatch({ type: 'initialize', currentStep }),
+      setInitialize: (currentStep: number, registrationAmount: string) =>
+        dispatch({ type: 'initialize', currentStep, registrationAmount }),
       setGameName: (currentStep: number, name: string) => dispatch({ type: 'game_name', currentStep, name }),
       setGameCreation: (
         currentStep: number,
@@ -159,7 +190,9 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     [state],
   )
 
-  return <GameCreationContext.Provider value={{ ...state, actions }}>{children}</GameCreationContext.Provider>
+  return (
+    <GameCreationContext.Provider value={{ ...state, actions, gameConfig }}>{children}</GameCreationContext.Provider>
+  )
 }
 
 export default GameCreationProvider

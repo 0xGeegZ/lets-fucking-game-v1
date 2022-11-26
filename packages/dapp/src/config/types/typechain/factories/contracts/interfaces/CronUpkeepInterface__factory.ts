@@ -2,12 +2,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { Contract, Signer, utils } from 'ethers'
+import type { Provider } from '@ethersproject/providers'
 import type {
   CronUpkeepInterface,
   CronUpkeepInterfaceInterface,
-} from "../../../contracts/interfaces/CronUpkeepInterface";
+} from '../../../contracts/interfaces/CronUpkeepInterface'
 
 const _abi = [
   {
@@ -15,295 +15,292 @@ const _abi = [
     inputs: [
       {
         indexed: true,
-        internalType: "uint256",
-        name: "id",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
       },
       {
         indexed: false,
-        internalType: "address",
-        name: "target",
-        type: "address",
+        internalType: 'address',
+        name: 'target',
+        type: 'address',
       },
       {
         indexed: false,
-        internalType: "bytes",
-        name: "handler",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'handler',
+        type: 'bytes',
       },
     ],
-    name: "CronJobCreated",
-    type: "event",
+    name: 'CronJobCreated',
+    type: 'event',
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: true,
-        internalType: "uint256",
-        name: "id",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
       },
     ],
-    name: "CronJobDeleted",
-    type: "event",
+    name: 'CronJobDeleted',
+    type: 'event',
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: true,
-        internalType: "uint256",
-        name: "id",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
       },
       {
         indexed: false,
-        internalType: "uint256",
-        name: "timestamp",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'timestamp',
+        type: 'uint256',
       },
     ],
-    name: "CronJobExecuted",
-    type: "event",
+    name: 'CronJobExecuted',
+    type: 'event',
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: true,
-        internalType: "uint256",
-        name: "id",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
       },
       {
         indexed: false,
-        internalType: "address",
-        name: "target",
-        type: "address",
+        internalType: 'address',
+        name: 'target',
+        type: 'address',
       },
       {
         indexed: false,
-        internalType: "bytes",
-        name: "handler",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'handler',
+        type: 'bytes',
       },
     ],
-    name: "CronJobUpdated",
-    type: "event",
+    name: 'CronJobUpdated',
+    type: 'event',
   },
   {
     inputs: [
       {
-        internalType: "address",
-        name: "delegator",
-        type: "address",
+        internalType: 'address',
+        name: 'delegator',
+        type: 'address',
       },
     ],
-    name: "addDelegator",
+    name: 'addDelegator',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "bytes",
-        name: "",
-        type: "bytes",
+        internalType: 'bytes',
+        name: '',
+        type: 'bytes',
       },
     ],
-    name: "checkUpkeep",
+    name: 'checkUpkeep',
     outputs: [
       {
-        internalType: "bool",
-        name: "",
-        type: "bool",
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
       },
       {
-        internalType: "bytes",
-        name: "",
-        type: "bytes",
+        internalType: 'bytes',
+        name: '',
+        type: 'bytes',
       },
     ],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "address",
-        name: "target",
-        type: "address",
+        internalType: 'address',
+        name: 'target',
+        type: 'address',
       },
       {
-        internalType: "bytes",
-        name: "handler",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'handler',
+        type: 'bytes',
       },
       {
-        internalType: "bytes",
-        name: "encodedCronSpec",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'encodedCronSpec',
+        type: 'bytes',
       },
     ],
-    name: "createCronJobFromEncodedSpec",
+    name: 'createCronJobFromEncodedSpec',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "id",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
       },
     ],
-    name: "deleteCronJob",
+    name: 'deleteCronJob',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [],
-    name: "getActiveCronJobIDs",
+    name: 'getActiveCronJobIDs',
     outputs: [
       {
-        internalType: "uint256[]",
-        name: "",
-        type: "uint256[]",
+        internalType: 'uint256[]',
+        name: '',
+        type: 'uint256[]',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "id",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
       },
     ],
-    name: "getCronJob",
+    name: 'getCronJob',
     outputs: [
       {
-        internalType: "address",
-        name: "target",
-        type: "address",
+        internalType: 'address',
+        name: 'target',
+        type: 'address',
       },
       {
-        internalType: "bytes",
-        name: "handler",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'handler',
+        type: 'bytes',
       },
       {
-        internalType: "string",
-        name: "cronString",
-        type: "string",
+        internalType: 'string',
+        name: 'cronString',
+        type: 'string',
       },
       {
-        internalType: "uint256",
-        name: "nextTick",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'nextTick',
+        type: 'uint256',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [],
-    name: "getNextCronJobIDs",
+    name: 'getNextCronJobIDs',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [],
-    name: "pause",
+    name: 'pause',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "bytes",
-        name: "performData",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'performData',
+        type: 'bytes',
       },
     ],
-    name: "performUpkeep",
+    name: 'performUpkeep',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "address",
-        name: "delegator",
-        type: "address",
+        internalType: 'address',
+        name: 'delegator',
+        type: 'address',
       },
     ],
-    name: "removeDelegator",
+    name: 'removeDelegator',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [],
-    name: "unpause",
+    name: 'unpause',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "id",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
       },
       {
-        internalType: "address",
-        name: "newTarget",
-        type: "address",
+        internalType: 'address',
+        name: 'newTarget',
+        type: 'address',
       },
       {
-        internalType: "bytes",
-        name: "newHandler",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'newHandler',
+        type: 'bytes',
       },
       {
-        internalType: "bytes",
-        name: "newEncodedCronSpec",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'newEncodedCronSpec',
+        type: 'bytes',
       },
     ],
-    name: "updateCronJob",
+    name: 'updateCronJob',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
-];
+]
 
 export class CronUpkeepInterface__factory {
-  static readonly abi = _abi;
+  static readonly abi = _abi
   static createInterface(): CronUpkeepInterfaceInterface {
-    return new utils.Interface(_abi) as CronUpkeepInterfaceInterface;
+    return new utils.Interface(_abi) as CronUpkeepInterfaceInterface
   }
-  static connect(
-    address: string,
-    signerOrProvider: Signer | Provider
-  ): CronUpkeepInterface {
-    return new Contract(address, _abi, signerOrProvider) as CronUpkeepInterface;
+  static connect(address: string, signerOrProvider: Signer | Provider): CronUpkeepInterface {
+    return new Contract(address, _abi, signerOrProvider) as CronUpkeepInterface
   }
 }

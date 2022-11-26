@@ -1,8 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { ChainId } from '@pancakeswap/sdk'
 import erc20ABI from 'config/abi/erc20.json'
-import masterchefABI from 'config/abi/masterchef.json'
-import nonBscVault from 'config/abi/nonBscVault.json'
 import multicall, { multicallv2 } from 'utils/multicall'
 import { verifyBscNetwork } from 'utils/verifyBscNetwork'
 import { isChainTestnet } from 'utils/wagmi'
@@ -141,7 +139,7 @@ export const fetchGamePlayerStakedBalances = async (
   })
 
   const rawStakedBalances = await multicallv2({
-    abi: isBscNetwork ? masterchefABI : nonBscVault,
+    abi: isBscNetwork ? null : null,
     calls,
     chainId,
     options: { requireSuccess: false },
@@ -165,7 +163,7 @@ export const fetchGamePlayerEarnings = async (account: string, gamesToFetch: Ser
     }
   })
 
-  const rawEarnings = await multicallv2({ abi: masterchefABI, calls, chainId: multiCallChainId })
+  const rawEarnings = await multicallv2({ abi: null, calls, chainId: multiCallChainId })
 
   const parsedEarnings = rawEarnings.map((earnings) => {
     return new BigNumber(earnings).toJSON()

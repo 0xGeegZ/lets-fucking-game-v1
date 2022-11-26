@@ -26,10 +26,6 @@ const BulletList = styled.ul`
   }
 `
 
-const Details = styled.div`
-  padding-top: 16px;
-`
-
 const Container = styled.div`
   padding-top: 16px;
 `
@@ -39,6 +35,7 @@ interface GameCardContentSectionProps {
   prizepool: BigNumber
   prizes: DeserializedPrizeData[]
   cronHumanReadable: string
+  remainingPlayersCount: BigNumber
   playerAddressesCount: BigNumber
   maxPlayers: BigNumber
   isInProgress: boolean
@@ -51,6 +48,7 @@ const CardContentSection: React.FC<React.PropsWithChildren<GameCardContentSectio
   prizepool,
   prizes,
   cronHumanReadable,
+  remainingPlayersCount,
   playerAddressesCount,
   maxPlayers,
   isInProgress,
@@ -132,7 +130,7 @@ const CardContentSection: React.FC<React.PropsWithChildren<GameCardContentSectio
         {isReady ? (
           <Text style={{ display: 'flex', alignItems: 'center' }}>
             <Text bold>
-              {playerAddressesCount.toNumber()}/{maxPlayers.toNumber()}
+              {remainingPlayersCount.toNumber()}/{maxPlayers.toNumber()}
             </Text>
             {isRegistering && (
               <Tooltip

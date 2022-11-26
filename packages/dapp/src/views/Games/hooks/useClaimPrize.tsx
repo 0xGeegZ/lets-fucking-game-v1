@@ -19,27 +19,27 @@ export const useClaimPrize = (gameAddress: string, roundId: BigNumber) => {
   const handleClaim = useCallback(async () => {
     const receipt = await fetchWithCatchTxError(() => contract.claimPrize(roundId))
 
-    addTransaction(
-      {
-        ...receipt,
-        hash: receipt.transactionHash,
-      },
-      {
-        summary: `Claim prize for game ${gameAddress} and round ${roundId}`,
-        translatableSummary: {
-          text: 'Claim prize for game %gameAddress% and round %roundId%',
-          data: { gameAddress, roundId: roundId.toNumber() },
-        },
-        type: 'claim-prize',
-      },
-    )
-
     if (receipt?.status) {
       toastSuccess(
         t('Success!'),
         <ToastDescriptionWithTx txHash={receipt.transactionHash}>
           {t('You have successfully claimed your prize.')}
         </ToastDescriptionWithTx>,
+      )
+
+      addTransaction(
+        {
+          ...receipt,
+          hash: receipt.transactionHash,
+        },
+        {
+          summary: `Claim prize for game ${gameAddress} and round ${roundId}`,
+          translatableSummary: {
+            text: 'Claim prize for game %gameAddress% and round %roundId%',
+            data: { gameAddress, roundId: roundId.toNumber() },
+          },
+          type: 'claim-prize',
+        },
       )
     }
   }, [fetchWithCatchTxError, contract, roundId, toastSuccess, t, addTransaction, gameAddress])

@@ -18,27 +18,26 @@ export const usePlayRound = (gameAddress: string) => {
   const handlePlay = useCallback(async () => {
     const receipt = await fetchWithCatchTxError(() => contract.playRound())
 
-    addTransaction(
-      {
-        ...receipt,
-        hash: receipt.transactionHash,
-      },
-      {
-        summary: `Play round for game ${gameAddress}`,
-        translatableSummary: {
-          text: 'Play round for game %gameAddress%',
-          data: { gameAddress },
-        },
-        type: 'play',
-      },
-    )
-
     if (receipt?.status) {
       toastSuccess(
         t('Success!'),
         <ToastDescriptionWithTx txHash={receipt.transactionHash}>
           {t('You have successfully played this round.')}
         </ToastDescriptionWithTx>,
+      )
+      addTransaction(
+        {
+          ...receipt,
+          hash: receipt.transactionHash,
+        },
+        {
+          summary: `Play round for game ${gameAddress}`,
+          translatableSummary: {
+            text: 'Play round for game %gameAddress%',
+            data: { gameAddress },
+          },
+          type: 'play',
+        },
       )
     }
   }, [fetchWithCatchTxError, contract, toastSuccess, t, addTransaction, gameAddress])

@@ -1,14 +1,11 @@
 import { useTranslation } from '@pancakeswap/localization'
 import { Flex, Heading, Skeleton, Text, WarningIcon } from '@pancakeswap/uikit'
-import cronstrue from 'cronstrue'
 
 import BigNumber from 'bignumber.js'
 
 import ConnectWalletButton from 'components/ConnectWalletButton'
-import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import momentTz from 'moment-timezone'
 
 import moment from 'moment'
 import ClaimButton from '../GameCardButtons/ClaimButton'
@@ -32,6 +29,7 @@ interface GameCardPlayerSectionProps {
   wonAmount: BigNumber
   nextFromRange: string
   nextToRange: string
+  remainingPlayersCount: BigNumber
   playerAddressesCount: BigNumber
   encodedCron: string
   isPlaying: boolean
@@ -43,6 +41,7 @@ interface GameCardPlayerSectionProps {
   isCreator: boolean
   isAdmin: boolean
   hasLost: boolean
+  hasPlayedRound: boolean
   account?: string
 }
 
@@ -57,6 +56,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   nextFromRange,
   nextToRange,
   encodedCron,
+  remainingPlayersCount,
   playerAddressesCount,
   isPlaying,
   isWonLastGames,
@@ -67,6 +67,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   isCreator,
   isAdmin,
   hasLost,
+  hasPlayedRound,
   account,
 }) => {
   const {
@@ -115,7 +116,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               <Text bold>
                 {isReady ? (
                   <>
-                    {0}/{playerAddressesCount.toNumber()}
+                    {0}/{remainingPlayersCount.toNumber()}
                   </>
                 ) : (
                   <Skeleton width={80} height={36} mb="4px" />
@@ -128,7 +129,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
         </Flex>
       )}
 
-      {isInProgress && isPlaying && (
+      {isInProgress && isPlaying && !hasLost && (
         <>
           <Flex justifyContent="space-between">
             <Heading mr="4px">{`${t('Next play time')}:`}</Heading>
@@ -150,7 +151,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
           </Flex>
 
           {/* {(hasLost || (!isInTimeRange && moment().isAfter(moment(nextToRange)))) && ( */}
-          {(hasLost || moment().isAfter(moment(nextToRange))) && (
+          {(hasLost || (moment().isAfter(moment(nextToRange)) && moment(nextFromRange).isSame(moment(), 'day'))) && (
             <Flex justifyContent="center" m="10px">
               <WarningIcon width="16px" color="failure" style={{ verticalAlign: 'middle' }} />
               <Heading mr="4px" color="failure">
@@ -171,7 +172,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             <PlayButton
               address={address}
               isInTimeRange={isInTimeRange}
-              isDisabled={!isPlaying || isCreator || isAdmin || isPaused}
+              isDisabled={!isPlaying || isCreator || isAdmin || isPaused || hasPlayedRound}
             />
           )}
           {isRegistering && (

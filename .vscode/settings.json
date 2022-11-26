@@ -4,6 +4,7 @@
     "source.fixAll.eslint": true
   },
   "eslint.workingDirectories": ["./packages/*"],
+  "eslint.packageManager": "yarn",
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,

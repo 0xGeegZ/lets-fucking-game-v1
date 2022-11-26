@@ -2,12 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
-import type { Provider } from "@ethersproject/providers";
-import type {
-  IKeeper,
-  IKeeperInterface,
-} from "../../../contracts/interfaces/IKeeper";
+import { Contract, Signer, utils } from 'ethers'
+import type { Provider } from '@ethersproject/providers'
+import type { IKeeper, IKeeperInterface } from '../../../contracts/interfaces/IKeeper'
 
 const _abi = [
   {
@@ -15,90 +12,87 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "uint256",
-        name: "jobId",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'jobId',
+        type: 'uint256',
       },
       {
         indexed: false,
-        internalType: "address",
-        name: "cronUpkeep",
-        type: "address",
+        internalType: 'address',
+        name: 'cronUpkeep',
+        type: 'address',
       },
     ],
-    name: "CronUpkeepUpdated",
-    type: "event",
+    name: 'CronUpkeepUpdated',
+    type: 'event',
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: false,
-        internalType: "uint256",
-        name: "jobId",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'jobId',
+        type: 'uint256',
       },
       {
         indexed: false,
-        internalType: "string",
-        name: "encodedCron",
-        type: "string",
+        internalType: 'string',
+        name: 'encodedCron',
+        type: 'string',
       },
     ],
-    name: "EncodedCronUpdated",
-    type: "event",
+    name: 'EncodedCronUpdated',
+    type: 'event',
   },
   {
     inputs: [],
-    name: "pauseKeeper",
+    name: 'pauseKeeper',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "address",
-        name: "_cronUpkeep",
-        type: "address",
+        internalType: 'address',
+        name: '_cronUpkeep',
+        type: 'address',
       },
     ],
-    name: "setCronUpkeep",
+    name: 'setCronUpkeep',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "string",
-        name: "_encodedCron",
-        type: "string",
+        internalType: 'string',
+        name: '_encodedCron',
+        type: 'string',
       },
     ],
-    name: "setEncodedCron",
+    name: 'setEncodedCron',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [],
-    name: "unpauseKeeper",
+    name: 'unpauseKeeper',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
-];
+]
 
 export class IKeeper__factory {
-  static readonly abi = _abi;
+  static readonly abi = _abi
   static createInterface(): IKeeperInterface {
-    return new utils.Interface(_abi) as IKeeperInterface;
+    return new utils.Interface(_abi) as IKeeperInterface
   }
-  static connect(
-    address: string,
-    signerOrProvider: Signer | Provider
-  ): IKeeper {
-    return new Contract(address, _abi, signerOrProvider) as IKeeper;
+  static connect(address: string, signerOrProvider: Signer | Provider): IKeeper {
+    return new Contract(address, _abi, signerOrProvider) as IKeeper
   }
 }
