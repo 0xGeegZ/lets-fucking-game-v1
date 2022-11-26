@@ -3,9 +3,9 @@ import { RowBetween } from 'components/Layout/Row'
 import { useTranslation } from '@pancakeswap/localization'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import { range } from 'utils'
-import NextStepButton from 'views/GameCreation/components/buttons/NextStepButton'
+import NextStepButton from 'views/GameCreation/components/Buttons/NextStepButton'
 import SelectionCard from 'views/GameCreation/components/SelectionCard'
-import BackStepButton from 'views/GameCreation/components/buttons/BackStepButton'
+import BackStepButton from 'views/GameCreation/components/Buttons/BackStepButton'
 import imageTest from '../../../../../public/images/chains/1.png'
 
 const AllowedPlayersToWinSelection = () => {

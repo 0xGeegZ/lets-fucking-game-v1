@@ -18,7 +18,7 @@ import styled from 'styled-components'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 
-import NextStepButton from 'views/GameCreation/components/buttons/NextStepButton'
+import NextStepButton from 'views/GameCreation/components/Buttons/NextStepButton'
 
 const InputWrap = styled.div`
   position: relative;

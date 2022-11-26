@@ -149,7 +149,42 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [isNotFullOnly, setNotFullOnly] = useState(!isActive)
   const [myGamesOnly, setMyGamesOnly] = useState(!isActive)
 
-  const activeGames = games.filter((game) => !game.isDeleted)
+  const activeGames = games
+    .filter((game) => !game.isDeleted)
+    .sort((a, b) => {
+      // sort game where user is playing first
+      if (a.userData.isPlaying && b.userData.isPlaying) {
+        // sort game currently in progress first
+        if (a.isInProgress && b.isInProgress) {
+          // sort game with less remaining players count
+          if (a.remainingPlayersCount === b.remainingPlayersCount) return 0
+          if (a.remainingPlayersCount < b.remainingPlayersCount) return -1
+          return 1
+        }
+        if (a.isInProgress) return -1
+        if (b.isInProgress) return 1
+        return 0
+      }
+
+      if (a.userData.isPlaying) return -1
+      if (b.userData.isPlaying) return 1
+
+      if (a.playerAddressesCount && b.playerAddressesCount) return 0
+      if (a.playerAddressesCount) return -1
+      if (b.playerAddressesCount) return 1
+
+      if (a.remainingPlayersCount && b.remainingPlayersCount) return 0
+      if (a.remainingPlayersCount) return -1
+      if (b.remainingPlayersCount) return 1
+
+      // sorting game paused last
+      if (a.isPaused && b.isPaused) return 0
+      if (a.isPaused) return 1
+      if (b.isPaused) return -1
+
+      return 0
+    })
+
   const notFullGames = games.filter(
     (game) => !game.isInProgress && game.maxPlayers.toNumber() !== game.playerAddressesCount.toNumber(),
   )
