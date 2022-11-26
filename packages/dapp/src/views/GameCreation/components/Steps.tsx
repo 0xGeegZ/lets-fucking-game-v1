@@ -1,13 +1,12 @@
-import { useContext } from 'react'
 import { useTranslation } from '@pancakeswap/localization'
 import { useWeb3React } from '@pancakeswap/wagmi'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
-import GameConfirmationAndContractCreation from 'views/GameCreation/components/Steps/GameConfirmationAndContractCreation'
 import GameCreation from 'views/GameCreation/components/Steps/GameCreation'
 import NoWalletConnected from 'views/GameCreation/components/Steps/WalletNotConnected'
 import PrizepoolConfiguration from 'views/GameCreation/components/Steps/PrizepoolConfiguration'
 import Confirmation from 'views/GameCreation/components/Steps/Confirmation'
 import GameName from 'views/GameCreation/components/Steps/GameName'
+import GameConfirmationAndContractCreation from 'views/GameCreation/components/Steps/GameConfirmationAndContractCreation'
 
 const Steps = () => {
   const { t } = useTranslation()
