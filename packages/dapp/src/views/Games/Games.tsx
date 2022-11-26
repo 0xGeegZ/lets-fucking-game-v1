@@ -112,6 +112,18 @@ const ViewControls = styled.div`
     }
   }
 `
+const FinishedTextContainer = styled(Flex)`
+  padding-bottom: 32px;
+  flex-direction: column;
+  ${({ theme }) => theme.mediaQueries.md} {
+    flex-direction: row;
+  }
+`
+const FinishedTextLink = styled(Link)`
+  font-weight: 400;
+  white-space: nowrap;
+  text-decoration: underline;
+`
 
 const NUMBER_OF_GAMES_VISIBLE = 12
 
@@ -160,7 +172,9 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const mineOnlyGames = games.filter((game) => game.userData && game.userData.isCreator)
 
   const deletedGames = games.filter((game) => game.isDeleted || game.isPaused)
-  const myDeletedGames = games.filter((game) => game.isDeleted && game.userData && game.userData.isCreator)
+  const myDeletedGames = games.filter(
+    (game) => game.isDeleted || (game.isPaused && game.userData && game.userData.isCreator),
+  )
 
   // const archivedGames = archivedGames.filter((game) => game.userData && false)
 
@@ -330,7 +344,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
               />
               <Text> {t('Not full only')}</Text>
             </ToggleWrapper>
-            <GameTabButtons hasStakeInFinishedGames={false} />
+            <GameTabButtons hasStakeInFinishedGames={myDeletedGames.length > 0 && isMyGames} />
           </ViewControls>
           <FilterContainer>
             <LabelWrapper>
@@ -363,41 +377,28 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
             </LabelWrapper>
           </FilterContainer>
         </ControlContainer>
-        {/* {isInactive && (
-          <FinishedTextContainer>
-            <Text fontSize={['16px', null, '20px']} color="failure" pr="4px">
-              {t("Don't see the game you are staking?")}
-            </Text>
-            <Flex>
-              <FinishedTextLink href="/migration" fontSize={['16px', null, '20px']} color="failure">
-                {t('Go to migration page')}
-              </FinishedTextLink>
-              <Text fontSize={['16px', null, '20px']} color="failure" padding="0px 4px">
-                or
-              </Text>
-              <FinishedTextLink
-                external
-                color="failure"
-                fontSize={['16px', null, '20px']}
-                href="https://v1-games.pancakeswap.finance/games/history"
-              >
-                {t('check out v1 games')}.
-              </FinishedTextLink>
-            </Flex>
-          </FinishedTextContainer>
-        )} */}
+
         {/* {viewMode === ViewMode.TABLE ? (
           <Table games={chosenGamesMemoized} cakePrice={cakePrice} userDataReady={userDataReady} />
         ) : ( */}
         <FlexLayout>{children}</FlexLayout>
         {/* )} */}
 
-        {/* // TODO GUIGUI UPDATE CONDITION */}
-        {/* {account && !userDataLoaded && ( */}
-        {!games && (
+        {userDataLoaded && !chosenGamesMemoized.length && isMyGames && (
+          <FinishedTextContainer>
+            <Text fontSize={['16px', null, '20px']} color="failure" pr="4px">
+              {t("You haven't created any games yet")}
+            </Text>
+            <Flex>
+              <FinishedTextLink href="/create-game" fontSize={['16px', null, '20px']} color="failure">
+                {t('Create a new game')}
+              </FinishedTextLink>
+            </Flex>
+          </FinishedTextContainer>
+        )}
+        {!userDataLoaded && (
           <Flex justifyContent="center">
             <Loading />
-            {/* <StyledImage src="/images/decorations/3dpan.png" alt="Pancake illustration" width={120} height={103} /> */}
           </Flex>
         )}
 
