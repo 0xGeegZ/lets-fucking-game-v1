@@ -20,6 +20,7 @@ import Select, { OptionProps } from 'components/Select/Select'
 import Loading from 'components/Loading'
 import ScrollToTopButton from 'components/ScrollToTopButton/ScrollToTopButtonV2'
 import { latinise } from 'utils/latinise'
+import { sortGamesDefault } from 'utils/sortGames'
 import GameTabButtons from './components/GameTabButtons'
 import { CreateGameCard } from './components/CreateGameCard'
 
@@ -131,9 +132,9 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { observerRef, isIntersecting } = useIntersectionObserver()
   const chosenGamesLength = useRef(0)
 
-  const isArchived = pathname.includes('archived')
+  const isMyGames = pathname.includes('my-games')
   const isDeleted = pathname.includes('history')
-  const isActive = !isArchived && !isDeleted
+  const isActive = !isDeleted
 
   // TODO GUIGUI get used Data
   usePollGamesWithUserData()
@@ -144,43 +145,11 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   // TODO GUIGUI FIRST HANDLE FILTERS
   const [isNotFullOnly, setNotFullOnly] = useState(!isActive)
-  const [myGamesOnly, setMyGamesOnly] = useState(!isActive)
+  const [myPlayingGamesOnly, setMyPlayingGamesOnly] = useState(!isActive)
 
   const activeGames = games
-    .filter((game) => !game.isDeleted)
-    .sort((a, b) => {
-      // sort game where user is playing first
-      if (a.userData.isPlaying && b.userData.isPlaying) {
-        // sort game currently in progress first
-        if (a.isInProgress && b.isInProgress) {
-          // sort game with less remaining players count
-          if (a.remainingPlayersCount === b.remainingPlayersCount) return 0
-          if (a.remainingPlayersCount < b.remainingPlayersCount) return -1
-          return 1
-        }
-        if (a.isInProgress) return -1
-        if (b.isInProgress) return 1
-        return 0
-      }
-
-      if (a.userData.isPlaying) return -1
-      if (b.userData.isPlaying) return 1
-
-      if (a.playerAddressesCount && b.playerAddressesCount) return 0
-      if (a.playerAddressesCount) return -1
-      if (b.playerAddressesCount) return 1
-
-      if (a.remainingPlayersCount && b.remainingPlayersCount) return 0
-      if (a.remainingPlayersCount) return -1
-      if (b.remainingPlayersCount) return 1
-
-      // sorting game paused last
-      if (a.isPaused && b.isPaused) return 0
-      if (a.isPaused) return 1
-      if (b.isPaused) return -1
-
-      return 0
-    })
+    .filter((game) => (!isMyGames ? !game.isPaused && !game.isDeleted : !game.isDeleted))
+    .sort(sortGamesDefault)
 
   const notFullGames = games.filter(
     (game) => !game.isInProgress && game.maxPlayers.toNumber() !== game.playerAddressesCount.toNumber(),
@@ -188,7 +157,10 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   const playingOnlyGames = games.filter((game) => game.userData && game.userData.isPlaying)
 
+  const mineOnlyGames = games.filter((game) => game.userData && game.userData.isCreator)
+
   const deletedGames = games.filter((game) => game.isDeleted)
+  const myDeletedGames = games.filter((game) => game.isDeleted && game.userData && game.userData.isCreator)
 
   // const archivedGames = archivedGames.filter((game) => game.userData && false)
 
@@ -225,37 +197,41 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
       chosenFs = gamesList(activeGames)
     }
 
-    if (isDeleted) {
-      chosenFs = gamesList(deletedGames)
+    if (isDeleted && isMyGames) {
+      if (isMyGames) chosenFs = gamesList(myDeletedGames)
+      else chosenFs = gamesList(deletedGames)
     }
 
     if (isNotFullOnly) {
       chosenFs = gamesList(notFullGames)
     }
 
-    if (myGamesOnly) {
-      chosenFs = gamesList(playingOnlyGames)
-    }
-    if (isArchived) {
+    if (myPlayingGamesOnly) {
       chosenFs = gamesList(playingOnlyGames)
     }
 
-    return chosenFs
+    if (isMyGames) {
+      chosenFs = gamesList(mineOnlyGames)
+    }
+
+    return chosenFs.sort(sortGamesDefault)
   }, [
     isActive,
     isDeleted,
+    isMyGames,
     isNotFullOnly,
-    myGamesOnly,
-    isArchived,
+    myPlayingGamesOnly,
     gamesList,
     activeGames,
+    myDeletedGames,
     deletedGames,
     notFullGames,
     playingOnlyGames,
+    mineOnlyGames,
   ])
 
   const chosenGamesMemoized = useMemo(() => {
-    const sortGames = (gamesToSort: DeserializedGame[]): DeserializedGame[] => {
+    const sortGamesDefault = (gamesToSort: DeserializedGame[]): DeserializedGame[] => {
       switch (sortOption) {
         case 'players':
           return orderBy(gamesToSort, (game: DeserializedGame) => game.playerAddressesCount, 'desc')
@@ -274,7 +250,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
       }
     }
 
-    return sortGames(chosenGames).slice(0, numberOfGamesVisible)
+    return sortGamesDefault(chosenGames).slice(0, numberOfGamesVisible)
   }, [chosenGames, sortOption, numberOfGamesVisible])
 
   chosenGamesLength.current = chosenGamesMemoized.length
@@ -305,15 +281,25 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
             <GameH2 scale="lg" color="text">
               {t('Register to a game to start playing.')}
             </GameH2>
-            {/* <NextLinkFromReactRouter to="/games/my-games" prefetch={false}> */}
-            <NextLinkFromReactRouter to="#" prefetch={false}>
-              <Button variant="text" disabled>
-                <Text color="primary" bold fontSize="16px" mr="4px">
-                  {t('My Created Games')}
-                </Text>
-                <ArrowForwardIcon color="primary" />
-              </Button>
-            </NextLinkFromReactRouter>
+            {isMyGames ? (
+              <NextLinkFromReactRouter to="/games" prefetch={false}>
+                <Button variant="secondary">
+                  <Text color="primary" bold fontSize="16px" mr="4px">
+                    {t('All Games')}
+                  </Text>
+                  <ArrowForwardIcon color="primary" />
+                </Button>
+              </NextLinkFromReactRouter>
+            ) : (
+              <NextLinkFromReactRouter to="/games/my-games" prefetch={false}>
+                <Button variant="secondary">
+                  <Text color="primary" bold fontSize="16px" mr="4px">
+                    {t('My Created Games')}
+                  </Text>
+                  <ArrowForwardIcon color="primary" />
+                </Button>
+              </NextLinkFromReactRouter>
+            )}
           </Box>
           {/* {chainId === ChainId.BSC && ( */}
           <Box>
@@ -329,8 +315,8 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
             <ToggleWrapper>
               <Toggle
                 id="my-games-only"
-                checked={myGamesOnly}
-                onChange={() => setMyGamesOnly((prev) => !prev)}
+                checked={myPlayingGamesOnly}
+                onChange={() => setMyPlayingGamesOnly((prev) => !prev)}
                 scale="sm"
               />
               <Text> {t('My Games')}</Text>

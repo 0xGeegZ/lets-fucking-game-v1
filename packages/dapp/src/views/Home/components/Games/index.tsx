@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { GamesPageLayout } from 'views/Games'
 import { useWeb3React } from '@pancakeswap/wagmi'
 import GameCard from 'views/Games/components/GameCard/GameCard'
+import { sortGamesLaunching } from 'utils/sortGames'
 
 import { useGames } from 'state/games/hooks'
 import Loading from 'components/Loading'
@@ -21,10 +22,13 @@ const GamesPage = () => {
   const { data: games } = useGames()
   const [numberOfGamesVisible] = useState(NUMBER_OF_GAMES_VISIBLE)
 
-  const activeGames = games.filter((game) => !game.isDeleted && !game.isInProgress)
+  let activeGames = games.filter((game) => !game.isDeleted && !game.isPaused && !game.isInProgress)
+
+  if (activeGames.length < NUMBER_OF_GAMES_VISIBLE)
+    activeGames = games.filter((game) => !game.isDeleted && !game.isPaused)
 
   const chosenGamesMemoized = useMemo(() => {
-    return activeGames.slice(0, numberOfGamesVisible)
+    return activeGames.sort(sortGamesLaunching).slice(0, numberOfGamesVisible)
   }, [activeGames, numberOfGamesVisible])
 
   return (

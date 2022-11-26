@@ -12,10 +12,9 @@ const AllowedPlayersToWinSelection = () => {
   const { numberPlayersAllowedToWin, prizeType, currentStep, actions, maxPlayers } = useGameContext()
 
   const halfNumberPlayers = Math.floor(maxPlayers * 0.5)
-  const listOfAllowedNumber = [...range(1, halfNumberPlayers)]
-
-  const selectedAllowedNumber = numberPlayersAllowedToWin > listOfAllowedNumber.length ? 1 : numberPlayersAllowedToWin
-
+  // TODO Remove filter but generate error on prizepool verification in smart contract if winners are odd (except 1)
+  const listOfAllowedWinners = [...range(1, halfNumberPlayers)].filter((n) => n === 1 || n % 2 === 0)
+  const selectedAllowedWinners = numberPlayersAllowedToWin > listOfAllowedWinners.length ? 1 : numberPlayersAllowedToWin
   const handleAllowedWinners = (value) => actions.setPrizeConfiguration(+value, prizeType, currentStep)
 
   return (
@@ -28,19 +27,19 @@ const AllowedPlayersToWinSelection = () => {
           <Text as="p" color="textSubtle" mb="24px">
             Each player will win a proportional share of the prize pool
           </Text>
-          {listOfAllowedNumber &&
-            listOfAllowedNumber.map((iteration) => {
+          {listOfAllowedWinners &&
+            listOfAllowedWinners.map((winner) => {
               return (
                 <SelectionCard
-                  name={iteration.toString()}
-                  value={iteration}
+                  name={winner.toString()}
+                  value={winner}
                   image={imageTest}
                   onChange={handleAllowedWinners}
-                  isChecked={selectedAllowedNumber === iteration}
+                  isChecked={selectedAllowedWinners === winner}
                 >
                   <RowBetween>
                     <CommunityIcon mr="8px" />
-                    <Text bold>{iteration.toString()}</Text>
+                    <Text bold>{winner.toString()}</Text>
                     <Text>{'  Players'}</Text>
                   </RowBetween>
                 </SelectionCard>

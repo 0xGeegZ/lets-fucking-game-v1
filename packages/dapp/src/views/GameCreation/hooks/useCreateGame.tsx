@@ -9,6 +9,8 @@ import { formatBytes32String } from '@ethersproject/strings'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import { ZERO_ADDRESS } from 'config/constants'
 import { useTransactionAdder } from 'state/transactions/hooks'
+import { BigNumber, FixedNumber } from '@ethersproject/bignumber'
+import { parse } from 'path'
 
 export const useCreateGame = (game) => {
   const { t } = useTranslation()
@@ -37,7 +39,6 @@ export const useCreateGame = (game) => {
 
   const parsedRegistrationAmount: number = registrationAmount ? parseFloat(formatEther(`${registrationAmount}`)) : 0
 
-  // TODO GUIGUI Load gameCreationAmount directly from smart contract
   const gameCreationAmountEther = GAME_CREATION_AMOUNT
 
   const registrationAmountEther = parseEther(`${parsedRegistrationAmount}`)
@@ -47,19 +48,25 @@ export const useCreateGame = (game) => {
     : gameCreationAmountEther.add(parseEther(`${freeGamePrizepoolAmount}`))
 
   const prizepool = parsedRegistrationAmount ? parsedRegistrationAmount * maxPlayers : freeGamePrizepoolAmount
+  console.log('🚀 ~ file: useCreateGame.tsx ~ line 49 ~ useCreateGame ~ prizepool', prizepool)
 
   const createPrize = (index, totalWinners) => {
+    const parsedPrizepool = parseEther(`${prizepool}`)
+    const parsedTotalWinners = parseEther(`${totalWinners}`)
+    const amount = parsedPrizepool.div(parsedTotalWinners)
+
     return {
       position: index,
-      amount: parseEther(`${prizepool / totalWinners}`),
-      // TODO use prizeType
+      amount,
       standard: 0,
       contractAddress: ZERO_ADDRESS,
       tokenId: 1,
     }
   }
 
-  const mapper = new Array(numberPlayersAllowedToWin).fill('').map((_, i) => i + 1)
+  const range = (start, end) => Array.from(Array(end + 1).keys()).slice(start)
+  const mapper = [...range(1, numberPlayersAllowedToWin)]
+
   const prizes = mapper.map((index) => createPrize(index, numberPlayersAllowedToWin))
 
   const formattedName = formatBytes32String(name)

@@ -189,6 +189,8 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               {!isPaused && <PauseButton address={address} isInProgress={isInProgress} />}
             </>
           )}
+          {/* // TODO GUIGUI ADD CLAIM BUTTON FOR CREATOR */}
+          {/* // TODO GUIGUI ADD CLAIM BUTTON FOR ADMIN */}
         </>
       )}
       {/* TODO Remove after integration phase */}
