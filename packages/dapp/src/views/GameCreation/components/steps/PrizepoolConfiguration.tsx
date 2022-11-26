@@ -12,9 +12,9 @@ const AllowedPlayersToWinSelection = () => {
   const { numberPlayersAllowedToWin, prizeType, currentStep, actions, maxPlayers } = useGameContext()
 
   const halfNumberPlayers = Math.floor(maxPlayers * 0.5)
-  // TODO Remove filter but generate error on prizepool verification in smart contract if winners are odd (except 1)
-  const listOfAllowedWinners = [...range(1, halfNumberPlayers)].filter((n) => n === 1 || n % 2 === 0)
+  const listOfAllowedWinners = [...range(1, halfNumberPlayers)]
   const selectedAllowedWinners = numberPlayersAllowedToWin > listOfAllowedWinners.length ? 1 : numberPlayersAllowedToWin
+
   const handleAllowedWinners = (value) => actions.setPrizeConfiguration(+value, prizeType, currentStep)
 
   return (
@@ -28,21 +28,24 @@ const AllowedPlayersToWinSelection = () => {
             Each player will win a proportional share of the prize pool
           </Text>
           {listOfAllowedWinners &&
-            listOfAllowedWinners.map((winner) => {
+            listOfAllowedWinners.map((winner, index) => {
               return (
-                <SelectionCard
-                  name={winner.toString()}
-                  value={winner}
-                  image={imageTest}
-                  onChange={handleAllowedWinners}
-                  isChecked={selectedAllowedWinners === winner}
-                >
-                  <RowBetween>
-                    <CommunityIcon mr="8px" />
-                    <Text bold>{winner.toString()}</Text>
-                    <Text>{'  Players'}</Text>
-                  </RowBetween>
-                </SelectionCard>
+                // TODO Remove filter but generate error on prizepool verification in smart contract if winners are odd (except 1)
+                (index === 0 || index % 2 !== 0) && (
+                  <SelectionCard
+                    name={winner.toString()}
+                    value={winner}
+                    image={imageTest}
+                    onChange={handleAllowedWinners}
+                    isChecked={selectedAllowedWinners === winner}
+                  >
+                    <RowBetween>
+                      <CommunityIcon mr="8px" />
+                      <Text bold>{winner.toString()}</Text>
+                      <Text>{'  Players'}</Text>
+                    </RowBetween>
+                  </SelectionCard>
+                )
               )
             })}
         </CardBody>

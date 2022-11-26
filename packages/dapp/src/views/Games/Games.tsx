@@ -231,7 +231,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   ])
 
   const chosenGamesMemoized = useMemo(() => {
-    const sortGamesDefault = (gamesToSort: DeserializedGame[]): DeserializedGame[] => {
+    const sortGames = (gamesToSort: DeserializedGame[]): DeserializedGame[] => {
       switch (sortOption) {
         case 'players':
           return orderBy(gamesToSort, (game: DeserializedGame) => game.playerAddressesCount, 'desc')
@@ -250,7 +250,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
       }
     }
 
-    return sortGamesDefault(chosenGames).slice(0, numberOfGamesVisible)
+    return sortGames(chosenGames).slice(0, numberOfGamesVisible)
   }, [chosenGames, sortOption, numberOfGamesVisible])
 
   chosenGamesLength.current = chosenGamesMemoized.length

@@ -11,6 +11,7 @@ import { ZERO_ADDRESS } from 'config/constants'
 import { useTransactionAdder } from 'state/transactions/hooks'
 import { BigNumber, FixedNumber } from '@ethersproject/bignumber'
 import { parse } from 'path'
+import { range } from 'utils'
 
 export const useCreateGame = (game) => {
   const { t } = useTranslation()
@@ -64,7 +65,6 @@ export const useCreateGame = (game) => {
     }
   }
 
-  const range = (start, end) => Array.from(Array(end + 1).keys()).slice(start)
   const mapper = [...range(1, numberPlayersAllowedToWin)]
 
   const prizes = mapper.map((index) => createPrize(index, numberPlayersAllowedToWin))
