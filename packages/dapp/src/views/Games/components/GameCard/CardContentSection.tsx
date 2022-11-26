@@ -26,10 +26,6 @@ const BulletList = styled.ul`
   }
 `
 
-const Details = styled.div`
-  padding-top: 16px;
-`
-
 const Container = styled.div`
   padding-top: 16px;
 `

@@ -1,17 +1,13 @@
 import { useTranslation } from '@pancakeswap/localization'
-import { Card, Flex, Skeleton, Text, RocketIcon, Heading } from '@pancakeswap/uikit'
+import { Card, Flex } from '@pancakeswap/uikit'
 import ExpandableSectionButton from 'components/ExpandableSectionButton'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { useCallback, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { getBlockExploreLink } from 'utils'
-import { NATIVE } from '@pancakeswap/sdk'
 import { DeserializedGame } from 'state/types'
-import cronstrue from 'cronstrue'
 import parser from 'cron-parser'
 import moment from 'moment'
-import momentTz from 'moment-timezone'
-import Tooltip from '../GameCardButtons/Tooltip'
 import CardPlayerSection from './CardPlayerSection'
 import CardHeadingSection from './CardHeadingSection'
 
@@ -38,28 +34,6 @@ const ExpandingWrapper = styled.div`
   padding: 24px;
   border-top: 2px solid ${({ theme }) => theme.colors.cardBorder};
   overflow: hidden;
-`
-
-const BulletList = styled.ul`
-  list-style-type: none;
-  margin-left: 8px;
-  padding: 0;
-  li {
-    margin: 0;
-    padding: 0;
-  }
-  li::before {
-    content: '•';
-    margin-right: 4px;
-    color: ${({ theme }) => theme.colors.textSubtle};
-  }
-  li::marker {
-    font-size: 12px;
-  }
-`
-
-const Container = styled.div`
-  margin-right: 4px;
 `
 
 interface GameCardProps {
@@ -136,27 +110,9 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     if (!encodedCron) return
 
     try {
-      //   const transform = cronstrue.toString(encodedCron, {
-      //     use24HourTimeFormat: false,
-      //     locale,
-      //   })
-      //   setCronHumanReadable(`${transform} UTC`)
-
       const interval = parser.parseExpression(encodedCron, { tz: 'Etc/UTC' })
       const transform = moment(interval.next().toString()).format('hh:mm A')
-      //   const transform = momentTz.tz(interval.next().toString(), timezone).format('hh:mm A')
       setCronHumanReadable(`${transform}`)
-
-      //   console.log('🚀 ~ file: GameCard.tsx ~ line 136 ~ useEffect ~ locale', locale)
-      //   console.log('🚀 ~ file: GameCard.tsx ~ line 142 ~ useEffect ~ timezone', timezone)
-
-      //   const interval = parser.parseExpression(encodedCron, { tz: 'Etc/UTC' })
-      //   const interval = parser.parseExpression(encodedCron, { tz: timezone })
-      //   const interval = parser.parseExpression(encodedCron)
-
-      //   console.log('🚀 ~  moment ', moment(interval.next().toString()).format('hh:mm A'))
-      //   console.log('🚀 ~  momentTz ', momentTz(interval.next().toString()).format('hh:mm A'))
-      //   setCronHumanReadable(momentTz(interval.next().toString()).format('hh:mm A'))
     } catch (e) {
       setCronHumanReadable('')
     }

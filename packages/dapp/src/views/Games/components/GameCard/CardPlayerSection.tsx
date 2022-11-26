@@ -1,14 +1,11 @@
 import { useTranslation } from '@pancakeswap/localization'
 import { Flex, Heading, Skeleton, Text, WarningIcon } from '@pancakeswap/uikit'
-import cronstrue from 'cronstrue'
 
 import BigNumber from 'bignumber.js'
 
 import ConnectWalletButton from 'components/ConnectWalletButton'
-import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import momentTz from 'moment-timezone'
 
 import moment from 'moment'
 import ClaimButton from '../GameCardButtons/ClaimButton'

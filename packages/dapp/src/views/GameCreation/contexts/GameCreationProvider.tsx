@@ -6,6 +6,7 @@ import { formatBytes32String } from '@ethersproject/strings'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { defaultGameConfig } from 'config/internal/gameConfig'
 import { useGameConfig } from 'hooks/useGameConfig'
+
 import fetchGamesFull from 'state/games/fetchGamesFull'
 
 import { Actions, BNB, ContextType, NFT, State } from 'views/GameCreation/types'
@@ -102,6 +103,7 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
   // Initial checks
   useEffect(() => {
     const loadGames = async () => {
+      // TODO create custom hook
       const games = await fetchGamesFull(chainId)
       const usedAmounts = games
         .map((game) => {
