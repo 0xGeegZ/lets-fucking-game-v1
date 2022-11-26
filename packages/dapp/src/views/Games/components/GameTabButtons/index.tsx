@@ -20,9 +20,6 @@ const GameTabButtons: React.FC<React.PropsWithChildren<GameTabButtonsProps>> = (
     case '/games/history':
       activeIndex = 1
       break
-    case '/_mp/games/history':
-      activeIndex = 1
-      break
     case '/games/archived':
       activeIndex = 2
       break

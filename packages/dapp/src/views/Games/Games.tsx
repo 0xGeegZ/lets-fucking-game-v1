@@ -131,9 +131,6 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { observerRef, isIntersecting } = useIntersectionObserver()
   const chosenGamesLength = useRef(0)
 
-  // TODO GUIGUI INVERSE WHEN UPDATING /path
-  //   const isDeleted = pathname.includes('archived')
-  //   const isPlayingOnly = pathname.includes('history')
   const isArchived = pathname.includes('archived')
   const isDeleted = pathname.includes('history')
   const isActive = !isArchived && !isDeleted
