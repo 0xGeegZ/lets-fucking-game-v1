@@ -120,10 +120,15 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
 
   // TODO GUIGUI isReady is when userData are loaded ??
   const isReady = game.prizepool !== undefined
-
+  const isRegistering = !isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber()
   // TODO GUIGUI use RoundProgress to display a progressBar if i
   return (
-    <StyledCard isActive={!isDeleted}>
+    <StyledCard
+      isActive={!isDeleted}
+      isFailure={hasLost}
+      isWarning={!isRegistering && !isInProgress}
+      isSuccess={isPlaying}
+    >
       <GameCardInnerContainer>
         <CardHeadingSection
           id={id}
@@ -135,7 +140,8 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           isReady={isReady}
           isFree={registrationAmount.toNumber() === 0}
           isInProgress={isInProgress}
-          isRegistering={!isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber()}
+          isRegistering={isRegistering}
+          hasLost={hasLost}
         />
 
         <CardContentSection
@@ -148,14 +154,14 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           isReady={isReady}
           prizes={prizes}
           isInProgress={isInProgress}
-          isRegistering={!isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber()}
+          isRegistering={isRegistering}
         />
 
         <CardPlayerSection
           address={address}
           roundId={roundId}
           isInProgress={isInProgress}
-          isRegistering={!isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber()}
+          isRegistering={isRegistering}
           wonAmount={wonAmount}
           nextFromRange={nextFromRange}
           nextToRange={nextToRange}

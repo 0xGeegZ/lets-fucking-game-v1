@@ -22,10 +22,15 @@ interface StyledCardProps extends CardProps {
 /**
  * Priority: Warning --> Success --> Active
  */
-const getBorderColor = ({ isActive, isSuccess, isWarning, borderBackground, theme }: StyledCardProps) => {
+const getBorderColor = ({ isActive, isSuccess, isWarning, isFailure, borderBackground, theme }: StyledCardProps) => {
   if (borderBackground) {
     return borderBackground;
   }
+
+  if (isFailure) {
+    return theme.colors.failure;
+  }
+
   if (isWarning) {
     return theme.colors.warning;
   }

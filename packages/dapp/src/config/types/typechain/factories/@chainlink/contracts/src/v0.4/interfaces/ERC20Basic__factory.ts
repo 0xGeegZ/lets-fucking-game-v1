@@ -2,100 +2,103 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from 'ethers'
-import type { Provider } from '@ethersproject/providers'
+import { Contract, Signer, utils } from "ethers";
+import type { Provider } from "@ethersproject/providers";
 import type {
   ERC20Basic,
   ERC20BasicInterface,
-} from '../../../../../../@chainlink/contracts/src/v0.4/interfaces/ERC20Basic'
+} from "../../../../../../@chainlink/contracts/src/v0.4/interfaces/ERC20Basic";
 
 const _abi = [
   {
     constant: true,
     inputs: [],
-    name: 'totalSupply',
+    name: "totalSupply",
     outputs: [
       {
-        name: '',
-        type: 'uint256',
+        name: "",
+        type: "uint256",
       },
     ],
     payable: false,
-    stateMutability: 'view',
-    type: 'function',
+    stateMutability: "view",
+    type: "function",
   },
   {
     constant: true,
     inputs: [
       {
-        name: 'who',
-        type: 'address',
+        name: "who",
+        type: "address",
       },
     ],
-    name: 'balanceOf',
+    name: "balanceOf",
     outputs: [
       {
-        name: '',
-        type: 'uint256',
+        name: "",
+        type: "uint256",
       },
     ],
     payable: false,
-    stateMutability: 'view',
-    type: 'function',
+    stateMutability: "view",
+    type: "function",
   },
   {
     constant: false,
     inputs: [
       {
-        name: 'to',
-        type: 'address',
+        name: "to",
+        type: "address",
       },
       {
-        name: 'value',
-        type: 'uint256',
+        name: "value",
+        type: "uint256",
       },
     ],
-    name: 'transfer',
+    name: "transfer",
     outputs: [
       {
-        name: '',
-        type: 'bool',
+        name: "",
+        type: "bool",
       },
     ],
     payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: true,
-        name: 'from',
-        type: 'address',
+        name: "from",
+        type: "address",
       },
       {
         indexed: true,
-        name: 'to',
-        type: 'address',
+        name: "to",
+        type: "address",
       },
       {
         indexed: false,
-        name: 'value',
-        type: 'uint256',
+        name: "value",
+        type: "uint256",
       },
     ],
-    name: 'Transfer',
-    type: 'event',
+    name: "Transfer",
+    type: "event",
   },
-]
+];
 
 export class ERC20Basic__factory {
-  static readonly abi = _abi
+  static readonly abi = _abi;
   static createInterface(): ERC20BasicInterface {
-    return new utils.Interface(_abi) as ERC20BasicInterface
+    return new utils.Interface(_abi) as ERC20BasicInterface;
   }
-  static connect(address: string, signerOrProvider: Signer | Provider): ERC20Basic {
-    return new Contract(address, _abi, signerOrProvider) as ERC20Basic
+  static connect(
+    address: string,
+    signerOrProvider: Signer | Provider
+  ): ERC20Basic {
+    return new Contract(address, _abi, signerOrProvider) as ERC20Basic;
   }
 }

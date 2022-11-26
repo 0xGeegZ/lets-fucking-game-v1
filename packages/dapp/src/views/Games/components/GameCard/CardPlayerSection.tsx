@@ -1,11 +1,12 @@
 import { useTranslation } from '@pancakeswap/localization'
-import { Flex, Heading, Skeleton, Text, WarningIcon } from '@pancakeswap/uikit'
+import { Flex, Heading, Skeleton, Text, ErrorIcon, Button } from '@pancakeswap/uikit'
 
 import BigNumber from 'bignumber.js'
 
 import ConnectWalletButton from 'components/ConnectWalletButton'
 import styled from 'styled-components'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
+import Tooltip from 'views/Games/components/GameCardButtons/Tooltip'
 
 import moment from 'moment'
 import ClaimButton from '../GameCardButtons/ClaimButton'
@@ -14,6 +15,9 @@ import RegisterButton from '../GameCardButtons/RegisterButton'
 import VoteSplitButton from '../GameCardButtons/VoteSplitButton'
 import PauseButton from '../GameCardButtons/PauseButton'
 import UnpauseButton from '../GameCardButtons/UnpauseButton'
+import ClaimCreatorFeeButton from '../GameCardButtons/ClaimCreatorFeeButton'
+import ClaimTreasuryFeeButton from '../GameCardButtons/ClaimTreasuryFeeButton'
+import ClaimAllFeeButton from '../GameCardButtons/ClaimAllFeeButton'
 
 const Container = styled.div`
   padding-top: 16px;
@@ -135,31 +139,33 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             <Heading mr="4px">{`${t('Next play time')}:`}</Heading>
             {isReady ? (
               <Text style={{ display: 'flex', alignItems: 'center' }}>
-                <Text bold style={{ textAlign: 'right' }}>
-                  {nextFromRange && nextToRange && (
-                    <>
-                      {moment(nextFromRange).isSame(moment(), 'day') ? 'Today' : 'Tomorrow'}
-                      {' between '}
-                      {moment(nextFromRange).format('hh:mm A')} and {moment(nextToRange).format('hh:mm A')}
-                    </>
-                  )}
-                </Text>
+                {nextFromRange && nextToRange && (
+                  <Text bold style={{ textAlign: 'right' }}>
+                    {hasPlayedRound ? (
+                      <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                        ...
+                        <Tooltip
+                          content={
+                            <>
+                              <Text>{t('Waiting for next draw')}</Text>
+                            </>
+                          }
+                        />
+                      </Text>
+                    ) : (
+                      <>
+                        {moment(nextFromRange).isSame(moment(), 'day') ? 'Today' : 'Tomorrow'}
+                        {' between '}
+                        {moment(nextFromRange).format('hh:mm A')} and {moment(nextToRange).format('hh:mm A')}
+                      </>
+                    )}
+                  </Text>
+                )}
               </Text>
             ) : (
               <Skeleton width="100%" height={18} mb="4px" />
             )}
           </Flex>
-
-          {/* {(hasLost || (!isInTimeRange && moment().isAfter(moment(nextToRange)))) && ( */}
-          {(hasLost || (moment().isAfter(moment(nextToRange)) && moment(nextFromRange).isSame(moment(), 'day'))) && (
-            <Flex justifyContent="center" m="10px">
-              <WarningIcon width="16px" color="failure" style={{ verticalAlign: 'middle' }} />
-              <Heading mr="4px" color="failure">
-                {t('You Loose')}
-              </Heading>
-              <WarningIcon width="16px" color="failure" style={{ verticalAlign: 'middle' }} />
-            </Flex>
-          )}
         </>
       )}
 
@@ -168,7 +174,31 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
         <ConnectWalletButton mt="8px" width="100%" />
       ) : (
         <>
-          {(isInProgress || !isRegistering) && (
+          {/* {(hasLost || (!isInTimeRange && moment().isAfter(moment(nextToRange)))) && ( */}
+          {(hasLost ||
+            (!hasPlayedRound &&
+              moment().isAfter(moment(nextToRange)) &&
+              moment(nextFromRange).isSame(moment(), 'day'))) && (
+            // <Button
+            //   mt="8px"
+            //   width="100%"
+            //   ml="auto"
+            //   disabled
+            //   endIcon={<ErrorIcon color="currentColor" />}
+            //   startIcon={<ErrorIcon color="currentColor" />}
+            // >
+            //   {t('You Loose')}
+            // </Button>
+            <Flex justifyContent="center" mt="20px" mb="16px">
+              <ErrorIcon width="16px" color="failure" style={{ verticalAlign: 'bottom' }} />
+              <Heading mr="4px" ml="4px" color="failure">
+                {t('You Loose')}
+              </Heading>
+              <ErrorIcon width="16px" color="failure" style={{ verticalAlign: 'bottom' }} />
+            </Flex>
+          )}
+
+          {(isInProgress || !isRegistering) && !hasLost && (
             <PlayButton
               address={address}
               isInTimeRange={isInTimeRange}
@@ -189,10 +219,12 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               {!isPaused && <PauseButton address={address} isInProgress={isInProgress} />}
             </>
           )}
-          {/* // TODO GUIGUI ADD CLAIM BUTTON FOR CREATOR */}
-          {/* // TODO GUIGUI ADD CLAIM BUTTON FOR ADMIN */}
+          {isPaused && isCreator && isAdmin && <ClaimAllFeeButton address={address} />}
+          {isPaused && isCreator && !isAdmin && <ClaimCreatorFeeButton address={address} />}
+          {isPaused && isAdmin && !isCreator && <ClaimTreasuryFeeButton address={address} />}
         </>
       )}
+
       {/* TODO Remove after integration phase */}
       {/* <Link href="/games/1" passHref>
         <Button as="a" id="showGameDetails" mt="8px" width="100%">

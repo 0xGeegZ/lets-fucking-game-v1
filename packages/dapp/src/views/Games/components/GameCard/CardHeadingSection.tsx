@@ -8,6 +8,7 @@ import StartingTag from 'views/Games/components/GameTags/StartingTag'
 
 import FreeTag from 'views/Games/components/GameTags/FreeTag'
 import PausedTag from 'views/Games/components/GameTags/PausedTag'
+import LostTag from 'views/Games/components/GameTags/LostTag'
 
 import BigNumber from 'bignumber.js'
 import { CurrencyLogo, DoubleCurrencyLogo } from 'components/Logo'
@@ -31,6 +32,7 @@ export interface ExpandableSectionProps {
   isFree: boolean
   isInProgress: boolean
   isRegistering: boolean
+  hasLost: boolean
 }
 
 const Wrapper = styled(Flex)`
@@ -54,6 +56,7 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
   isFree,
   isInProgress,
   isRegistering,
+  hasLost,
 }) => {
   // TODO GUIGUI DISPLAY gameCreationAmount
   return (
@@ -74,6 +77,8 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
       <Flex flexDirection="column" alignItems="flex-end">
         {isReady ? <Heading mb="4px">{name}</Heading> : <Skeleton mb="4px" width={60} height={18} />}
         <Flex justifyContent="center" mt="4px">
+          {isReady && hasLost && <LostTag mr="4px" />}
+
           {isReady ? <>{isInProgress && <ProgressTag mr="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />}
           {isReady ? (
             <>{!isRegistering && !isInProgress && !isPaused && <StartingTag mr="4px" />}</>
@@ -85,9 +90,9 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
           ) : (
             <Skeleton ml="4px" width={42} height={28} />
           )}
+          {isReady && isPaused && <PausedTag mr="4px" />}
 
-          {isReady && isPaused && <PausedTag ml="4px" />}
-          {isReady ? <>{isFree && <FreeTag ml="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />}
+          {isReady ? <>{isFree && <FreeTag mr="4px" />}</> : <Skeleton ml="4px" width={42} height={28} />}
           {isReady ? (
             <>{multiplier && <MultiplierTag variant="secondary">{`x${multiplier.toNumber()}`}</MultiplierTag>}</>
           ) : (
