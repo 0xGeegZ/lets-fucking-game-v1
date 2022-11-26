@@ -278,9 +278,11 @@ describe('GameV1Contract - Mecanism', function () {
           players: this.players,
           contract: this.deployedPayableGame,
           amount: this.correctRegistrationAmount,
-
           mockKeeper: this.mockKeeper,
         })
+        const remainingPlayersCount =
+          await this.deployedPayableGame.getRemainingPlayersCount()
+        expect(remainingPlayersCount.eq(10)).to.be.true
 
         // A day passes until the next checkpoint
         await ethers.provider.send('evm_increaseTime', [ONE_DAY_IN_SECONDS])
@@ -290,6 +292,10 @@ describe('GameV1Contract - Mecanism', function () {
             .connect(this.mockKeeper)
             .triggerDailyCheckpoint()
         ).to.emit(this.deployedPayableGame, 'GameLost')
+
+        const updatedRemainingPlayersCount =
+          await this.deployedPayableGame.getRemainingPlayersCount()
+        expect(updatedRemainingPlayersCount.eq(0)).to.be.true
       })
 
       it('should check if game ended and close it', async function () {
@@ -764,6 +770,10 @@ describe('GameV1Contract - Mecanism', function () {
           mockKeeper: this.mockKeeper,
         })
 
+        const remainingPlayersCount =
+          await this.deployedPayableGame.getRemainingPlayersCount()
+        expect(remainingPlayersCount.eq(2)).to.be.true
+
         const looserUpdatedData = await this.deployedPayableGame.players(
           this.players[looserIndex].address
         )
@@ -799,6 +809,10 @@ describe('GameV1Contract - Mecanism', function () {
           mockKeeper: this.mockKeeper,
         })
 
+        const remainingPlayersCount =
+          await this.deployedPayableGame.getRemainingPlayersCount()
+        expect(remainingPlayersCount.eq(2)).to.be.true
+
         const looserUpdatedData = await this.deployedPayableGame.players(
           this.players[looserIndex].address
         )
@@ -833,6 +847,11 @@ describe('GameV1Contract - Mecanism', function () {
           startedGameTimestamp,
           mockKeeper: this.mockKeeper,
         })
+
+        const remainingPlayersCount =
+          await this.deployedPayableGame.getRemainingPlayersCount()
+        expect(remainingPlayersCount.eq(2)).to.be.true
+
         const looserUpdatedData = await this.deployedPayableGame.players(
           this.players[looserIndex].address
         )
@@ -855,7 +874,6 @@ describe('GameV1Contract - Mecanism', function () {
           winnerIndex,
           contract: this.deployedPayableGame,
           amount: this.correctRegistrationAmount,
-
           mockKeeper: this.mockKeeper,
         })
 

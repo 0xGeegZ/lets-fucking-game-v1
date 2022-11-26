@@ -1,8 +1,10 @@
+import { GameConfig } from 'config/internal/gameConfig'
+
 export type NFT = 'ERC721' | 'ERC1155'
 export type BNB = 'ERC20'
 
 export type Actions =
-  | { type: 'initialize'; currentStep: number }
+  | { type: 'initialize'; currentStep: number; registrationAmount: string }
   | { type: 'previous_step'; currentStep: number }
   | { type: 'next_step'; currentStep: number }
   | {
@@ -68,7 +70,7 @@ export interface ContextType extends State {
   actions: {
     previousStep: (currentStep: number) => void
     nextStep: (currentStep: number) => void
-    setInitialize: (currentStep: number) => void
+    setInitialize: (currentStep: number, registrationAmount: string) => void
     setGameName: (currentStep: number, name: string) => void
     setGameCreation: (
       currentStep: number,
@@ -100,4 +102,5 @@ export interface ContextType extends State {
     ) => void
     setSuccessOrErrorMessage: (successMessage: string | null, errorMessage: string | null, currentStep: number) => void
   }
+  gameConfig: GameConfig
 }

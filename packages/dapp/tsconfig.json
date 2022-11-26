@@ -15,8 +15,6 @@
       "@pancakeswap/wagmi/chains": ["../packages/wagmi/chains/index.ts"],
       "@pancakeswap/wagmi": ["../packages/wagmi/src/index.ts"],
       "@pancakeswap/hooks": ["../packages/hooks/src/index.ts"]
-      // TODO GUIGUI WHY THIS DOES NOT WORK (with associated hardhat config) ??
-      // "@types/typechain": ["../../types/typechain/index.ts"]
     }
   },
   "exclude": ["node_modules", "cypress", "/apps/*"],

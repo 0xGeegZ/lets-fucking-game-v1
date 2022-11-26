@@ -23,7 +23,7 @@ const setUpGameReadyToPlay = async ({
   }
 
   // Some time passes before the daily checkpoint gets triggered
-  await ethers.provider.send('evm_increaseTime', [7200])
+  await ethers.provider.send('evm_increaseTime', [ONE_DAY_IN_SECONDS])
 
   // Daily checkpoint gets triggered, the game starts
   return contract.connect(mockKeeper).triggerDailyCheckpoint()

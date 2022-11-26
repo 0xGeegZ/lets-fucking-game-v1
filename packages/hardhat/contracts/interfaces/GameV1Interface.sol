@@ -86,6 +86,8 @@ interface GameV1Interface {
         uint256 roundId;
         bytes32 name;
         uint256 playerAddressesCount;
+        // TODO add it in next game version
+        // uint256 remainingPlayersCount;
         uint256 maxPlayers;
         uint256 registrationAmount;
         uint256 playTimeRange;

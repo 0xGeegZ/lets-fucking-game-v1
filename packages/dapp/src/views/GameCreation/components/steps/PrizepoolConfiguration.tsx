@@ -3,22 +3,18 @@ import { RowBetween } from 'components/Layout/Row'
 import { useTranslation } from '@pancakeswap/localization'
 import { useGameContext } from 'views/GameCreation/hooks/useGameContext'
 import { range } from 'utils'
-import NextStepButton from 'views/GameCreation/components/buttons/NextStepButton'
+import NextStepButton from 'views/GameCreation/components/Buttons/NextStepButton'
 import SelectionCard from 'views/GameCreation/components/SelectionCard'
-import BackStepButton from 'views/GameCreation/components/buttons/BackStepButton'
+import BackStepButton from 'views/GameCreation/components/Buttons/BackStepButton'
 import imageTest from '../../../../../public/images/chains/1.png'
 
 const AllowedPlayersToWinSelection = () => {
-  const {
-    numberPlayersAllowedToWin: selectedAllowedNumber,
-    prizeType,
-    currentStep,
-    actions,
-    maxPlayers,
-  } = useGameContext()
+  const { numberPlayersAllowedToWin, prizeType, currentStep, actions, maxPlayers } = useGameContext()
 
   const halfNumberPlayers = Math.floor(maxPlayers * 0.5)
   const listOfAllowedNumber = [...range(1, halfNumberPlayers)]
+
+  const selectedAllowedNumber = numberPlayersAllowedToWin > listOfAllowedNumber.length ? 1 : numberPlayersAllowedToWin
 
   const handleAllowedWinners = (value) => actions.setPrizeConfiguration(+value, prizeType, currentStep)
 

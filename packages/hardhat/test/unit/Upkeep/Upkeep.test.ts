@@ -15,6 +15,7 @@ describe('Upkeep - Initialisation', function () {
           .callStatic.checkUpkeep(checkData)
         expect(upkeepNeeded).to.be.false
       })
+
       it('should checkUpkeep been executed', async function () {
         const checkData = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(''))
 
@@ -89,6 +90,68 @@ describe('Upkeep - Initialisation', function () {
           .callStatic.checkUpkeep(checkData)
 
         expect(shouldNotNeedUpdateAnymore).to.be.false
+      })
+
+      it('should checkUpkeep been executed and game data updated', async function () {
+        const checkData = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(''))
+
+        const initialRemainingPlayersCount =
+          await this.deployedPayableGame.getRemainingPlayersCount()
+        expect(initialRemainingPlayersCount.eq(0)).to.be.true
+
+        for (let i = 0; i < 10; i++) {
+          await registerPlayer({
+            player: this.players[i],
+            contract: this.deployedPayableGame,
+            value: this.correctRegistrationAmount,
+          })
+        }
+
+        await ethers.provider.send('evm_increaseTime', [ONE_DAY_IN_SECONDS + 1])
+        await ethers.provider.send('evm_mine')
+
+        let isNeedRecheckupkeep = true
+        while (isNeedRecheckupkeep) {
+          const [upkeepNeeded, performData] = await this.cronUpkeep
+            .connect(this.owner)
+            .callStatic.checkUpkeep(checkData)
+
+          if (upkeepNeeded)
+            await this.cronUpkeep.connect(this.owner).performUpkeep(performData)
+
+          isNeedRecheckupkeep = upkeepNeeded
+        }
+
+        const isGameInProgress = await this.deployedPayableGame.isInProgress()
+        expect(isGameInProgress).to.be.true
+
+        const remainingPlayersCount =
+          await this.deployedPayableGame.getRemainingPlayersCount()
+        expect(remainingPlayersCount.eq(10)).to.be.true
+
+        await ethers.provider.send('evm_increaseTime', [ONE_DAY_IN_SECONDS + 1])
+        await ethers.provider.send('evm_mine')
+
+        isNeedRecheckupkeep = true
+        while (isNeedRecheckupkeep) {
+          const [upkeepNeeded, performData] = await this.cronUpkeep
+            .connect(this.owner)
+            .callStatic.checkUpkeep(checkData)
+
+          if (upkeepNeeded)
+            await this.cronUpkeep.connect(this.owner).performUpkeep(performData)
+
+          isNeedRecheckupkeep = upkeepNeeded
+        }
+
+        const updatingRemainingPlayersCount =
+          await this.deployedPayableGame.getRemainingPlayersCount()
+
+        expect(updatingRemainingPlayersCount.eq(0)).to.be.true
+
+        const isGameInProgressUpdated =
+          await this.deployedPayableGame.isInProgress()
+        expect(isGameInProgressUpdated).to.be.false
       })
     })
   })

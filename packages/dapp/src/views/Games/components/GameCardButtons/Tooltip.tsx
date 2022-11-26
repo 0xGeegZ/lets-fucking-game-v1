@@ -1,14 +1,4 @@
-import {
-  Button,
-  Heading,
-  Text,
-  ButtonProps,
-  HelpIcon,
-  Flex,
-  TooltipText,
-  useTooltip,
-  useMatchBreakpoints,
-} from '@pancakeswap/uikit'
+import { ButtonProps, HelpIcon, Flex, TooltipText, useTooltip, useMatchBreakpoints } from '@pancakeswap/uikit'
 import _isEmpty from 'lodash/isEmpty'
 import { ReactNode } from 'react'
 import styled from 'styled-components'
@@ -24,7 +14,9 @@ interface TooltipPropsType extends ButtonProps {
 }
 
 const TooltipElement = ({ content }) => {
-  return <>{content}</>
+  const { t } = useTranslation()
+
+  return <>{t(content)}</>
 }
 
 const Tooltip: React.FC<TooltipPropsType> = ({ content, additionalStyle }) => {
