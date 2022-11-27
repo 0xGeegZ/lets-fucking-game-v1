@@ -18,6 +18,15 @@ export const sortGamesDefault = (a, b) => {
     }
     if (a.isInProgress) return -1
     if (b.isInProgress) return 1
+
+    // sort game currently starting first
+    const isARegistering = !a.isInProgress && a.maxPlayers.toNumber() !== a.playerAddressesCount.toNumber()
+    const isBRegistering = !b.isInProgress && b.maxPlayers.toNumber() !== b.playerAddressesCount.toNumber()
+
+    if (isARegistering && isBRegistering) return 0
+    if (isARegistering) return 1
+    if (isBRegistering) return -1
+
     return 0
   }
 
