@@ -23,9 +23,8 @@ export const sortGamesDefault = (a, b) => {
     const isARegistering = !a.isInProgress && a.maxPlayers.toNumber() !== a.playerAddressesCount.toNumber()
     const isBRegistering = !b.isInProgress && b.maxPlayers.toNumber() !== b.playerAddressesCount.toNumber()
 
-    if (isARegistering && isBRegistering) return 0
-    if (isARegistering) return 1
-    if (isBRegistering) return -1
+    if (isARegistering && !isBRegistering) return 1
+    if (isBRegistering && !isARegistering) return -1
 
     return 0
   }
@@ -38,6 +37,7 @@ export const sortGamesDefault = (a, b) => {
     if (a.remainingPlayersCount < b.remainingPlayersCount) return -1
     return 1
   }
+
   if (a.isInProgress) return -1
   if (b.isInProgress) return 1
 
@@ -45,22 +45,21 @@ export const sortGamesDefault = (a, b) => {
   const isARegistering = !a.isInProgress && a.maxPlayers.toNumber() !== a.playerAddressesCount.toNumber()
   const isBRegistering = !b.isInProgress && b.maxPlayers.toNumber() !== b.playerAddressesCount.toNumber()
 
-  if (isARegistering && isBRegistering) return 0
-  if (isARegistering) return 1
-  if (isBRegistering) return -1
+  if (isARegistering && !isBRegistering) return 1
+  if (isBRegistering && !isARegistering) return -1
 
   // sorting game paused last
   if (a.isPaused && b.isPaused) return 0
   if (a.isPaused) return 1
   if (b.isPaused) return -1
 
-  if (a.playerAddressesCount && b.playerAddressesCount) return 0
-  if (a.playerAddressesCount) return -1
-  if (b.playerAddressesCount) return 1
+  if (a.playerAddressesCount === b.playerAddressesCount) return 0
+  if (a.playerAddressesCount < b.playerAddressesCount) return 1
+  if (a.playerAddressesCount > b.playerAddressesCount) return -1
 
-  if (a.remainingPlayersCount && b.remainingPlayersCount) return 0
-  if (a.remainingPlayersCount) return -1
-  if (b.remainingPlayersCount) return 1
+  if (a.remainingPlayersCount === b.remainingPlayersCount) return 0
+  if (a.remainingPlayersCount < b.remainingPlayersCount) return 1
+  if (a.remainingPlayersCount > b.remainingPlayersCount) return -1
 
   return 0
 }
@@ -70,17 +69,16 @@ export const sortGamesLaunching = (a, b) => {
   if (a.isPaused) return 1
   if (b.isPaused) return -1
 
+  if (a.userData.isPlaying) return 1
+  if (b.userData.isPlaying) return -1
+
   if (a.isInProgress && b.isInProgress) return 0
   if (a.isInProgress) return 1
   if (b.isInProgress) return -1
 
-  if (a.playerAddressesCount && b.playerAddressesCount) return 0
-  if (a.playerAddressesCount) return -1
-  if (b.playerAddressesCount) return 1
-
-  // if (a.remainingPlayersCount && b.remainingPlayersCount) return 0
-  // if (a.remainingPlayersCount) return -1
-  // if (b.remainingPlayersCount) return 1
+  if (a.playerAddressesCount === b.playerAddressesCount) return 0
+  if (a.playerAddressesCount < b.playerAddressesCount) return 1
+  if (a.playerAddressesCount > b.playerAddressesCount) return -1
 
   return 0
 }
