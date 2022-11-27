@@ -386,7 +386,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
         <FlexLayout>{children}</FlexLayout>
         {/* )} */}
 
-        {userDataLoaded && !chosenGamesMemoized.length && isMyGames && (
+        {!chosenGamesMemoized.length && isMyGames && (
           <FinishedTextContainer>
             <Text fontSize={['16px', null, '20px']} color="failure" pr="4px">
               {t("You haven't created any games yet")}
@@ -398,7 +398,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
             </Flex>
           </FinishedTextContainer>
         )}
-        {!userDataLoaded && (
+        {!chosenGamesMemoized.length && !userDataLoaded && (
           <Flex justifyContent="center">
             <Loading />
           </Flex>
