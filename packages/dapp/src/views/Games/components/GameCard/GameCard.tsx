@@ -61,6 +61,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     id,
     isPaused,
     isInProgress,
+    isRegistering,
     isDeleted,
     maxPlayers,
     remainingPlayersCount,
@@ -77,7 +78,16 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     creatorAmount,
     prizes,
     lastRoundWinners,
-    userData: { isCreator, isAdmin, isPlaying, nextFromRange, nextToRange, isCanVoteSplitPot, isInTimeRange },
+    userData: {
+      isCreator,
+      isAdmin,
+      isPlaying,
+      nextFromRange,
+      nextToRange,
+      isCanVoteSplitPot,
+      isInTimeRange,
+      isLoosing,
+    },
     // TODO GUIGUI USE playerData
     playerData: {
       playerAddress,
@@ -104,7 +114,6 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
 
   useEffect(() => {
     if (!encodedCron) return
-
     try {
       const interval = parser.parseExpression(encodedCron, { tz: 'Etc/UTC' })
       const transform = moment(interval.next().toString()).format('hh:mm A')
@@ -116,12 +125,10 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
 
   const isReady = game.prizepool !== undefined
 
-  const isRegistering = !isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber()
-
   const lastGamePrize = lastRoundWinners.find((winner) => winner.playerAddress === playerAddress)
   const isWonLastGames = !!lastGamePrize
-  const lastGameWonAmount = lastGamePrize ? lastGamePrize.amountWon : EthersBigNumber.from('0')
-  const lastGameRoundId = lastGamePrize ? lastGamePrize.roundId : EthersBigNumber.from('0')
+  const lastGameWonAmount = isWonLastGames ? lastGamePrize.amountWon : new BigNumber('0')
+  const lastGameRoundId = isWonLastGames ? lastGamePrize.roundId : new BigNumber('0')
 
   // TODO GUIGUI use RoundProgress to display a progressBar if necessary
   return (
@@ -184,6 +191,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           isCreator={isCreator}
           isAdmin={isAdmin}
           hasLost={hasLost}
+          isLoosing={isLoosing}
           hasPlayedRound={hasPlayedRound}
           isSplitOk={isSplitOk}
           account={account}

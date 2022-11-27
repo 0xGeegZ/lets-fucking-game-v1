@@ -64,6 +64,7 @@ export const gameBaseTransformer = (gameData, gamePlayers, gameCreatorAmounts, g
       treasuryFee: treasuryFee.toString(),
       treasuryAmount: treasuryAmount.toString(),
       isInProgress,
+      isRegistering: !isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber(),
       isPaused,
       isDeleted: false,
       address,
@@ -73,6 +74,7 @@ export const gameBaseTransformer = (gameData, gamePlayers, gameCreatorAmounts, g
       encodedCron: encodedCron.toString(),
       playerAddresses,
       prizes: [],
+      lastRoundWinners: [],
     }
   }
 }
@@ -176,6 +178,7 @@ export const gamePlayerDataTransformer = (gamesPlayerData, account) => {
         nextFromRange: fromRange.toString(),
         nextToRange: toRange.toString(),
         isCanVoteSplitPot: game.isInProgress && game.playerAddressesCount <= game.maxPlayers * 0.5,
+        isLoosing: moment().isAfter(moment(toRange)) && moment(fromRange).isSame(moment(), 'day'),
       },
     }
   }

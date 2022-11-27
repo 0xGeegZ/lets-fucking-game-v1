@@ -80,7 +80,7 @@ export interface SerializedGameUserData {
   nextToRange: string
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
-  // TODO add isLoosed
+  isLoosing: boolean
 }
 
 export interface DeserializedGameUserData {
@@ -91,7 +91,7 @@ export interface DeserializedGameUserData {
   nextToRange: string
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
-  // TODO add isLoosed ?
+  isLoosing: boolean
 }
 
 export interface SerializedGame {
@@ -101,7 +101,7 @@ export interface SerializedGame {
   roundId: number
   isPaused: boolean
   isInProgress: boolean
-  // TODO add isRegistering
+  isRegistering: boolean
   isDeleted: boolean
   maxPlayers: number
   playTimeRange: number
@@ -132,7 +132,7 @@ export interface DeserializedGame {
   roundId: BigNumber
   isPaused: boolean
   isInProgress: boolean
-  // TODO add isRegistering
+  isRegistering: boolean
   isDeleted: boolean
   maxPlayers: BigNumber
   playTimeRange: BigNumber

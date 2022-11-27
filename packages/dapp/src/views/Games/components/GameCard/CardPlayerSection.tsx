@@ -48,6 +48,7 @@ interface GameCardPlayerSectionProps {
   isCreator: boolean
   isAdmin: boolean
   hasLost: boolean
+  isLoosing: boolean
   hasPlayedRound: boolean
   isSplitOk: boolean
   account?: string
@@ -78,6 +79,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   isCreator,
   isAdmin,
   hasLost,
+  isLoosing,
   hasPlayedRound,
   isSplitOk,
   account,
@@ -182,7 +184,6 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
         <ConnectWalletButton mt="8px" width="100%" />
       ) : (
         <>
-          {/* {(hasLost || (!isInTimeRange && moment().isAfter(moment(nextToRange)))) && ( */}
           {hasLost && (
             <Flex justifyContent="center" mt="20px" mb="16px">
               <ErrorIcon width="16px" color="failure" style={{ verticalAlign: 'bottom' }} />
@@ -192,7 +193,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               <ErrorIcon width="16px" color="failure" style={{ verticalAlign: 'bottom' }} />
             </Flex>
           )}
-          {!hasPlayedRound && moment().isAfter(moment(nextToRange)) && moment(nextFromRange).isSame(moment(), 'day') && (
+          {!hasPlayedRound && isLoosing && (
             <Flex justifyContent="center" mt="20px">
               <ErrorIcon width="16px" color="failure" style={{ verticalAlign: 'bottom' }} />
               <Heading mr="4px" ml="4px" color="failure">
@@ -202,19 +203,13 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             </Flex>
           )}
 
-          {(isInProgress || !isRegistering) &&
-            !hasLost &&
-            !(
-              !hasPlayedRound &&
-              moment().isAfter(moment(nextToRange)) &&
-              moment(nextFromRange).isSame(moment(), 'day')
-            ) && (
-              <PlayButton
-                address={address}
-                isInTimeRange={isInTimeRange}
-                isDisabled={!isPlaying || isCreator || isAdmin || isPaused || hasPlayedRound}
-              />
-            )}
+          {(isInProgress || !isRegistering) && !hasLost && !(!hasPlayedRound && isLoosing) && (
+            <PlayButton
+              address={address}
+              isInTimeRange={isInTimeRange}
+              isDisabled={!isPlaying || isCreator || isAdmin || isPaused || hasPlayedRound}
+            />
+          )}
           {isRegistering && (
             <RegisterButton
               address={address}

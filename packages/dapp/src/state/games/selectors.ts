@@ -21,6 +21,7 @@ const deserializeGameUserData = (game: SerializedGame): DeserializedGameUserData
     nextToRange: game?.userData ? game.userData.nextToRange : '',
     isCanVoteSplitPot: game?.userData ? game.userData.isCanVoteSplitPot : false,
     isInTimeRange: game?.userData ? game.userData.isInTimeRange : false,
+    isLoosing: game?.userData ? game.userData.isLoosing : false,
   }
 }
 
@@ -66,6 +67,7 @@ const deserializeGame = (game: SerializedGame): DeserializedGame => {
     roundId,
     isPaused,
     isInProgress,
+    isRegistering,
     isDeleted,
     maxPlayers,
     playTimeRange,
@@ -92,6 +94,7 @@ const deserializeGame = (game: SerializedGame): DeserializedGame => {
     roundId: roundId ? new BigNumber(roundId) : BIG_ZERO,
     isPaused,
     isInProgress,
+    isRegistering,
     isDeleted,
     playTimeRange: playTimeRange ? new BigNumber(playTimeRange) : BIG_ZERO,
     maxPlayers: maxPlayers ? new BigNumber(maxPlayers) : BIG_ZERO,

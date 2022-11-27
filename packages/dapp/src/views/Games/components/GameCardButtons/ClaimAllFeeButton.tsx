@@ -19,7 +19,6 @@ const ClaimAllFeeButton: React.FC<React.PropsWithChildren<ClaimAllFeeButtonProps
   const { t } = useTranslation()
   const { chain } = useActiveWeb3React()
   const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
-  console.log('🚀 ~ file: ClaimAllFeeButton.tsx ~ line 22 ~ chainSymbol', chainSymbol)
 
   const { isPending, handleClaimAllFee } = useClaimAllFee(address)
 
