@@ -9,7 +9,6 @@ import { DeserializedGame } from 'state/types'
 import parser from 'cron-parser'
 import moment from 'moment'
 import BigNumber from 'bignumber.js'
-import { BigNumber as EthersBigNumber } from '@ethersproject/bignumber'
 import CardPlayerSection from './CardPlayerSection'
 import CardHeadingSection from './CardHeadingSection'
 
@@ -142,6 +141,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
         <CardHeadingSection
           id={id}
           name={name}
+          versionId={versionId}
           chainId={chainId}
           prizepool={prizepool}
           multiplier={registrationAmount.toNumber() !== 0 ? prizepool.dividedBy(registrationAmount) : null}
@@ -186,6 +186,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           registrationAmount={registrationAmount}
           creatorAmount={creatorAmount}
           treasuryAmount={treasuryAmount}
+          roundCount={roundCount}
           isReady={isReady}
           isPaused={isPaused}
           isCreator={isCreator}
@@ -206,6 +207,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
             bscScanAddress={getBlockExploreLink(address, 'address', chainId)}
             treasuryFee={treasuryFee}
             creatorFee={creatorFee}
+            creator={getBlockExploreLink(creator, 'address', chainId)}
           />
         )}
       </ExpandingWrapper>

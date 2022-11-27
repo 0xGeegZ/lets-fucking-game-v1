@@ -1,5 +1,5 @@
 import { useTranslation } from '@pancakeswap/localization'
-import { Flex, Heading, Skeleton, Text, ErrorIcon, Button } from '@pancakeswap/uikit'
+import { Flex, Heading, Skeleton, Text, ErrorIcon, Button, Link } from '@pancakeswap/uikit'
 
 import BigNumber from 'bignumber.js'
 
@@ -41,6 +41,7 @@ interface GameCardPlayerSectionProps {
   isWonLastGames: boolean
   lastGameWonAmount: BigNumber
   lastGameRoundId: BigNumber
+  roundCount: BigNumber
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
   isReady: boolean
@@ -72,6 +73,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   isWonLastGames,
   lastGameWonAmount,
   lastGameRoundId,
+  roundCount,
   isCanVoteSplitPot,
   isInTimeRange,
   isReady,
@@ -121,8 +123,25 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
           </Flex>
         </>
       )}
-
-      {isInProgress && isPlaying && false && (
+      {isInProgress && isPlaying && !hasLost && (
+        <>
+          <Flex justifyContent="space-between">
+            <Heading mr="4px">{`${t('Round')}:`}</Heading>
+            {isReady ? (
+              <Text style={{ display: 'flex', alignItems: 'center' }}>
+                <Text bold style={{ textAlign: 'right' }}>
+                  <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                    {roundCount.toNumber()}
+                  </Text>
+                </Text>
+              </Text>
+            ) : (
+              <Skeleton width="100%" height={18} mb="4px" />
+            )}
+          </Flex>
+        </>
+      )}
+      {isInProgress && isPlaying && isCanVoteSplitPot && (
         <Flex justifyContent="space-between">
           <Heading mr="4px">{`${t('Split pot')}:`}</Heading>
           {isReady ? (
@@ -142,7 +161,6 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
           )}
         </Flex>
       )}
-
       {isInProgress && isPlaying && !hasLost && (
         <>
           <Flex justifyContent="space-between">
@@ -178,8 +196,6 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
           </Flex>
         </>
       )}
-
-      {/* TODO ADD CONDITION IF ACCOUNT IS GAME CREATOR. If true, display play and pause button */}
       {!account ? (
         <ConnectWalletButton mt="8px" width="100%" />
       ) : (
@@ -236,12 +252,20 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
         </>
       )}
 
-      {/* TODO Remove after integration phase */}
-      {/* <Link href="/games/1" passHref>
-        <Button as="a" id="showGameDetails" mt="8px" width="100%">
-          {t('Show Game Details')}
-        </Button>
-      </Link> */}
+      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+      {/* <Link href="" passHref style={{ width: '100%' }}> */}
+      <Button
+        width="100%"
+        as="a"
+        id="showGameDetails"
+        disabled
+        variant="tertiary"
+        mt="16px"
+        decorator={{ text: 'Soon' }}
+      >
+        {t('Show Game Details')}
+      </Button>
+      {/* </Link> */}
     </Container>
   )
 }

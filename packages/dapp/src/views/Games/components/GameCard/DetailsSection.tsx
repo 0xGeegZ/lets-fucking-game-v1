@@ -9,6 +9,7 @@ export interface ExpandableSectionProps {
   bscScanAddress?: string
   treasuryFee: BigNumber
   creatorFee: BigNumber
+  creator: string
   isReady: boolean
 }
 
@@ -36,6 +37,7 @@ const DetailsSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> 
   isReady,
   treasuryFee,
   creatorFee,
+  creator,
 }) => {
   const { t } = useTranslation()
 
@@ -60,6 +62,14 @@ const DetailsSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> 
             <Text color="textSubtle" fontSize="12px">
               {t(`Creator fee : ${creatorFee.toNumber() / 100}%`)}
             </Text>
+          ) : (
+            <Skeleton ml="4px" width={42} height={28} />
+          )}
+        </Flex>
+
+        <Flex style={{ paddingTop: 10 }}>
+          {isReady ? (
+            <StyledLinkExternal href={creator}>{t('Creator')}</StyledLinkExternal>
           ) : (
             <Skeleton ml="4px" width={42} height={28} />
           )}

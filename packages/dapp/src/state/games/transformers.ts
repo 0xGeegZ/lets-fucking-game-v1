@@ -51,7 +51,7 @@ export const gameBaseTransformer = (gameData, gamePlayers, gameCreatorAmounts, g
     return {
       id: id.toNumber(),
       name: parseStringOrBytes32('', name, 'Game'),
-      versionId: versionId.toNumber(),
+      versionId: versionId?.toNumber(),
       roundId: roundId.toNumber(),
       maxPlayers: maxPlayers.toNumber(),
       remainingPlayersCount: remainingPlayersCount.toNumber(),
