@@ -18,7 +18,7 @@ function parseStringOrBytes32(str: string | undefined, bytes32: string | undefin
     : defaultValue
 }
 
-export const gameBaseTransformer = (gameData, gamePlayers) => {
+export const gameBaseTransformer = (gameData, gamePlayers, gameCreatorAmounts, gameTreasuryAmounts) => {
   return (game, index): SerializedGame => {
     const { deployedAddress: address, gameCreationAmount } = game
     const [
@@ -44,6 +44,8 @@ export const gameBaseTransformer = (gameData, gamePlayers) => {
     ] = gameData[index]
 
     const [[playerAddresses]] = gamePlayers[index]
+    const [[creatorAmount]] = gameCreatorAmounts[index]
+    const [[treasuryAmount]] = gameTreasuryAmounts[index]
 
     return {
       id: id.toNumber(),
@@ -56,7 +58,9 @@ export const gameBaseTransformer = (gameData, gamePlayers) => {
       registrationAmount: formatEther(`${registrationAmount}`),
       gameCreationAmount: formatEther(`${gameCreationAmount}`),
       creatorFee: creatorFee.toString(),
+      creatorAmount: creatorAmount.toString(),
       treasuryFee: treasuryFee.toString(),
+      treasuryAmount: treasuryAmount.toString(),
       isInProgress,
       isPaused,
       isDeleted: false,

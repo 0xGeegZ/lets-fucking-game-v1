@@ -36,6 +36,8 @@ interface GameCardPlayerSectionProps {
   remainingPlayersCount: BigNumber
   playerAddressesCount: BigNumber
   encodedCron: string
+  creatorAmount: string
+  treasuryAmount: string
   isPlaying: boolean
   isWonLastGames: boolean
   isCanVoteSplitPot: boolean
@@ -62,6 +64,8 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   encodedCron,
   remainingPlayersCount,
   playerAddressesCount,
+  creatorAmount,
+  treasuryAmount,
   isPlaying,
   isWonLastGames,
   isCanVoteSplitPot,
@@ -221,9 +225,15 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               {!isPaused && <PauseButton address={address} isInProgress={isInProgress} />}
             </>
           )}
-          {isPaused && isCreator && isAdmin && <ClaimAllFeeButton address={address} />}
-          {isPaused && isCreator && !isAdmin && <ClaimCreatorFeeButton address={address} />}
-          {isPaused && isAdmin && !isCreator && <ClaimTreasuryFeeButton address={address} />}
+          {isCreator && isAdmin && !!+treasuryAmount && !!+creatorAmount && (
+            <ClaimAllFeeButton address={address} treasuryAmount={treasuryAmount} creatorAmount={creatorAmount} />
+          )}
+          {isCreator && !isAdmin && !!+creatorAmount && (
+            <ClaimCreatorFeeButton address={address} creatorAmount={creatorAmount} />
+          )}
+          {isAdmin && !isCreator && !!+treasuryAmount && (
+            <ClaimTreasuryFeeButton address={address} treasuryAmount={treasuryAmount} />
+          )}
         </>
       )}
 

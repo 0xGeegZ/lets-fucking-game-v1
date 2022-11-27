@@ -69,7 +69,9 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     encodedCron,
     creator,
     treasuryFee,
+    treasuryAmount,
     creatorFee,
+    creatorAmount,
     prizes,
     userData: {
       isCreator,
@@ -174,6 +176,8 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           isInTimeRange={isInTimeRange}
           gameCreationAmount={gameCreationAmount}
           registrationAmount={registrationAmount}
+          creatorAmount={creatorAmount}
+          treasuryAmount={treasuryAmount}
           isReady={isReady}
           isPaused={isPaused}
           isCreator={isCreator}

@@ -105,7 +105,9 @@ export interface SerializedGame {
   creator: string
   admin: string
   treasuryFee: string
+  treasuryAmount: string
   creatorFee: string
+  creatorAmount: string
   playerAddresses: string[]
   prizes: SerializedPrizeData[]
   userData?: SerializedGameUserData
@@ -131,7 +133,9 @@ export interface DeserializedGame {
   creator: string
   admin: string
   treasuryFee: BigNumber
+  treasuryAmount: string
   creatorFee: BigNumber
+  creatorAmount: string
   playerAddresses: string[]
   prizes: DeserializedPrizeData[]
   userData?: DeserializedGameUserData
