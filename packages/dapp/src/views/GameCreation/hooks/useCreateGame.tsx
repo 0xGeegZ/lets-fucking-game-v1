@@ -51,9 +51,10 @@ export const useCreateGame = (game) => {
   const prizepool = parsedRegistrationAmount ? parsedRegistrationAmount * maxPlayers : freeGamePrizepoolAmount
 
   const createPrize = (index, totalWinners) => {
-    const parsedPrizepool = parseEther(`${prizepool}`)
-    const parsedTotalWinners = parseEther(`${totalWinners}`)
-    const amount = parsedPrizepool.div(parsedTotalWinners)
+    // const parsedPrizepool = parseEther(`${prizepool}`)
+    // const parsedTotalWinners = parseEther(`${totalWinners}`)
+    // const amount = parsedPrizepool.div(parsedTotalWinners)
+    const amount = parseEther(`${prizepool / totalWinners}`)
 
     return {
       position: index,

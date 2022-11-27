@@ -416,6 +416,12 @@ const _abi = [
         name: "emmiter",
         type: "address",
       },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
     ],
     name: "TriggeredDailyCheckpoint",
     type: "event",
@@ -534,6 +540,11 @@ const _abi = [
           {
             internalType: "uint256",
             name: "playerAddressesCount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "remainingPlayersCount",
             type: "uint256",
           },
           {

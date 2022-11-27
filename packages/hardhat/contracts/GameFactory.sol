@@ -238,11 +238,9 @@ contract GameFactory is Pausable, Ownable, ReentrancyGuard {
      * @param _authorizedAmount the authorized amount to get
      * @return gameAuthorisedAmount the authorized amount
      */
-    function getAuthorizedAmount(uint256 _authorizedAmount)
-        external
-        view
-        returns (AuthorizedAmount memory gameAuthorisedAmount)
-    {
+    function getAuthorizedAmount(
+        uint256 _authorizedAmount
+    ) external view returns (AuthorizedAmount memory gameAuthorisedAmount) {
         return usedAuthorizedAmounts[_authorizedAmount];
     }
 

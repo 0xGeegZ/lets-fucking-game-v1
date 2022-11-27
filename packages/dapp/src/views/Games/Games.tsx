@@ -160,6 +160,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [myPlayingGamesOnly, setMyPlayingGamesOnly] = useState(!isActive)
 
   const activeGames = games
+    // .filter((game) => !game.isPaused && !game.isDeleted)
     .filter((game) => (!isMyGames ? !game.isPaused && !game.isDeleted : !game.isDeleted))
     .sort(sortGamesDefault)
 
@@ -169,9 +170,10 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   const playingOnlyGames = games.filter((game) => game.userData && game.userData.isPlaying)
 
-  const mineOnlyGames = games.filter((game) => game.userData && game.userData.isCreator)
+  const mineOnlyGames = games.filter((game) => game.userData && game.userData.isCreator && !game.isPaused)
 
   const deletedGames = games.filter((game) => game.isDeleted || game.isPaused)
+
   const myDeletedGames = games.filter(
     (game) => game.isDeleted || (game.isPaused && game.userData && game.userData.isCreator),
   )

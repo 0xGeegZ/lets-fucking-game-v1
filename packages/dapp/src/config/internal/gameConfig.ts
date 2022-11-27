@@ -95,8 +95,7 @@ export const gameConfig: Record<string, GameConfig | null> = {
   },
   '97': {
     ...defaultGameConfig,
-    GAME_CREATION_AMOUNT: parseEther('0.1'),
-    // GAME_CREATION_AMOUNT: parseEther('0.2'),
+    GAME_CREATION_AMOUNT: parseEther('0.01'),
     PLAYERS_DEFAULT: 5,
   },
   '5': {

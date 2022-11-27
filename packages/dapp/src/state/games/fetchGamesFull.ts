@@ -16,12 +16,11 @@ const fetchGamesFull = async (chainId: number): Promise<SerializedGame[]> => {
   const gameFactoryContract: GameFactory = getGameFactoryV1Contract(chainId)
   const gamesToFetch: GameFactory.GameStructOutput[] = await gameFactoryContract.getDeployedGames()
 
-  const [gameData, gameRemainingPlayersCount, gamePlayers] = await Promise.all([
+  const [gameData, gamePlayers] = await Promise.all([
     fetchPublicGamesData(gamesToFetch, chainId),
-    fetchGamesRemainingPlayersCount(gamesToFetch, chainId),
     fetchGamesPlayersAddresses(gamesToFetch, chainId),
   ])
-  const transformedGames = gamesToFetch.map(gameBaseTransformer(gameData, gamePlayers, gameRemainingPlayersCount))
+  const transformedGames = gamesToFetch.map(gameBaseTransformer(gameData, gamePlayers))
   // TODO GUIGUI HANDLE gamePlayersData
   const [gamePrizes /* , gamePlayersData */] = await Promise.all([
     fetchGamesPrizes(transformedGames, chainId),
