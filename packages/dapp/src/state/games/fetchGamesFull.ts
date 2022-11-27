@@ -1,7 +1,7 @@
 import { getGameFactoryV1Contract } from 'utils/contractHelpers'
 import { GameFactory } from 'config/types/typechain'
 
-import { gameBaseTransformer, gameExtendedTransformer } from './transformers'
+import { gameBaseTransformer, gameFullTransformer } from './transformers'
 
 import {
   fetchPublicGamesData,
@@ -32,7 +32,7 @@ const fetchGamesFull = async (chainId: number): Promise<SerializedGame[]> => {
     fetchGamesPrizes(transformedGames, chainId),
     // fetchGamesPlayersData(transformedGames, chainId),
   ])
-  const completeGames = transformedGames.map(gameExtendedTransformer(gamePrizes /* , gamePlayersData */))
+  const completeGames = transformedGames.map(gameFullTransformer(gamePrizes /* , gamePlayersData */))
   return completeGames
 }
 

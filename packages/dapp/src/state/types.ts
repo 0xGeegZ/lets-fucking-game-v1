@@ -34,6 +34,22 @@ export interface DeserializedPrizeData {
   position: BigNumber
 }
 
+export interface SerializedWinnerData {
+  roundId: number
+  playerAddress: string
+  amountWon: string
+  position: number
+  prizeClaimed: boolean
+}
+
+export interface DeserializedWinnerData {
+  roundId: BigNumber
+  playerAddress: string
+  amountWon: BigNumber
+  position: BigNumber
+  prizeClaimed: boolean
+}
+
 export interface SerializedGamePlayerData {
   playerAddress: string
   roundRangeLowerLimit: number
@@ -60,27 +76,19 @@ export interface SerializedGameUserData {
   isCreator: boolean
   isAdmin: boolean
   isPlaying: boolean
-  wonAmount: string
-  // TODO delete this var ??
   nextFromRange: string
-  // TODO delete this var ??
   nextToRange: string
-  isWonLastGames: boolean
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
-  // TODO add isLoosed ?
+  // TODO add isLoosed
 }
 
 export interface DeserializedGameUserData {
   isCreator: boolean
   isAdmin: boolean
   isPlaying: boolean
-  wonAmount: BigNumber
-  // TODO delete this var ??
   nextFromRange: string
-  // TODO delete this var ??
   nextToRange: string
-  isWonLastGames: boolean
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
   // TODO add isLoosed ?
@@ -93,6 +101,7 @@ export interface SerializedGame {
   roundId: number
   isPaused: boolean
   isInProgress: boolean
+  // TODO add isRegistering
   isDeleted: boolean
   maxPlayers: number
   playTimeRange: number
@@ -111,6 +120,7 @@ export interface SerializedGame {
   creatorAmount: string
   playerAddresses: string[]
   prizes: SerializedPrizeData[]
+  lastRoundWinners: SerializedWinnerData[]
   userData?: SerializedGameUserData
   playerData?: SerializedGamePlayerData
 }
@@ -122,6 +132,7 @@ export interface DeserializedGame {
   roundId: BigNumber
   isPaused: boolean
   isInProgress: boolean
+  // TODO add isRegistering
   isDeleted: boolean
   maxPlayers: BigNumber
   playTimeRange: BigNumber
@@ -140,6 +151,7 @@ export interface DeserializedGame {
   creatorAmount: string
   playerAddresses: string[]
   prizes: DeserializedPrizeData[]
+  lastRoundWinners: DeserializedWinnerData[]
   userData?: DeserializedGameUserData
   playerData?: DeserializedGamePlayerData
 }

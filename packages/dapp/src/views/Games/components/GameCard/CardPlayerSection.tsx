@@ -30,7 +30,6 @@ interface GameCardPlayerSectionProps {
   gameCreationAmount: BigNumber
   isInProgress: boolean
   isRegistering: boolean
-  wonAmount: BigNumber
   nextFromRange: string
   nextToRange: string
   remainingPlayersCount: BigNumber
@@ -40,6 +39,8 @@ interface GameCardPlayerSectionProps {
   treasuryAmount: string
   isPlaying: boolean
   isWonLastGames: boolean
+  lastGameWonAmount: BigNumber
+  lastGameRoundId: BigNumber
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
   isReady: boolean
@@ -48,6 +49,7 @@ interface GameCardPlayerSectionProps {
   isAdmin: boolean
   hasLost: boolean
   hasPlayedRound: boolean
+  isSplitOk: boolean
   account?: string
 }
 
@@ -58,7 +60,6 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   gameCreationAmount,
   isInProgress,
   isRegistering,
-  wonAmount,
   nextFromRange,
   nextToRange,
   encodedCron,
@@ -68,6 +69,8 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   treasuryAmount,
   isPlaying,
   isWonLastGames,
+  lastGameWonAmount,
+  lastGameRoundId,
   isCanVoteSplitPot,
   isInTimeRange,
   isReady,
@@ -76,6 +79,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   isAdmin,
   hasLost,
   hasPlayedRound,
+  isSplitOk,
   account,
 }) => {
   const {
@@ -96,7 +100,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             <Text bold style={{ display: 'flex', alignItems: 'center' }}>
               {isReady ? (
                 <Text bold color="success" fontSize={16}>
-                  {wonAmount.toNumber()} {chainSymbol}
+                  {lastGameWonAmount.toNumber()} {chainSymbol}
                 </Text>
               ) : (
                 <Skeleton width={80} height={18} mb="4px" />
@@ -107,7 +111,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             <Heading mr="4px" />
             <Text bold style={{ display: 'flex', alignItems: 'center' }}>
               {isReady ? (
-                <ClaimButton address={address} roundId={roundId} />
+                <ClaimButton address={address} roundId={lastGameRoundId} />
               ) : (
                 <Skeleton width={80} height={36} mb="4px" />
               )}
@@ -218,7 +222,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               isDisabled={isPlaying || isCreator || isAdmin || isPaused}
             />
           )}
-          {isCanVoteSplitPot && <VoteSplitButton address={address} />}
+          {isCanVoteSplitPot && <VoteSplitButton address={address} isSplitOk={isSplitOk} />}
           {(isCreator || isAdmin) && !isInProgress && isRegistering && (
             <>
               {isPaused && <UnpauseButton address={address} isInProgress={isInProgress} />}

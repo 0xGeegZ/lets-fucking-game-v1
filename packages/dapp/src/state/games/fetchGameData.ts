@@ -117,3 +117,23 @@ export const fetchGamesPrizes = async (games: any[], chainId = ChainId.BSC): Pro
 
   return chunk(gameMultiCallResult, chunkSize)
 }
+
+export const fetchGamesWinners = async (games: any[], chainId = ChainId.BSC): Promise<any[]> => {
+  const gameCalls = games.map((game) => {
+    const roundId = game.roundId ? game.roundId - 1 : game.roundId
+    return {
+      address: game.address,
+      name: 'getWinners',
+      params: [roundId],
+    }
+  })
+  const chunkSize = gameCalls.length / games.length
+
+  const gameMultiCallResult = await multicallv2({
+    abi: internal[chainId || ChainId.BSC].GameV1.abi,
+    calls: gameCalls,
+    chainId,
+  })
+
+  return chunk(gameMultiCallResult, chunkSize)
+}

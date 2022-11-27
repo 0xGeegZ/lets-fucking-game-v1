@@ -8,6 +8,8 @@ import { getBlockExploreLink } from 'utils'
 import { DeserializedGame } from 'state/types'
 import parser from 'cron-parser'
 import moment from 'moment'
+import BigNumber from 'bignumber.js'
+import { BigNumber as EthersBigNumber } from '@ethersproject/bignumber'
 import CardPlayerSection from './CardPlayerSection'
 import CardHeadingSection from './CardHeadingSection'
 
@@ -54,6 +56,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
 
   const {
     name,
+    versionId,
     roundId,
     id,
     isPaused,
@@ -73,17 +76,8 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     creatorFee,
     creatorAmount,
     prizes,
-    userData: {
-      isCreator,
-      isAdmin,
-      isPlaying,
-      wonAmount,
-      nextFromRange,
-      nextToRange,
-      isWonLastGames,
-      isCanVoteSplitPot,
-      isInTimeRange,
-    },
+    lastRoundWinners,
+    userData: { isCreator, isAdmin, isPlaying, nextFromRange, nextToRange, isCanVoteSplitPot, isInTimeRange },
     // TODO GUIGUI USE playerData
     playerData: {
       playerAddress,
@@ -120,10 +114,16 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     }
   }, [encodedCron, timezone])
 
-  // TODO GUIGUI isReady is when userData are loaded ??
   const isReady = game.prizepool !== undefined
+
   const isRegistering = !isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber()
-  // TODO GUIGUI use RoundProgress to display a progressBar if i
+
+  const lastGamePrize = lastRoundWinners.find((winner) => winner.playerAddress === playerAddress)
+  const isWonLastGames = !!lastGamePrize
+  const lastGameWonAmount = lastGamePrize ? lastGamePrize.amountWon : EthersBigNumber.from('0')
+  const lastGameRoundId = lastGamePrize ? lastGamePrize.roundId : EthersBigNumber.from('0')
+
+  // TODO GUIGUI use RoundProgress to display a progressBar if necessary
   return (
     <StyledCard
       isActive={!isDeleted}
@@ -164,7 +164,6 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           roundId={roundId}
           isInProgress={isInProgress}
           isRegistering={isRegistering}
-          wonAmount={wonAmount}
           nextFromRange={nextFromRange}
           nextToRange={nextToRange}
           encodedCron={encodedCron}
@@ -172,6 +171,8 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           playerAddressesCount={playerAddressesCount}
           isPlaying={isPlaying}
           isWonLastGames={isWonLastGames}
+          lastGameWonAmount={lastGameWonAmount}
+          lastGameRoundId={lastGameRoundId}
           isCanVoteSplitPot={isCanVoteSplitPot}
           isInTimeRange={isInTimeRange}
           gameCreationAmount={gameCreationAmount}
@@ -184,6 +185,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           isAdmin={isAdmin}
           hasLost={hasLost}
           hasPlayedRound={hasPlayedRound}
+          isSplitOk={isSplitOk}
           account={account}
         />
       </GameCardInnerContainer>

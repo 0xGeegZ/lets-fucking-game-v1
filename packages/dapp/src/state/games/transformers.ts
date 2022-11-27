@@ -4,7 +4,7 @@ import { parseBytes32String } from '@ethersproject/strings'
 import { arrayify } from '@ethersproject/bytes'
 import { ZERO_ADDRESS } from 'config/constants'
 import moment from 'moment'
-import { SerializedGame, SerializedPrizeData } from '../types'
+import { SerializedGame, SerializedPrizeData, SerializedWinnerData } from '../types'
 
 // parse a name or symbol from a token response
 const BYTES32_REGEX = /^0x[a-fA-F0-9]{64}$/
@@ -77,7 +77,40 @@ export const gameBaseTransformer = (gameData, gamePlayers, gameCreatorAmounts, g
   }
 }
 
-export const gameExtendedTransformer = (gamePrizes /* , gamePlayersData */) => {
+export const gameExtendedTransformer = (gamePrizes, gameWinners) => {
+  return (game, index): SerializedGame => {
+    const [[rawPrizes]] = gamePrizes[index]
+    const prizes: SerializedPrizeData[] = rawPrizes.map((prize) => {
+      const { amount, position } = prize
+      return {
+        amount: formatEther(`${amount}`),
+        position: position.toNumber(),
+      }
+    })
+    const prizepool = prizes.reduce((acc, prize) => acc + +prize.amount, 0)
+    const [[rawWinners]] = gameWinners[index]
+
+    const winners: SerializedWinnerData[] = rawWinners.map((winner) => {
+      const { roundId, playerAddress, amountWon, position, prizeClaimed } = winner
+      return {
+        roundId: roundId.toNumber(),
+        playerAddress: playerAddress.toString(),
+        amountWon: formatEther(`${amountWon}`),
+        position: position.toNumber(),
+        prizeClaimed,
+      }
+    })
+
+    return {
+      ...game,
+      prizepool: `${prizepool}`,
+      prizes,
+      lastRoundWinners: winners,
+    }
+  }
+}
+
+export const gameFullTransformer = (gamePrizes /* , gamePlayersData */) => {
   return (game, index): SerializedGame => {
     const [[rawPrizes]] = gamePrizes[index]
     const prizes: SerializedPrizeData[] = rawPrizes.map((prize) => {
@@ -143,9 +176,6 @@ export const gamePlayerDataTransformer = (gamesPlayerData, account) => {
         nextFromRange: fromRange.toString(),
         nextToRange: toRange.toString(),
         isCanVoteSplitPot: game.isInProgress && game.playerAddressesCount <= game.maxPlayers * 0.5,
-        // TODO GUIGUI NEXT HANDLE WON CLAIM
-        isWonLastGames: false,
-        wonAmount: '0',
       },
     }
   }

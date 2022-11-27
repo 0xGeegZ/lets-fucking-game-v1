@@ -8,6 +8,7 @@ import {
   DeserializedGame,
   DeserializedGameUserData,
   DeserializedPrizeData,
+  DeserializedWinnerData,
   DeserializedGamePlayerData,
 } from '../types'
 
@@ -16,10 +17,8 @@ const deserializeGameUserData = (game: SerializedGame): DeserializedGameUserData
     isPlaying: game?.userData ? game.userData.isPlaying : false,
     isCreator: game?.userData ? game.userData.isCreator : false,
     isAdmin: game?.userData ? game.userData.isAdmin : false,
-    wonAmount: game?.userData ? new BigNumber(game.userData.wonAmount) : BIG_ZERO,
     nextFromRange: game?.userData ? game.userData.nextFromRange : '',
     nextToRange: game?.userData ? game.userData.nextToRange : '',
-    isWonLastGames: game?.userData ? game.userData.isWonLastGames : false,
     isCanVoteSplitPot: game?.userData ? game.userData.isCanVoteSplitPot : false,
     isInTimeRange: game?.userData ? game.userData.isInTimeRange : false,
   }
@@ -43,6 +42,18 @@ const deserializeGamePrize = (game: SerializedGame): DeserializedPrizeData[] => 
     return {
       amount: prize?.amount ? new BigNumber(prize.amount) : BIG_ZERO,
       position: prize?.position ? new BigNumber(prize.position) : BIG_ZERO,
+    }
+  })
+}
+
+const deserializeGameWinner = (game: SerializedGame): DeserializedWinnerData[] => {
+  return game?.lastRoundWinners?.map((winner) => {
+    return {
+      roundId: winner?.roundId ? new BigNumber(winner.roundId) : BIG_ZERO,
+      playerAddress: winner?.playerAddress ? winner.playerAddress : '',
+      amountWon: winner?.amountWon ? new BigNumber(winner.amountWon) : BIG_ZERO,
+      position: winner?.position ? new BigNumber(winner.position) : BIG_ZERO,
+      prizeClaimed: winner?.prizeClaimed ? winner.prizeClaimed : false,
     }
   })
 }
@@ -101,6 +112,7 @@ const deserializeGame = (game: SerializedGame): DeserializedGame => {
     creatorAmount,
     playerAddresses,
     prizes: deserializeGamePrize(game),
+    lastRoundWinners: deserializeGameWinner(game),
     userData: deserializeGameUserData(game),
     playerData: deserializeGamePlayerData(game),
   }

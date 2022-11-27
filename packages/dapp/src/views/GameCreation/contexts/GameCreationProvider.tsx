@@ -7,7 +7,7 @@ import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { defaultGameConfig } from 'config/internal/gameConfig'
 import { useGameConfig } from 'hooks/useGameConfig'
 
-import fetchGamesFull from 'state/games/fetchGamesFull'
+import fetchGames from 'state/games/fetchGames'
 
 import { Actions, BNB, ContextType, NFT, State } from 'views/GameCreation/types'
 
@@ -104,7 +104,7 @@ const GameCreationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
   useEffect(() => {
     const loadGames = async () => {
       // TODO create custom hook
-      const games = await fetchGamesFull(chainId)
+      const games = await fetchGames(chainId)
       const usedAmounts = games
         .map((game) => {
           return Number(game.registrationAmount)
