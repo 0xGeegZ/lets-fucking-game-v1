@@ -26,6 +26,7 @@ const fetchGamesFull = async (chainId: number): Promise<SerializedGame[]> => {
   const transformedGames = gamesToFetch.map(
     gameBaseTransformer(gameData, gamePlayers, gameCreatorAmounts, gameTreasuryAmounts),
   )
+
   // TODO GUIGUI HANDLE gamePlayersData
   const [gamePrizes /* , gamePlayersData */] = await Promise.all([
     fetchGamesPrizes(transformedGames, chainId),

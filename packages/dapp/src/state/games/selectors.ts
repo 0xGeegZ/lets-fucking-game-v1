@@ -51,6 +51,7 @@ const deserializeGame = (game: SerializedGame): DeserializedGame => {
   const {
     id,
     name,
+    versionId,
     roundId,
     isPaused,
     isInProgress,
@@ -76,6 +77,7 @@ const deserializeGame = (game: SerializedGame): DeserializedGame => {
   return {
     id: id ? new BigNumber(id) : BIG_ZERO,
     name,
+    versionId: versionId ? new BigNumber(versionId) : BIG_ZERO,
     roundId: roundId ? new BigNumber(roundId) : BIG_ZERO,
     isPaused,
     isInProgress,

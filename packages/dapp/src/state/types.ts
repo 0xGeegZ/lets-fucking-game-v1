@@ -89,6 +89,7 @@ export interface DeserializedGameUserData {
 export interface SerializedGame {
   id: number
   name: string
+  versionId: number
   roundId: number
   isPaused: boolean
   isInProgress: boolean
@@ -117,6 +118,7 @@ export interface SerializedGame {
 export interface DeserializedGame {
   id: BigNumber
   name: string
+  versionId: BigNumber
   roundId: BigNumber
   isPaused: boolean
   isInProgress: boolean

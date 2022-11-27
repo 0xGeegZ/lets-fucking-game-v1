@@ -83,6 +83,7 @@ interface GameV1Interface {
 
     struct GameData {
         uint256 id;
+        uint256 versionId;
         uint256 roundId;
         bytes32 name;
         uint256 playerAddressesCount;

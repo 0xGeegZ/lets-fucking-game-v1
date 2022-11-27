@@ -628,6 +628,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         return
             GameData({
                 id: id,
+                versionId: version,
                 roundId: roundId,
                 name: name,
                 playerAddressesCount: playerAddresses.length,
