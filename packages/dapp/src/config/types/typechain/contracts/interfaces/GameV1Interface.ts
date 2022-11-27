@@ -56,6 +56,7 @@ export declare namespace GameV1Interface {
     roundId: PromiseOrValue<BigNumberish>;
     name: PromiseOrValue<BytesLike>;
     playerAddressesCount: PromiseOrValue<BigNumberish>;
+    remainingPlayersCount: PromiseOrValue<BigNumberish>;
     maxPlayers: PromiseOrValue<BigNumberish>;
     registrationAmount: PromiseOrValue<BigNumberish>;
     playTimeRange: PromiseOrValue<BigNumberish>;
@@ -78,6 +79,7 @@ export declare namespace GameV1Interface {
     BigNumber,
     BigNumber,
     BigNumber,
+    BigNumber,
     boolean,
     boolean,
     string,
@@ -88,6 +90,7 @@ export declare namespace GameV1Interface {
     roundId: BigNumber;
     name: string;
     playerAddressesCount: BigNumber;
+    remainingPlayersCount: BigNumber;
     maxPlayers: BigNumber;
     registrationAmount: BigNumber;
     playTimeRange: BigNumber;
@@ -495,7 +498,7 @@ export interface GameV1InterfaceInterface extends utils.Interface {
     "StartedGame(uint256,uint256)": EventFragment;
     "TreasuryFeeClaimed(uint256)": EventFragment;
     "TreasuryFeeClaimedByFactory(uint256)": EventFragment;
-    "TriggeredDailyCheckpoint(uint256,address)": EventFragment;
+    "TriggeredDailyCheckpoint(uint256,address,uint256)": EventFragment;
     "VoteToSplitPot(uint256,address)": EventFragment;
   };
 
@@ -752,9 +755,10 @@ export type TreasuryFeeClaimedByFactoryEventFilter =
 export interface TriggeredDailyCheckpointEventObject {
   roundId: BigNumber;
   emmiter: string;
+  timestamp: BigNumber;
 }
 export type TriggeredDailyCheckpointEvent = TypedEvent<
-  [BigNumber, string],
+  [BigNumber, string, BigNumber],
   TriggeredDailyCheckpointEventObject
 >;
 
@@ -1358,13 +1362,15 @@ export interface GameV1Interface extends BaseContract {
       amount?: null
     ): TreasuryFeeClaimedByFactoryEventFilter;
 
-    "TriggeredDailyCheckpoint(uint256,address)"(
+    "TriggeredDailyCheckpoint(uint256,address,uint256)"(
       roundId?: null,
-      emmiter?: null
+      emmiter?: null,
+      timestamp?: null
     ): TriggeredDailyCheckpointEventFilter;
     TriggeredDailyCheckpoint(
       roundId?: null,
-      emmiter?: null
+      emmiter?: null,
+      timestamp?: null
     ): TriggeredDailyCheckpointEventFilter;
 
     "VoteToSplitPot(uint256,address)"(

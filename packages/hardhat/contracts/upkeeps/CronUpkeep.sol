@@ -50,6 +50,7 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
 
     error CallFailed(uint256 id, string reason);
     error CronJobIDNotFound(uint256 id);
+    error DontNeedPerformUpkeep();
     error ExceedsMaxJobs();
     error InvalidHandler();
     error TickInFuture();
@@ -94,9 +95,8 @@ contract CronUpkeep is KeeperCompatibleInterface, KeeperBase, ConfirmedOwner, Pa
         validate(id, tickTime, target, handler);
         s_lastRuns[id] = block.timestamp;
         (bool success, bytes memory payload) = target.call(handler);
-        if (!success) {
-            revert CallFailed(id, getRevertMsg(payload));
-        }
+
+        if (!success) revert CallFailed(id, getRevertMsg(payload));
         emit CronJobExecuted(id, block.timestamp);
     }
 

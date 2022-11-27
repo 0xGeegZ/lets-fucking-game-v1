@@ -62,11 +62,10 @@ const func: DeployFunction = async function ({
     args: gameFactoryArgs,
   })
 
-  if (!gameFactoryNewlyDeployed) return
-
-  log(
-    `✅ Contract GameFactory deployed at ${gameFactoryAddress} using ${gameFactoryGasUsed} gas`
-  )
+  if (gameFactoryNewlyDeployed)
+    log(
+      `✅ Contract GameFactory deployed at ${gameFactoryAddress} using ${gameFactoryGasUsed} gas`
+    )
 
   log('Adding GameFactory to Keeper delegators')
   try {
@@ -94,7 +93,7 @@ const func: DeployFunction = async function ({
     cronUpkeep.addDelegator(gameFactoryAddress)
   }
 
-  if (isLocalDeployment) return
+  if (isLocalDeployment || !gameFactoryNewlyDeployed) return
 
   await delay(30 * 1000)
   try {

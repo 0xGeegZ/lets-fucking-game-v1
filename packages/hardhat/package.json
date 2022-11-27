@@ -31,6 +31,7 @@
     "test:trace": "hardhat test --trace",
     "test:coverage": "yarn chain:stop && (ganache-cli &) && hardhat coverage",
     "task:trigger": "npx hardhat trigger-daily-checkpoint --network bscTestnet --contract",
+    "task:upkeep": "npx hardhat perform-upkeep --network bscTestnet --upkeep",
     "build": "bin/build.sh",
     "analyze:static": "docker run -v \"$(pwd):/labs\" analyze:latest slither",
     "analyze:security": "docker run -v \"$(pwd):/labs\" analyze:latest myth analyze --solc-json mythril.config.json",

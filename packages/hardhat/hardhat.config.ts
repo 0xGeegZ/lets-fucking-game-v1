@@ -17,6 +17,7 @@ import '@appliedblockchain/chainlink-plugins-fund-link'
 import './tasks/accounts'
 import './tasks/storage-layout'
 import './tasks/trigger-daily-checkpoint'
+import './tasks/perform-upkeep'
 import './tasks/withdraw-link'
 
 import * as dotenv from 'dotenv'

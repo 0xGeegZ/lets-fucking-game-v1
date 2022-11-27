@@ -86,8 +86,7 @@ interface GameV1Interface {
         uint256 roundId;
         bytes32 name;
         uint256 playerAddressesCount;
-        // TODO add it in next game version
-        // uint256 remainingPlayersCount;
+        uint256 remainingPlayersCount;
         uint256 maxPlayers;
         uint256 registrationAmount;
         uint256 playTimeRange;
@@ -139,7 +138,7 @@ interface GameV1Interface {
     /**
      * @notice Called when TriggerDailyCheckpoint function is called
      */
-    event TriggeredDailyCheckpoint(uint256 roundId, address emmiter);
+    event TriggeredDailyCheckpoint(uint256 roundId, address emmiter, uint256 timestamp);
 
     /**
      * @notice Called when a prize is added

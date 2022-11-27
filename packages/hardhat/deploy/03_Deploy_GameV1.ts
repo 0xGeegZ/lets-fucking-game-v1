@@ -36,9 +36,10 @@ const func: DeployFunction = async function ({
     receipt: { gasUsed: gameGasUsed },
   } = await deploy('GameV1', { ...options, ...libraries })
 
-  if (!gameNewlyDeployed) return
-
-  log(`✅ Contract GameV1 deployed at ${gameAddress} using ${gameGasUsed} gas`)
+  if (gameNewlyDeployed)
+    log(
+      `✅ Contract GameV1 deployed at ${gameAddress} using ${gameGasUsed} gas`
+    )
 
   log('Adding GameV1 to Keeper delegators')
 
@@ -56,7 +57,7 @@ const func: DeployFunction = async function ({
   )
   cronUpkeep.addDelegator(gameAddress)
 
-  if (isLocalDeployment) return
+  if (isLocalDeployment || !gameNewlyDeployed) return
 
   await delay(30 * 1000)
   try {

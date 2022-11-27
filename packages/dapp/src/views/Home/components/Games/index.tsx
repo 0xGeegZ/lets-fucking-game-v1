@@ -45,7 +45,7 @@ const GamesPage = () => {
         {chosenGamesMemoized.map((game) => (
           <GameCard key={game.id.toNumber()} game={game} account={account} />
         ))}
-        {!chosenGamesMemoized && (
+        {!chosenGamesMemoized.length && (
           <Flex justifyContent="center">
             <Loading />
           </Flex>

@@ -225,11 +225,12 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @dev TODO NEXT VERSION Update triggerDailyCheckpoint to make it only callable by keeper
      */
     function triggerDailyCheckpoint() external override onlyAdminOrKeeper whenNotPaused {
-        emit TriggeredDailyCheckpoint(roundId, msg.sender);
         if (isInProgress) {
             _refreshPlayerStatus();
             _checkIfGameEnded();
         } else if (playerAddresses.length == maxPlayers) _startGame();
+
+        emit TriggeredDailyCheckpoint(roundId, msg.sender, block.timestamp);
     }
 
     /**
@@ -630,7 +631,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
                 roundId: roundId,
                 name: name,
                 playerAddressesCount: playerAddresses.length,
-                // remainingPlayersCount: _getRemainingPlayersCount(),
+                remainingPlayersCount: _getRemainingPlayersCount(),
                 maxPlayers: maxPlayers,
                 registrationAmount: registrationAmount,
                 playTimeRange: playTimeRange,

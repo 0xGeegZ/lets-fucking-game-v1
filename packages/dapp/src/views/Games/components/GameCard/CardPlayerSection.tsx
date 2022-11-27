@@ -147,7 +147,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
                         <Tooltip
                           content={
                             <>
-                              <Text>{t('Waiting for next draw')}</Text>
+                              <Text>{t('Already played, waiting for next draw')}</Text>
                             </>
                           }
                         />
@@ -175,36 +175,38 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
       ) : (
         <>
           {/* {(hasLost || (!isInTimeRange && moment().isAfter(moment(nextToRange)))) && ( */}
-          {(hasLost ||
-            (!hasPlayedRound &&
-              moment().isAfter(moment(nextToRange)) &&
-              moment(nextFromRange).isSame(moment(), 'day'))) && (
-            // <Button
-            //   mt="8px"
-            //   width="100%"
-            //   ml="auto"
-            //   disabled
-            //   endIcon={<ErrorIcon color="currentColor" />}
-            //   startIcon={<ErrorIcon color="currentColor" />}
-            // >
-            //   {t('You Loose')}
-            // </Button>
+          {hasLost && (
             <Flex justifyContent="center" mt="20px" mb="16px">
               <ErrorIcon width="16px" color="failure" style={{ verticalAlign: 'bottom' }} />
               <Heading mr="4px" ml="4px" color="failure">
-                {t('You Loose')}
+                {t('You loose')}
+              </Heading>
+              <ErrorIcon width="16px" color="failure" style={{ verticalAlign: 'bottom' }} />
+            </Flex>
+          )}
+          {!hasPlayedRound && moment().isAfter(moment(nextToRange)) && moment(nextFromRange).isSame(moment(), 'day') && (
+            <Flex justifyContent="center" mt="20px">
+              <ErrorIcon width="16px" color="failure" style={{ verticalAlign: 'bottom' }} />
+              <Heading mr="4px" ml="4px" color="failure">
+                {t('Round missed')}
               </Heading>
               <ErrorIcon width="16px" color="failure" style={{ verticalAlign: 'bottom' }} />
             </Flex>
           )}
 
-          {(isInProgress || !isRegistering) && !hasLost && (
-            <PlayButton
-              address={address}
-              isInTimeRange={isInTimeRange}
-              isDisabled={!isPlaying || isCreator || isAdmin || isPaused || hasPlayedRound}
-            />
-          )}
+          {(isInProgress || !isRegistering) &&
+            !hasLost &&
+            !(
+              !hasPlayedRound &&
+              moment().isAfter(moment(nextToRange)) &&
+              moment(nextFromRange).isSame(moment(), 'day')
+            ) && (
+              <PlayButton
+                address={address}
+                isInTimeRange={isInTimeRange}
+                isDisabled={!isPlaying || isCreator || isAdmin || isPaused || hasPlayedRound}
+              />
+            )}
           {isRegistering && (
             <RegisterButton
               address={address}

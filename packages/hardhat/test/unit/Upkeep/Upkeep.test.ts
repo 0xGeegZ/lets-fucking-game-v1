@@ -144,6 +144,9 @@ describe('Upkeep - Initialisation', function () {
           isNeedRecheckupkeep = upkeepNeeded
         }
 
+        // TODO should upkeep delete cron job ID when finished
+        // CronJobDeleted
+
         const updatingRemainingPlayersCount =
           await this.deployedPayableGame.getRemainingPlayersCount()
 
