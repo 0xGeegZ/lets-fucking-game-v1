@@ -36,7 +36,7 @@ const fetchGames = async (chainId: number): Promise<SerializedGame[]> => {
     const completeGames = transformedGames.map(gameExtendedTransformer(gamePrizes, gameWinners))
     return completeGames
   } catch (e) {
-    console.log('🚀 ~ file: fetchGames.ts ~ line 23 ~ fetchGames ~ e', e)
+    console.log('🚀 ~ file: fetchGames.ts ~ line 21 ~ fetchGames ~ e', e)
     return []
   }
 }

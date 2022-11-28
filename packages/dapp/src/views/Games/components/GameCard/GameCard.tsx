@@ -124,7 +124,11 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
 
   const isReady = game.prizepool !== undefined
 
-  const lastGamePrize = lastRoundWinners.find((winner) => winner.playerAddress === playerAddress)
+  const lastGamePrize = lastRoundWinners.find((winner) => {
+    return winner.playerAddress === account
+    // TODO GUIGUI WHY playerAddress is not defined
+    // return winner.playerAddress === playerAddress
+  })
   const isWonLastGames = !!lastGamePrize
   const lastGameWonAmount = isWonLastGames ? lastGamePrize.amountWon : new BigNumber('0')
   const lastGameRoundId = isWonLastGames ? lastGamePrize.roundId : new BigNumber('0')

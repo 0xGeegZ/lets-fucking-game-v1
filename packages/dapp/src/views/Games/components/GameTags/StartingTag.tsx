@@ -10,7 +10,7 @@ interface StartingTag extends TagProps {
 const StartingTag: React.FC<StartingTag> = (props) => {
   const { t } = useTranslation()
   return (
-    <Tag variant="textSubtle" style={{ background: 'none' }} outline {...props}>
+    <Tag variant="warning" style={{ background: 'none' }} outline {...props}>
       {t('Starting')}
     </Tag>
   )

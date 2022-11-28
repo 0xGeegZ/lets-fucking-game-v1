@@ -131,7 +131,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               <Text style={{ display: 'flex', alignItems: 'center' }}>
                 <Text bold style={{ textAlign: 'right' }}>
                   <Text bold style={{ display: 'flex', alignItems: 'center' }}>
-                    {roundCount.toNumber()}
+                    {roundCount.toNumber() + 1}
                   </Text>
                 </Text>
               </Text>
@@ -260,7 +260,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
         id="showGameDetails"
         disabled
         variant="tertiary"
-        mt="16px"
+        mt="8px"
         decorator={{ text: 'Soon' }}
       >
         {t('Show Game Details')}
