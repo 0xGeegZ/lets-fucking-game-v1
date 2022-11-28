@@ -41,6 +41,7 @@ interface GameCardPlayerSectionProps {
   isWonLastGames: boolean
   lastGameWonAmount: BigNumber
   lastGameRoundId: BigNumber
+  isPrizeClaimed: boolean
   roundCount: BigNumber
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
@@ -73,6 +74,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   isWonLastGames,
   lastGameWonAmount,
   lastGameRoundId,
+  isPrizeClaimed,
   roundCount,
   isCanVoteSplitPot,
   isInTimeRange,
@@ -96,7 +98,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
 
   return (
     <Container>
-      {isWonLastGames && (
+      {isWonLastGames && !isPrizeClaimed && (
         <>
           <Flex justifyContent="space-between">
             <Heading mr="4px">{t('Earned')}: </Heading>
@@ -226,7 +228,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               isDisabled={!isPlaying || isCreator || isAdmin || isPaused || hasPlayedRound}
             />
           )}
-          {isRegistering && (
+          {isRegistering && !isCreator && !isAdmin && (
             <RegisterButton
               address={address}
               registrationAmount={registrationAmount}

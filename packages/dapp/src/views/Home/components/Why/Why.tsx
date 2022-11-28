@@ -28,7 +28,7 @@ const Why: React.FC<React.PropsWithChildren> = () => {
             {t('Discover Web3')}
           </Heading>
           <Text mb="16px" color="textSubtle">
-            {t('As a developper team, we want to learn web3 and ttry new technologies like keepers or EPNS.')}
+            {t('As a developper team, we want to learn web3 and try new technologies like keepers or EPNS.')}
           </Text>
           <Heading mt="24px" scale="md">
             {t('Bring a new way to activate community')}
