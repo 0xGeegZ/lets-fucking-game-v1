@@ -1,5 +1,5 @@
 import { useTranslation } from '@pancakeswap/localization'
-import { Flex, Heading, Skeleton, Text, ErrorIcon, Button } from '@pancakeswap/uikit'
+import { Flex, Heading, Skeleton, Text, ErrorIcon, Button, Link } from '@pancakeswap/uikit'
 
 import BigNumber from 'bignumber.js'
 
@@ -30,14 +30,18 @@ interface GameCardPlayerSectionProps {
   gameCreationAmount: BigNumber
   isInProgress: boolean
   isRegistering: boolean
-  wonAmount: BigNumber
   nextFromRange: string
   nextToRange: string
   remainingPlayersCount: BigNumber
   playerAddressesCount: BigNumber
   encodedCron: string
+  creatorAmount: string
+  treasuryAmount: string
   isPlaying: boolean
   isWonLastGames: boolean
+  lastGameWonAmount: BigNumber
+  lastGameRoundId: BigNumber
+  roundCount: BigNumber
   isCanVoteSplitPot: boolean
   isInTimeRange: boolean
   isReady: boolean
@@ -45,7 +49,9 @@ interface GameCardPlayerSectionProps {
   isCreator: boolean
   isAdmin: boolean
   hasLost: boolean
+  isLoosing: boolean
   hasPlayedRound: boolean
+  isSplitOk: boolean
   account?: string
 }
 
@@ -56,14 +62,18 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   gameCreationAmount,
   isInProgress,
   isRegistering,
-  wonAmount,
   nextFromRange,
   nextToRange,
   encodedCron,
   remainingPlayersCount,
   playerAddressesCount,
+  creatorAmount,
+  treasuryAmount,
   isPlaying,
   isWonLastGames,
+  lastGameWonAmount,
+  lastGameRoundId,
+  roundCount,
   isCanVoteSplitPot,
   isInTimeRange,
   isReady,
@@ -71,7 +81,9 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
   isCreator,
   isAdmin,
   hasLost,
+  isLoosing,
   hasPlayedRound,
+  isSplitOk,
   account,
 }) => {
   const {
@@ -92,7 +104,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             <Text bold style={{ display: 'flex', alignItems: 'center' }}>
               {isReady ? (
                 <Text bold color="success" fontSize={16}>
-                  {wonAmount.toNumber()} {chainSymbol}
+                  {lastGameWonAmount.toNumber()} {chainSymbol}
                 </Text>
               ) : (
                 <Skeleton width={80} height={18} mb="4px" />
@@ -103,7 +115,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             <Heading mr="4px" />
             <Text bold style={{ display: 'flex', alignItems: 'center' }}>
               {isReady ? (
-                <ClaimButton address={address} roundId={roundId} />
+                <ClaimButton address={address} roundId={lastGameRoundId} />
               ) : (
                 <Skeleton width={80} height={36} mb="4px" />
               )}
@@ -111,8 +123,25 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
           </Flex>
         </>
       )}
-
-      {isInProgress && isPlaying && false && (
+      {isInProgress && isPlaying && !hasLost && (
+        <>
+          <Flex justifyContent="space-between">
+            <Heading mr="4px">{`${t('Round')}:`}</Heading>
+            {isReady ? (
+              <Text style={{ display: 'flex', alignItems: 'center' }}>
+                <Text bold style={{ textAlign: 'right' }}>
+                  <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                    {roundCount.toNumber() + 1}
+                  </Text>
+                </Text>
+              </Text>
+            ) : (
+              <Skeleton width="100%" height={18} mb="4px" />
+            )}
+          </Flex>
+        </>
+      )}
+      {isInProgress && isPlaying && isCanVoteSplitPot && (
         <Flex justifyContent="space-between">
           <Heading mr="4px">{`${t('Split pot')}:`}</Heading>
           {isReady ? (
@@ -132,7 +161,6 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
           )}
         </Flex>
       )}
-
       {isInProgress && isPlaying && !hasLost && (
         <>
           <Flex justifyContent="space-between">
@@ -168,13 +196,10 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
           </Flex>
         </>
       )}
-
-      {/* TODO ADD CONDITION IF ACCOUNT IS GAME CREATOR. If true, display play and pause button */}
       {!account ? (
         <ConnectWalletButton mt="8px" width="100%" />
       ) : (
         <>
-          {/* {(hasLost || (!isInTimeRange && moment().isAfter(moment(nextToRange)))) && ( */}
           {hasLost && (
             <Flex justifyContent="center" mt="20px" mb="16px">
               <ErrorIcon width="16px" color="failure" style={{ verticalAlign: 'bottom' }} />
@@ -184,7 +209,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               <ErrorIcon width="16px" color="failure" style={{ verticalAlign: 'bottom' }} />
             </Flex>
           )}
-          {!hasPlayedRound && moment().isAfter(moment(nextToRange)) && moment(nextFromRange).isSame(moment(), 'day') && (
+          {!hasPlayedRound && isLoosing && (
             <Flex justifyContent="center" mt="20px">
               <ErrorIcon width="16px" color="failure" style={{ verticalAlign: 'bottom' }} />
               <Heading mr="4px" ml="4px" color="failure">
@@ -194,19 +219,13 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
             </Flex>
           )}
 
-          {(isInProgress || !isRegistering) &&
-            !hasLost &&
-            !(
-              !hasPlayedRound &&
-              moment().isAfter(moment(nextToRange)) &&
-              moment(nextFromRange).isSame(moment(), 'day')
-            ) && (
-              <PlayButton
-                address={address}
-                isInTimeRange={isInTimeRange}
-                isDisabled={!isPlaying || isCreator || isAdmin || isPaused || hasPlayedRound}
-              />
-            )}
+          {(isInProgress || !isRegistering) && !hasLost && !(!hasPlayedRound && isLoosing) && (
+            <PlayButton
+              address={address}
+              isInTimeRange={isInTimeRange}
+              isDisabled={!isPlaying || isCreator || isAdmin || isPaused || hasPlayedRound}
+            />
+          )}
           {isRegistering && (
             <RegisterButton
               address={address}
@@ -214,25 +233,39 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
               isDisabled={isPlaying || isCreator || isAdmin || isPaused}
             />
           )}
-          {isCanVoteSplitPot && <VoteSplitButton address={address} />}
+          {isCanVoteSplitPot && <VoteSplitButton address={address} isSplitOk={isSplitOk} />}
           {(isCreator || isAdmin) && !isInProgress && isRegistering && (
             <>
               {isPaused && <UnpauseButton address={address} isInProgress={isInProgress} />}
               {!isPaused && <PauseButton address={address} isInProgress={isInProgress} />}
             </>
           )}
-          {isPaused && isCreator && isAdmin && <ClaimAllFeeButton address={address} />}
-          {isPaused && isCreator && !isAdmin && <ClaimCreatorFeeButton address={address} />}
-          {isPaused && isAdmin && !isCreator && <ClaimTreasuryFeeButton address={address} />}
+          {isCreator && isAdmin && !!+treasuryAmount && !!+creatorAmount && (
+            <ClaimAllFeeButton address={address} treasuryAmount={treasuryAmount} creatorAmount={creatorAmount} />
+          )}
+          {isCreator && !isAdmin && !!+creatorAmount && (
+            <ClaimCreatorFeeButton address={address} creatorAmount={creatorAmount} />
+          )}
+          {isAdmin && !isCreator && !!+treasuryAmount && (
+            <ClaimTreasuryFeeButton address={address} treasuryAmount={treasuryAmount} />
+          )}
         </>
       )}
 
-      {/* TODO Remove after integration phase */}
-      {/* <Link href="/games/1" passHref>
-        <Button as="a" id="showGameDetails" mt="8px" width="100%">
-          {t('Show Game Details')}
-        </Button>
-      </Link> */}
+      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+      {/* <Link href="" passHref style={{ width: '100%' }}> */}
+      <Button
+        width="100%"
+        as="a"
+        id="showGameDetails"
+        disabled
+        variant="tertiary"
+        mt="8px"
+        decorator={{ text: 'Soon' }}
+      >
+        {t('Show Game Details')}
+      </Button>
+      {/* </Link> */}
     </Container>
   )
 }

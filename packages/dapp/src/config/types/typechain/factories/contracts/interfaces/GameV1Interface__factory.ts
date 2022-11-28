@@ -529,6 +529,11 @@ const _abi = [
           },
           {
             internalType: "uint256",
+            name: "versionId",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
             name: "roundId",
             type: "uint256",
           },

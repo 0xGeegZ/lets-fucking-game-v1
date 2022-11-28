@@ -30,14 +30,35 @@ export const fetchPublicGamesData = async (
   return chunk(gameMultiCallResult, chunkSize)
 }
 
-export const fetchGamesRemainingPlayersCount = async (
+export const fetchGamesCreatorAmounts = async (
   games: GameFactory.GameStructOutput[],
   chainId = ChainId.BSC,
 ): Promise<any[]> => {
   const gameCalls = games.map((game) => {
     return {
       address: game.deployedAddress,
-      name: 'getRemainingPlayersCount',
+      name: 'creatorAmount',
+    }
+  })
+  const chunkSize = gameCalls.length / games.length
+
+  const gameMultiCallResult = await multicallv2({
+    abi: internal[chainId || ChainId.BSC].GameV1.abi,
+    calls: gameCalls,
+    chainId,
+  })
+
+  return chunk(gameMultiCallResult, chunkSize)
+}
+
+export const fetchGamesTreasuryAmounts = async (
+  games: GameFactory.GameStructOutput[],
+  chainId = ChainId.BSC,
+): Promise<any[]> => {
+  const gameCalls = games.map((game) => {
+    return {
+      address: game.deployedAddress,
+      name: 'treasuryAmount',
     }
   })
   const chunkSize = gameCalls.length / games.length
@@ -84,6 +105,26 @@ export const fetchGamesPrizes = async (games: any[], chainId = ChainId.BSC): Pro
       address: game.address,
       name: 'getPrizes',
       params: [game.roundId],
+    }
+  })
+  const chunkSize = gameCalls.length / games.length
+
+  const gameMultiCallResult = await multicallv2({
+    abi: internal[chainId || ChainId.BSC].GameV1.abi,
+    calls: gameCalls,
+    chainId,
+  })
+
+  return chunk(gameMultiCallResult, chunkSize)
+}
+
+export const fetchGamesWinners = async (games: any[], chainId = ChainId.BSC): Promise<any[]> => {
+  const gameCalls = games.map((game) => {
+    const roundId = game.roundId ? game.roundId - 1 : game.roundId
+    return {
+      address: game.address,
+      name: 'getWinners',
+      params: [roundId],
     }
   })
   const chunkSize = gameCalls.length / games.length
