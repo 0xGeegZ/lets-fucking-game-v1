@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Spinner } from '@pancakeswap/uikit'
+import Loading from 'components/Loading'
 import Page from '../Layout/Page'
 
 const Wrapper = styled(Page)`
@@ -11,7 +11,7 @@ const Wrapper = styled(Page)`
 const PageLoader: React.FC<React.PropsWithChildren<unknown>> = () => {
   return (
     <Wrapper>
-      <Spinner />
+      <Loading />
     </Wrapper>
   )
 }
