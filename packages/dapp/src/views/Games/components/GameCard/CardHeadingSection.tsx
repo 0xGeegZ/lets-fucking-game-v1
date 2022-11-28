@@ -81,7 +81,7 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
       )}
       <Flex flexDirection="column" alignItems="flex-end">
         {isReady ? (
-          <Heading mb="4px">
+          <Heading textAlign="right" mb="4px">
             #{id.toNumber() + 1}.{roundId.toNumber() + 1} - {name}
           </Heading>
         ) : (
