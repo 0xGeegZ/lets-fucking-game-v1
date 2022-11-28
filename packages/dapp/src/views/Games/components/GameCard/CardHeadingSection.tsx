@@ -25,6 +25,7 @@ const StyledLogo = styled(Logo)<{ size: string }>`
 export interface ExpandableSectionProps {
   id: BigNumber
   name?: string
+  roundId: BigNumber
   versionId: BigNumber
   chainId: number
   prizepool: BigNumber
@@ -50,6 +51,7 @@ const MultiplierTag = styled(Tag)`
 const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> = ({
   id,
   name,
+  roundId,
   versionId,
   chainId,
   prizepool,
@@ -78,7 +80,13 @@ const CardHeadingSection: React.FC<React.PropsWithChildren<ExpandableSectionProp
         <Skeleton mr="8px" width={63} height={63} variant="circle" />
       )}
       <Flex flexDirection="column" alignItems="flex-end">
-        {isReady ? <Heading mb="4px">{name}</Heading> : <Skeleton mb="4px" width={60} height={18} />}
+        {isReady ? (
+          <Heading mb="4px">
+            {name} - #{roundId.toNumber()}
+          </Heading>
+        ) : (
+          <Skeleton mb="4px" width={60} height={18} />
+        )}
         <Flex justifyContent="center" mt="4px">
           {isReady && hasLost && <LostTag mr="4px" />}
 

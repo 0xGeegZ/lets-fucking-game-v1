@@ -335,7 +335,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
                 onChange={() => setMyPlayingGamesOnly((prev) => !prev)}
                 scale="sm"
               />
-              <Text> {t('My Games')}</Text>
+              <Text> {t('Playing only')}</Text>
             </ToggleWrapper>
             <ToggleWrapper>
               <Toggle
@@ -344,7 +344,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
                 onChange={() => setNotFullOnly(!isNotFullOnly)}
                 scale="sm"
               />
-              <Text> {t('Not full only')}</Text>
+              <Text> {t('Registering only')}</Text>
             </ToggleWrapper>
             <GameTabButtons hasStakeInFinishedGames={myDeletedGames.length > 0 && isMyGames} />
           </ViewControls>

@@ -132,6 +132,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
   const isWonLastGames = !!lastGamePrize
   const lastGameWonAmount = isWonLastGames ? lastGamePrize.amountWon : new BigNumber('0')
   const lastGameRoundId = isWonLastGames ? lastGamePrize.roundId : new BigNumber('0')
+  const isPrizeClaimed = isWonLastGames ? lastGamePrize.prizeClaimed : true
 
   // TODO GUIGUI use RoundProgress to display a progressBar if necessary
   return (
@@ -145,6 +146,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
         <CardHeadingSection
           id={id}
           name={name}
+          roundId={roundId}
           versionId={versionId}
           chainId={chainId}
           prizepool={prizepool}
@@ -184,6 +186,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           isWonLastGames={isWonLastGames}
           lastGameWonAmount={lastGameWonAmount}
           lastGameRoundId={lastGameRoundId}
+          isPrizeClaimed={isPrizeClaimed}
           isCanVoteSplitPot={isCanVoteSplitPot}
           isInTimeRange={isInTimeRange}
           gameCreationAmount={gameCreationAmount}
