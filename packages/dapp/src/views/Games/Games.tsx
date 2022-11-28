@@ -140,7 +140,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   //   const [viewMode, setViewMode] = useUserGamesViewMode()
 
   //   const { account } = useWeb3React()
-  const [sortOption, setSortOption] = useState('hot')
+  const [sortOption, setSortOption] = useState('players')
   const { observerRef, isIntersecting } = useIntersectionObserver()
   const chosenGamesLength = useRef(0)
 
@@ -148,7 +148,6 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const isDeleted = pathname.includes('history')
   const isActive = !isDeleted
 
-  // TODO GUIGUI get used Data
   usePollGamesWithUserData()
 
   // Users with no wallet connected should see 0 as Earned amount
@@ -160,7 +159,6 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [myPlayingGamesOnly, setMyPlayingGamesOnly] = useState(!isActive)
 
   const activeGames = games
-    // .filter((game) => !game.isPaused && !game.isDeleted)
     .filter((game) => (!isMyGames ? !game.isPaused && !game.isDeleted : !game.isDeleted))
     .sort(sortGamesDefault)
 
@@ -260,7 +258,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
         case 'playing':
           return orderBy(gamesToSort, (game: DeserializedGame) => Number(game.userData.isPlaying), 'desc')
         case 'latest':
-          return orderBy(gamesToSort, (game: DeserializedGame) => Number(game.roundId), 'desc')
+          return orderBy(gamesToSort, (game: DeserializedGame) => Number(game.id), 'desc')
         default:
           return gamesToSort
       }
