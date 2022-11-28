@@ -396,7 +396,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         }
 
         if (remainingPlayersCount == 0)
-            // Creator will take everything except the first prize
+            // Creator will take everything except the first prize that goes to the treasury
             for (uint256 i = 0; i < _prizes.length; i++) {
                 treasuryRoundAmount = (_prizes[i].amount * treasuryFee) / 10000;
                 creatorRoundAmount = (_prizes[i].amount * creatorFee) / 10000;
@@ -628,6 +628,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         return
             GameData({
                 id: id,
+                versionId: version,
                 roundId: roundId,
                 name: name,
                 playerAddressesCount: playerAddresses.length,

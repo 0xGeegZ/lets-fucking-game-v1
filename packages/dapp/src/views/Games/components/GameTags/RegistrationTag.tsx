@@ -10,7 +10,7 @@ interface RegistrationTag extends TagProps {
 const RegistrationTag: React.FC<RegistrationTag> = (props) => {
   const { t } = useTranslation()
   return (
-    <Tag variant="warning" style={{ background: 'none' }} outline {...props}>
+    <Tag variant="primary" style={{ background: 'none' }} outline {...props}>
       {t('Registering')}
     </Tag>
   )

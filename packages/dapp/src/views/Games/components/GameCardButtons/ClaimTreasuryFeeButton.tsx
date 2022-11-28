@@ -2,16 +2,27 @@ import { useMemo } from 'react'
 import { useTranslation } from '@pancakeswap/localization'
 import { Button, AutoRenewIcon } from '@pancakeswap/uikit'
 import { useClaimTreasuryFee } from 'views/Games/hooks/useClaimTreasuryFee'
+import { formatEther } from '@ethersproject/units'
+import useActiveWeb3React from 'hooks/useActiveWeb3React'
 
 interface ClaimTreasuryFeeButtonProps {
   address: string
+  treasuryAmount: string
 }
 
-const ClaimTreasuryFeeButton: React.FC<React.PropsWithChildren<ClaimTreasuryFeeButtonProps>> = ({ address }) => {
+const ClaimTreasuryFeeButton: React.FC<React.PropsWithChildren<ClaimTreasuryFeeButtonProps>> = ({
+  address,
+  treasuryAmount,
+}) => {
   const { t } = useTranslation()
+  const { chain } = useActiveWeb3React()
+  const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
+
   const { isPending, handleClaimTreasuryFee } = useClaimTreasuryFee(address)
 
   const isDisabledButton = useMemo(() => !address || isPending, [address, isPending])
+
+  const claimAmount = parseFloat(formatEther(treasuryAmount))
 
   return (
     <Button
@@ -23,7 +34,7 @@ const ClaimTreasuryFeeButton: React.FC<React.PropsWithChildren<ClaimTreasuryFeeB
       endIcon={isPending ? <AutoRenewIcon spin color="currentColor" /> : null}
       onClick={handleClaimTreasuryFee}
     >
-      {t('Claim treasury fee')}
+      {`${t('Claim treasury fee')} : ${claimAmount} ${chainSymbol}`}
     </Button>
   )
 }

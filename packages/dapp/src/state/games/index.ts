@@ -11,11 +11,11 @@ import { chains } from 'utils/wagmi'
 
 import { resetUserState } from '../global/actions'
 import { SerializedGame, SerializedGamesState, SerializedGamePlayerData } from '../types'
-import fetchGamesFull from './fetchGamesFull'
+import fetchGames from './fetchGames'
 import { fetchGamesPlayerData } from './fetchGamePlayerData'
 import { gamePlayerDataTransformer } from './transformers'
 
-const fetchGamePublicDataPkg = async ({ chainId }): Promise<SerializedGame[]> => fetchGamesFull(chainId)
+const fetchGamePublicDataPkg = async ({ chainId }): Promise<SerializedGame[]> => fetchGames(chainId)
 
 const initialState: SerializedGamesState = {
   data: [],
@@ -43,12 +43,11 @@ export const fetchInitialGamesData = createAsyncThunk<
         isPlaying: false,
         isCreator: false,
         isAdmin: false,
-        wonAmount: '0',
         nextFromRange: '0',
         nextToRange: '0',
-        isWonLastGames: false,
         isCanVoteSplitPot: false,
         isInTimeRange: false,
+        isLoosing: false,
       },
       playerData: {
         playerAddress: '',
@@ -165,6 +164,7 @@ export const fetchGamePlayerDataAsync = createAsyncThunk<
 
     const playerData = await fetchGamesPlayerData(games, account, chainId)
 
+    // TODO GUIGUI LOAD ROUND WINNERS HISTORY AND CHECK IF PLAYER HAS WON
     return games.map(gamePlayerDataTransformer(playerData, account))
   },
   {
@@ -209,12 +209,11 @@ export const gamesSlice = createSlice({
             isPlaying: false,
             isCreator: false,
             isAdmin: false,
-            wonAmount: '0',
             nextFromRange: '0',
             nextToRange: '0',
-            isWonLastGames: false,
             isCanVoteSplitPot: false,
             isInTimeRange: false,
+            isLoosing: false,
           },
           playerData: {
             playerAddress: '',

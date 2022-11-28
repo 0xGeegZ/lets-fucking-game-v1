@@ -8,6 +8,7 @@ import { getBlockExploreLink } from 'utils'
 import { DeserializedGame } from 'state/types'
 import parser from 'cron-parser'
 import moment from 'moment'
+import BigNumber from 'bignumber.js'
 import CardPlayerSection from './CardPlayerSection'
 import CardHeadingSection from './CardHeadingSection'
 
@@ -54,10 +55,12 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
 
   const {
     name,
+    versionId,
     roundId,
     id,
     isPaused,
     isInProgress,
+    isRegistering,
     isDeleted,
     maxPlayers,
     remainingPlayersCount,
@@ -69,18 +72,20 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     encodedCron,
     creator,
     treasuryFee,
+    treasuryAmount,
     creatorFee,
+    creatorAmount,
     prizes,
+    lastRoundWinners,
     userData: {
       isCreator,
       isAdmin,
       isPlaying,
-      wonAmount,
       nextFromRange,
       nextToRange,
-      isWonLastGames,
       isCanVoteSplitPot,
       isInTimeRange,
+      isLoosing,
     },
     // TODO GUIGUI USE playerData
     playerData: {
@@ -108,7 +113,6 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
 
   useEffect(() => {
     if (!encodedCron) return
-
     try {
       const interval = parser.parseExpression(encodedCron, { tz: 'Etc/UTC' })
       const transform = moment(interval.next().toString()).format('hh:mm A')
@@ -118,10 +122,18 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
     }
   }, [encodedCron, timezone])
 
-  // TODO GUIGUI isReady is when userData are loaded ??
   const isReady = game.prizepool !== undefined
-  const isRegistering = !isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber()
-  // TODO GUIGUI use RoundProgress to display a progressBar if i
+
+  const lastGamePrize = lastRoundWinners.find((winner) => {
+    return winner.playerAddress === account
+    // TODO GUIGUI WHY playerAddress is not defined
+    // return winner.playerAddress === playerAddress
+  })
+  const isWonLastGames = !!lastGamePrize
+  const lastGameWonAmount = isWonLastGames ? lastGamePrize.amountWon : new BigNumber('0')
+  const lastGameRoundId = isWonLastGames ? lastGamePrize.roundId : new BigNumber('0')
+
+  // TODO GUIGUI use RoundProgress to display a progressBar if necessary
   return (
     <StyledCard
       isActive={!isDeleted}
@@ -133,6 +145,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
         <CardHeadingSection
           id={id}
           name={name}
+          versionId={versionId}
           chainId={chainId}
           prizepool={prizepool}
           multiplier={registrationAmount.toNumber() !== 0 ? prizepool.dividedBy(registrationAmount) : null}
@@ -162,7 +175,6 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           roundId={roundId}
           isInProgress={isInProgress}
           isRegistering={isRegistering}
-          wonAmount={wonAmount}
           nextFromRange={nextFromRange}
           nextToRange={nextToRange}
           encodedCron={encodedCron}
@@ -170,16 +182,23 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
           playerAddressesCount={playerAddressesCount}
           isPlaying={isPlaying}
           isWonLastGames={isWonLastGames}
+          lastGameWonAmount={lastGameWonAmount}
+          lastGameRoundId={lastGameRoundId}
           isCanVoteSplitPot={isCanVoteSplitPot}
           isInTimeRange={isInTimeRange}
           gameCreationAmount={gameCreationAmount}
           registrationAmount={registrationAmount}
+          creatorAmount={creatorAmount}
+          treasuryAmount={treasuryAmount}
+          roundCount={roundCount}
           isReady={isReady}
           isPaused={isPaused}
           isCreator={isCreator}
           isAdmin={isAdmin}
           hasLost={hasLost}
+          isLoosing={isLoosing}
           hasPlayedRound={hasPlayedRound}
+          isSplitOk={isSplitOk}
           account={account}
         />
       </GameCardInnerContainer>
@@ -192,6 +211,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
             bscScanAddress={getBlockExploreLink(address, 'address', chainId)}
             treasuryFee={treasuryFee}
             creatorFee={creatorFee}
+            creator={getBlockExploreLink(creator, 'address', chainId)}
           />
         )}
       </ExpandingWrapper>

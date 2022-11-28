@@ -4,7 +4,7 @@ import { parseBytes32String } from '@ethersproject/strings'
 import { arrayify } from '@ethersproject/bytes'
 import { ZERO_ADDRESS } from 'config/constants'
 import moment from 'moment'
-import { SerializedGame, SerializedPrizeData } from '../types'
+import { SerializedGame, SerializedPrizeData, SerializedWinnerData } from '../types'
 
 // parse a name or symbol from a token response
 const BYTES32_REGEX = /^0x[a-fA-F0-9]{64}$/
@@ -18,7 +18,7 @@ function parseStringOrBytes32(str: string | undefined, bytes32: string | undefin
     : defaultValue
 }
 
-export const gameBaseTransformer = (gameData, gamePlayers) => {
+export const gameBaseTransformer = (gameData, gamePlayers, gameCreatorAmounts, gameTreasuryAmounts) => {
   return (game, index): SerializedGame => {
     const { deployedAddress: address, gameCreationAmount } = game
     const [
@@ -26,6 +26,7 @@ export const gameBaseTransformer = (gameData, gamePlayers) => {
         {
           id,
           name,
+          versionId,
           roundId,
           maxPlayers,
           playTimeRange,
@@ -44,10 +45,13 @@ export const gameBaseTransformer = (gameData, gamePlayers) => {
     ] = gameData[index]
 
     const [[playerAddresses]] = gamePlayers[index]
+    const [[creatorAmount]] = gameCreatorAmounts[index]
+    const [[treasuryAmount]] = gameTreasuryAmounts[index]
 
     return {
       id: id.toNumber(),
       name: parseStringOrBytes32('', name, 'Game'),
+      versionId: versionId?.toNumber(),
       roundId: roundId.toNumber(),
       maxPlayers: maxPlayers.toNumber(),
       remainingPlayersCount: remainingPlayersCount.toNumber(),
@@ -56,8 +60,11 @@ export const gameBaseTransformer = (gameData, gamePlayers) => {
       registrationAmount: formatEther(`${registrationAmount}`),
       gameCreationAmount: formatEther(`${gameCreationAmount}`),
       creatorFee: creatorFee.toString(),
+      creatorAmount: creatorAmount.toString(),
       treasuryFee: treasuryFee.toString(),
+      treasuryAmount: treasuryAmount.toString(),
       isInProgress,
+      isRegistering: !isInProgress && maxPlayers.toNumber() !== playerAddressesCount.toNumber(),
       isPaused,
       isDeleted: false,
       address,
@@ -67,11 +74,45 @@ export const gameBaseTransformer = (gameData, gamePlayers) => {
       encodedCron: encodedCron.toString(),
       playerAddresses,
       prizes: [],
+      lastRoundWinners: [],
     }
   }
 }
 
-export const gameExtendedTransformer = (gamePrizes /* , gamePlayersData */) => {
+export const gameExtendedTransformer = (gamePrizes, gameWinners) => {
+  return (game, index): SerializedGame => {
+    const [[rawPrizes]] = gamePrizes[index]
+    const prizes: SerializedPrizeData[] = rawPrizes.map((prize) => {
+      const { amount, position } = prize
+      return {
+        amount: formatEther(`${amount}`),
+        position: position.toNumber(),
+      }
+    })
+    const prizepool = prizes.reduce((acc, prize) => acc + +prize.amount, 0)
+    const [[rawWinners]] = gameWinners[index]
+
+    const winners: SerializedWinnerData[] = rawWinners.map((winner) => {
+      const { roundId, playerAddress, amountWon, position, prizeClaimed } = winner
+      return {
+        roundId: roundId.toNumber(),
+        playerAddress: playerAddress.toString(),
+        amountWon: formatEther(`${amountWon}`),
+        position: position.toNumber(),
+        prizeClaimed,
+      }
+    })
+
+    return {
+      ...game,
+      prizepool: `${prizepool}`,
+      prizes,
+      lastRoundWinners: winners,
+    }
+  }
+}
+
+export const gameFullTransformer = (gamePrizes /* , gamePlayersData */) => {
   return (game, index): SerializedGame => {
     const [[rawPrizes]] = gamePrizes[index]
     const prizes: SerializedPrizeData[] = rawPrizes.map((prize) => {
@@ -137,9 +178,7 @@ export const gamePlayerDataTransformer = (gamesPlayerData, account) => {
         nextFromRange: fromRange.toString(),
         nextToRange: toRange.toString(),
         isCanVoteSplitPot: game.isInProgress && game.playerAddressesCount <= game.maxPlayers * 0.5,
-        // TODO GUIGUI NEXT HANDLE WON CLAIM
-        isWonLastGames: false,
-        wonAmount: '0',
+        isLoosing: moment().isAfter(moment(toRange)) && moment(fromRange).isSame(moment(), 'day'),
       },
     }
   }

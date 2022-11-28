@@ -8,6 +8,7 @@ import {
   DeserializedGame,
   DeserializedGameUserData,
   DeserializedPrizeData,
+  DeserializedWinnerData,
   DeserializedGamePlayerData,
 } from '../types'
 
@@ -16,12 +17,11 @@ const deserializeGameUserData = (game: SerializedGame): DeserializedGameUserData
     isPlaying: game?.userData ? game.userData.isPlaying : false,
     isCreator: game?.userData ? game.userData.isCreator : false,
     isAdmin: game?.userData ? game.userData.isAdmin : false,
-    wonAmount: game?.userData ? new BigNumber(game.userData.wonAmount) : BIG_ZERO,
     nextFromRange: game?.userData ? game.userData.nextFromRange : '',
     nextToRange: game?.userData ? game.userData.nextToRange : '',
-    isWonLastGames: game?.userData ? game.userData.isWonLastGames : false,
     isCanVoteSplitPot: game?.userData ? game.userData.isCanVoteSplitPot : false,
     isInTimeRange: game?.userData ? game.userData.isInTimeRange : false,
+    isLoosing: game?.userData ? game.userData.isLoosing : false,
   }
 }
 
@@ -47,13 +47,27 @@ const deserializeGamePrize = (game: SerializedGame): DeserializedPrizeData[] => 
   })
 }
 
+const deserializeGameWinner = (game: SerializedGame): DeserializedWinnerData[] => {
+  return game?.lastRoundWinners?.map((winner) => {
+    return {
+      roundId: winner?.roundId ? new BigNumber(winner.roundId) : BIG_ZERO,
+      playerAddress: winner?.playerAddress ? winner.playerAddress : '',
+      amountWon: winner?.amountWon ? new BigNumber(winner.amountWon) : BIG_ZERO,
+      position: winner?.position ? new BigNumber(winner.position) : BIG_ZERO,
+      prizeClaimed: winner?.prizeClaimed ? winner.prizeClaimed : false,
+    }
+  })
+}
+
 const deserializeGame = (game: SerializedGame): DeserializedGame => {
   const {
     id,
     name,
+    versionId,
     roundId,
     isPaused,
     isInProgress,
+    isRegistering,
     isDeleted,
     maxPlayers,
     playTimeRange,
@@ -67,16 +81,20 @@ const deserializeGame = (game: SerializedGame): DeserializedGame => {
     creator,
     admin,
     treasuryFee,
+    treasuryAmount,
     creatorFee,
+    creatorAmount,
     playerAddresses,
   } = game
 
   return {
     id: id ? new BigNumber(id) : BIG_ZERO,
     name,
+    versionId: versionId ? new BigNumber(versionId) : BIG_ZERO,
     roundId: roundId ? new BigNumber(roundId) : BIG_ZERO,
     isPaused,
     isInProgress,
+    isRegistering,
     isDeleted,
     playTimeRange: playTimeRange ? new BigNumber(playTimeRange) : BIG_ZERO,
     maxPlayers: maxPlayers ? new BigNumber(maxPlayers) : BIG_ZERO,
@@ -90,9 +108,14 @@ const deserializeGame = (game: SerializedGame): DeserializedGame => {
     creator,
     admin,
     treasuryFee: treasuryFee ? new BigNumber(treasuryFee) : BIG_ZERO,
+    // treasuryAmount: treasuryAmount ? new BigNumber(treasuryAmount) : BIG_ZERO,
+    treasuryAmount,
     creatorFee: creatorFee ? new BigNumber(creatorFee) : BIG_ZERO,
+    // creatorAmount: creatorAmount ? new BigNumber(creatorAmount) : BIG_ZERO,
+    creatorAmount,
     playerAddresses,
     prizes: deserializeGamePrize(game),
+    lastRoundWinners: deserializeGameWinner(game),
     userData: deserializeGameUserData(game),
     playerData: deserializeGamePlayerData(game),
   }

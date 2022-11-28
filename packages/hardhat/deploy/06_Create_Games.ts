@@ -102,8 +102,8 @@ const func: DeployFunction = async function ({
   //   zeroRegistrationAmount,
   //   treasuryFee,
   //   creatorFee,
-  //   // '*/5 * * * *',
-  //   encodedCron,
+  //   '*/2 * * * *',
+  //   // encodedCron,
   //   freeGamePrizes,
   //   { value: gameCreationAmount.add(freeGamePrizepoolAmount) }
   // )

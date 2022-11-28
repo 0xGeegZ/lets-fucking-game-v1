@@ -53,6 +53,7 @@ export declare namespace GameV1Interface {
 
   export type GameDataStruct = {
     id: PromiseOrValue<BigNumberish>;
+    versionId: PromiseOrValue<BigNumberish>;
     roundId: PromiseOrValue<BigNumberish>;
     name: PromiseOrValue<BytesLike>;
     playerAddressesCount: PromiseOrValue<BigNumberish>;
@@ -72,6 +73,7 @@ export declare namespace GameV1Interface {
   export type GameDataStructOutput = [
     BigNumber,
     BigNumber,
+    BigNumber,
     string,
     BigNumber,
     BigNumber,
@@ -87,6 +89,7 @@ export declare namespace GameV1Interface {
     string
   ] & {
     id: BigNumber;
+    versionId: BigNumber;
     roundId: BigNumber;
     name: string;
     playerAddressesCount: BigNumber;
