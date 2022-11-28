@@ -66,15 +66,16 @@ const DetailsSection: React.FC<React.PropsWithChildren<ExpandableSectionProps>> 
             <Skeleton ml="4px" width={42} height={28} />
           )}
         </Flex>
-
-        <Flex style={{ paddingTop: 10 }}>
+        <Flex>
           {isReady ? (
-            <StyledLinkExternal href={creator}>{t('Creator')}</StyledLinkExternal>
+            <StyledLinkExternal fontSize="12px" href={creator}>
+              {t('Creator')}
+            </StyledLinkExternal>
           ) : (
             <Skeleton ml="4px" width={42} height={28} />
           )}
         </Flex>
-        <Flex style={{ paddingTop: 10 }}>
+        <Flex style={{ paddingTop: 8 }}>
           {isReady ? (
             <StyledLinkExternal href={bscScanAddress}>{t('View Contract')}</StyledLinkExternal>
           ) : (
