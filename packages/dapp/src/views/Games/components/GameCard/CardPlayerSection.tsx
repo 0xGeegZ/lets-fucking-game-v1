@@ -125,24 +125,7 @@ const CardPlayerSection: React.FC<React.PropsWithChildren<GameCardPlayerSectionP
           </Flex>
         </>
       )}
-      {isInProgress && isPlaying && !hasLost && (
-        <>
-          <Flex justifyContent="space-between">
-            <Heading mr="4px">{`${t('Round')}:`}</Heading>
-            {isReady ? (
-              <Text style={{ display: 'flex', alignItems: 'center' }}>
-                <Text bold style={{ textAlign: 'right' }}>
-                  <Text bold style={{ display: 'flex', alignItems: 'center' }}>
-                    {roundCount.toNumber() + 1}
-                  </Text>
-                </Text>
-              </Text>
-            ) : (
-              <Skeleton width="100%" height={18} mb="4px" />
-            )}
-          </Flex>
-        </>
-      )}
+
       {isInProgress && isPlaying && isCanVoteSplitPot && (
         <Flex justifyContent="space-between">
           <Heading mr="4px">{`${t('Split pot')}:`}</Heading>

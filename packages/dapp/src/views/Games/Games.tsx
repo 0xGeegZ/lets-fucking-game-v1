@@ -140,7 +140,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   //   const [viewMode, setViewMode] = useUserGamesViewMode()
 
   //   const { account } = useWeb3React()
-  const [sortOption, setSortOption] = useState('players')
+  const [sortOption, setSortOption] = useState('playing')
   const { observerRef, isIntersecting } = useIntersectionObserver()
   const chosenGamesLength = useRef(0)
 
@@ -352,6 +352,10 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
               <Select
                 options={[
                   {
+                    label: t('Playing'),
+                    value: 'playing',
+                  },
+                  {
                     label: t('Players'),
                     value: 'players',
                   },
@@ -359,10 +363,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
                     label: t('Prize'),
                     value: 'prize',
                   },
-                  {
-                    label: t('Playing'),
-                    value: 'playing',
-                  },
+
                   {
                     label: t('Latest'),
                     value: 'latest',
