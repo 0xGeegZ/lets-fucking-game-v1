@@ -28,19 +28,21 @@ const AllowedPlayersToWinSelection = () => {
   //        : 1
   //      : halfNumberPlayers
 
-  const listOfAllowedWinners = [...range(1, halfNumberPlayers)]
+  let listOfAllowedWinners = [...range(1, halfNumberPlayers)]
 
   const selectedAllowedWinners = numberPlayersAllowedToWin > listOfAllowedWinners.length ? 1 : numberPlayersAllowedToWin
 
   const isGamePrizeLength = game && !isUpdated && game.prizes && game.prizes.length
   const defaultSelectedWinners = isGamePrizeLength ? game.prizes.length : selectedAllowedWinners
 
+  if (defaultSelectedWinners > halfNumberPlayers) listOfAllowedWinners = [...range(1, defaultSelectedWinners)]
+
   const handleAllowedWinners = (value) => {
     setIsUpdated(true)
     actions.setPrizeConfiguration(+value, prizeType, currentStep)
   }
 
-  if (isGamePrizeLength) handleAllowedWinners(listOfAllowedWinners[defaultSelectedWinners - 1])
+  //   if (isGamePrizeLength) handleAllowedWinners(listOfAllowedWinners[defaultSelectedWinners - 1])
 
   return (
     <>
@@ -74,7 +76,6 @@ const AllowedPlayersToWinSelection = () => {
               return (
                 // TODO Remove filter but generate error on prizepool verification in smart contract if winners are odd (except 1)
                 (index === 0 || index % 2 !== 0 || index + 1 === defaultSelectedWinners) && (
-                  // (game ? index >= game?.prizes?.length - 1 : true) &&
                   <SelectionCard
                     name={winner.toString()}
                     value={winner}

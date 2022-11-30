@@ -1,14 +1,21 @@
-import { Card, CardBody, Flex, Heading, Text } from '@pancakeswap/uikit'
+import { Card, CardBody, Flex, Heading, Text, Box } from '@pancakeswap/uikit'
 
 import { useTranslation } from '@pancakeswap/localization'
 import styled from 'styled-components'
 import { useGameContext } from 'views/GameForm/hooks/useGameContext'
-import { formatEther } from '@ethersproject/units'
+import { formatEther, parseEther } from '@ethersproject/units'
 import { useState, useEffect } from 'react'
 import parser from 'cron-parser'
 import momentTz from 'moment-timezone'
 
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
+
+const Dot = styled(Box)<{ $color: string }>`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: ${({ $color, theme }) => theme.colors[$color]};
+`
 
 const BulletList = styled.ul`
   list-style-type: none;
@@ -82,8 +89,11 @@ const RecapConfigGame = () => {
             {t('You could update configuration later if game is not in progress')}
           </Text>
 
-          <Text as="h2" mt="16px">
-            {name}
+          <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+            {game && <Dot mr="8px" $color={game.name === name ? 'success' : 'warning'} />}
+            <Heading as="h6" my="16px">
+              {t('Name')}: {name}
+            </Heading>
           </Text>
 
           <Flex
@@ -94,65 +104,84 @@ const RecapConfigGame = () => {
             mb="8px"
           >
             <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
-              <BulletList>
-                <li>
-                  <Text color="textSubtle" display="inline">
-                    {t('Registration amount')}:{' '}
-                    {registrationAmount !== '0'
-                      ? `${parseFloat(formatEther(registrationAmount.toString()))} ${chainSymbol}`
-                      : 'FREE'}
-                  </Text>
-                </li>
+              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                <Dot mr="8px" $color={game ? 'success' : 'white'} />
+                <Text color="textSubtle" display="inline">
+                  {t('Registration amount')}:{' '}
+                  {registrationAmount !== '0'
+                    ? `${parseFloat(formatEther(registrationAmount.toString()))} ${chainSymbol}`
+                    : 'FREE'}
+                </Text>
+              </Text>
 
-                <li>
-                  <Text color="textSubtle" display="inline">
-                    {t('Daily draw')}: {cronHumanReadable}
-                  </Text>
-                </li>
+              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                <Dot mr="8px" $color={game ? (game.encodedCron === encodedCron ? 'success' : 'warning') : 'white'} />
+                <Text color="textSubtle" display="inline">
+                  {t('Daily draw')}: {cronHumanReadable}
+                </Text>
+              </Text>
 
-                <li>
-                  <Text color="textSubtle" display="inline">
-                    {t('Winners')}: {numberPlayersAllowedToWin}
-                  </Text>
-                </li>
+              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                <Dot
+                  mr="8px"
+                  $color={game ? (game.prizes.length === numberPlayersAllowedToWin ? 'success' : 'warning') : 'white'}
+                />
 
-                <li>
-                  <Text fontSize="12px" color="textSubtle" display="inline" lineHeight={2.5}>
-                    {t('Treasury fee')}: {treasuryFee / 100} %
-                  </Text>
-                </li>
-              </BulletList>
+                <Text color="textSubtle" display="inline">
+                  {t('Winners')}: {numberPlayersAllowedToWin}
+                </Text>
+              </Text>
+
+              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                <Dot mr="8px" $color={game ? (game.treasuryFee === treasuryFee ? 'success' : 'warning') : 'white'} />
+
+                <Text fontSize="12px" color="textSubtle" display="inline">
+                  {t('Treasury fee')}: {treasuryFee / 100} %
+                </Text>
+              </Text>
             </Flex>
             <Flex width="45%" style={{ gap: '4px' }} flexDirection="column">
-              <BulletList>
-                <li>
-                  <Text color="textSubtle" display="inline">
-                    {t('Prizepool')}:{' '}
-                    {registrationAmount !== '0'
-                      ? parseFloat(formatEther(`${Number(registrationAmount) * Number(maxPlayers)}`))
-                      : parseFloat(freeGamePrizepoolAmount)}{' '}
-                    {chainSymbol}
-                  </Text>
-                </li>
+              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                <Dot
+                  mr="8px"
+                  $color={game ? (game.prizepool === freeGamePrizepoolAmount ? 'success' : 'warning') : 'white'}
+                />
 
-                <li>
-                  <Text color="textSubtle" display="inline">
-                    {t('Daily play time range')}: {playTimeRange}H
-                  </Text>
-                </li>
+                <Text color="textSubtle" display="inline">
+                  {t('Prizepool')}:{' '}
+                  {registrationAmount !== '0'
+                    ? parseFloat(formatEther(`${Number(registrationAmount) * Number(maxPlayers)}`))
+                    : parseFloat(freeGamePrizepoolAmount)}{' '}
+                  {chainSymbol}
+                </Text>
+              </Text>
 
-                <li>
-                  <Text color="textSubtle" display="inline">
-                    {t('Maximum players')}: {maxPlayers}
-                  </Text>
-                </li>
+              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                <Dot
+                  mr="8px"
+                  $color={game ? (game.playTimeRange === playTimeRange ? 'success' : 'warning') : 'white'}
+                />
 
-                <li>
-                  <Text fontSize="12px" color="textSubtle" display="inline">
-                    {t('Creator fee')}: {creatorFee / 100} %
-                  </Text>
-                </li>
-              </BulletList>
+                <Text color="textSubtle" display="inline">
+                  {t('Daily play time range')}: {playTimeRange}H
+                </Text>
+              </Text>
+
+              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                <Dot mr="8px" $color={game ? (game.maxPlayers === maxPlayers ? 'success' : 'warning') : 'white'} />
+
+                <Text color="textSubtle" display="inline">
+                  {t('Maximum players')}: {maxPlayers}
+                </Text>
+              </Text>
+
+              <Text bold style={{ display: 'flex', alignItems: 'center' }}>
+                <Dot mr="8px" $color={game ? (game.creatorFee === creatorFee ? 'success' : 'warning') : 'white'} />
+
+                <Text fontSize="12px" color="textSubtle" display="inline">
+                  {t('Creator fee')}: {creatorFee / 100} %
+                </Text>
+              </Text>
             </Flex>
           </Flex>
         </CardBody>

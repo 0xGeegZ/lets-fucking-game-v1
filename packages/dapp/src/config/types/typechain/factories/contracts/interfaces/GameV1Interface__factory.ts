@@ -999,6 +999,56 @@ const _abi = [
   {
     inputs: [
       {
+        components: [
+          {
+            internalType: "bytes32",
+            name: "name",
+            type: "bytes32",
+          },
+          {
+            internalType: "uint256",
+            name: "maxPlayers",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "registrationAmount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "playTimeRange",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "treasuryFee",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "creatorFee",
+            type: "uint256",
+          },
+          {
+            internalType: "string",
+            name: "encodedCron",
+            type: "string",
+          },
+        ],
+        internalType: "struct GameV1Interface.UpdateGameData",
+        name: "_updateGameData",
+        type: "tuple",
+      },
+    ],
+    name: "setGameData",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "uint256",
         name: "_maxPlayers",
         type: "uint256",
