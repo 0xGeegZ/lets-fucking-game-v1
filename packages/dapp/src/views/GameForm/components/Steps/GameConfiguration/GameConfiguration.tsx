@@ -1,4 +1,5 @@
 import { Flex, Heading, Text, useToast } from '@pancakeswap/uikit'
+import { formatEther } from '@ethersproject/units'
 
 import { useTranslation } from '@pancakeswap/localization'
 import { useGameContext } from 'views/GameForm/hooks/useGameContext'
@@ -17,6 +18,7 @@ const GameConfiguration: React.FC = () => {
     gameConfig,
     currentStep,
     treasuryFee,
+    freeGamePrizepoolAmount,
     registrationAmount,
     maxPlayers,
     playTimeRange,
@@ -24,7 +26,7 @@ const GameConfiguration: React.FC = () => {
   } = useGameContext()
   const { toastError } = useToast()
 
-  const { PLAYERS_MIN_LENGTH, PLAYERS_MAX_LENGTH } = gameConfig
+  const { PLAYERS_MIN_LENGTH, PLAYERS_MAX_LENGTH, REGISTRATION_AMOUNT_FREE_MIN } = gameConfig
 
   const checkFieldsAndValidate = () => {
     if (!isValidCron(encodedCron)) return toastError(t('Error'), t('Wrong entered Cron'))
@@ -60,7 +62,15 @@ const GameConfiguration: React.FC = () => {
         </BackStepButton>
         <NextStepButton
           onClick={checkFieldsAndValidate}
-          disabled={!treasuryFee || !registrationAmount || !maxPlayers || !playTimeRange || !encodedCron}
+          disabled={
+            !treasuryFee ||
+            !registrationAmount ||
+            (!Number(registrationAmount) &&
+              Number(freeGamePrizepoolAmount) < Number(formatEther(REGISTRATION_AMOUNT_FREE_MIN))) ||
+            !maxPlayers ||
+            !playTimeRange ||
+            !encodedCron
+          }
         >
           {t('Next Step')}
         </NextStepButton>

@@ -2,7 +2,8 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { parseEther } from '@ethersproject/units'
 
-export const range = (start, end) => Array.from(Array(end + 1).keys()).slice(start)
+export const range = (start, end) =>
+  Array.from(Array(end + 1).keys()).slice(start)
 
 const randomNumber = () => {
   return Math.floor(Math.random() * (10000 - 1) + 1)
@@ -24,6 +25,7 @@ export interface GameConfig {
 
   REGISTRATION_AMOUNT_DEFAULT: BigNumber
   REGISTRATION_AMOUNT_FREE: BigNumber
+  REGISTRATION_AMOUNT_FREE_MIN: BigNumber
   AUTHORIZED_REGISTRATION_AMOUNTS: Array<number>
 
   PRIZEPOOL_NUMBER: number
@@ -59,7 +61,10 @@ export const defaultGameConfig: GameConfig = {
 
   REGISTRATION_AMOUNT_DEFAULT: parseEther('0.0001'),
   REGISTRATION_AMOUNT_FREE: parseEther('0'),
-  AUTHORIZED_REGISTRATION_AMOUNTS: [0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10],
+  REGISTRATION_AMOUNT_FREE_MIN: parseEther('0.005'),
+  AUTHORIZED_REGISTRATION_AMOUNTS: [
+    0, 0.0001, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
+  ],
 
   PRIZEPOOL_NUMBER: 0.01,
   PRIZEPOOL_AMOUNT: parseEther('0.01'),
@@ -85,26 +90,33 @@ export const gameConfig: Record<string, GameConfig | null> = {
   '56': {
     ...defaultGameConfig,
     GAME_CREATION_AMOUNT: parseEther('0.5'),
-    AUTHORIZED_REGISTRATION_AMOUNTS: [0, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10],
+    AUTHORIZED_REGISTRATION_AMOUNTS: [
+      0, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 5, 10,
+    ],
     REGISTRATION_AMOUNT_DEFAULT: parseEther('0.1'),
+    REGISTRATION_AMOUNT_FREE_MIN: parseEther('0.01'),
   },
   '97': {
     ...defaultGameConfig,
     GAME_CREATION_AMOUNT: parseEther('0.01'),
     PLAYERS_DEFAULT: 5,
+    REGISTRATION_AMOUNT_FREE_MIN: parseEther('0.01'),
   },
   '5': {
     ...defaultGameConfig,
     GAME_CREATION_AMOUNT: parseEther('0.05'),
-    // GAME_CREATION_AMOUNT: parseEther('0.05'),
+    REGISTRATION_AMOUNT_FREE_MIN: parseEther('0.001'),
     PLAYERS_DEFAULT: 5,
   },
   '80001': {
     ...defaultGameConfig,
     GAME_CREATION_AMOUNT: parseEther('0.01'),
     // GAME_CREATION_AMOUNT: parseEther('50'),
+    REGISTRATION_AMOUNT_FREE_MIN: parseEther('1'),
     PLAYERS_DEFAULT: 5,
-    AUTHORIZED_REGISTRATION_AMOUNTS: [0, 0.0001, 0.5, 1, 2, 5, 10, 100, 200, 250],
+    AUTHORIZED_REGISTRATION_AMOUNTS: [
+      0, 0.0001, 0.5, 1, 2, 5, 10, 100, 200, 250,
+    ],
   },
 }
 

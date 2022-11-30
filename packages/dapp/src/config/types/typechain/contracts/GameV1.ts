@@ -204,6 +204,34 @@ export declare namespace GameV1Interface {
     encodedCron: string;
     prizes: GameV1Interface.PrizeStructOutput[];
   };
+
+  export type UpdateGameDataStruct = {
+    name: PromiseOrValue<BytesLike>;
+    maxPlayers: PromiseOrValue<BigNumberish>;
+    registrationAmount: PromiseOrValue<BigNumberish>;
+    playTimeRange: PromiseOrValue<BigNumberish>;
+    treasuryFee: PromiseOrValue<BigNumberish>;
+    creatorFee: PromiseOrValue<BigNumberish>;
+    encodedCron: PromiseOrValue<string>;
+  };
+
+  export type UpdateGameDataStructOutput = [
+    string,
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    string
+  ] & {
+    name: string;
+    maxPlayers: BigNumber;
+    registrationAmount: BigNumber;
+    playTimeRange: BigNumber;
+    treasuryFee: BigNumber;
+    creatorFee: BigNumber;
+    encodedCron: string;
+  };
 }
 
 export interface GameV1Interface extends utils.Interface {
@@ -247,6 +275,7 @@ export interface GameV1Interface extends utils.Interface {
     "setCreatorFee(uint256)": FunctionFragment;
     "setCronUpkeep(address)": FunctionFragment;
     "setEncodedCron(string)": FunctionFragment;
+    "setGameData((bytes32,uint256,uint256,uint256,uint256,uint256,string))": FunctionFragment;
     "setMaxPlayers(uint256)": FunctionFragment;
     "setName(bytes32)": FunctionFragment;
     "setPlayTimeRange(uint256)": FunctionFragment;
@@ -305,6 +334,7 @@ export interface GameV1Interface extends utils.Interface {
       | "setCreatorFee"
       | "setCronUpkeep"
       | "setEncodedCron"
+      | "setGameData"
       | "setMaxPlayers"
       | "setName"
       | "setPlayTimeRange"
@@ -450,6 +480,10 @@ export interface GameV1Interface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "setEncodedCron",
     values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setGameData",
+    values: [GameV1Interface.UpdateGameDataStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "setMaxPlayers",
@@ -600,6 +634,10 @@ export interface GameV1Interface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setEncodedCron",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setGameData",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -1163,6 +1201,11 @@ export interface GameV1 extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    setGameData(
+      _updateGameData: GameV1Interface.UpdateGameDataStruct,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     setMaxPlayers(
       _maxPlayers: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1369,6 +1412,11 @@ export interface GameV1 extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  setGameData(
+    _updateGameData: GameV1Interface.UpdateGameDataStruct,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   setMaxPlayers(
     _maxPlayers: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1562,6 +1610,11 @@ export interface GameV1 extends BaseContract {
 
     setEncodedCron(
       _encodedCron: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setGameData(
+      _updateGameData: GameV1Interface.UpdateGameDataStruct,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1927,6 +1980,11 @@ export interface GameV1 extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    setGameData(
+      _updateGameData: GameV1Interface.UpdateGameDataStruct,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     setMaxPlayers(
       _maxPlayers: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -2119,6 +2177,11 @@ export interface GameV1 extends BaseContract {
 
     setEncodedCron(
       _encodedCron: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setGameData(
+      _updateGameData: GameV1Interface.UpdateGameDataStruct,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
