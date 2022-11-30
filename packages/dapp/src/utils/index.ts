@@ -8,6 +8,7 @@ import { ChainId, Currency } from '@pancakeswap/sdk'
 import { bsc } from '@pancakeswap/wagmi/chains'
 import memoize from 'lodash/memoize'
 import { TokenAddressMap } from '@pancakeswap/tokens'
+import _isEqual from 'lodash/isEqual'
 import { chains } from './wagmi'
 
 // returns the checksummed address if the address is valid, otherwise returns false
@@ -81,3 +82,10 @@ export function isTokenOnList(defaultTokens: TokenAddressMap, currency?: Currenc
 }
 
 export const range = (start, end) => Array.from(Array(end + 1).keys()).slice(start)
+
+export const difference = (object, base) => {
+  return Object.entries(object).reduce(
+    (diff, [key, value]) => (_isEqual(base[key], value) ? diff : { ...diff, [key]: value }),
+    {},
+  )
+}

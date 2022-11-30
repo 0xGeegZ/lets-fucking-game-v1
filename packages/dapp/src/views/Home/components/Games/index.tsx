@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { GamesPageLayout } from 'views/Games'
 import { useWeb3React } from '@pancakeswap/wagmi'
-import GameCard from 'views/Games/components/GameCard/GameCard'
+import GameCard from 'views/Games/components/GameCard'
 import { sortGamesLaunching } from 'utils/sortGames'
 
 import { useGames } from 'state/games/hooks'

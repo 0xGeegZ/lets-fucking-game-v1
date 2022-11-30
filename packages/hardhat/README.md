@@ -4,7 +4,7 @@
 
 | Statements                                                                         | Functions                                                                        | Lines                                                                    |
 | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| ![Statements](https://img.shields.io/badge/statements-71.73%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-65.19%25-red.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-67.43%25-red.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-78.07%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-71.52%25-red.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-74.1%25-red.svg?style=flat) |
 
 # Prerequisites
 

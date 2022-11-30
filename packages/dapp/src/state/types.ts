@@ -114,9 +114,9 @@ export interface SerializedGame {
   encodedCron: string
   creator: string
   admin: string
-  treasuryFee: string
+  treasuryFee: number
   treasuryAmount: string
-  creatorFee: string
+  creatorFee: number
   creatorAmount: string
   playerAddresses: string[]
   prizes: SerializedPrizeData[]

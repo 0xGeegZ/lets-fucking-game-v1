@@ -9,6 +9,7 @@ export type TransactionType =
   | 'claim-prize'
   | 'vote-split-pot'
   | 'create-game'
+  | 'update-game'
   | 'pause-game'
   | 'unpause-game'
   | 'claim-treasury-fee'
@@ -23,7 +24,6 @@ export type TransactionType =
   | 'limit-order-cancellation'
   | 'limit-order-approval'
   | 'non-bsc-farm'
-
 export interface SerializableTransactionReceipt {
   to: string
   from: string

@@ -20,7 +20,8 @@ const getPathList = (t: ContextApi['t']): PathList => {
       '/': { title: t('Home') },
       '/games': { title: t('Games') },
       '/game': { title: t('Game') },
-      '/create-game': { title: t('Create Game') },
+      '/game/:id/update': { title: t('Update Game') },
+      '/game/create': { title: t('Create Game') },
     },
     defaultTitleSuffix: t("Let's F*#@$* Game"),
   }

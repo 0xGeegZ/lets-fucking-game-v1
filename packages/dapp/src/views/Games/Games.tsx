@@ -155,8 +155,8 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
   //   const userDataReady = !account || (!!account && userDataLoaded)
 
   // TODO GUIGUI FIRST HANDLE FILTERS
-  const [isNotFullOnly, setNotFullOnly] = useState(!isActive)
-  const [myPlayingGamesOnly, setMyPlayingGamesOnly] = useState(!isActive)
+  const [isNotFullOnly, setNotFullOnly] = useState(false)
+  const [myPlayingGamesOnly, setMyPlayingGamesOnly] = useState(false)
 
   const activeGames = games
     .filter((game) => (!isMyGames ? !game.isPaused && !game.isDeleted : !game.isDeleted))
@@ -391,7 +391,7 @@ const Games: React.FC<React.PropsWithChildren> = ({ children }) => {
               {t("You haven't created any games yet")}
             </Text>
             <Flex>
-              <FinishedTextLink href="/create-game" fontSize={['16px', null, '20px']} color="failure">
+              <FinishedTextLink href="/game/create" fontSize={['16px', null, '20px']} color="failure">
                 {t('Create a new game')}
               </FinishedTextLink>
             </Flex>

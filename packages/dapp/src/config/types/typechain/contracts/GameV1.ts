@@ -249,6 +249,7 @@ export interface GameV1Interface extends utils.Interface {
     "setEncodedCron(string)": FunctionFragment;
     "setMaxPlayers(uint256)": FunctionFragment;
     "setName(bytes32)": FunctionFragment;
+    "setPlayTimeRange(uint256)": FunctionFragment;
     "setTreasuryFee(uint256)": FunctionFragment;
     "startGame()": FunctionFragment;
     "transferAdminOwnership(address)": FunctionFragment;
@@ -306,6 +307,7 @@ export interface GameV1Interface extends utils.Interface {
       | "setEncodedCron"
       | "setMaxPlayers"
       | "setName"
+      | "setPlayTimeRange"
       | "setTreasuryFee"
       | "startGame"
       | "transferAdminOwnership"
@@ -458,6 +460,10 @@ export interface GameV1Interface extends utils.Interface {
     values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
+    functionFragment: "setPlayTimeRange",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setTreasuryFee",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
@@ -601,6 +607,10 @@ export interface GameV1Interface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setName", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setPlayTimeRange",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "setTreasuryFee",
     data: BytesLike
@@ -1163,6 +1173,11 @@ export interface GameV1 extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    setPlayTimeRange(
+      _playTimeRange: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     setTreasuryFee(
       _treasuryFee: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1364,6 +1379,11 @@ export interface GameV1 extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  setPlayTimeRange(
+    _playTimeRange: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   setTreasuryFee(
     _treasuryFee: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1552,6 +1572,11 @@ export interface GameV1 extends BaseContract {
 
     setName(
       _name: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setPlayTimeRange(
+      _playTimeRange: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1912,6 +1937,11 @@ export interface GameV1 extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    setPlayTimeRange(
+      _playTimeRange: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     setTreasuryFee(
       _treasuryFee: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -2099,6 +2129,11 @@ export interface GameV1 extends BaseContract {
 
     setName(
       _name: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setPlayTimeRange(
+      _playTimeRange: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
