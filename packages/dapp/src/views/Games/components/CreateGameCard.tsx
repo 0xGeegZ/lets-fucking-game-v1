@@ -141,7 +141,7 @@ const CardContent: React.FC = () => {
       <Text color="textSubtle" fontSize={12} mb="16px">
         {t('An active fixed-term CAKE staking position is required for activating game yield boosters.')}
       </Text>
-      <NextLink href="/create-game" passHref>
+      <NextLink href="/game/create" passHref>
         <Button as="a" width="100%" style={{ backgroundColor: theme.colors.textSubtle }}>
           {t('Create Game')}
         </Button>

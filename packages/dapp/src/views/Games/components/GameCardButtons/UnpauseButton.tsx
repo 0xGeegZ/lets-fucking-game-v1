@@ -24,7 +24,7 @@ const UnpauseButton: React.FC<React.PropsWithChildren<UnpauseButtonProps>> = ({ 
       endIcon={isPending ? <AutoRenewIcon spin color="currentColor" /> : null}
       onClick={handleUnpause}
     >
-      {t('Unpause game')}
+      {t('Resume game')}
     </Button>
   )
 }

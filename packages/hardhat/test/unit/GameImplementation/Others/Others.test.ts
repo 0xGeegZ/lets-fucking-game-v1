@@ -35,6 +35,7 @@ describe('GameV1Contract - Others', function () {
     describe('setMaxPlayers', function () {
       describe('when caller is not the admin or creator', function () {
         it('should revert with correct error message', async function () {
+          await this.deployedPayableGame.connect(this.owner).pause()
           await expectRevert(
             this.deployedPayableGame.connect(this.bob).setMaxPlayers(50),
             'Caller is not the admin or creator'
@@ -45,6 +46,7 @@ describe('GameV1Contract - Others', function () {
       describe('when caller is the creator', function () {
         it('should update the max players', async function () {
           const newMaxPlayers = 50
+          await this.deployedPayableGame.connect(this.owner).pause()
           await this.deployedPayableGame
             .connect(this.owner)
             .setMaxPlayers(newMaxPlayers)
@@ -54,6 +56,7 @@ describe('GameV1Contract - Others', function () {
 
         it('should revert with correct error message if max players is too low', async function () {
           const tooHighMaxPlayers = 1
+          await this.deployedPayableGame.connect(this.owner).pause()
           await expectRevert(
             this.deployedPayableGame
               .connect(this.owner)
@@ -64,6 +67,7 @@ describe('GameV1Contract - Others', function () {
 
         it('should revert with correct error message if max players is too high', async function () {
           const tooHighMaxPlayers = 1000
+          await this.deployedPayableGame.connect(this.owner).pause()
           await expectRevert(
             this.deployedPayableGame
               .connect(this.owner)
@@ -375,6 +379,7 @@ describe('GameV1Contract - Others', function () {
     context('setCronUpkeep', function () {
       describe('when called by non admin', function () {
         it('should revert with correct message', async function () {
+          await this.deployedPayableGame.connect(this.owner).pause()
           await expectRevert(
             this.deployedPayableGame
               .connect(this.bob)
@@ -391,6 +396,7 @@ describe('GameV1Contract - Others', function () {
             this.deployedPayableGame.address
           )
 
+          await this.deployedPayableGame.connect(this.owner).pause()
           await expect(
             this.deployedPayableGame
               .connect(this.owner)
@@ -404,6 +410,7 @@ describe('GameV1Contract - Others', function () {
         })
 
         it('should revert if keeper address is not a contract address', async function () {
+          await this.deployedPayableGame.connect(this.owner).pause()
           await expectRevert(
             this.deployedPayableGame
               .connect(this.owner)
@@ -423,6 +430,7 @@ describe('GameV1Contract - Others', function () {
     context('setEncodedCron', function () {
       describe('when called by non admin', function () {
         it('should revert with correct message', async function () {
+          await this.deployedPayableGame.connect(this.owner).pause()
           await expectRevert(
             this.deployedPayableGame
               .connect(this.bob)
@@ -433,23 +441,21 @@ describe('GameV1Contract - Others', function () {
       })
 
       describe('when called by admin', function () {
-        it.skip('should update keeper cron for the game and associated keeper job', async function () {
-          // TODO FIXME call toEncodedSpec from externalCron
-          expect(true).to.be.false
+        it('should update keeper cron for the game and associated keeper job', async function () {
+          await this.deployedPayableGame.connect(this.owner).pause()
+          const newEncodedCron = '0 1 * * *'
+          await this.deployedPayableGame
+            .connect(this.owner)
+            .setEncodedCron(newEncodedCron)
 
-          // const newEncodedCron = '* * * * *'
-          // await this.deployedPayableGame
-          //   .connect(this.owner)
-          //   .setEncodedCron(newEncodedCron)
+          const updatedEncodedCron =
+            await this.deployedPayableGame.encodedCron()
 
-          // const encodedCronBytes = await this.deployedPayableGame.encodedCron()
-
-          // const updatedEncodedCron =
-          //   this.cronExternal.toEncodedSpec(newEncodedCron)
-          // expect(updatedEncodedCron).to.be.equal(encodedCronBytes)
+          expect(updatedEncodedCron).to.be.equal(newEncodedCron)
         })
 
         it('should revert if keeper cron is not init', async function () {
+          await this.deployedPayableGame.connect(this.owner).pause()
           await expectRevert(
             this.deployedPayableGame.connect(this.owner).setEncodedCron(''),
             'Keeper cron need to be initialised'

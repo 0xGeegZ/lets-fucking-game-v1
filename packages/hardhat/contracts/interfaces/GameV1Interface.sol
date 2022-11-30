@@ -358,6 +358,13 @@ interface GameV1Interface {
     function setName(bytes32 _name) external;
 
     /**
+     * @notice Set the playTimeRange of the game
+     * @param _playTimeRange the new game playTimeRange
+     * @dev Callable by creator
+     */
+    function setPlayTimeRange(uint256 _playTimeRange) external;
+
+    /**
      * @notice Set the maximum allowed players for the game
      * @param _maxPlayers the new max players limit
      * @dev Callable by admin or creator

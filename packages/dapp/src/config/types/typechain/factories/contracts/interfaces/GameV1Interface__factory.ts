@@ -1026,6 +1026,19 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
+        name: "_playTimeRange",
+        type: "uint256",
+      },
+    ],
+    name: "setPlayTimeRange",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
         name: "_treasuryFee",
         type: "uint256",
       },
