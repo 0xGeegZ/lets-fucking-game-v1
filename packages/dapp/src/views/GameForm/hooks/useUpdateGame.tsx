@@ -297,7 +297,6 @@ export const useUpdateGame = (data) => {
       encodedCron: needUpdateEncodedCron,
       prizepool: needUpdatePrizepool,
     } = getGameUpdateFieldsList()
-
     if (needUpdateName) await updateName(formatBytes32String(needUpdateName))
     if (needUpdateMaxPlayers) await updateMaxPlayers(needUpdateMaxPlayers)
     if (needUpdatePlayTimeRange) await updatePlayTimeRange(needUpdatePlayTimeRange)
