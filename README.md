@@ -6,6 +6,8 @@
 
 This application was done during the [ChainLink Hackathon Fall 2022](https://devpost.com/software/let-s-fucking-game-be-the-last-to-win-the-prize)
 
+Hackathon version Release accessible [HERE](https://github.com/lets-fucking-game/lets-fucking-game/releases/tag/0.2.9).
+
 ## Contracts deployed on ETHEREUM CHAIN TESTNET GOERLI :
 
 **PRIMARY :**
