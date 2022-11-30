@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { SUPPORT_GAMES_TEST } from 'config/constants/supportChains'
 import { GamesPageLayout, GamesContext } from 'views/Games'
-import GameCard from 'views/Games/components/GameCard/GameCard'
+import GameCard from 'views/Games/components/GameCard'
 import { useWeb3React } from '@pancakeswap/wagmi'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 

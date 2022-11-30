@@ -146,6 +146,7 @@ describe('GameFactoryContract', function () {
       it('should update keeper address for the factory and all games and associated keeper job', async function () {
         const newCronUpkeep = this.cronUpkeepSecondary.address
         this.cronUpkeepSecondary.addDelegator(this.gameFactory.address)
+        await this.gameFactory.connect(this.owner).pauseAllGamesAndFactory()
         await expect(
           this.gameFactory.connect(this.owner).updateCronUpkeep(newCronUpkeep)
         )

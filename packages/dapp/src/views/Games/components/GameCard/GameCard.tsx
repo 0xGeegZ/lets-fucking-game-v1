@@ -1,4 +1,3 @@
-import { useTranslation } from '@pancakeswap/localization'
 import { Card, Flex } from '@pancakeswap/uikit'
 import ExpandableSectionButton from 'components/ExpandableSectionButton'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
@@ -9,11 +8,10 @@ import { DeserializedGame } from 'state/types'
 import parser from 'cron-parser'
 import moment from 'moment'
 import BigNumber from 'bignumber.js'
-import CardPlayerSection from './CardPlayerSection'
-import CardHeadingSection from './CardHeadingSection'
-
-import DetailsSection from './DetailsSection'
-import CardContentSection from './CardContentSection'
+import CardPlayerSection from 'views/Games/components/GameCard/components/CardPlayerSection'
+import CardHeadingSection from 'views/Games/components/GameCard/components/CardHeadingSection'
+import DetailsSection from 'views/Games/components/GameCard/components/DetailsSection'
+import CardContentSection from 'views/Games/components/GameCard/components/CardContentSection'
 
 const StyledCard = styled(Card)`
   align-self: baseline;
@@ -44,11 +42,6 @@ interface GameCardProps {
 
 const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, account }) => {
   const { chainId } = useActiveWeb3React()
-
-  const {
-    t,
-    currentLanguage: { locale },
-  } = useTranslation()
 
   const [showExpandableSection, setShowExpandableSection] = useState(false)
   const [cronHumanReadable, setCronHumanReadable] = useState('')
@@ -173,6 +166,7 @@ const GameCard: React.FC<React.PropsWithChildren<GameCardProps>> = ({ game, acco
         />
 
         <CardPlayerSection
+          id={id}
           address={address}
           roundId={roundId}
           isInProgress={isInProgress}

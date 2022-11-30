@@ -26,7 +26,7 @@ import Providers from '../Providers'
 import GlobalStyle from '../style/Global'
 import bunnyImage from '../../public/images/home/lunar-bunny/astronaut-bunny.png'
 
-const EasterEgg = dynamic(() => import('components/EasterEgg'), { ssr: false })
+// const EasterEgg = dynamic(() => import('components/EasterEgg'), { ssr: false })
 
 // This config is required for number formatting
 BigNumber.config({
@@ -146,7 +146,7 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
           <Component {...pageProps} />
         </Layout>
       </ShowMenu>
-      <EasterEgg iterations={2} />
+      {/* <EasterEgg iterations={2} /> */}
       <ToastListener />
       <FixedSubgraphHealthIndicator />
       <NetworkModal pageSupportedChains={Component.chains} />

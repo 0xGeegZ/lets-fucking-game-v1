@@ -23,6 +23,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
     address public cronUpkeep;
     string public encodedCron;
     uint256 private cronUpkeepJobId;
+    uint256 private constant DEFAULT_CRON_UPKEEP_JOB_ID = 999;
 
     uint256 public registrationAmount;
 
@@ -137,14 +138,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         require(_isGameAllPrizesStandard(), "This version only allow standard prize");
 
         // Register the keeper job
-        uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
-        cronUpkeepJobId = nextCronJobIDs;
-
-        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
-            address(this),
-            abi.encodeWithSignature("triggerDailyCheckpoint()"),
-            encodedCronBytes
-        );
+        _registerCronToUpkeep();
     }
 
     /**
@@ -576,6 +570,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
     function _pauseGame() internal whenNotPaused {
         _pause();
         CronUpkeepInterface(cronUpkeep).deleteCronJob(cronUpkeepJobId);
+        cronUpkeepJobId = DEFAULT_CRON_UPKEEP_JOB_ID;
     }
 
     /**
@@ -593,6 +588,18 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
                 player.hasPlayedRound = false;
             }
         }
+
+        // check if cronUpkeepJobId has already been updated by calling setEncodedCron before unpausing game
+        if (cronUpkeepJobId != DEFAULT_CRON_UPKEEP_JOB_ID) return;
+
+        _registerCronToUpkeep();
+    }
+
+    /**
+     * @notice Register the cron to the upkeep contract
+     * @dev Callable by admin or creator or factory
+     */
+    function _registerCronToUpkeep() internal onlyAdminOrCreatorOrFactory {
         uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
         cronUpkeepJobId = nextCronJobIDs;
 
@@ -731,13 +738,29 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
     }
 
     /**
+     * @notice Set the playTimeRange of the game
+     * @param _playTimeRange the new game playTimeRange
+     * @dev Callable by creator
+     */
+    function setPlayTimeRange(uint256 _playTimeRange) external override whenPaused onlyCreator {
+        playTimeRange = _playTimeRange;
+    }
+
+    /**
      * @notice Set the maximum allowed players for the game
      * @param _maxPlayers the new max players limit
      * @dev Callable by admin or creator
      */
     function setMaxPlayers(
         uint256 _maxPlayers
-    ) external override onlyAdminOrCreator onlyAllowedNumberOfPlayers(_maxPlayers) onlyIfGameIsNotInProgress {
+    )
+        external
+        override
+        whenPaused
+        onlyAdminOrCreator
+        onlyAllowedNumberOfPlayers(_maxPlayers)
+        onlyIfGameIsNotInProgress
+    {
         maxPlayers = _maxPlayers;
     }
 
@@ -808,20 +831,12 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @param _cronUpkeep the new keeper address
      * @dev Callable by admin or factory
      */
-    function setCronUpkeep(address _cronUpkeep) external override onlyAdminOrFactory onlyAddressInit(_cronUpkeep) {
+    function setCronUpkeep(
+        address _cronUpkeep
+    ) external override whenPaused onlyAdminOrFactory onlyAddressInit(_cronUpkeep) {
         cronUpkeep = _cronUpkeep;
+        _registerCronToUpkeep();
         emit CronUpkeepUpdated(cronUpkeepJobId, cronUpkeep);
-
-        uint256 nextCronJobIDs = CronUpkeepInterface(cronUpkeep).getNextCronJobIDs();
-        cronUpkeepJobId = nextCronJobIDs;
-
-        bytes memory encodedCronBytes = CronExternal.toEncodedSpec(encodedCron);
-
-        CronUpkeepInterface(cronUpkeep).createCronJobFromEncodedSpec(
-            address(this),
-            abi.encodeWithSignature("triggerDailyCheckpoint()"),
-            encodedCronBytes
-        );
     }
 
     /**
@@ -829,20 +844,11 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @param _encodedCron the new encoded cron as * * * * *
      * @dev Callable by admin or creator
      */
-    function setEncodedCron(string memory _encodedCron) external override onlyAdminOrCreator {
+    function setEncodedCron(string memory _encodedCron) external override whenPaused onlyAdminOrCreator {
         require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
-
         encodedCron = _encodedCron;
-        bytes memory encodedCronBytes = CronExternal.toEncodedSpec(encodedCron);
-
+        _registerCronToUpkeep();
         emit EncodedCronUpdated(cronUpkeepJobId, encodedCron);
-
-        CronUpkeepInterface(cronUpkeep).updateCronJob(
-            cronUpkeepJobId,
-            address(this),
-            abi.encodeWithSignature("triggerDailyCheckpoint()"),
-            encodedCronBytes
-        );
     }
 
     /**
