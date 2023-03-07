@@ -1,6 +1,7 @@
 import { Flex, Text, Input, CheckmarkIcon, WarningIcon } from '@pancakeswap/uikit'
 import { useState } from 'react'
 import styled from 'styled-components'
+import { formatEther } from '@ethersproject/units'
 
 import { escapeRegExp } from 'utils'
 
@@ -28,6 +29,7 @@ const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`) // match escaped "." charact
 
 const FreeGameAmountSelection = () => {
   const {
+    gameConfig,
     game,
     registrationAmount,
     freeGamePrizepoolAmount,
@@ -46,11 +48,21 @@ const FreeGameAmountSelection = () => {
 
   const chainSymbol = chain?.nativeCurrency?.symbol || 'BNB'
 
+  const { REGISTRATION_AMOUNT_FREE_MIN } = gameConfig
+
   const handleChange = (value: string) => {
     if (game && value !== game.prizepool) {
       setIsWarning(true)
     } else {
       setIsWarning(false)
+    }
+
+    if (Number(value) < Number(formatEther(REGISTRATION_AMOUNT_FREE_MIN))) {
+      setIsValid(false)
+      setMessage(`Prizepool amount should be more than ${formatEther(REGISTRATION_AMOUNT_FREE_MIN)} ${chainSymbol}`)
+    } else {
+      setIsValid(true)
+      setMessage('')
     }
 
     actions.setGameCreation(
@@ -66,6 +78,8 @@ const FreeGameAmountSelection = () => {
     setIsUpdated(true)
   }
 
+  const [isValid, setIsValid] = useState(true)
+  const [message, setMessage] = useState('')
   const [isWarning, setIsWarning] = useState(false)
   const [isUpdated, setIsUpdated] = useState(false)
 
@@ -108,6 +122,8 @@ const FreeGameAmountSelection = () => {
                   handleChange(nextUserInput)
                 }
               }}
+              isWarning={defaultPrizepoolAmount && !isValid}
+              isSuccess={defaultPrizepoolAmount && isValid}
               // universal input options
               inputMode="decimal"
               autoComplete="off"
@@ -120,11 +136,16 @@ const FreeGameAmountSelection = () => {
               spellCheck="false"
             />
             <Indicator>
-              {!isWarning && defaultPrizepoolAmount && <CheckmarkIcon color="success" />}
-              {isWarning && defaultPrizepoolAmount && <WarningIcon color="warning" />}
+              {!isWarning && isValid && defaultPrizepoolAmount && <CheckmarkIcon color="success" />}
+              {(isWarning || !isValid) && defaultPrizepoolAmount && <WarningIcon color="warning" />}
             </Indicator>
           </InputWrap>
-          {isWarning && (
+          {!isValid && (
+            <Text color="failure" fontSize="14px" py="4px" mb="16px" style={{ minHeight: 'auto' }}>
+              {message}
+            </Text>
+          )}
+          {isWarning && isValid && (
             <>
               <Text color="warning" fontSize="14px" pt="4px" mb="0px" style={{ minHeight: 'auto' }}>
                 {t(

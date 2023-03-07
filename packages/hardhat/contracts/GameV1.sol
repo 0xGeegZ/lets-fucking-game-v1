@@ -612,6 +612,18 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
         );
     }
 
+    /**
+     * @notice Set the encoded cron
+     * @param _encodedCron the new encoded cron as * * * * *
+     * @dev Callable by admin or creator
+     */
+    function _setEncodedCron(string memory _encodedCron) internal whenPaused onlyAdminOrCreator {
+        require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
+        encodedCron = _encodedCron;
+        _registerCronToUpkeep();
+        emit EncodedCronUpdated(cronUpkeepJobId, encodedCron);
+    }
+
     ///
     /// GETTERS FUNCTIONS
     ///
@@ -651,6 +663,30 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
                 admin: owner,
                 encodedCron: encodedCron
             });
+    }
+
+    /**
+     * @notice Return game informations
+     * @dev Callable by admin or creator
+     * @param _updateGameData the game data to update
+     *  _updateGameData.name the name of the game
+     *  _updateGameData.maxPlayers the maximum players of the game
+     *  _updateGameData.registrationAmount the registration amount of the game
+     *  _updateGameData.playTimeRange the player time range of the game
+     *  _updateGameData.treasuryFee the treasury fee of the game
+     *  _updateGameData.creatorFee the creator fee of the game
+     *  _updateGameData.encodedCron the encoded cron of the game
+     */
+    function setGameData(UpdateGameData memory _updateGameData) external override whenPaused onlyAdminOrCreator {
+        if (_updateGameData.name != name) name = _updateGameData.name;
+        if (_updateGameData.maxPlayers != maxPlayers) maxPlayers = _updateGameData.maxPlayers;
+        if (_updateGameData.registrationAmount != registrationAmount)
+            registrationAmount = _updateGameData.registrationAmount;
+        if (_updateGameData.playTimeRange != playTimeRange) playTimeRange = _updateGameData.playTimeRange;
+        if (_updateGameData.treasuryFee != treasuryFee) treasuryFee = _updateGameData.treasuryFee;
+        if (_updateGameData.creatorFee != creatorFee) creatorFee = _updateGameData.creatorFee;
+        if (keccak256(abi.encodePacked(_updateGameData.encodedCron)) != keccak256(abi.encodePacked(encodedCron)))
+            _setEncodedCron(_updateGameData.encodedCron);
     }
 
     /**
@@ -845,10 +881,7 @@ contract GameV1 is GameV1Interface, ReentrancyGuard, Pausable {
      * @dev Callable by admin or creator
      */
     function setEncodedCron(string memory _encodedCron) external override whenPaused onlyAdminOrCreator {
-        require(bytes(_encodedCron).length != 0, "Keeper cron need to be initialised");
-        encodedCron = _encodedCron;
-        _registerCronToUpkeep();
-        emit EncodedCronUpdated(cronUpkeepJobId, encodedCron);
+        _setEncodedCron(_encodedCron);
     }
 
     /**

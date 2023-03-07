@@ -100,6 +100,16 @@ interface GameV1Interface {
         string encodedCron;
     }
 
+    struct UpdateGameData {
+        bytes32 name;
+        uint256 maxPlayers;
+        uint256 registrationAmount;
+        uint256 playTimeRange;
+        uint256 treasuryFee;
+        uint256 creatorFee;
+        string encodedCron;
+    }
+
     ///
     ///EVENTS
     ///
@@ -294,6 +304,20 @@ interface GameV1Interface {
      *  gameData.isInProgress a boolean set to true if game is in progress
      */
     function getGameData() external view returns (GameData memory gameData);
+
+    /**
+     * @notice Return game informations
+     * @dev Callable by admin or creator
+     * @param _updateGameData the game data to update
+     *  _updateGameData.name the name of the game
+     *  _updateGameData.maxPlayers the maximum players of the game
+     *  _updateGameData.registrationAmount the registration amount of the game
+     *  _updateGameData.playTimeRange the player time range of the game
+     *  _updateGameData.treasuryFee the treasury fee of the game
+     *  _updateGameData.creatorFee the creator fee of the game
+     *  _updateGameData.encodedCron the encoded cron of the game
+     */
+    function setGameData(UpdateGameData memory _updateGameData) external;
 
     /**
      * @notice Return the players addresses for the current game
